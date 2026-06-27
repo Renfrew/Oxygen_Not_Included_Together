@@ -15,7 +15,7 @@ namespace ONI_Together.Networking.OxySync.Components
         public static OxySyncManager? Instance { get; private set; }
 
         private readonly List<NetworkBehaviour> _behaviours = new();
-        private readonly List<(int Hash, Variant Value)> _changedScratch = new();
+        private readonly Dictionary<int, List<(int Hash, Variant Value)>> _changedByGroup = new();
 
         public int RegisteredCount => _behaviours.Count;
         public IReadOnlyList<NetworkBehaviour> AllBehaviours => _behaviours;
@@ -77,6 +77,18 @@ namespace ONI_Together.Networking.OxySync.Components
                 return true;
             };
 
+            NetworkBehaviour.SendClientRpcToGroup = (group, netId, methodHash, args) =>
+            {
+                PacketSender.SendToGroup(group, new ClientRpcPacket
+                {
+                    NetId = netId,
+                    MethodHash = methodHash,
+                    Args = args,
+                    TargetPlayerId = ulong.MaxValue,
+                });
+                return true;
+            };
+
             NetworkBehaviour.LocalUserIdQuery = () => MultiplayerSession.LocalUserID;
 
             NetworkBehaviour.SendTargetRpcToPlayer = (targetPlayer, netId, methodHash, args) =>
@@ -90,12 +102,40 @@ namespace ONI_Together.Networking.OxySync.Components
                 });
                 return true;
             };
+
+            App.OnPostLoadScene += OnPostLoadScene;
+        }
+
+        private void OnPostLoadScene()
+        {
+            if (!Utils.IsInGame()) return;
+            Game.Instance.OnSpawnComplete += InitWorldTracking;
+        }
+
+        private void InitWorldTracking()
+        {
+            Game.Instance.Subscribe(1983128072, OnActiveWorldChanged);
+            if (ClusterManager.Instance != null)
+                InterestGroupManager.SubscribeToGroup(ClusterManager.Instance.activeWorldId);
+            Game.Instance.OnSpawnComplete -= InitWorldTracking;
+        }
+
+        private void OnActiveWorldChanged(object data)
+        {
+            var tuple = (Tuple<int, int>)data;
+            InterestGroupManager.UnsubscribeFromGroup(tuple.second);
+            InterestGroupManager.SubscribeToGroup(tuple.first);
         }
 
         private void OnDestroy()
         {
             NetworkBehaviour.OnSpawned -= Register;
             NetworkBehaviour.OnBehaviourCleanUp -= Unregister;
+
+            App.OnPostLoadScene -= OnPostLoadScene;
+
+            if (Game.Instance != null)
+                Game.Instance.Unsubscribe(1983128072, OnActiveWorldChanged);
 
             if (Instance == this)
                 Instance = null;
@@ -105,6 +145,13 @@ namespace ONI_Together.Networking.OxySync.Components
         {
             if (!_behaviours.Contains(behaviour))
                 _behaviours.Add(behaviour);
+
+            if (behaviour.InterestGroup == -1)
+            {
+                int worldId = behaviour.GetMyWorldId();
+                if (worldId >= 0)
+                    behaviour.InterestGroup = worldId;
+            }
         }
 
         private void Unregister(NetworkBehaviour behaviour)
@@ -131,7 +178,7 @@ namespace ONI_Together.Networking.OxySync.Components
 
                 behaviour._lastSyncTime = Time.unscaledTime;
 
-                _changedScratch.Clear();
+                 _changedByGroup.Clear();
                 var fields = behaviour.SyncVarFields;
 
                 for (int j = 0; j < fields.Count; j++)
@@ -143,40 +190,57 @@ namespace ONI_Together.Networking.OxySync.Components
 
                     if (ValuesDiffer(currentVariant, lastVariant, field.Epsilon))
                     {
-                        _changedScratch.Add((field.Hash, currentVariant));
+                        int group = field.InterestGroup;
+                        if (group == -1) group = behaviour.InterestGroup;
+                        if (!_changedByGroup.TryGetValue(group, out var list))
+                        {
+                            list = new List<(int Hash, Variant Value)>();
+                            _changedByGroup[group] = list;
+                        }
+                        list.Add((field.Hash, currentVariant));
                     }
                 }
 
-                if (_changedScratch.Count == 0) continue;
+                if (_changedByGroup.Count == 0) continue;
 
                 var identity = behaviour.GetComponent<NetworkIdentity>();
                 if (identity == null || identity.NetId == 0)
                     continue;
 
                 int netId = identity.NetId;
-
                 long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                if (_changedScratch.Count == 1)
+
+                foreach (var kvp in _changedByGroup)
                 {
-                    var update = _changedScratch[0];
-                    PacketSender.SendToAllClients(new SyncVarPacket
+                    int groupId = kvp.Key;
+                    var updates = kvp.Value;
+
+                     if (updates.Count == 1)
                     {
-                        NetId = netId,
-                        FieldHash = update.Hash,
-                        Value = update.Value,
-                        Timestamp = timestamp,
-                    }, PacketSendMode.Unreliable);
-                }
-                else
-                {
-                    var batch = new SyncVarBatchPacket(netId, _changedScratch)
+                        var update = updates[0];
+                        PacketSender.SendToGroup(groupId, new SyncVarPacket
+                        {
+                            NetId = netId,
+                            FieldHash = update.Hash,
+                            Value = update.Value,
+                            Timestamp = timestamp,
+                        }, PacketSendMode.Unreliable);
+                    }
+                    else
                     {
-                        Timestamp = timestamp,
-                    };
-                    PacketSender.SendToAllClients(batch, PacketSendMode.Unreliable);
+                        var batch = new SyncVarBatchPacket(netId, updates)
+                        {
+                            Timestamp = timestamp,
+                        };
+                        PacketSender.SendToGroup(groupId, batch, PacketSendMode.Unreliable);
+                    }
                 }
 
                 behaviour.SyncLastSentValues();
+
+                int currentWorld = behaviour.GetMyWorldId();
+                if (currentWorld >= 0 && currentWorld != behaviour.InterestGroup)
+                    behaviour.InterestGroup = currentWorld;
             }
         }
 
