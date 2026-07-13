@@ -36,6 +36,8 @@ public class OxySyncChat : NetworkBehaviour
     private static List<PendingMessage> _chatHistory = new();
     private HashSet<ulong> _knownPlayers = new();
 
+    private List<long> _timestampCache = new ();
+    
     public static IReadOnlyList<PendingMessage> ChatHistory => _chatHistory;
 
     public override void OnSpawn()
@@ -188,7 +190,12 @@ public class OxySyncChat : NetworkBehaviour
     }*/
     public void AddMessageToChatbox(string sender, string message, long timestamp, Color color)
     {
-        string timestampString = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
-        UnityChatBoxUI.Instance.SendNewChatMessage(sender, timestampString, message, color);
+        // Only add messages to the chatbox if they don't already exist. Protects against retransmissions duplicating messages
+        if (!_timestampCache.Contains(timestamp))
+        {
+            string timestampString = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
+            UnityChatBoxUI.Instance.SendNewChatMessage(sender, timestampString, message);
+            _timestampCache.Add(timestamp);
+        }
     }
 }
