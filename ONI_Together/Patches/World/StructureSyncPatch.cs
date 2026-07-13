@@ -93,7 +93,7 @@ namespace ONI_Together.Patches.World
             __instance.gameObject.AddOrGet<ToiletStructureSyncer>();
         }
     }
-    
+
     [HarmonyPatch(typeof(Reactor), nameof(Reactor.OnSpawn))]
     public static class ReactorSpawnPatch
     {
@@ -121,6 +121,16 @@ namespace ONI_Together.Patches.World
         {
             using var _ = Profiler.Scope();
             __instance.gameObject.AddOrGet<PrintingPodSyncer>();
+        }
+    }
+
+    [HarmonyPatch(typeof(BottleEmptier), nameof(BottleEmptier.OnSpawn))]
+    public static class BottleEmptierSpawnPatch
+    {
+        public static void Postfix(BottleEmptier __instance)
+        {
+            using var _ = Profiler.Scope();
+            __instance.gameObject.AddOrGet<BottleEmptierSyncer>();
         }
     }
 }
