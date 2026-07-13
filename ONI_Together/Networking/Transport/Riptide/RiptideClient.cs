@@ -318,8 +318,7 @@ namespace ONI_Together.Networking.Transport.Lan
             else
             {
                 string name = MultiplayerSession.KnownPlayerNames.TryGetValue(id, out var cached) ? cached : $"Player {id}";
-                ChatScreen.PendingMessage pending = ChatScreen.GeneratePendingMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
-                ChatScreen.QueueMessage(pending);
+                ChatScreen.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
                 Utils.PauseSimOnPlayerLeft();
 			}
 			var boxedId = Boxed<ulong>.Get(id);
