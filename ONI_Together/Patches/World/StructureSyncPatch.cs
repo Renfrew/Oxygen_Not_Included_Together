@@ -104,6 +104,16 @@ namespace ONI_Together.Patches.World
         }
     }
 
+    [HarmonyPatch(typeof(Grave), nameof(Grave.OnSpawn))]
+    public static class GraveSpawnPatch
+    {
+        public static void Postfix(Grave __instance)
+        {
+            using var _ = Profiler.Scope();
+            __instance.gameObject.AddOrGet<GraveSyncer>();
+        }
+    }
+
     [HarmonyPatch(typeof(Growing), nameof(Growing.OnSpawn))]
     public static class Growing_OnSpawn_OxySync_Patch
     {
