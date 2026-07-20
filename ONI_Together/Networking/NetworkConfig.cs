@@ -100,7 +100,6 @@ namespace ONI_Together.Networking
         public static void Stop()
         {
             GameClient.IsHardSyncInProgress = false;
-
             switch(transport)
             {
                 case NetworkTransport.STEAMWORKS:
