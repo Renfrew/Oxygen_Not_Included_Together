@@ -381,9 +381,6 @@ namespace ONI_Together.Misc
 			return cells.ToArray();
 		}
 
-
-
-
 		[HarmonyPatch(typeof(LogicPorts), nameof(LogicPorts.OnSpawn))]
 		public class LogicPorts_OnSpawn_Patch
 		{
