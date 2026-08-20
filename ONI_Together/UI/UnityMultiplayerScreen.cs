@@ -636,8 +636,6 @@ namespace ONI_Together.UI
 				STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT,
 				STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT)
 				.SetOnFromCode(Configuration.Instance.Host.Server.PauseSimOnPlayerDisconnect);
-
-			//AddOrGetLobbySettingsEntry_NumInput("TestNumInput", (i) => Debug.Log("writtenNumber: " + i), "Test Number input", "Test", "e",42);
 		}
 
 		void ToggleHardSyncSetting(bool hardSyncEnabled)
@@ -697,10 +695,10 @@ namespace ONI_Together.UI
 			return numOption;
 		}
 
-		static void ParseNumber(string text, System.Action<int> OnParse)
+		static void ParseNumber(string text, System.Action<int> onParse)
 		{
 			if (int.TryParse(text, out int value))
-				OnParse(value);
+				onParse(value);
 		}
 
 		public FCycle AddOrGetLobbySettingsEntry_Cycle(string id, List<FCycle.Option> options, System.Action<FCycle.Option> onOptionSelect, string label, string tooltip = "")
