@@ -14,7 +14,6 @@ using ONI_Together.Networking.Packets.Tools.Deconstruct;
 using ONI_Together.Networking.Packets.Tools.Dig;
 using ONI_Together.Networking.Packets.Tools.Disinfect;
 using ONI_Together.Networking.Packets.Tools.Move;
-using ONI_Together.Networking.Packets.Tools.Prioritize;
 using ONI_Together.Networking.Packets.World;
 using System;
 using System.Collections.Generic;
