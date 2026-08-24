@@ -12,7 +12,6 @@ namespace ONI_Together.Networking.OxySync.Components
     [FixedInterestGroup]
     public class WorkableSyncer : NetworkBehaviour
     {
-
         private string GetWorkableTypeId(Workable workable)
         {
             return workable?.GetType().AssemblyQualifiedName ?? string.Empty;
@@ -85,10 +84,10 @@ namespace ONI_Together.Networking.OxySync.Components
         }
 
         public static void RegisterNetId(GameObject parent = null) {
-            var root = parent == null ? Game.Instance.gameObject : parent;
+            var root = parent ?? Game.Instance.gameObject;
             if (Instance == null)
             {
-                DebugConsole.LogWarning("[WorkableSyncer] Initializing WorkableSyncer instance.");
+                DebugConsole.Log("[WorkableSyncer] Initializing WorkableSyncer instance.");
                 var syncerRoot = new GameObject("WorkableSyncer");
                 syncerRoot.transform.SetParent(root.transform);
                 Instance = syncerRoot.AddComponent<WorkableSyncer>();
@@ -161,6 +160,19 @@ namespace ONI_Together.Networking.OxySync.Components
             Instance?.workableAuthorization.Remove(Instance.BuildAuthKey(workable, method));
         }
 
+        private static readonly HashSet<Type> workablesToSkip =
+        [
+            // Pickupables
+            typeof(Bottler),
+            typeof(IceKettleWorkable),
+            typeof(LiquidPumpingStation),
+            typeof(Pickupable),
+
+            typeof(DefragmentationZone),
+            typeof(RancherChore.RancherWorkable),
+        ];
+
+
         public void RequestUpdateWorkable(MethodType method, Workable workable, WorkerBase worker)
         {
             if (!MultiplayerSession.IsHostInSession || !MultiplayerSession.SessionHasPlayers)
@@ -173,6 +185,9 @@ namespace ONI_Together.Networking.OxySync.Components
                 DebugConsole.LogWarning($"[WorkableSyncer] Skip sync for method {method}: WorkableNullOrDestroyed={workable.IsNullOrDestroyed()}, WorkerNullOrDestroyed={worker.IsNullOrDestroyed()}");
                 return;
             }
+
+            if (workablesToSkip.Contains(workable.GetType()))
+                return;
 
             int workableNetId = workable.GetNetId();
             int workerNetId = worker.GetNetId();
@@ -189,12 +204,13 @@ namespace ONI_Together.Networking.OxySync.Components
             try
             {
                 string workableTypeId = GetWorkableTypeId(workable);
-                DebugConsole.Log($"[WorkableSyncer] Worker has NetId {workerNetId} '{method}' on workable {workableNetId} : {workableTypeId}");
                 CallClientRpc(nameof(RpcUpdateWorkable), method, workableNetId, workableTypeId, workerNetId);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                DebugConsole.LogWarning($"[WorkableSyncer] Failed to request update for method {method}. WorkableNetId={workableNetId}, WorkerNetId={workerNetId}. Error: {ex}");
+                DebugConsole.LogWarning(
+                    $"[WorkableSyncer] Failed to request update for method {method}. " +
+                    $"WorkableNetId={workableNetId}, WorkerNetId={workerNetId}. Error: {ex}");
             }
         }
 
@@ -213,7 +229,8 @@ namespace ONI_Together.Networking.OxySync.Components
                 var workableType = ResolveWorkableType(normalizedTypeId);
                 if (workableType == null)
                 {
-                    DebugConsole.LogWarning($"[WorkableSyncer] Could not resolve workable type '{normalizedTypeId}' for netId {workableNetId}");
+                    DebugConsole.LogWarning(
+                        $"[WorkableSyncer] Could not resolve workable type '{normalizedTypeId}' for netId {workableNetId}");
                     return;
                 }
 
@@ -226,10 +243,8 @@ namespace ONI_Together.Networking.OxySync.Components
             }
 
             workable ??= identity.gameObject.GetComponent<Workable>();
-            if (workable == null)
-            {
+            if (workable == null || workablesToSkip.Contains(workable.GetType()))
                 return;
-            }
 
             if (workerNetId == 0 || !NetworkIdentityRegistry.TryGetComponent<WorkerBase>(workerNetId, out var worker) || worker == null || worker.gameObject.IsNullOrDestroyed())
             {
@@ -237,8 +252,6 @@ namespace ONI_Together.Networking.OxySync.Components
             }
 
             workableAuthorization[BuildAuthKey(workableNetId, workableTypeId, method)] = workerNetId;
-
-            DebugConsole.Log($"[WorkableSyncer] [Client] Worker has NetId {workerNetId} '{method}' on workable {workableNetId} : {workableTypeId}");
 
             switch (method)
             {
