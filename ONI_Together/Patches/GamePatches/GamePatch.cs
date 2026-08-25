@@ -5,6 +5,7 @@ using ONI_Together.Misc.World;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.OxySync.Components;
+using ONI_Together.Networking.OxySync.Components.Tools;
 using ONI_Together.UI;
 using Shared.Profiling;
 
@@ -70,6 +71,7 @@ namespace ONI_Together.Patches.GamePatches
       Game.Instance.gameObject.AddComponent<LogicPortManager>();
       PlantLifecycleSyncer.Instance?.SetNetworkIdentity();
       WorkableSyncer.RegisterNetId(Game.Instance.gameObject);
+      MoveToLocationToolSyncer.RegisterNetId(Game.Instance.gameObject);
     }
   }
 }
