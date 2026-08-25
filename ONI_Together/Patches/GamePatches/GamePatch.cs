@@ -69,9 +69,8 @@ namespace ONI_Together.Patches.GamePatches
       }
 
       Game.Instance.gameObject.AddComponent<LogicPortManager>();
-
       PlantLifecycleSyncer.Instance?.SetNetworkIdentity();
-      WorkableSyncer.RegisterNetId();
+      WorkableSyncer.RegisterNetId(Game.Instance.gameObject);
       MoveToLocationToolSyncer.RegisterNetId(Game.Instance.gameObject);
     }
   }
