@@ -14,23 +14,7 @@ namespace ONI_Together.Networking.Packets.World
 	/// </summary>
 	public class GroundItemPickedUpPacket : IPacket
 	{
-		private static readonly HashSet<int> PendingPickupNetIds = [];
-
 		public int NetId;
-
-		public static bool TryConsumePending(int netId)
-		{
-			using var _ = Profiler.Scope();
-			return PendingPickupNetIds.Remove(netId);
-		}
-
-		public static void ClearPending()
-		{
-			using var _ = Profiler.Scope();
-			int n = PendingPickupNetIds.Count;
-			PendingPickupNetIds.Clear();
-			DebugConsole.Log($"[PendingPickup] cleared count={n}");
-		}
 
 		public void Serialize(BinaryWriter writer)
 		{

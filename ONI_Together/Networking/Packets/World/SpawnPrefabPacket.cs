@@ -237,7 +237,7 @@ public class SpawnPrefabPacket : IPacket
                 // Race condition guard: ONLY for loose substance/ore ground resources, NEVER destroy living creatures / plants / minions / buildings!
                 if (HasElementData || go.GetComponent<SubstanceChunk>() != null)
                 {
-                    if (GroundItemPickedUpPacket.TryConsumePending(NetId) || StorageItemPacket.TryConsumePending(NetId))
+                    if (PendingPickupRegistry.TryConsume(NetId))
                     {
                         DebugConsole.Log($"[SpawnPrefabPacket] Consumed pending pickup for resource NetId {NetId}");
                         Util.KDestroyGameObject(go);

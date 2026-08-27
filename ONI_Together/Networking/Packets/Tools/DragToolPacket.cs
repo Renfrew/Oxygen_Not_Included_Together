@@ -122,7 +122,6 @@ namespace ONI_Together.Networking.Packets.Tools
 				ApplyFilterData(filteredToolInstance, currentFilterTargets);
 			}
 
-
 			Vector3 cachedDownPos = ToolInstance.downPos;
 			ProcessingIncoming = true;
 			bool completed = false;

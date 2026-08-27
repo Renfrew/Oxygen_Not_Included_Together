@@ -97,16 +97,21 @@ namespace ONI_Together.Patches.World
             }
         }
 
+        // `TakeUnit` is not patched separately: it delegates to `Take`, so a patch on it
+        // would send a second packet for the same pickup.
         [HarmonyPatch(typeof(Pickupable), nameof(Pickupable.Take))]
         public static class PickupableTakePatch
         {
-            public static void Postfix(Pickupable __instance)
+            public static void Postfix(Pickupable __instance, Pickupable __result)
             {
                 using var _ = Profiler.Scope();
                 try
                 {
                     if (!MultiplayerSession.IsHost || !MultiplayerSession.InActiveSession)
                         return;
+
+                     // nothing was taken
+                    if (__result == null)
 
                     if (__instance == null || __instance.TotalAmount > 0f)
                         return;
@@ -119,38 +124,17 @@ namespace ONI_Together.Patches.World
                     var identity = __instance.GetNetIdentity();
                     if (identity == null || identity.NetId == 0)
                         return;
-                    PacketSender.SendToAllClients(new PickupItemPacket { NetId = identity.NetId });
-                }
-                catch (System.Exception ex)
-                {
-                    DebugConsole.LogError($"[PickupableTakePatch] Exception: {ex}");
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(Pickupable), nameof(Pickupable.TakeUnit))]
-        public static class PickupableTakeUnitPatch
-        {
-            public static void Postfix(Pickupable __instance)
-            {
-                using var _ = Profiler.Scope();
-                try
-                {
-                    if (!MultiplayerSession.IsHost || !MultiplayerSession.InActiveSession)
-                        return;
-
-                    if (__instance == null || __instance.TotalAmount > 0f)
-                        return;
-
-                    if (__instance.GetComponent<CreatureBrain>() != null || 
-                        __instance.GetComponent<Health>() != null || 
-                        __instance.GetComponent<MinionIdentity>() != null)
-                        return;
-
-                    var identity = __instance.GetNetIdentity();
-                    if (identity == null || identity.NetId == 0)
-                        return;
-                    PacketSender.SendToAllClients(new PickupItemPacket { NetId = identity.NetId });
+                    
+                    // A partial take splits off a new pickupable and leaves the source stack alive.
+                    // A full take returns the source itself.
+                    bool sourceRemains = __result != __instance;
+                    PacketSender.SendToAllClients(new PickupItemPacket
+                    {
+                        NetId = identity.NetId,
+                        UnitsTaken = __result.TotalAmount,
+                        UnitsRemaining = sourceRemains ? __instance.TotalAmount : 0f,
+                        SourceRemains = sourceRemains,
+                    });
                 }
                 catch (System.Exception ex)
                 {

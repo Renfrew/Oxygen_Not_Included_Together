@@ -89,6 +89,12 @@ namespace ONI_Together.Patches.World.Buildings
 			{
 				using var _ = Profiler.Scope();
 
+				if (__instance.IsNullOrDestroyed())
+                {
+                    __result = false;
+                    return false;
+                }
+
 				if (!MultiplayerSession.IsClient)
 					return true;
 

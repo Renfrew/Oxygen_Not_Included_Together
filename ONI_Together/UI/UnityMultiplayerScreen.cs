@@ -696,7 +696,7 @@ namespace ONI_Together.UI
 				STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE)
 				.SetValueById(Configuration.Instance.Host.Server.TickRate.ToString());
 		}
-		
+
 		void ToggleHardSyncSetting(bool hardSyncEnabled)
 		{
 			var config = Configuration.Instance;
@@ -847,7 +847,7 @@ namespace ONI_Together.UI
 
 		void StartHostingGame()
 		{
-            switch (CurrentHostMode)
+			switch (CurrentHostMode)
 			{
 				case HostMode.Steam:
 					StartHostingSteamGame();
@@ -862,7 +862,7 @@ namespace ONI_Together.UI
 			using var _ = Profiler.Scope();
 			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.LITENETLIB);
 
-            string ipAdress = HostIPInput.Text;
+			string ipAdress = HostIPInput.Text;
 			string portText = HostPortInput.Text;
 
 			if (int.TryParse(portText, out int port))
@@ -915,10 +915,10 @@ namespace ONI_Together.UI
 		private void StartHostingSteamGame()
 		{
 			using var _ = Profiler.Scope();
-            NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
+			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
 
-            // Save the host config
-            StoreHostConfigurationSettings();
+			// Save the host config
+			StoreHostConfigurationSettings();
 
 			if (Utils.IsInGame())
 			{
