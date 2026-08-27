@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HarmonyLib;
 using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using UnityEngine;
@@ -122,6 +123,21 @@ namespace ONI_Together.Networking.Packets.Tools
 				ApplyFilterData(filteredToolInstance, currentFilterTargets);
 			}
 
+			var priorityScreen = ToolMenu.Instance?.PriorityScreen;
+			Traverse lastSelectedPriority = null;
+			PrioritySetting prioritySetting = default;
+			bool hasPriorityScreen = priorityScreen != null;
+			if (hasPriorityScreen)
+			{
+				lastSelectedPriority = Traverse.Create(priorityScreen).Field("lastSelectedPriority");
+				prioritySetting = lastSelectedPriority.GetValue<PrioritySetting>();
+				lastSelectedPriority.SetValue(Priority);
+			}
+			else
+			{
+				DebugConsole.LogWarning("[FilteredDragToolPacket] PriorityScreen is null in OnDispatched; applying tool without overriding priority");
+			}
+
 			Vector3 cachedDownPos = ToolInstance.downPos;
 			ProcessingIncoming = true;
 			bool completed = false;
@@ -156,6 +172,9 @@ namespace ONI_Together.Networking.Packets.Tools
 					if (n <= 5 || n % 100 == 0)
 						DebugConsole.LogWarning($"[DragTool] ProcessingIncoming restored after exception #{n}");
 				}
+
+				if (hasPriorityScreen)
+					lastSelectedPriority.SetValue(prioritySetting);
 
 				if (isFilteredTool)
 					ApplyFilterData(filteredToolInstance, cachedFilters);
