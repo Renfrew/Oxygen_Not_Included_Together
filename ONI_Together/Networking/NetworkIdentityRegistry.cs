@@ -39,7 +39,6 @@ namespace ONI_Together.Networking
 
 			identities.Remove(netId);
 			PlayAnimPacket.ForgetNetId(netId);
-			NavigationSequence.Forget(netId);
 		}
 
 
@@ -132,7 +131,6 @@ namespace ONI_Together.Networking
 			PendingPickupRegistry.Clear();
 
 			PlayAnimPacket.ClearState();
-			NavigationSequence.Clear();
 		}
 
 		public static IEnumerable<NetworkIdentity> AllIdentities => identities.Values;
