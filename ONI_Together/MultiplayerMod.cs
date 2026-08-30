@@ -55,6 +55,8 @@ namespace ONI_Together
 				DebugConsole.Init(); // Init console first to catch logs
 				PacketTracker.Init();
 				DebugConsole.Log("[ONI_Together] Loaded Oxygen Not Included Together Multiplayer Mod.");
+				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
+				DebugConsole.Log($"[ONI_Together] Version: {version}");
 
                 // CHECKPOINT 1
                 System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 1: Pre-DebugMenu\n");

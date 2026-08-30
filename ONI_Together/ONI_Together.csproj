@@ -3,15 +3,15 @@
 	<!-- General Package Properties -->
 	<PropertyGroup>
 		<PackageId>ItsLukesMultiplayerMod</PackageId>
-		<Version>0.8.0-alpha</Version>
-		<Authors>ItsLuke,Sgt_Lmalas</Authors>
+		<Version>0.8.0.3</Version>
+		<Authors>ItsLuke,Sgt_Lmalas,Renfrew</Authors>
 		<Copyright>$(AssemblyCopyright)</Copyright>
 	</PropertyGroup>
 
 	<!-- Mod Info, used to generate yaml files on the fly -->
 	<PropertyGroup>
-		<ModName>Oxygen Not Included Together</ModName>
-		<ModDescription>Adds multiplayer to Oxygen Not Included! By Lyraedan</ModDescription>
+		<ModName>ONI Together - experimental</ModName>
+		<ModDescription>Adds multiplayer to Oxygen Not Included! By Renfrew</ModDescription>
 		<MinimumSupportedBuild>$(TargetGameVersion)</MinimumSupportedBuild>
 		<APIVersion>2</APIVersion>
 	</PropertyGroup>
@@ -25,6 +25,7 @@
 		<GenerateMetadata>true</GenerateMetadata>
 		<!--Merges dlls into one, becomes relevant if PLib is added, does not play nice with gDrives transitive nuget requirements-->
 		<IsPacked>true</IsPacked>
+		<AssemblyName>ONI_Together_experimental</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
