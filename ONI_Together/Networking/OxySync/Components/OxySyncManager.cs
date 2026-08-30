@@ -23,19 +23,15 @@ namespace ONI_Together.Networking.OxySync.Components
         private readonly HashSet<Type> _explicitGroupTypes = new();
         private readonly Dictionary<int, HashSet<NetworkBehaviour>> _behavioursByGroup = new();
 
-        // NetworkBehaviour fast lookup Dictionary for quick access by NetId and BehaviourId
-        private int behaviorIdCounter = 1;
-        private const int MaxRegistrationAttempts = 8;
         private readonly Dictionary<(int, int), NetworkBehaviour> _behaviourLookup = new();
+        private readonly Dictionary<(int NetId, int TypeHash), int> _typeOrdinals = new();
 
         private float _tickAccumulator;
 
         public int RegisteredCount => _behaviours.Count;
         public IReadOnlyList<NetworkBehaviour> AllBehaviours => _behaviours;
-        public static int GetBehaviourCountInGroup(int groupId) =>
-            Instance != null && Instance._behavioursByGroup.TryGetValue(groupId, out var set) ? set.Count : 0;
 
-        public static bool TryGet(int NetId, int BehaviourId, out NetworkBehaviour behaviour)
+        public static bool TryGetBehaviour(int NetId, int BehaviourId, out NetworkBehaviour behaviour)
         {
             if (Instance == null)
             {
@@ -148,10 +144,8 @@ namespace ONI_Together.Networking.OxySync.Components
 			if (!_behaviours.Contains(behaviour))
 				_behaviours.Add(behaviour);
 
-            if (AssignBehaviourId(behaviour))
-            {
-                _behaviourLookup[(behaviour.NetId, behaviour.BehaviourId)] = behaviour;
-            }
+            ResolveBehaviourId(behaviour);
+            _behaviourLookup[(behaviour.NetId, behaviour.BehaviourId)] = behaviour;
 
 			if (behaviour.GetType().GetCustomAttribute<FixedInterestGroupAttribute>() != null)
 				_explicitGroupTypes.Add(behaviour.GetType());
@@ -432,76 +426,20 @@ namespace ONI_Together.Networking.OxySync.Components
             }
         }
 
-        private bool AssignBehaviourId(NetworkBehaviour behaviour)
+        private void ResolveBehaviourId(NetworkBehaviour behaviour)
         {
-            using var _ = Profiler.Scope();
+            int netId = behaviour.NetId;
+            int id = behaviour.BehaviourId;
 
-            int behaviorId = behaviour.BehaviourId;
+            if (!_behaviourLookup.ContainsKey((netId, id)))
+                return;
 
-            // Preserve explicit/non-default IDs when valid.
-            if (behaviorId != -1 && !_behaviourLookup.ContainsKey((behaviour.NetId, behaviorId)))
+            do
             {
-                behaviour.BehaviourId = behaviorId;
-                return true;
-            }
-
-            // Deterministic ID: same behaviour type + same per-entity type ordinal => same ID across peers.
-            string stableKey = GetDeterministicBehaviourKey(behaviour);
-            behaviorId = stableKey.GetHashCode();
-            if (!_behaviourLookup.ContainsKey((behaviour.NetId, behaviorId)))
-            {
-                behaviour.BehaviourId = behaviorId;
-                return true;
-            }
-
-            // Deterministic probing with built-in hash based on a stable suffix.
-            for (int attempts = 0; attempts < MaxRegistrationAttempts; attempts++)
-            {
-                int probedId = (stableKey + "|probe|" + attempts).GetHashCode();
-
-                if (!_behaviourLookup.ContainsKey((behaviour.NetId, probedId)))
-                {
-                    behaviour.BehaviourId = probedId;
-                    return true;
-                }
-            }
-
-            // Last-resort counter fallback to avoid hard-failing registration.
-            for (int attempts = 0; attempts < MaxRegistrationAttempts; attempts++)
-            {
-                int fallbackId = behaviorIdCounter++;
-                if (fallbackId == -1 || fallbackId == 0)
-                    continue;
-
-                if (!_behaviourLookup.ContainsKey((behaviour.NetId, fallbackId)))
-                {
-                    behaviour.BehaviourId = fallbackId;
-                    DebugConsole.LogWarning(
-                        $"[OxySyncManager] Deterministic BehaviourId collision fallback used for {behaviour.GetType().FullName} on {behaviour.gameObject.name}: NetId={behaviour.NetId}, deterministic={behaviorId}, fallback={fallbackId}");
-                    return true;
-                }
-            }
-
-            if (!_behaviourLookup.ContainsKey((behaviour.NetId, behaviorId)))
-            {
-                behaviour.BehaviourId = behaviorId;
-                return true;
-            }
-
-            DebugConsole.LogWarning(
-                $"[OxySyncManager] Failed to assign BehaviourId for {behaviour.GetType().Name}" +
-                $" on {behaviour.gameObject.name} after {MaxRegistrationAttempts} attempts.");
-            return false;
-        }
-
-        private static string GetDeterministicBehaviourKey(NetworkBehaviour behaviour)
-        {
-            using var _ =  Profiler.Scope();
-            var type = behaviour.GetType();
-            string assemblyName = type.Assembly.GetName().Name ?? string.Empty;
-            string typeName = type.FullName ?? type.Name;
-
-            return assemblyName + "|" + typeName;
+                id++;
+            } while (_behaviourLookup.ContainsKey((netId, id)));
+            
+            behaviour.BehaviourId = id;
         }
     }
 }
