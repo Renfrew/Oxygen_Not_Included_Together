@@ -10,6 +10,10 @@ namespace ONI_Together.DebugTools
     public class DebugConsole
     {
         private static DebugConsole _instance;
+
+        public static bool ForceVerboseLogging = false;
+        private static bool VerboseEnabled => Debug.isDebugBuild || ForceVerboseLogging;
+
         private static readonly List<LogEntry> logEntries = new List<LogEntry>();
         private static readonly object _lock = new object();
 
@@ -55,6 +59,9 @@ namespace ONI_Together.DebugTools
         public static void Log(string message)
         {
             using var _ = Profiler.Scope();
+
+            if (!VerboseEnabled)
+                return;
 
             Debug.Log($"[ONI_Together] {message}");
             EnsureInstance();
@@ -110,6 +117,9 @@ namespace ONI_Together.DebugTools
         {
             using var _ = Profiler.Scope();
 
+            if (!VerboseEnabled)
+                return;
+
             Debug.Log($"[ONI_Together] {message}");
             EnsureInstance();
             _instance.AddLog(message, "", LogType.Success);
@@ -118,6 +128,9 @@ namespace ONI_Together.DebugTools
         public static void LogNonImportant(string message)
         {
             using var _ = Profiler.Scope();
+
+            if (!VerboseEnabled)
+                return;
 
             Debug.Log($"[ONI_Together] {message}");
             EnsureInstance();
