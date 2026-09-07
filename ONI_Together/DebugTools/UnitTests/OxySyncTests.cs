@@ -20,6 +20,57 @@ namespace ONI_Together.DebugTools.UnitTests
             HighValue = 1000,
         }
 
+        [Serializable]
+        private sealed class TestSyncClass
+        {
+            public int Count;
+            public string Label;
+            public TestSyncNested Nested;
+
+            [SerializeField]
+            private int _privateIncluded;
+
+            private int _privateIgnored;
+
+            [NonSerialized]
+            public string RuntimeOnly;
+
+            public int PrivateIncluded => _privateIncluded;
+            public int PrivateIgnored => _privateIgnored;
+
+            public void ConfigurePrivateFields(int included, int ignored)
+            {
+                _privateIncluded = included;
+                _privateIgnored = ignored;
+            }
+        }
+
+        [Serializable]
+        private sealed class TestSyncNested
+        {
+            public bool Enabled;
+            public float Temperature;
+        }
+
+        private sealed class TestExplicitFieldClass
+        {
+            [SerializeField]
+            private int _count;
+
+            public int Count => _count;
+            public string Ignored;
+
+            public TestExplicitFieldClass(int count, string ignored)
+            {
+                _count = count;
+                Ignored = ignored;
+            }
+
+            private TestExplicitFieldClass()
+            {
+            }
+        }
+
 		[UnitTest(name: "OxySync protocol hashes are deterministic", category: "OxySync")]
 		public static UnitTestResult OxySyncProtocolHashIsDeterministic()
 		{
@@ -386,6 +437,33 @@ namespace ONI_Together.DebugTools.UnitTests
 			if (nullVariant.Type != Variant.TypeCode.Null ||
 				VariantHelper.VariantToObject(nullVariant, typeof(string)) != null)
 				return UnitTestResult.Fail("A null SyncVar did not preserve its null state");
+
+            var classInput = new TestSyncClass { Count = 77, Label = "class-value" };
+            classInput.Nested = new TestSyncNested { Enabled = true, Temperature = 12.5f };
+            classInput.ConfigurePrivateFields(99, 1234);
+            classInput.RuntimeOnly = "ignore-me";
+            Variant classVariant = VariantHelper.ObjectToVariant(classInput);
+            if (classVariant.Type != Variant.TypeCode.VariantArray)
+                return UnitTestResult.Fail($"Expected VariantArray variant for class value, got {classVariant.Type}");
+            var classRoundTrip = VariantHelper.VariantToObject(classVariant, typeof(TestSyncClass)) as TestSyncClass;
+            if (classRoundTrip == null || classRoundTrip.Count != classInput.Count || classRoundTrip.Label != classInput.Label)
+                return UnitTestResult.Fail("A class SyncVar did not round-trip");
+            if (classRoundTrip.Nested == null || !classRoundTrip.Nested.Enabled || Math.Abs(classRoundTrip.Nested.Temperature - 12.5f) > 0.001f)
+                return UnitTestResult.Fail("A nested class SyncVar did not round-trip recursively");
+            if (classRoundTrip.PrivateIncluded != 99)
+                return UnitTestResult.Fail("[SerializeField] private field should round-trip in [Serializable] class mode");
+            if (classRoundTrip.PrivateIgnored != 0)
+                return UnitTestResult.Fail("Non-[SerializeField] private field should not round-trip in [Serializable] class mode");
+            if (classRoundTrip.RuntimeOnly != null)
+                return UnitTestResult.Fail("[NonSerialized] field should not round-trip in [Serializable] class mode");
+
+            var explicitInput = new TestExplicitFieldClass(31, "not-serialized");
+            Variant explicitVariant = VariantHelper.ObjectToVariant(explicitInput);
+            var explicitRoundTrip = VariantHelper.VariantToObject(explicitVariant, typeof(TestExplicitFieldClass)) as TestExplicitFieldClass;
+            if (explicitRoundTrip == null || explicitRoundTrip.Count != 31)
+                return UnitTestResult.Fail("A [SerializeField]-based class SyncVar did not round-trip");
+            if (explicitRoundTrip.Ignored != null)
+                return UnitTestResult.Fail("A non-[SerializeField] field should not be serialized for explicit-field class mode");
 
 			Variant testEnum = VariantHelper.ObjectToVariant(TestEnum.HighValue);
 			if ((TestEnum)VariantHelper.VariantToObject(testEnum, typeof(TestEnum)) != TestEnum.HighValue)
@@ -1062,6 +1140,49 @@ namespace ONI_Together.DebugTools.UnitTests
             return UnitTestResult.Pass("Null collection elements round-trip correctly");
         }
 
+        [UnitTest(name: "RpcSerializer class args round-trip", category: "OxySync")]
+        public static UnitTestResult RpcSerializerClassArgsRoundTrip()
+        {
+            var input = new TestSyncClass
+            {
+                Count = 9,
+                Label = "rpc",
+                Nested = new TestSyncNested
+                {
+                    Enabled = true,
+                    Temperature = 273.15f,
+                },
+                RuntimeOnly = "ignored",
+            };
+            input.ConfigurePrivateFields(included: 123, ignored: 456);
+
+            object[] args = { input };
+            Type[] types = { typeof(TestSyncClass) };
+
+            var data = RpcSerializer.Serialize(args, types);
+            var result = RpcSerializer.Deserialize(data, types);
+
+            if (result.Length != 1)
+                return UnitTestResult.Fail("Unexpected arg count");
+            if (result[0] is not TestSyncClass output)
+                return UnitTestResult.Fail("Deserialized arg type mismatch");
+
+            if (output.Count != 9)
+                return UnitTestResult.Fail($"Count mismatch: {output.Count}");
+            if (output.Label != "rpc")
+                return UnitTestResult.Fail("Label mismatch");
+            if (output.Nested == null || !output.Nested.Enabled || Mathf.Abs(output.Nested.Temperature - 273.15f) > 0.001f)
+                return UnitTestResult.Fail("Nested class mismatch");
+            if (output.PrivateIncluded != 123)
+                return UnitTestResult.Fail("[SerializeField] private field was not serialized");
+            if (output.PrivateIgnored != 0)
+                return UnitTestResult.Fail("Non-[SerializeField] private field should not be serialized");
+            if (output.RuntimeOnly != null)
+                return UnitTestResult.Fail("[NonSerialized] field should not be serialized");
+
+            return UnitTestResult.Pass("Serializable class RPC args round-trip correctly");
+        }
+
         [UnitTest(name: "RpcSerializer IsSupportedType covers new types", category: "OxySync")]
         public static UnitTestResult RpcSerializerIsSupportedType()
         {
@@ -1081,6 +1202,8 @@ namespace ONI_Together.DebugTools.UnitTests
                 typeof(List<List<int>>),
                 typeof(Dictionary<string, List<int>>),
                 typeof(int[][]),
+                typeof(TestSyncClass),
+                typeof(TestExplicitFieldClass),
             };
 
             foreach (var t in supported)
