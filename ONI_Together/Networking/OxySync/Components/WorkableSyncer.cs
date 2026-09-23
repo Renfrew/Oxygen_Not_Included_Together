@@ -246,6 +246,13 @@ namespace ONI_Together.Networking.OxySync.Components
             if (workable == null || workablesToSkip.Contains(workable.GetType()))
                 return;
 
+            if (workable is Pickupable)
+            {
+                if (ENABLE_LOG)
+                    DebugConsole.Log($"[WorkableSyncer]{workable.gameObject.GetProperName()};{workableNetId} Skipping update for Pickupable workable.");
+                return;
+            }
+
             if (workerNetId == 0 || !NetworkIdentityRegistry.TryGetComponent<WorkerBase>(workerNetId, out var worker) || worker == null || worker.gameObject.IsNullOrDestroyed())
             {
                 return;
