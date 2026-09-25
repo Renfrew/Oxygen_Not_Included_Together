@@ -180,7 +180,7 @@ namespace ONI_Together.Networking.OxySync.Components
                 return;
             }
 
-            if (workable.IsNullOrDestroyed() || worker.IsNullOrDestroyed())
+            if (worker.IsNullOrDestroyed())
             {
                 DebugConsole.LogWarning($"[WorkableSyncer] Skip sync for method {method}: WorkableNullOrDestroyed={workable.IsNullOrDestroyed()}, WorkerNullOrDestroyed={worker.IsNullOrDestroyed()}");
                 return;
@@ -245,13 +245,6 @@ namespace ONI_Together.Networking.OxySync.Components
             workable ??= identity.gameObject.GetComponent<Workable>();
             if (workable == null || workablesToSkip.Contains(workable.GetType()))
                 return;
-
-            if (workable is Pickupable)
-            {
-                if (ENABLE_LOG)
-                    DebugConsole.Log($"[WorkableSyncer]{workable.gameObject.GetProperName()};{workableNetId} Skipping update for Pickupable workable.");
-                return;
-            }
 
             if (workerNetId == 0 || !NetworkIdentityRegistry.TryGetComponent<WorkerBase>(workerNetId, out var worker) || worker == null || worker.gameObject.IsNullOrDestroyed())
             {
