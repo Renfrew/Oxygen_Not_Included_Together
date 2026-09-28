@@ -143,6 +143,29 @@ namespace ONI_Together.Networking.Packets.Animation
 
 			try
 			{
+				string[] multitoolAnims =
+					MultitoolController.GetAnimationStrings(
+						workable,
+						worker);
+
+				DebugConsole.Log(
+					$"[WORK-START][CLIENT] " +
+					$"worker={worker.GetProperName()}:{WorkerNetId} " +
+					$"workable={workable.GetProperName()}:{WorkableNetId} " +
+					$"expected=[" +
+					$"{multitoolAnims[0]}, " +
+					$"{multitoolAnims[1]}, " +
+					$"{multitoolAnims[2]}]");
+			}
+			catch (Exception ex)
+			{
+				DebugConsole.LogWarning(
+					$"[WORK-START][CLIENT] Could not inspect multitool animations: {ex}");
+			}
+
+
+			try
+			{
 				if (!worker.state.Equals(StandardWorker.State.Idle))
 				{
 					worker.StopWork();
