@@ -28,7 +28,6 @@ public static class DuplicantPatch
 		}
 
 		__result.AddOrGet<AnimSyncer>();
-		__result.AddOrGet<OxySyncEntityPositionHandler>();
 		__result.AddOrGet<VitalStatsSyncer>();
 
 		if (__result.HasTag(GameTags.Minions.Models.Bionic))

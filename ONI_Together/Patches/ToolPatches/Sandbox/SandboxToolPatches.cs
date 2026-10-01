@@ -149,7 +149,6 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                         var minionIdentity = spawned.GetComponent<MinionIdentity>();
                         if (minionIdentity != null)
                         {
-                            spawned.AddOrGet<OxySyncEntityPositionHandler>();
                             spawned.AddOrGet<AnimSyncer>();
                             spawned.AddOrGet<Scripts.Duplicants.MinionMultiplayerInitializer>();
 
@@ -207,7 +206,6 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
 
                         if (spawned.GetComponent<CreatureBrain>() != null || spawned.HasTag(GameTags.Creature))
                         {
-                            spawned.AddOrGet<OxySyncEntityPositionHandler>();
                             spawned.AddOrGet<AnimSyncer>();
                             spawned.AddOrGet<CreatureMultiplayerInitializer>();
                         }

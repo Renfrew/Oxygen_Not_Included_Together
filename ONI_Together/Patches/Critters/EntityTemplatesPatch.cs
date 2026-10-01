@@ -22,7 +22,6 @@ namespace ONI_Together.Patches.Critters
 					if (__result == null || __result.HasTag(GameTags.BaseMinion))
 						return;
 
-					__result.AddOrGet<OxySyncEntityPositionHandler>();
 					__result.AddOrGet<NetworkIdentity>();
 					__result.AddOrGet<AnimSyncer>();
 					__result.AddOrGet<CreatureMultiplayerInitializer>();
