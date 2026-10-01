@@ -23,8 +23,8 @@ namespace ONI_Together.Scripts.Duplicants
 
 			// Animate related component should be initialized before the prefab is fully spawned.
 			gameObject.AddOrGet<NavigatorSyncer>();
+			gameObject.AddOrGet<AnimSyncer>();
         }
-
 
 		public override void OnSpawn()
 		{
@@ -79,7 +79,6 @@ namespace ONI_Together.Scripts.Duplicants
 
 		void InitializeHost(GameObject go)
 		{
-			// go.AddOrGet<DuplicantStateSender>();
 			go.AddOrGet<DuplicantChoreBroadcaster>();
 			go.AddOrGet<StatusItemsSyncer>();
 		}

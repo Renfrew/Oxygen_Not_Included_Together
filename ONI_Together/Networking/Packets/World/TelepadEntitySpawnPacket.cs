@@ -6,7 +6,6 @@ using ONI_Together.Scripts.Duplicants;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.OxySync.Components;
 
 namespace ONI_Together.Networking.Packets.World
 {
@@ -76,7 +75,6 @@ namespace ONI_Together.Networking.Packets.World
 
 					if (entity.GetComponent<MinionIdentity>() != null || entity.HasTag(GameTags.BaseMinion))
 					{
-						entity.AddOrGet<AnimSyncer>();
 						entity.AddOrGet<MinionMultiplayerInitializer>();
 					}
 
