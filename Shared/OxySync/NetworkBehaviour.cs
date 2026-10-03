@@ -29,6 +29,15 @@ namespace Shared.OxySync
 
         private static readonly Dictionary<Type, int> BehaviourIdCache = new();
 
+        enum InterestGroups: int
+        {
+            // Not designated to any specific group
+            Unassigned = -2,
+
+            // Default group, send to all
+            Default = -1
+        }
+
         private List<SyncVarField>? _syncVarFields;
         private Dictionary<int, CachedMethod>? _commandMethods;
         private Dictionary<int, CachedMethod>? _clientRpcMethods;
@@ -70,6 +79,7 @@ namespace Shared.OxySync
             public int Hash;
             public object? LastSentValue;
             public MethodInfo? Hook;
+            public long timestamp;
             public float Epsilon;
             public int InterestGroup;
             public int SendMode;
@@ -85,12 +95,18 @@ namespace Shared.OxySync
             public bool IncludeHost;
         }
 
-        public override void OnSpawn()
+        public override void OnPrefabInit()
         {
-            base.OnSpawn();
+            base.OnPrefabInit();
+            
             BehaviourId = ResolveBehaviourId(GetType());
             DiscoverSyncVars();
             DiscoverRpcs();
+        }
+
+        public override void OnSpawn()
+        {
+            base.OnSpawn();
             OnSpawned?.Invoke(this);
         }
 
@@ -105,6 +121,11 @@ namespace Shared.OxySync
         public override void OnCleanUp()
         {
             OnBehaviourCleanUp?.Invoke(this);
+            _syncVarFields?.Clear();
+            _commandMethods?.Clear();
+            _clientRpcMethods?.Clear();
+            _targetRpcMethods?.Clear();
+
             base.OnCleanUp();
         }
 
@@ -117,6 +138,11 @@ namespace Shared.OxySync
         public override void OnForcedCleanUp()
         {
             OnBehaviourCleanUp?.Invoke(this);
+            _syncVarFields?.Clear();
+            _commandMethods?.Clear();
+            _clientRpcMethods?.Clear();
+            _targetRpcMethods?.Clear();
+
             base.OnForcedCleanUp();
         }
 
@@ -129,6 +155,32 @@ namespace Shared.OxySync
                     yield return field;
 
                 type_ = type_.BaseType;
+            }
+        }
+
+        public static void InvokeWithExceptionLogging(System.Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                LogWarning?.Invoke($"[OxySync] Exception in InvokeWithExceptionLogging: {ex}");
+                throw;
+            }
+        }
+
+        public static T InvokeWithExceptionLogging<T>(Func<T> func)
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception ex)
+            {
+                LogWarning?.Invoke($"[OxySync] Exception in InvokeWithExceptionLogging: {ex}");
+                throw;
             }
         }
 
@@ -157,6 +209,7 @@ namespace Shared.OxySync
                     Hash = field.Name.GetHashCode(),
                     LastSentValue = field.GetValue(this),
                     Hook = hook,
+                    timestamp = -1,
                     Epsilon = attr.Epsilon,
                     InterestGroup = group,
                     SendMode = attr.SendMode,
@@ -263,7 +316,7 @@ namespace Shared.OxySync
             };
         }
 
-        protected void CallCommand(string methodName, params object[] args)
+        protected void InternalCallCommand(string methodName, params object[] args)
         {
             if (!inSession) return;
 
@@ -286,6 +339,11 @@ namespace Shared.OxySync
 
             var sendMode = GetCommandSendMode(hash);
             SendCommandToHost?.Invoke(NetId, BehaviourId, hash, serialized, sendMode);
+        }
+
+        protected void CallCommand(string methodName, params object[] args)
+        {
+            InvokeWithExceptionLogging(() => InternalCallCommand(methodName, args));
         }
 
         protected void CallCommand(Expression<Action> expr)
@@ -317,29 +375,7 @@ namespace Shared.OxySync
 
         protected void CallClientRpc(string methodName, params object[] args)
         {
-            if (!inSession || !isServer) return;
-
-            var hash = methodName.GetHashCode();
-
-            if (_clientRpcMethods == null || !_clientRpcMethods.ContainsKey(hash))
-            {
-                LogWarning?.Invoke($"[OxySync] '{methodName}' is not a registered ClientRpc on {GetType().Name}.");
-                return;
-            }
-
-            var argTypes = GetClientRpcArgTypes(hash);
-            var serialized = RpcSerializer.Serialize(args, argTypes);
-
-            int group = GetClientRpcGroup(hash);
-            if (group == -1) group = InterestGroup;
-            var sendMode = GetClientRpcSendMode(hash);
-            if (group == -1)
-                SendClientRpcToAll?.Invoke(NetId, BehaviourId, hash, serialized, sendMode);
-            else
-                SendClientRpcToGroup?.Invoke(group, NetId, BehaviourId, hash, serialized, sendMode);
-
-            if (GetClientRpcIncludeHost(hash))
-                InvokeClientRpc(hash, serialized);
+            CallClientRpc((int)InterestGroups.Unassigned, methodName, args);
         }
 
         protected void CallClientRpc(Expression<Action> expr)
@@ -353,7 +389,7 @@ namespace Shared.OxySync
             CallClientRpc(method.Method.Name, args);
         }
 
-        protected void CallClientRpc(int interestGroup, string methodName, params object[] args)
+        protected void InternalCallClientRpc(int interestGroup, string methodName, params object[] args)
         {
             if (!inSession || !isServer) return;
 
@@ -369,13 +405,29 @@ namespace Shared.OxySync
             var serialized = RpcSerializer.Serialize(args, argTypes);
 
             var sendMode = GetClientRpcSendMode(hash);
-            if (interestGroup == -1)
+
+            int targetGroup = interestGroup;
+            if (targetGroup == (int)InterestGroups.Unassigned)
+                targetGroup = GetClientRpcGroup(hash);
+            
+            if (targetGroup == (int)InterestGroups.Unassigned)
+                targetGroup = InterestGroup;
+            
+            if (targetGroup == (int)InterestGroups.Unassigned)
+                targetGroup = (int)InterestGroups.Default;
+
+            if (targetGroup == (int)InterestGroups.Default)
                 SendClientRpcToAll?.Invoke(NetId, BehaviourId, hash, serialized, sendMode);
             else
-                SendClientRpcToGroup?.Invoke(interestGroup, NetId, BehaviourId, hash, serialized, sendMode);
+                SendClientRpcToGroup?.Invoke(targetGroup, NetId, BehaviourId, hash, serialized, sendMode);
 
             if (GetClientRpcIncludeHost(hash))
                 InvokeClientRpc(hash, serialized);
+        }
+
+        protected void CallClientRpc(int interestGroup, string methodName, params object[] args)
+        {
+            InvokeWithExceptionLogging(() => InternalCallClientRpc(interestGroup, methodName, args));
         }
 
         protected void CallClientRpc(int interestGroup, Expression<Action> expr)
@@ -388,8 +440,7 @@ namespace Shared.OxySync
         {
             CallClientRpc(interestGroup, method.Method.Name, args);
         }
-
-        protected void CallTargetRpc(ulong targetPlayer, string methodName, params object[] args)
+        private void InternalCallTargetRpc(ulong targetPlayer, string methodName, params object[] args)
         {
             if (!inSession || !isServer) return;
 
@@ -408,6 +459,11 @@ namespace Shared.OxySync
             SendTargetRpcToPlayer?.Invoke(targetPlayer, NetId, BehaviourId, hash, serialized, sendMode);
         }
 
+        protected void CallTargetRpc(ulong targetPlayer, string methodName, params object[] args)
+        {
+            InvokeWithExceptionLogging(() => InternalCallTargetRpc(targetPlayer, methodName, args));
+        }
+
         protected void CallTargetRpc(ulong targetPlayer, Expression<Action> expr)
         {
             if (expr.Body is MethodCallExpression mce)
@@ -419,27 +475,35 @@ namespace Shared.OxySync
             CallTargetRpc(targetPlayer, method.Method.Name, args);
         }
 
-        public virtual void ApplySyncVar(int fieldHash, object value, long timestamp = 0)
+        public void ApplySyncVar(int fieldHash, object value, long timestamp = 0)
         {
-            if (_syncVarFields == null) return;
+            InvokeWithExceptionLogging(() => InternalApplySyncVar(fieldHash, value, timestamp));
+        }
 
-            for (int i = 0; i < _syncVarFields.Count; i++)
+        public virtual void InternalApplySyncVar(int fieldHash, object value, long timestamp = 0)
+        {
+            if (_syncVarFields == null || _syncVarHashToIndex == null) return;
+
+            if (!_syncVarHashToIndex.TryGetValue(fieldHash, out var fieldIdx))
             {
-                var field = _syncVarFields[i];
-                if (field.Hash != fieldHash) continue;
-
-                var oldValue = field.Info.GetValue(this);
-                field.Info.SetValue(this, value);
-
-                var updated = field;
-                updated.LastSentValue = value;
-                _syncVarFields[i] = updated;
-
-                if (field.Hook != null && !Equals(oldValue, value))
-                {
-                    field.Hook.Invoke(this, new[] { oldValue, value });
-                }
+                LogWarning?.Invoke($"[OxySync][ApplySyncVar] '{fieldHash}' is not registered on {GetType().Name}.");
                 return;
+            }
+
+            var field = _syncVarFields[fieldIdx];
+            if (field.timestamp > timestamp) return;
+
+            var oldValue = field.Info.GetValue(this);
+            field.Info.SetValue(this, value);
+
+            var updated = field;
+            updated.LastSentValue = value;
+            updated.timestamp = timestamp;
+            _syncVarFields[fieldIdx] = updated;
+
+            if (field.Hook != null && !Equals(oldValue, value))
+            {
+                field.Hook.Invoke(this, new[] { oldValue, value });
             }
         }
 
@@ -465,6 +529,11 @@ namespace Shared.OxySync
         }
 
         private void InvokeMethod(CachedMethod method, byte[] args)
+        {
+            InvokeWithExceptionLogging(() => InternalInvokeMethod(method, args));
+        }
+
+        private void InternalInvokeMethod(CachedMethod method, byte[] args)
         {
             if (method.Info.GetCustomAttribute<ServerAttribute>() != null && !isServer)
             {
@@ -510,7 +579,7 @@ namespace Shared.OxySync
         {
             if (_clientRpcMethods != null && _clientRpcMethods.TryGetValue(hash, out var m))
                 return m.InterestGroup;
-            return -1;
+            return (int)InterestGroups.Unassigned;
         }
 
         private bool GetClientRpcIncludeHost(int hash)
@@ -550,30 +619,32 @@ namespace Shared.OxySync
 
         public object? GetSyncVarValue(int fieldHash)
         {
-            if (_syncVarFields == null) return null;
-            foreach (var field in _syncVarFields)
-            {
-                if (field.Hash == fieldHash)
-                    return field.Info.GetValue(this);
-            }
+            if (_syncVarFields == null || _syncVarHashToIndex == null) return null;
+
+            if (_syncVarHashToIndex.TryGetValue(fieldHash, out int idx))
+                return _syncVarFields[idx].Info.GetValue(this);
+            
+            LogWarning?.Invoke($"[OxySync][GetSyncVarValue] SyncVar {fieldHash} not found on {GetType().Name}.");
             return null;
         }
 
         public void SetSyncVarValue(int fieldHash, object value)
         {
-            if (_syncVarFields == null) return;
-            for (int i = 0; i < _syncVarFields.Count; i++)
-            {
-                var field = _syncVarFields[i];
-                if (field.Hash != fieldHash) continue;
+            if (_syncVarFields == null || _syncVarHashToIndex == null) return;
 
-                field.Info.SetValue(this, value);
-                var updated = field;
-                updated.LastSentValue = value;
-                _syncVarFields[i] = updated;
-                MarkSyncVarAsDirty(fieldHash);
+            if (!_syncVarHashToIndex.TryGetValue(fieldHash, out int idx))
+            {
+                LogWarning?.Invoke($"[OxySync][SetSyncVarValue] SyncVar {fieldHash} not found on {GetType().Name}.");
                 return;
             }
+
+            var field = _syncVarFields[idx];
+            field.Info.SetValue(this, value);
+            var updated = field;
+            updated.LastSentValue = value;
+            updated.timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            _syncVarFields[idx] = updated;
+            MarkSyncVarAsDirty(fieldHash);
         }
 
         public void SyncLastSentValues()
