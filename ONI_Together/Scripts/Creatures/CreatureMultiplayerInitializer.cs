@@ -1,7 +1,7 @@
-using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.OxySync.Components;
+using ONI_Together.Networking.OxySync.Components.Entities;
 using ONI_Together.Networking.Packets.World;
 using System.Collections;
 using Shared.Profiling;
@@ -15,6 +15,15 @@ namespace ONI_Together.Scripts.Creatures
 		[MyCmpGet] KPrefabID kpref;
 
 		private bool HasInit = false;
+
+        public override void OnPrefabInit()
+        {
+			using var _ = Profiler.Scope();
+            base.OnPrefabInit();
+
+			gameObject.AddOrGet<AnimSyncer>();
+			gameObject.AddOrGet<NavigatorSyncer>();
+        }
 
 		public override void OnSpawn()
 		{

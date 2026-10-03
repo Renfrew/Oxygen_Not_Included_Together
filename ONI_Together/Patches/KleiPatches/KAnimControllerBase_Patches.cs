@@ -1,103 +1,125 @@
 ﻿using HarmonyLib;
 using ONI_Together.DebugTools;
-using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Animation;
-using ONI_Together.Networking.Packets.Core;
-using System;
-using Shared.Profiling;
-using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.OxySync.Components.Entities;
+using Shared.Profiling;
+using System;
+using System.Linq;
 
 namespace ONI_Together.Patches.KleiPatches
 {
 	class KAnimControllerBase_Patches
 	{
-		internal static bool ShouldSyncAnim(KAnimControllerBase controller, KPrefabID prefabID)
+		internal static readonly bool ENABLE_LOG = false;
+
+		internal static bool ShouldSyncAnim(KAnimControllerBase controller)
 		{
-			// Only suppress local state-machine animation writes for entities whose
-			// visual state is authoritative on the host. UI and unrelated local
-			// animations must continue to run normally on clients.
+			if (!controller.TryGetComponent<KPrefabID>(out var prefabID))
+				return false;
+
+			// Only sync animations for creatures and minions.
+			// This is to avoid syncing animations for things like buildings,
+			// which can cause issues with the game.
 			if (prefabID.HasTag(GameTags.Creature) || prefabID.HasTag(GameTags.BaseMinion))
 				return true;
-
+			
 			return false;
 		}
 
-		internal static bool CanPlayAnim(KAnimControllerBase controller, out AnimSyncer animSyncer)
+		internal static bool CanPlayAnim(
+			KAnimControllerBase controller, out AnimSyncer animSyncer, HashedString[] animNames)
 		{
 			using var _ = Profiler.Scope();
 			animSyncer = null;
 
-			if (!MultiplayerSession.InActiveSession)
+			if (animNames == null || animNames.Length == 0 || animNames.FirstOrDefault() == default)
 				return true;
 
-			if (MultiplayerSession.IsClient)
+			if (!MultiplayerSession.InActiveSession)
 				return true;
 
 			if (controller == null || controller.gameObject.IsNullOrDestroyed())
 				return true;
+			
+			if (!ShouldSyncAnim(controller))
+				return true;
+			
+			HashedString primaryAnim = animNames.FirstOrDefault();
 
-			if (!controller.TryGetComponent<KPrefabID>(out var prefabId))
-				return true;
-			
-			if (!ShouldSyncAnim(controller, prefabId))
-				return true;
-			
+			if (controller.TryGetComponent<NavigatorSyncer>(out var navigatorSyncer))
+			{
+				if (navigatorSyncer.IsNavigatorAnim(primaryAnim))
+					return true;
+			}
+
+			if (controller.TryGetComponent<StandardWorkerSyncer>(out var workerSyncer))
+			{
+				if (workerSyncer.IsActiveWorkerAnimation(primaryAnim))
+					return true;
+			}
+
 			if (!controller.TryGetComponent<AnimSyncer>(out var _animSyncer))
 			{
-				DebugConsole.LogWarning($"[KAnimControllerBase_Patches] AnimSyncer not found on {controller.GetProperName()}");
-				// Allow the animation to play anyway, but log a warning. This should not happen in a properly configured multiplayer session.
+				// Allow the animation to play anyway, but log a warning.
+				// This should never happen, as the AnimSyncer is added to all creatures and minions
+				// in MinionMultiplayerInitializer and CreatureMultiplayerInitializer.
+				// On the client, we may be able to see this log during the initialize process.
+				// Therefore, we can ignore warnings at the beginning of the log file on the client side.
+				DebugConsole.LogAssert(
+					$"[KAnimControllerBase_Patches]{controller.gameObject.GetProperName()}:(unknown netid) " +
+					$"AnimSyncer not found. anim: {primaryAnim}");
 				return true;
 			}
 
-			// HashedString primaryAnim = anims.FirstOrDefault();
-
-			// if (controller.TryGetComponent<StandardWorkerSyncer>(out var workerSyncer))
-			// {
-			// 	if (workerSyncer.IsActiveWorkerAnimation(primaryAnim))
-			// 		return true;
-			// }
-
-			// Clients should not play animations directly. they should only be played through packets from the host.
 			if (MultiplayerSession.IsClient)
-				return false;
-			
-			if (MultiplayerSession.IsHost && MultiplayerSession.SessionHasPlayers)
+			{
+				// If the animate is from the host, we should allow it to play on the client. Otherwise, block it.
+				return _animSyncer.IsInSyncedPlaybackScope();
+			}
+
+			if (!MultiplayerSession.IsHost || !MultiplayerSession.SessionHasPlayers)
+				return true;
+
+			// Host with active session, and has players: set the syncer to send animations to clients.
+			// Meanwhile, we do not need to sync those animations that are handled by the client locally.
+			if (!_animSyncer.IsInSyncedPlaybackScope())
 				animSyncer = _animSyncer;
 
 			return true;
 		}
 
-
-		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.Play), [typeof(HashedString), typeof(KAnim.PlayMode), typeof(float), typeof(float)])]
+		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.Play),
+			[typeof(HashedString), typeof(KAnim.PlayMode), typeof(float), typeof(float)])]
 		public class KAnimControllerBase_Play_Patch
 		{
-			public static bool Prefix(KAnimControllerBase __instance, HashedString anim_name, KAnim.PlayMode mode, float speed, float time_offset)
+			public static bool Prefix(KAnimControllerBase __instance,
+				HashedString anim_name, KAnim.PlayMode mode, float speed, float time_offset)
 			{
 				using var _ = Profiler.Scope();
 
-				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer))
+				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer, [anim_name]))
 					return false;
 
-                animSyncer?.RequestToPlayAnim(false, [anim_name], mode, speed, time_offset);
+				animSyncer?.RequestToPlayAnim(false, [anim_name], mode, speed, time_offset);
 
 				return true;
 			}
-        }
+		}
 
-        [HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.Play), [typeof(HashedString[]), typeof(KAnim.PlayMode)])]
+		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.Play),
+			[typeof(HashedString[]), typeof(KAnim.PlayMode)])]
 		public class KAnimControllerBase_PlayRange_Patch
 		{
-			public static bool Prefix(KAnimControllerBase __instance, HashedString[] anim_names, KAnim.PlayMode mode)
+			public static bool Prefix(KAnimControllerBase __instance,
+				HashedString[] anim_names, KAnim.PlayMode mode)
 			{
 				using var _ = Profiler.Scope();
 
-				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer))
+				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer, anim_names))
 					return false;
-				
+
 				animSyncer?.RequestToPlayAnim(false, anim_names, mode);
-				
+
 				return true;
 			}
 		}
@@ -105,13 +127,14 @@ namespace ONI_Together.Patches.KleiPatches
 		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.Queue))]
 		public class KAnimControllerBase_Queue_Patch
 		{
-			public static bool Prefix(KAnimControllerBase __instance, HashedString anim_name, KAnim.PlayMode mode, float speed, float time_offset)
+			public static bool Prefix(KAnimControllerBase __instance,
+				HashedString anim_name, KAnim.PlayMode mode, float speed, float time_offset)
 			{
 				using var _ = Profiler.Scope();
 
-				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer))
+				if (!CanPlayAnim(__instance, out AnimSyncer animSyncer, [anim_name]))
 					return false;
-				
+
 				animSyncer?.RequestToPlayAnim(true, [anim_name], mode, speed, time_offset);
 				
 				return true;
@@ -119,67 +142,54 @@ namespace ONI_Together.Patches.KleiPatches
 		}
 
 		/// Kanim Overrides
-
-		private static bool TogglingOverrideFromPacket = false;
-		internal static void AddKanimOverride(KAnimControllerBase kbac, string kanim, float priority)
+		
+		private static bool TryProcessOverride(
+			KAnimControllerBase kbac, bool isAdding, KAnimFile kanim_file, float priority = 0f)
 		{
 			using var _ = Profiler.Scope();
 
-			TogglingOverrideFromPacket = true;
-			if (Assets.TryGetAnim(kanim, out var anim))
+			if (!MultiplayerSession.InActiveSession)
+				return true;
+			
+			if (kanim_file == null || string.IsNullOrEmpty(kanim_file.name))
+				return true;
+
+			if (kbac == null || kbac.gameObject.IsNullOrDestroyed())
+				return true;
+			
+			if (!ShouldSyncAnim(kbac))
+				return true;
+			
+			if (!kbac.TryGetComponent<AnimSyncer>(out var syncer))
 			{
-				kbac.AddAnimOverrides(anim, priority);
+				DebugConsole.LogAssert(
+					$"[KAnimControllerBase_Patches][OVERRIDE]{kbac.gameObject.GetProperName()} AnimSyncer not found.");
+				return true;
 			}
-			else
-				DebugConsole.LogWarning("could not find anim " + kanim);
 
-			Console.WriteLine("Adding Kanim Override " + kanim);
-			TogglingOverrideFromPacket = false;
-		}
-
-		internal static void RemoveKanimOverride(KAnimControllerBase kbac, string kanim)
-		{
-			using var _ = Profiler.Scope();
-
-			TogglingOverrideFromPacket = true;
-			if (Assets.TryGetAnim(kanim, out var anim))
+			if (MultiplayerSession.IsClient)
 			{
-				kbac.RemoveAnimOverrides(anim);
+				// For the client, we only process the override if we are currently in the override scope.
+				return syncer.IsInOverrideScope();
 			}
-			else
-				DebugConsole.LogWarning("could not find anim " + kanim);
-			Console.WriteLine("Removing Kanim Override " + kanim);
-			TogglingOverrideFromPacket = false;
-		}
 
+			if (!MultiplayerSession.IsHost || !MultiplayerSession.SessionHasPlayers)
+				return true;
+
+			// Host with active session, and has players: set the syncer to send animations to clients.
+			// Meanwhile, we do not need to sync those animations that are handled by the client locally.
+			if (!syncer.IsInOverrideScope())
+				syncer.RequestUpdateKanimOverride(kanim_file.name, isAdding, priority);
+
+			return true;
+		}
 
 		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.AddAnimOverrides))]
 		public class KAnimControllerBase_AddAnimOverrides_Patch
 		{
-			public static bool Prefix(KAnimControllerBase __instance, KAnimFile kanim_file, float priority = 0f)
+			public static bool Prefix(KAnimControllerBase __instance, KAnimFile kanim_file, float priority)
 			{
-				using var _ = Profiler.Scope();
-
-				try
-				{
-					if (!MultiplayerSession.InActiveSession) return kanim_file != null;
-
-					//leave to minions for now, potentially remove later
-					if (!__instance.HasTag(GameTags.BaseMinion))
-						return kanim_file != null;
-
-					if (MultiplayerSession.IsClient)
-						return TogglingOverrideFromPacket;
-
-					Console.WriteLine("sending addAnimOveridePacket");
-					PacketSender.SendToAllClients(new ToggleAnimOverridePacket(__instance.gameObject, kanim_file, priority));
-					return kanim_file != null;
-				}
-				catch (Exception ex)
-				{
-					DebugConsole.LogError($"[KAnimControllerBase_AddAnimOverrides_Patch.Prefix] {ex}");
-					return kanim_file != null;
-				}
+				return TryProcessOverride(__instance, true, kanim_file, priority);
 			}
 		}
 
@@ -188,33 +198,11 @@ namespace ONI_Together.Patches.KleiPatches
 		{
 			public static bool Prefix(KAnimControllerBase __instance, KAnimFile kanim_file)
 			{
-				using var _ = Profiler.Scope();
-
-				try
-				{
-					if (!MultiplayerSession.InActiveSession) return kanim_file != null;
-
-					//leave to minions for now, potentially remove later
-					if (!__instance.HasTag(GameTags.BaseMinion))
-						return kanim_file != null;
-
-					if (MultiplayerSession.IsClient)
-						return TogglingOverrideFromPacket;
-
-					Console.WriteLine("sending removeAnimOveridePacket");
-					PacketSender.SendToAllClients(new ToggleAnimOverridePacket(__instance.gameObject, kanim_file));
-					return kanim_file != null;
-				}
-				catch (Exception ex)
-				{
-					DebugConsole.LogError($"[KAnimControllerBase_RemoveAnimOverrides_Patch.Prefix] {ex}");
-					return kanim_file != null;
-				}
+				return TryProcessOverride(__instance, false, kanim_file);
 			}
 		}
 
 		/// Symbol Visibility
-
 		[HarmonyPatch(typeof(KAnimControllerBase), nameof(KAnimControllerBase.SetSymbolVisiblity))]
 		public class KAnimControllerBase_SetSymbolVisiblity_Patch
 		{
@@ -224,10 +212,22 @@ namespace ONI_Together.Patches.KleiPatches
 
 				try
 				{
-					if (!Utils.IsHostMinion(__instance))
+					if (__instance == null || __instance.gameObject.IsNullOrDestroyed())
+						return;
+					
+					if (!ShouldSyncAnim(__instance))
 						return;
 
-					PacketSender.SendToAllClients(new SymbolVisibilityTogglePacket(__instance, symbol, is_visible));
+					if (__instance.TryGetComponent<AnimSyncer>(out var animSyncer))
+					{
+						if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
+							animSyncer.RequestSetSymbolVisiblity(symbol, is_visible);
+						
+						if (ENABLE_LOG && MultiplayerSession.IsClient && !animSyncer.IsApplyingSymbolVisibility())
+							DebugConsole.LogNonImportant(
+								$"[KAnimControllerBase_Patches][SYMBOL][CLIENT_LOCAL] " +
+								$"{animSyncer.EntityName}:{animSyncer.NetId} {symbol} visible={is_visible}");
+					}
 				}
 				catch (Exception ex)
 				{
