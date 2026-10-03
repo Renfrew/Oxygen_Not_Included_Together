@@ -52,6 +52,12 @@ namespace ONI_Together.Patches.KleiPatches
 					return true;
 			}
 
+			if (controller.TryGetComponent<StandardWorkerSyncer>(out var workerSyncer))
+			{
+				if (workerSyncer.IsActiveWorkerAnimation(primaryAnim))
+					return true;
+			}
+
 			if (!controller.TryGetComponent<AnimSyncer>(out var _animSyncer))
 			{
 				// Allow the animation to play anyway, but log a warning.
