@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.OxySync.Components;
@@ -12,8 +11,6 @@ namespace ONI_Together.Patches.World
 {
 	internal class WorkablePatch
 	{
-		private static readonly bool ENABLE_LOG = false;
-
 		private static bool IsAuthorizedToWork(Workable workable, WorkableSyncer.MethodType method, WorkerBase worker, out WorkableSyncer syncer)
 		{
 			using var _ = Profiler.Scope();

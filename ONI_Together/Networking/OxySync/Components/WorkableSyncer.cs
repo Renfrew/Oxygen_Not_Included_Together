@@ -180,7 +180,7 @@ namespace ONI_Together.Networking.OxySync.Components
                 return;
             }
 
-            if (worker.IsNullOrDestroyed())
+            if (workable.IsNullOrDestroyed() || worker.IsNullOrDestroyed())
             {
                 DebugConsole.LogWarning($"[WorkableSyncer] Skip sync for method {method}: WorkableNullOrDestroyed={workable.IsNullOrDestroyed()}, WorkerNullOrDestroyed={worker.IsNullOrDestroyed()}");
                 return;
