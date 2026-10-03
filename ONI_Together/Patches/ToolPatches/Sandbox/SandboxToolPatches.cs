@@ -150,7 +150,6 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                         if (minionIdentity != null)
                         {
                             spawned.AddOrGet<OxySyncEntityPositionHandler>();
-                            spawned.AddOrGet<AnimSyncer>();
                             spawned.AddOrGet<Scripts.Duplicants.MinionMultiplayerInitializer>();
 
                             // Build full ImmigrantOptionEntry from live duplicant to preserve textures/traits
@@ -208,7 +207,6 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                         if (spawned.GetComponent<CreatureBrain>() != null || spawned.HasTag(GameTags.Creature))
                         {
                             spawned.AddOrGet<OxySyncEntityPositionHandler>();
-                            spawned.AddOrGet<AnimSyncer>();
                             spawned.AddOrGet<CreatureMultiplayerInitializer>();
                         }
 

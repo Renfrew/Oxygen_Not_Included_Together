@@ -24,7 +24,6 @@ namespace ONI_Together.Patches.Critters
 
 					__result.AddOrGet<OxySyncEntityPositionHandler>();
 					__result.AddOrGet<NetworkIdentity>();
-					__result.AddOrGet<AnimSyncer>();
 					__result.AddOrGet<CreatureMultiplayerInitializer>();
 				}
 				catch (Exception ex)
