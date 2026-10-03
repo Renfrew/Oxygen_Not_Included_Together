@@ -21,6 +21,7 @@ namespace ONI_Together.Scripts.Duplicants
             base.OnPrefabInit();
 
 			gameObject.AddOrGet<AnimSyncer>();
+			gameObject.AddOrGet<NavigatorSyncer>();
         }
 
 		public override void OnSpawn()

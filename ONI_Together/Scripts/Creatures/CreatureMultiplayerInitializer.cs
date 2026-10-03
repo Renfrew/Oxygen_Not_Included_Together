@@ -22,6 +22,7 @@ namespace ONI_Together.Scripts.Creatures
             base.OnPrefabInit();
 
 			gameObject.AddOrGet<AnimSyncer>();
+			gameObject.AddOrGet<NavigatorSyncer>();
         }
 
 		public override void OnSpawn()

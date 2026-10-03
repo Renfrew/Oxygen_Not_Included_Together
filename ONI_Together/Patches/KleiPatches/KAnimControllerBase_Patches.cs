@@ -46,6 +46,12 @@ namespace ONI_Together.Patches.KleiPatches
 			
 			HashedString primaryAnim = animNames.FirstOrDefault();
 
+			if (controller.TryGetComponent<NavigatorSyncer>(out var navigatorSyncer))
+			{
+				if (navigatorSyncer.IsNavigatorAnim(primaryAnim))
+					return true;
+			}
+
 			if (!controller.TryGetComponent<AnimSyncer>(out var _animSyncer))
 			{
 				// Allow the animation to play anyway, but log a warning.
