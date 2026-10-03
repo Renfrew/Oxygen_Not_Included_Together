@@ -7,6 +7,7 @@ using ONI_Together.Networking.Packets.Core;
 using System;
 using Shared.Profiling;
 using ONI_Together.Networking.OxySync.Components;
+using ONI_Together.Networking.OxySync.Components.Entities;
 
 namespace ONI_Together.Patches.KleiPatches
 {
@@ -42,6 +43,12 @@ namespace ONI_Together.Patches.KleiPatches
 			
 			if (!ShouldSyncAnim(controller, prefabId))
 				return true;
+
+			if (controller.TryGetComponent<NavigatorSyncer>(out var navigatorSyncer))
+			{
+				if (navigatorSyncer.IsNavigatorAnim(controller.currentAnim))
+					return true;
+			}
 			
 			if (!controller.TryGetComponent<AnimSyncer>(out var _animSyncer))
 			{
