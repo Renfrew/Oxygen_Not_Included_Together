@@ -48,7 +48,7 @@ namespace ONI_Together.Patches.KleiPatches
 
 			if (controller.TryGetComponent<NavigatorSyncer>(out var navigatorSyncer))
 			{
-				if (navigatorSyncer.IsNavigatorAnim(controller.currentAnim))
+				if (navigatorSyncer.IsNavigatorAnim(primaryAnim))
 					return true;
 			}
 
