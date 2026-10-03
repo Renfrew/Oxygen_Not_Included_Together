@@ -113,7 +113,6 @@ namespace ONI_Together.Patches.World
 
 			var identity = __instance.gameObject.AddOrGet<NetworkIdentity>();
 			identity.RegisterIdentity();
-			__instance.gameObject.AddOrGet<AnimSyncer>();
             __instance.gameObject.AddOrGet<PlantSyncer>();
         }
     }
