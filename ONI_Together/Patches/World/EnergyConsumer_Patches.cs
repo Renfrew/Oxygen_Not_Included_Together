@@ -28,33 +28,37 @@ namespace ONI_Together.Patches.World
         [HarmonyPatch(typeof(EnergyConsumerSelfSustaining), nameof(EnergyConsumerSelfSustaining.IsPowered), MethodType.Getter)]
         public static class EnergyConsumerSelfSustaining_IsPowered_Getter_Patch
         {
-            public static void Prefix(EnergyConsumerSelfSustaining __instance, ref bool __result)
+            public static bool Prefix(EnergyConsumerSelfSustaining __instance, ref bool __result)
             {
                 if (!SkipOnClient())
-                    return;
+                    return true;
 
-                if (!__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap))
-                    return;
-
-                __result = wrap.IsPowered;
+                if (__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap) && wrap.HasHostState)
+                {
+                    __result = wrap.IsPowered;
+                    return false;
+                }
+                return true;
             }
         }
 
         [HarmonyPatch(typeof(Operational), nameof(Operational.GetFlag))]
         public static class Operational_GetFlag_Patch
         {
-            public static void Prefix(Operational __instance, Operational.Flag flag, ref bool __result)
+            public static bool Prefix(Operational __instance, Operational.Flag flag, ref bool __result)
             {
                 if (!SkipOnClient())
-                    return;
+                    return true;
 
                 if (flag != EnergyConsumer.PoweredFlag)
-                    return;
+                    return true;
 
-                if (!__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap))
-                    return;
-
-                __result = wrap.IsOperational;
+                if (__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap) && wrap.HasHostState)
+                {
+                    __result = wrap.IsPowered;
+                    return false;
+                }
+                return true;
             }
         }
     }

@@ -1,7 +1,8 @@
 using System.IO;
 using System.Text;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components.Entities;
+using ONI_Together.Networking.Components;
+using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.Packets.Architecture;
 using ONI_Together.Networking.Packets.Core;
 using ONI_Together.Networking.Packets.World;
@@ -17,6 +18,8 @@ namespace ONI_Together.DebugTools.UnitTests
 			if (!MultiplayerSession.InActiveSession)
 				return UnitTestResult.Fail("Not in a multiplayer session");
 
+			const float MaxCellDelta = 2f;
+
 			int minionsChecked = 0;
 			int minionsSynced = 0;
 			foreach (var identity in NetworkIdentityRegistry.AllIdentities)
@@ -28,8 +31,8 @@ namespace ONI_Together.DebugTools.UnitTests
 				if (prefabId == null || !prefabId.HasTag(GameTags.BaseMinion))
 					continue;
 
-				if (!identity.gameObject.TryGetComponent<NavigatorSyncer>(out var handler))
-					return UnitTestResult.Fail($"Minion '{identity.gameObject.name}' has no NavigatorSyncer");
+				if (!identity.gameObject.TryGetComponent<OxySyncEntityPositionHandler>(out var handler))
+					return UnitTestResult.Fail($"Minion '{identity.gameObject.name}' has no EntityPositionHandler");
 
 				minionsChecked++;
 

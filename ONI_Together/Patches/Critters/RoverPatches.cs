@@ -22,7 +22,7 @@ namespace ONI_Together.Patches.Critters
 					return;
 
 				__result.AddOrGet<NetworkIdentity>();
-				__result.AddOrGet<AnimSyncer>();
+				__result.AddOrGet<OxySyncEntityPositionHandler>();
 				__result.AddOrGet<CreatureMultiplayerInitializer>();
 			}
 		}
