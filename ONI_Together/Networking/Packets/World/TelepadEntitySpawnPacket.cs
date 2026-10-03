@@ -77,6 +77,7 @@ namespace ONI_Together.Networking.Packets.World
 					if (entity.GetComponent<MinionIdentity>() != null || entity.HasTag(GameTags.BaseMinion))
 					{
 						entity.AddOrGet<OxySyncEntityPositionHandler>();
+						entity.AddOrGet<AnimSyncer>();
 						entity.AddOrGet<MinionMultiplayerInitializer>();
 					}
 
