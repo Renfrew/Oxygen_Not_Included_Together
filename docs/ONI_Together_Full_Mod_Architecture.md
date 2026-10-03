@@ -1,8 +1,30 @@
 # ONI Together: Full Multiplayer Mod Architecture
 
-**Design proposal · 23 September 2026**  
+**Design proposal · 23 September 2026; architecture updated · 3 October 2026**  
 **Scope:** Whole mod: session lifecycle, simulation authority, player commands, world and entity replication, saves, time control, presentation, transport, recovery, and implementation strategy.  
 **Status:** Target design and migration guide. This is not a claim that the current repository already implements these components or that every ONI system can be made passive without investigation.
+
+### Architecture and implementation boundary
+
+This document describes the enduring full-mod architecture and migration direction. It may identify integrated subsystem designs where they clarify ownership or module boundaries, but it is not a release-status, bug-tracking, or test-history document.
+
+Keep these categories separate:
+
+1. **Architecture:** enduring authority, ownership, protocol, lifecycle, recovery, and module-boundary rules.
+2. **Integrated design:** architecture already represented in the mod and expected to remain part of the design.
+3. **Proposed migration:** target mechanisms that are not yet fully implemented.
+
+The integrated design currently includes:
+
+- `NavigatorSyncer` and `NavigatorPatch` for host-authoritative navigation and semantic arrival publication ordering.
+- `StandardWorkerSyncer` for ordinary worker lifecycle synchronization; special workables remain separate synchronization domains.
+- `AnimSyncer` for synchronized animation playback, KAnim overrides, and symbol-visibility operations.
+- `ReactableSyncer` using host authorization with a client-local Reactable. The broader semantic event/adapter model described later remains a migration direction.
+- `GameSpeedSyncer` using host-authoritative requested speed/pause state with revision/freshness protection.
+- Operational/power synchronization that permits valid vanilla/local client state until authoritative host state becomes available; unsafe initialization-time getter virtualization remains rejected.
+- OxySync transport abstraction with per-command/RPC delivery policies, freshness handling, and host spawn-publication helpers.
+
+Detailed implementation status, temporary regressions, release blockers, runtime evidence, and exact-release verification belong in `STATUS.md` and `DEVELOPMENT_ROADMAP.md`.
 
 ## 1. Decision and constraints
 
@@ -16,7 +38,7 @@ ONI was designed around a local simulation. A loaded client world may continue r
 2. Clients eventually converge to host state even when a transient animation fails or a packet is lost.
 3. Reconnect and hard sync establish a clear new baseline without replaying obsolete history.
 4. New sync features fit a common ownership, identity, versioning, and logging model.
-5. The design can be adopted incrementally in the existing Harmony/OxySync/Riptide-based mod.
+5. The design can be adopted incrementally in the existing Harmony/OxySync transport-abstracted mod.
 
 ### Deliberate limits
 
@@ -66,6 +88,8 @@ Every networked feature needs an ownership record before implementation. The def
 | Camera, cursor, local selection | Each player | Immediate local update | None |
 | Reactable/emote/effects | Host event or current activity | Replay presentation without independent gameplay decision | Activity state; one-shot event can expire |
 
+The current Reactable implementation is a narrower authorization rendezvous: the host authorizes a `(Reactable id, reactor NetId)` pair and the client consumes that authorization while using its locally created Reactable and `InternalCanBegin`. Expiry, broader deduplication, snapshots, and semantic replay adapters remain proposed improvements rather than current behavior.
+
 Do not assume a single `IsClient` check makes a subsystem safe. For each patch, state whether it blocks an input, blocks a simulation mutation, observes a host event, applies replicated state, or only controls presentation. An ownership registry in documentation/code review can prevent accidental double writers.
 
 ## 4. Protocol model
@@ -81,7 +105,7 @@ Messages belong to six conceptual families:
 | Semantic event | Host → clients | One-time outcome or presentation cue | Reliable ordered where causally important; bounded age |
 | Snapshot/save | Host → joining or resyncing client | Baseline plus high-water mark | Reliable chunked transfer with integrity checks |
 
-Every gameplay message includes `ProtocolVersion`, `SessionId`, `Epoch`, and an appropriate sequence/version. `Epoch` changes when a new save baseline is installed or a host session starts. A packet from an old epoch cannot modify the current world.
+In the target protocol, gameplay messages include `ProtocolVersion`, `SessionId`, `Epoch`, and an appropriate sequence/version. `Epoch` changes when a new save baseline is installed or a host session starts. A packet from an old epoch cannot modify the current world.
 
 Example envelope (illustrative, not a required C# implementation):
 
@@ -137,9 +161,11 @@ If multiple players can control speed, define one policy: host-only; any player 
 
 Host tick timestamps help discard stale events and measure drift. They do not by themselves make the client deterministic. Time correction should avoid jumping animation and UI unnecessarily while keeping simulation-owned state current.
 
+The current implementation sends absolute speed plus pause state to the host, validates the speed, increments a host revision, and broadcasts the applied state with a reliable-immediate RPC. Permission policy, session epochs, and tick-drift correction remain target-design work.
+
 ## 7. Identity and object lifecycle
 
-Network entity IDs are stable across a baseline save and the deltas that follow it. The host assigns IDs; clients maintain a mapping from host ID to local ONI object. Local Unity instance IDs, object names, and transient hash codes are not network identities.
+Network entity IDs must remain stable across a baseline save and the deltas that follow it. The target architecture requires host-authoritative identity assignment, or an equivalent host-controlled baseline mapping; clients maintain a mapping from host identity to local ONI objects. Local Unity instance IDs, object names, and transient hash codes are not network identities.
 
 Define identity for: duplicants, creatures, buildings, stored items/equipment, world regions, and any target referenced by commands or events. An ID must include or be guarded by an epoch/generation to prevent reuse of a destroyed object from binding to a later spawn. Decide how existing objects in a transferred save obtain the same IDs on both machines: persist a mod-owned ID with the save where feasible, or distribute a validated baseline mapping keyed by stable save data. This is a gating design spike, since unreliable baseline mapping breaks all later references.
 
@@ -157,6 +183,8 @@ Use domain-specific state adapters rather than one universal object serializer. 
 - **Relationships:** storage item belongs to building, equipment occupies duplicant slot, target/errand references. Apply only after both referenced IDs exist or hold pending with expiry.
 
 The host should emit changes at stable simulation boundaries rather than during partially mutated object state. Coalesce repeated values within a tick. If the client applies deltas to an ONI subsystem that subsequently mutates them, either block the competing path, reconcile at a known cadence, or change the adapter. Avoid fighting the client simulation with high-frequency writes indefinitely.
+
+Operational/power synchronization illustrates this boundary. The integrated design retains host-state synchronization while allowing clients to use valid vanilla/local getter results until host state has arrived. The architecture rejects forcing uninitialized network-backed values through early getters; it does not require removal of Operational synchronization itself. Longer-term input-level synchronization may replace derived-state replication where that produces a cleaner ownership boundary.
 
 ### Coverage ledger
 
@@ -276,6 +304,8 @@ An acceptance criterion for a domain is not merely “it looked right once”: t
 
 ## 15. Incremental implementation plan
 
+This section defines the long-term architecture migration sequence. Current release gates, short-term priorities, and next-session work are maintained in `DEVELOPMENT_ROADMAP.md`.
+
 | Phase | Deliverable | Exit evidence |
 | --- | --- | --- |
 | 0. Inventory | Map current patches/syncers to ownership ledger; measure divergence | A list of synchronized, mirrored, and unsynchronized domains |
@@ -296,7 +326,7 @@ These are explicit design spikes, not implementation facts:
 2. Whether mod-owned entity IDs survive save/load or require a baseline mapping; how item and nested object identity works.
 3. Which client simulation systems can be suppressed without breaking visuals, lifecycle, or save loading.
 4. Which existing syncers already own state and which accidentally echo client mutations.
-5. Which Riptide delivery modes and payload sizes the current mod actually uses.
+5. Which delivery modes and payload limits each registered transport actually provides and how those modes map to protocol requirements.
 6. Whether host callbacks expose stable semantic points for grid, inventory, chores, and activity transitions.
 7. The safest Reactable replay entry points, especially where `Run` mutates equipment.
 8. The actual byte rate and CPU cost of grid/region changes in representative colonies.
