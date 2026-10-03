@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using Shared.Profiling;
 using static STRINGS.UI.CLUSTERMAP.ROCKETS;
+using ONI_Together.Networking.OxySync.Components.Entities;
 
 namespace ONI_Together.Patches.KleiPatches
 {
@@ -49,6 +50,14 @@ namespace ONI_Together.Patches.KleiPatches
 
 			if (LockAnimSending)
 				return;
+
+			HashedString primaryAnim = anims.FirstOrDefault();
+
+			if (__instance.TryGetComponent<StandardWorkerSyncer>(out var workerSyncer))
+			{
+				if (workerSyncer.IsActiveWorkerAnimation(primaryAnim))
+					return;
+			}
 
 			LockAnimSending = true;
 			PacketSender.SendToAllClients(new PlayAnimPacket(netId, anims, queueing,mode,speed,time_offset));

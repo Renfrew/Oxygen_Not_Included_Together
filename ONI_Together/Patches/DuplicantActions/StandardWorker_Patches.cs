@@ -1,101 +1,195 @@
 using HarmonyLib;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Animation;
-using ONI_Together.Networking.Packets.World;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using ONI_Together.Networking.OxySync.Components.Entities;
 using Shared.Profiling;
-using static RancherChore;
-using static WorkerBase;
-using static ClusterTelescope;
+using UnityEngine;
 
 namespace ONI_Together.Patches.DuplicantActions
 {
 	internal class StandardWorker_Patches
 	{
+        [HarmonyPatch(typeof(StandardWorker), nameof(StandardWorker.OnPrefabInit))]
+        public class StandardWorker_OnPrefabInit_Patch
+        {
+            public static void Postfix(StandardWorker __instance)
+            {
+                if (__instance?.GetComponent<KPrefabID>()?.HasTag(GameTags.BaseMinion) == true)
+                    __instance.gameObject.AddOrGet<StandardWorkerSyncer>();
+            }
+        }
 
 		[HarmonyPatch(typeof(StandardWorker), nameof(StandardWorker.StartWork))]
 		public class StandardWorker_StartWork_Patch
 		{
-			// SKIP WORKABLE
-			private static Type[] workablesToSkip =
-			{
-                typeof(DefragmentationZone),
-                typeof(RancherWorkable),
-                typeof(LiquidPumpingStation),
-				typeof(IceKettleWorkable),
-				typeof(Sleepable),
-				typeof(Bottler),
-				typeof(ClusterTelescopeIdentifyMeteorWorkable),
-				typeof(Edible)
-            };
+            public static bool Prefix(StandardWorker __instance, WorkerBase.StartWorkInfo start_work_info)
+            {
+                using var _ = Profiler.Scope();
 
-			public static void Postfix(StandardWorker __instance, StartWorkInfo start_work_info)
-			{
-				using var _ = Profiler.Scope();
-
-				if (__instance.IsNullOrDestroyed())
-					return;
-
-				if (start_work_info.IsNullOrDestroyed())
-					return;
-
-				if (!Utils.IsHostMinion(__instance))
-					return;
-
-				foreach (Type workableType in workablesToSkip)
-				{
-                    if (start_work_info.workable.GetType() == workableType)
-                        return;
+                if (!__instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    return true;
+                
+                if (!syncer.CanSync(start_work_info, out var workableId))
+                    return true;
+                
+                if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
+                {
+                    syncer.BeginWorkerPlayback(workableId);
+                    syncer.RequestStartWork(start_work_info);
+                    return true;
                 }
 
-                PacketSender.SendToAllClients(new StandardWorker_WorkingState_Packet(__instance, start_work_info.workable, true));
-			}
+                if (MultiplayerSession.IsClient)
+                {
+                    // Block client from starting work if not in the correct work scope (authorized by the host)
+                    if (!syncer.IsInWorkScope) return false;
+
+                    syncer.BeginWorkerPlayback(workableId);
+                }
+
+                return true;
+            }
 		}
+
+        [HarmonyPatch(typeof(StandardWorker), nameof(StandardWorker.StartPlayingPostAnim))]
+        public class StandardWorker_StartPlayingPostAnim_Patch
+        {
+            public static bool Prefix(StandardWorker __instance)
+            {
+                using var _ = Profiler.Scope();
+
+                if (!__instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    return true;
+                
+                if (!syncer.TryGetSyncedWork(out var _))
+                    return true;
+                
+                if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
+                {
+                    syncer.RequestBeginComplete();
+                    return true;
+                }
+
+                return !MultiplayerSession.IsClient || syncer.IsInWorkScope;
+            }
+        }
+
+        [HarmonyPatch(typeof(StandardWorker), nameof(StandardWorker.CompleteWork))]
+        public class StandardWorker_CompleteWork_Patch
+        {
+            public static bool Prefix(StandardWorker __instance, out int __state)
+            {
+                using var _ = Profiler.Scope();
+
+                __state = 0;
+
+                if (!__instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    return true;
+                
+                if (!syncer.TryGetSyncedWork(out var workableId))
+                    return true;
+                
+                if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
+                {
+                    __state = workableId;
+                    syncer.RequestCompleteWork();
+                    return true;
+                }
+
+                if (MultiplayerSession.IsClient)
+                {
+                    if (!syncer.IsInWorkScope) return false;
+
+                    __state = workableId;
+                }
+
+                return true;
+            }
+
+            public static void Postfix(StandardWorker __instance, int __state)
+            {
+                using var _ = Profiler.Scope();
+
+                if (__state != 0 && __instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    syncer.EndWorkerPlayback(__state);
+            }
+        }
+        
 
 		[HarmonyPatch(typeof(StandardWorker), nameof(StandardWorker.StopWork))]
 		public class StandardWorker_StopWork_Patch
 		{
-			public static void Prefix(StandardWorker __instance)
+			public static bool Prefix(StandardWorker __instance, out int __state)
 			{
 				using var _ = Profiler.Scope();
 
-				if (__instance.IsNullOrDestroyed())
-					return;
+                __state = 0;
 
-				if (!Utils.IsHostMinion(__instance))
-					return;
+                if (!__instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    return true;
+                
+                if (!syncer.TryGetSyncedWork(out var workableId))
+                    return true;
+                
+                if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
+                {
+                    WorkerBase.State state = __instance.GetState();
 
-				var workable = __instance.GetWorkable();
-				if (workable == null || workable.IsNullOrDestroyed())
-					return;
+                    bool IsCompleting = state == WorkerBase.State.Completing
+                        || state == WorkerBase.State.PendingCompletion;
 
-				PacketSender.SendToAllClients(WorkableProgressPacket.CreateHidden(workable), PacketSendMode.ReliableImmediate);
+                    bool isAbort = state == WorkerBase.State.Working
+                        || (!__instance.successFullyCompleted && IsCompleting);
 
-				if (workable.TryGetComponent<ComplexFabricator>(out var fabricator) && fabricator != null && !fabricator.IsNullOrDestroyed())
-				{
-					PacketSender.SendToAllClients(WorkableProgressPacket.CreateComplexFabricator(fabricator, showProgressBar: false), PacketSendMode.ReliableImmediate);
-				}
+                    // Completed work would also emit a stop work event,
+                    // so we need to handle aborts separately to avoid duplicated stop work overwrites the animation.
+                    if (isAbort)
+                    {
+                        __state = workableId;
+                        syncer.RequestAbortWork();
+                    }
+
+                    return true;
+                }
+
+                if (MultiplayerSession.IsClient)
+                {
+                    if (!syncer.IsInWorkScope) return false;
+
+                    __state = workableId;
+                }
+
+                return true;
 			}
 
-			public static void Postfix(StandardWorker __instance)
+			public static void Postfix(StandardWorker __instance, int __state)
 			{
 				using var _ = Profiler.Scope();
-
-				if (__instance.IsNullOrDestroyed())
-					return;
-
-				if (!Utils.IsHostMinion(__instance))
-					return;
-
-				PacketSender.SendToAllClients(new StandardWorker_WorkingState_Packet(__instance,null, false));
+                
+                if (__state != 0 && __instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    syncer.EndWorkerPlayback(__state);
 			}
 		}
-	}
+
+        [HarmonyPatch(typeof(AnimEventHandler), nameof(AnimEventHandler.UpdateWorkTarget))]
+        public class UpdateWorkTarget_Patch
+        {
+            public static void Prefix(AnimEventHandler __instance, Vector3 pos)
+            {
+                if (!MultiplayerSession.IsHostInSession || !MultiplayerSession.SessionHasPlayers)
+                    return;
+                
+                if (!__instance.TryGetComponent<StandardWorkerSyncer>(out var syncer))
+                    return;
+
+                Workable workable = syncer.Worker.GetWorkable();
+                if (workable == null || workable.IsNullOrDestroyed())
+                    return;
+
+                // This workable cannot be synced by the workable syncer,
+                // Fallback to sync the work target only to fix the animation.
+                if (!syncer.CanSync(workable, out var _))
+                    syncer.RequestUpdateWorkTarget(pos);
+            }
+        }
+    }
 }
