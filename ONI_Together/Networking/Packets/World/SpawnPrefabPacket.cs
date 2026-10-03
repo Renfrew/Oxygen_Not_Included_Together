@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
+using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.Packets.Architecture;
 using ONI_Together.Scripts.Creatures;
 using ONI_Together.Scripts.Duplicants;
@@ -220,10 +221,12 @@ public class SpawnPrefabPacket : IPacket
 
                 if (go.GetComponent<MinionIdentity>() != null || go.HasTag(GameTags.BaseMinion))
                 {
+                    go.AddOrGet<OxySyncEntityPositionHandler>();
                     go.AddOrGet<MinionMultiplayerInitializer>();
                 }
                 else if (go.GetComponent<CreatureBrain>() != null || go.HasTag(GameTags.Creature))
                 {
+                    go.AddOrGet<OxySyncEntityPositionHandler>();
                     go.AddOrGet<CreatureMultiplayerInitializer>();
                 }
 

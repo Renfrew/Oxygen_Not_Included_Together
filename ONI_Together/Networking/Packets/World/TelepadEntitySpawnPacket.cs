@@ -1,5 +1,6 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
+using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.Packets.Architecture;
 using ONI_Together.Networking.Packets.Social;
 using ONI_Together.Scripts.Duplicants;
@@ -75,6 +76,7 @@ namespace ONI_Together.Networking.Packets.World
 
 					if (entity.GetComponent<MinionIdentity>() != null || entity.HasTag(GameTags.BaseMinion))
 					{
+						entity.AddOrGet<OxySyncEntityPositionHandler>();
 						entity.AddOrGet<MinionMultiplayerInitializer>();
 					}
 

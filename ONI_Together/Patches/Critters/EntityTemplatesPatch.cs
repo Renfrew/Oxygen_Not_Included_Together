@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
+using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Scripts.Creatures;
 using Shared.Profiling;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace ONI_Together.Patches.Critters
 					if (__result == null || __result.HasTag(GameTags.BaseMinion))
 						return;
 
+					__result.AddOrGet<OxySyncEntityPositionHandler>();
 					__result.AddOrGet<NetworkIdentity>();
 					__result.AddOrGet<CreatureMultiplayerInitializer>();
 				}
