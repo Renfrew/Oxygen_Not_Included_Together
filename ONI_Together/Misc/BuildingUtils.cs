@@ -167,6 +167,7 @@ namespace ONI_Together.Misc
                 // without this the suit or the animal is deleted here and simply never
                 // comes back.
                 if (IsEntityNotContents(storage.items[i])) continue;
+                if (storage.items[i].IsNullOrDestroyed()) continue;
                 storage.items[i].DeleteObject();
             }
             storage.items.RemoveAll(item => item == null || item.IsNullOrDestroyed());
