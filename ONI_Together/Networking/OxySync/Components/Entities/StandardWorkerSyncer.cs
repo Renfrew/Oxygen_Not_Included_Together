@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
@@ -23,14 +24,12 @@ namespace ONI_Together.Networking.OxySync.Components.Entities
         [MyCmpGet]
         private AnimEventHandler animEventHandler;
 
-        [MyCmpGet]
-        private AnimSyncer animSyncer;
-
         public string EntityName => gameObject?.GetProperName() ?? "Unknown Entity";
 
         private int workDepth;
         public bool IsInWorkScope => workDepth > 0;
 
+        private int activeWorkableId;
         private bool CanSend => isServer && MultiplayerSession.SessionHasPlayers;
 
         public override void OnPrefabInit()
@@ -49,7 +48,8 @@ namespace ONI_Together.Networking.OxySync.Components.Entities
 
             worker ??= GetComponent<StandardWorker>();
             animEventHandler ??= GetComponent<AnimEventHandler>();
-            animSyncer ??= GetComponent<AnimSyncer>();
+
+            activeWorkableId = 0;
 
             if (ENABLE_LOG)
                 DebugConsole.LogSuccess($"[StandardWorkerSyncer][ON_SPAWN] {EntityName}:{NetId} spawned.");
@@ -59,6 +59,9 @@ namespace ONI_Together.Networking.OxySync.Components.Entities
 		{
             if (ENABLE_LOG)
                 DebugConsole.LogSuccess($"[StandardWorkerSyncer][ON_CLEANUP] {EntityName}:{NetId} cleaning up.");
+
+            workDepth = 0;
+            activeWorkableId = 0;
 
 			base.OnCleanUp();
 		}
@@ -277,29 +280,49 @@ namespace ONI_Together.Networking.OxySync.Components.Entities
         {
             if (workableId == 0)
                 return;
-            
-            animSyncer ??= GetComponent<AnimSyncer>();
-            if (animSyncer == null)
-            {
-                LogUnexpected("BeginWorkerPlayback", $"AnimSyncer component is missing.");
-            }
 
-            animSyncer.BeginWorkerPlayback(workableId);
+            activeWorkableId = workableId;
+
+            if (ENABLE_LOG)
+                DebugConsole.LogNonImportant(
+                    $"[StandardWorkerSyncer][BEGIN_PLAYBACK] {EntityName}:{NetId} workableId={workableId}");
         }
 
         public void EndWorkerPlayback(int workableId)
         {
-            if (workableId == 0)
+            if (activeWorkableId != workableId)
                 return;
-            
-            animSyncer ??= GetComponent<AnimSyncer>();
-            if (animSyncer == null)
-            {
-                LogUnexpected("EndWorkerPlayback", $"AnimSyncer component is missing.");
-                return;
-            }
 
-            animSyncer.EndWorkerPlayback(workableId);
+            activeWorkableId = 0;
+            
+            if (ENABLE_LOG)
+                DebugConsole.LogNonImportant(
+                    $"[StandardWorkerSyncer][END_PLAYBACK] {EntityName}:{NetId} workableId={workableId}");
+        }
+
+        public bool IsActiveWorkerAnimation(HashedString animName)
+        {
+            if (activeWorkableId == 0)
+                return false;
+
+            Workable workable = worker.GetWorkable();
+            if (workable == null || workable.IsNullOrDestroyed())
+                return false;
+
+            if (workable.GetComponent<NetworkIdentity>()?.NetId != activeWorkableId)
+                return false;
+
+            try
+            {
+                return MultitoolController
+                    .GetAnimationStrings(workable, worker)
+                    .Any(anim => new HashedString(anim) == animName);
+            }
+            catch (Exception e)
+            {
+                LogUnexpected(nameof(IsActiveWorkerAnimation), $"Failed to resolve work animation: {e}");
+                return false;
+            }
         }
 
         private bool TryGetWorkableInfo(out int workableId, out string workableTypeName)
