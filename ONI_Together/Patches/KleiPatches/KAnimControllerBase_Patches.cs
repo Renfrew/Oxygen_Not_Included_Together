@@ -7,6 +7,7 @@ using ONI_Together.Networking.Packets.Core;
 using System;
 using Shared.Profiling;
 using ONI_Together.Networking.OxySync.Components;
+using ONI_Together.Networking.OxySync.Components.Entities;
 
 namespace ONI_Together.Patches.KleiPatches
 {
@@ -49,6 +50,14 @@ namespace ONI_Together.Patches.KleiPatches
 				// Allow the animation to play anyway, but log a warning. This should not happen in a properly configured multiplayer session.
 				return true;
 			}
+
+			// HashedString primaryAnim = anims.FirstOrDefault();
+
+			// if (controller.TryGetComponent<StandardWorkerSyncer>(out var workerSyncer))
+			// {
+			// 	if (workerSyncer.IsActiveWorkerAnimation(primaryAnim))
+			// 		return true;
+			// }
 
 			// Clients should not play animations directly. they should only be played through packets from the host.
 			if (MultiplayerSession.IsClient)
