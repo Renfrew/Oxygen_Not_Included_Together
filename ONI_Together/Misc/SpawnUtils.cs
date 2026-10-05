@@ -41,10 +41,12 @@ public static class SpawnUtils
     /// </summary>
     /// <param name="go">The GameObject the host has spawned.</param>
     /// <param name="isActive">Whether the clients should spawn it active.</param>
-    /// <returns>The object's NetId, or 0 if it could not be registered.</returns>
+    /// <returns>The object's NetId, or 0 if it could not be registered or not the host.</returns>
     [API_Method]
     public static int BroadcastSpawn(GameObject go, bool isActive = true)
     {
+        if (!MultiplayerSession.IsHost) return 0;
+        
         if (go == null)
             return 0;
 
@@ -92,16 +94,18 @@ public static class SpawnUtils
     /// resource is sent as a prefab spawn (<see cref="BroadcastSpawn"/>).
     /// </summary>
     /// <param name="go">The resource GameObject the host has spawned.</param>
-    /// <returns>The object's NetId, or 0 if it could not be registered.</returns>
+    /// <returns>The object's NetId, or 0 if it could not be registered or not the host.</returns>
     [API_Method]
     public static int BroadcastResourceSpawn(GameObject go)
     {
+        if (!MultiplayerSession.IsHost) return 0;
+        
         if (go == null)
             return 0;
 
         var primaryElement = go.GetComponent<PrimaryElement>();
         if (primaryElement == null || primaryElement.Element == null || go.PrefabID() != primaryElement.Element.tag)
-            return BroadcastSpawn(go, go.activeSelf);
+            return BroadcastSpawn(go, go.activeSelf); // Still not 100% sure about this fallback, but I'll leave it here
 
         var identity = AssignIdentity(go);
         if (identity.NetId == 0)
