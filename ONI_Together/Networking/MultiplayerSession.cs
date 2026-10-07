@@ -177,6 +177,8 @@ namespace ONI_Together.Networking
 			if (connection != null && !Equals(player.Connection, connection))
 				return;
 
+			ReadyManager.CancelPendingJoin(clientId);
+
 			close?.Invoke(player.Connection);
 			player.Connection = null;
 			ConnectedPlayers.Remove(clientId);

@@ -46,6 +46,16 @@ namespace ONI_Together.Networking
 				PendingJoins.Remove(playerId);
 		}
 
+		internal static void CancelPendingJoin(ulong playerId)
+		{
+			if (playerId != 0
+				&& PendingJoins.TryGetValue(playerId, out PendingJoin pendingJoin)
+				&& pendingJoin.Status == ClientReadyState.Unready)
+			{
+				PendingJoins.Remove(playerId);
+			}
+		}
+
 		public static void SetupListeners()
 		{
 			using var _ = Profiler.Scope();
