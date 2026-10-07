@@ -25,6 +25,7 @@ namespace ONI_Together.Networking
 		public static ClientState State => _state;
 
 		private static bool _pollingPaused = false;
+		private static bool _cancellingConnectionAttempt = false;
 
 		private static CachedConnectionInfo? _cachedConnectionInfo = null;
 
@@ -78,15 +79,90 @@ namespace ONI_Together.Networking
 			_cachedConnectionInfo = null;
 		}
 
-		public static void SetState(ClientState newState)
+		public static TransitionResult Handle(ClientEvent evt)
 		{
 			using var _ = Profiler.Scope();
 
-			if (_state != newState)
+			ClientState nextState;
+			switch (evt)
 			{
-				_state = newState;
-				DebugConsole.Log($"[GameClient] State changed to: {_state}");
+				case ClientEvent.BeginConnect:
+					if (_state == ClientState.Disconnected || _state == ClientState.LoadingWorld)
+						nextState = ClientState.Connecting;
+					else
+						return RejectTransition(evt, $"Cannot begin connecting while in {_state} state.");
+					break;
+				case ClientEvent.ConnectionFailed:
+					if (_state == ClientState.Disconnected)
+						return ApplyStateTransition(_state, evt);
+					if (_state == ClientState.Connecting)
+						nextState = ClientState.Disconnected;
+					else
+						return RejectTransition(evt, $"Cannot fail a connection attempt while in {_state} state.");
+					break;
+				case ClientEvent.CancelConnect:
+					if (_state == ClientState.Disconnected)
+						return ApplyStateTransition(_state, evt);
+					if (_state == ClientState.Connecting)
+						nextState = ClientState.Disconnected;
+					else
+						return RejectTransition(evt, $"Cannot cancel a connection attempt while in {_state} state.");
+					break;
+				case ClientEvent.TransportConnected:
+					if (_state == ClientState.Connecting)
+						nextState = ClientState.Connected;
+					else
+						return RejectTransition(evt, $"Cannot complete transport connection while in {_state} state.");
+					break;
+				case ClientEvent.WorldLoadStarted:
+					if (_state == ClientState.LoadingWorld)
+						return ApplyStateTransition(_state, evt);
+					if (_state == ClientState.Connected || _state == ClientState.InGame)
+						nextState = ClientState.LoadingWorld;
+					else
+						return RejectTransition(evt, $"Cannot start a world load while in {_state} state.");
+					break;
+				case ClientEvent.ConnectionFlowCompleted:
+					if (_state == ClientState.InGame)
+						return ApplyStateTransition(_state, evt);
+					if (_state == ClientState.Connected)
+						nextState = ClientState.InGame;
+					else
+						return RejectTransition(evt, $"Cannot complete the connection flow while in {_state} state.");
+					break;
+				case ClientEvent.TransportDisconnected:
+					if (_state == ClientState.Disconnected)
+						return ApplyStateTransition(_state, evt);
+					if (_state == ClientState.Connecting || _state == ClientState.Connected ||
+						_state == ClientState.LoadingWorld || _state == ClientState.InGame ||
+						_state == ClientState.Error)
+						nextState = ClientState.Disconnected;
+					else
+						return RejectTransition(evt, $"Cannot disconnect while in {_state} state.");
+					break;
+				default:
+					return RejectTransition(evt, $"Unknown client event {evt}.");
 			}
+
+			return ApplyStateTransition(nextState, evt);
+		}
+
+		private static TransitionResult ApplyStateTransition(ClientState nextState, ClientEvent evt)
+		{
+			if (_state != nextState)
+			{
+				ClientState previousState = _state;
+				_state = nextState;
+				DebugConsole.Log($"[GameClientLifecycle] {previousState} -> {_state} via {evt}");
+			}
+
+			return TransitionResult.Accepted();
+		}
+
+		private static TransitionResult RejectTransition(ClientEvent evt, string reason)
+		{
+			DebugConsole.LogWarning($"[GameClientLifecycle] Rejected {evt} while in {_state}. Reason: {reason}");
+			return TransitionResult.Rejected(reason);
 		}
 
 		public static void Init()
@@ -94,8 +170,21 @@ namespace ONI_Together.Networking
 			using var _ = Profiler.Scope();
 
 			// I fucking hate this, maybe replace this with hashes?
-			NetworkConfig.TransportClient.OnClientDisconnected = () => SetState(ClientState.Disconnected);
-			NetworkConfig.TransportClient.OnClientConnected = () => SetState(ClientState.Connected);
+			NetworkConfig.TransportClient.OnClientDisconnected = () =>
+			{
+				if (!_cancellingConnectionAttempt)
+					Handle(_state == ClientState.Connecting ? ClientEvent.ConnectionFailed : ClientEvent.TransportDisconnected);
+			};
+			NetworkConfig.TransportClient.OnConnectionFailed = () =>
+			{
+				if (!_cancellingConnectionAttempt)
+					Handle(ClientEvent.ConnectionFailed);
+			};
+			NetworkConfig.TransportClient.OnClientConnected = () =>
+			{
+				if (!_cancellingConnectionAttempt)
+					Handle(ClientEvent.TransportConnected);
+			};
 			NetworkConfig.TransportClient.OnContinueConnectionFlow = () => ContinueConnectionFlow();
 			NetworkConfig.TransportClient.OnReturnToMenu = (reason, message) => CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message));
 			NetworkConfig.TransportClient.OnRequestStateOrReturn = () =>
@@ -130,8 +219,19 @@ namespace ONI_Together.Networking
 					MultiplayerOverlay.Show(string.Format(STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST, hostName));
 			}
 
-			SetState(ClientState.Connecting);
-			NetworkConfig.TransportClient.ConnectToHost(ip, port);
+			TransitionResult transition = Handle(ClientEvent.BeginConnect);
+			if (!transition.Success)
+				return;
+
+			try
+			{
+				NetworkConfig.TransportClient.ConnectToHost(ip, port);
+			}
+			catch
+			{
+				Handle(ClientEvent.ConnectionFailed);
+				throw;
+			}
 		}
 
 		public static void Disconnect()
@@ -139,6 +239,30 @@ namespace ONI_Together.Networking
 			using var _ = Profiler.Scope();
 
 			NetworkConfig.TransportClient.Disconnect();
+		}
+
+		public static void CancelConnectionAttempt()
+		{
+			using var _ = Profiler.Scope();
+
+			if (_state != ClientState.Connecting)
+				return;
+
+			_cancellingConnectionAttempt = true;
+			try
+			{
+				NetworkConfig.TransportClient.Disconnect();
+			}
+			finally
+			{
+				_cancellingConnectionAttempt = false;
+
+				TransitionResult transition = Handle(ClientEvent.CancelConnect);
+				if (!transition.Success)
+					DebugConsole.LogError($"[GameClient] Failed to complete connection cancellation: {transition.Reason}");
+
+				MultiplayerOverlay.Close();
+			}
 		}
 
 		public static void ReconnectToSession()
@@ -314,9 +438,7 @@ namespace ONI_Together.Networking
 				}
 				else
 				{
-					DebugConsole.Log("[GameClient] Hard sync in progress, sending ready status");
-					// Tell the host we're ready
-					ReadyManager.SendReadyStatusPacket(ClientReadyState.Ready);
+					DebugConsole.Log("[GameClient] Hard sync in progress; readiness will be confirmed after entering the game");
 				}
 			}
 			else if (Utils.IsInGame())
@@ -324,7 +446,7 @@ namespace ONI_Together.Networking
 				DebugConsole.Log("[GameClient] Client is in game - treating as reconnection");
 
 				// We're in game already. Consider this a reconnection
-				SetState(ClientState.InGame);
+				TransitionResult transition = Handle(ClientEvent.ConnectionFlowCompleted);
 
 				// CRÍTICO: Habilitar processamento de pacotes
 				PacketHandler.readyToProcess = true;
@@ -337,7 +459,8 @@ namespace ONI_Together.Networking
 				}
 
 				Game.Instance?.Trigger(MP_HASHES.GameClient_OnConnectedInGame);
-                ReadyManager.SendReadyStatusPacket(ClientReadyState.Ready);
+				if (transition.Success)
+					ReadyManager.SendReadyStatusPacket(ClientReadyState.Ready);
 				MultiplayerSession.CreateConnectedPlayerCursors();
 
 				//CursorManager.Instance.AssignColor();

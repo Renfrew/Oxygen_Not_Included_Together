@@ -17,6 +17,7 @@ using ONI_Together.Patches.ToolPatches;
 using UnityEngine;
 using System.Collections;
 using Shared;
+using ONI_Together.Networking.States;
 
 namespace ONI_Together.Networking
 {
@@ -102,6 +103,12 @@ namespace ONI_Together.Networking
         public static void Stop()
         {
             GameClient.IsHardSyncInProgress = false;
+            bool resetClientLifecycle = GameClient.State != ClientState.LoadingWorld
+                && (MultiplayerSession.IsClient
+                    || GameClient.State == ClientState.Connecting
+                    || GameClient.State == ClientState.Connected
+                    || GameClient.State == ClientState.InGame
+                    || GameClient.State == ClientState.Error);
             switch(transport)
             {
                 case NetworkTransport.STEAMWORKS:
@@ -112,6 +119,9 @@ namespace ONI_Together.Networking
                     StopRaw();
                     break;
             }
+            if (resetClientLifecycle)
+                GameClient.Handle(ClientEvent.TransportDisconnected);
+
             Game.Instance?.Trigger(MP_HASHES.OnDisconnected);
         }
 

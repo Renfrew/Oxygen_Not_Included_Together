@@ -22,6 +22,7 @@ namespace ONI_Together.Networking.Transport.Steam
     {
         private static Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
         public static HSteamNetConnection? Connection { get; private set; }
+        private static readonly HashSet<uint> _intentionalDisconnects = new();
 
         private static SteamNetConnectionRealTimeStatus_t? connectionHealth = null;
 
@@ -72,12 +73,17 @@ namespace ONI_Together.Networking.Transport.Steam
             {
                 DebugConsole.Log("[GameClient] Disconnecting from host...");
 
+                HSteamNetConnection connection = Connection.Value;
+                uint connectionHandle = connection.m_HSteamNetConnection;
+                _intentionalDisconnects.Add(connectionHandle);
                 bool result = SteamNetworkingSockets.CloseConnection(
-                        Connection.Value,
+                        connection,
                         0,
                         "Client disconnecting",
                         false
                 );
+                if (!result)
+                    _intentionalDisconnects.Remove(connectionHandle);
 
                 MultiplayerSession.OnDisconnectedFromHost(null);
                 DebugConsole.Log($"[GameClient] CloseConnection result: {result}");
@@ -184,6 +190,11 @@ namespace ONI_Together.Networking.Transport.Steam
 
             DebugConsole.Log($"[GameClient] Connection status changed: {state} (remote={remote})");
 
+            if ((state == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer
+                    || state == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
+                && _intentionalDisconnects.Remove(data.m_hConn.m_HSteamNetConnection))
+                return;
+
             if (Connection.HasValue && data.m_hConn.m_HSteamNetConnection != Connection.Value.m_HSteamNetConnection)
                 return;
 
@@ -231,6 +242,9 @@ namespace ONI_Together.Networking.Transport.Steam
                 DebugConsole.Log("[GameClient] Ignoring disconnect callback - world is loading, will reconnect after.");
                 return;
             }
+
+            if (GameClient.State == ClientState.Connecting)
+                NetworkConfig.TransportClient.OnConnectionFailed?.Invoke();
 
             switch (state)
             {

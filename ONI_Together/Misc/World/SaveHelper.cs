@@ -85,10 +85,16 @@ public static class SaveHelper
 			return;
 		}
 
+		TransitionResult transition = GameClient.Handle(ClientEvent.WorldLoadStarted);
+		if (!transition.Success)
+		{
+			DebugConsole.LogError($"[SaveHelper] Aborting world load because the client lifecycle rejected WorldLoadStarted: {transition.Reason}");
+			return;
+		}
+
 		// Notify host before disconnecting so it can suppress leave/join messages
 		ReadyManager.SendReadyStatusPacket(ClientReadyState.Loading);
 
-		GameClient.SetState(ClientState.LoadingWorld);
 		GameClient.CacheCurrentServer();
 		GameClient.Disconnect();
 		PacketHandler.readyToProcess = false;
@@ -461,10 +467,16 @@ public static class SaveHelper
 			return;
 		}
 
+		TransitionResult transition = GameClient.Handle(ClientEvent.WorldLoadStarted);
+		if (!transition.Success)
+		{
+			DebugConsole.LogError($"[SaveHelper] Aborting world load because the client lifecycle rejected WorldLoadStarted: {transition.Reason}");
+			return;
+		}
+
 		// Notify host before disconnecting so it can suppress leave/join messages
 		ReadyManager.SendReadyStatusPacket(ClientReadyState.Loading);
 
-		GameClient.SetState(ClientState.LoadingWorld);
 		GameClient.CacheCurrentServer();
 		GameClient.Disconnect();
 		PacketHandler.readyToProcess = false;
