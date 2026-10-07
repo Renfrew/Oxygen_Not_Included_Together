@@ -92,8 +92,13 @@ namespace ONI_Together.Networking.Packets.Core
 
 			if (Status == ClientReadyState.Loading)
 			{
+				player.readyState = ClientReadyState.Loading;
+				if (NetworkConfig.transport != NetworkConfig.NetworkTransport.RIPTIDE)
+					ReadyManager.TrackPendingJoin(player.PlayerId, player.PlayerName, Status);
 				var server = NetworkConfig.TransportServer as LiteNetLibServer;
 				server?.MarkClientLoading(SenderId);
+				ReadyManager.RefreshScreen();
+				ReadyManager.RefreshReadyState();
 				return;
 			}
 
@@ -101,6 +106,14 @@ namespace ONI_Together.Networking.Packets.Core
 			if (nameChanged)
 			{
 				player.PlayerName = PlayerName;
+			}
+
+			if (NetworkConfig.transport != NetworkConfig.NetworkTransport.RIPTIDE)
+			{
+				if (Status == ClientReadyState.Unready)
+					ReadyManager.TrackPendingJoin(player.PlayerId, player.PlayerName, Status);
+				else if (Status == ClientReadyState.Ready)
+					ReadyManager.CompletePendingJoin(player.PlayerId);
 			}
 
             ReadyManager.SetPlayerReadyState(player, Status);
