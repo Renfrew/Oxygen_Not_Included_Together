@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static ONI_Together.Menus.NetworkIndicatorsScreen;
 
 namespace ONI_Together.Networking.Transport.Lan
@@ -38,6 +39,7 @@ namespace ONI_Together.Networking.Transport.Lan
         /// </summary>
         private static bool _connectedEventDelivered;
         private static bool _transportConnected;
+        private static int _connectionGeneration;
 
         private const string HostIdentityHandshake = "ONI_TOGETHER_HOST";
 
@@ -166,6 +168,10 @@ namespace ONI_Together.Networking.Transport.Lan
                     return;
             }
 
+            int generation = ++_connectionGeneration;
+            float startedAt = Time.realtimeSinceStartup;
+            int timeout = Configuration.Instance.Client.TimeoutSeconds;
+
             MultiplayerSession.ServerIp = ip;
             MultiplayerSession.ServerPort = port;
 
@@ -196,19 +202,29 @@ namespace ONI_Together.Networking.Transport.Lan
             _transportConnected = false;
             _serverPeer = _client.Connect(ip, port, writer);
 
-            int timeout = Configuration.Instance.Client.TimeoutSeconds;
-            CoroutineRunner.RunOne(WaitForConnectionSuccess(timeout));
+            CoroutineRunner.RunOne(WaitForConnectionSuccess(timeout, generation, startedAt));
         }
 
-        private IEnumerator WaitForConnectionSuccess(int timeoutSeconds)
+        private IEnumerator WaitForConnectionSuccess(int timeoutSeconds, int generation, float startedAt)
         {
             float elapsed = 0f;
             float connectedWithoutEventSince = -1f;
+            float nextHeartbeat = 5f;
 
             while (elapsed < timeoutSeconds)
             {
-                if (_connectedEventDelivered)
+                if (generation != _connectionGeneration)
                     yield break;
+
+                if (_connectedEventDelivered)
+                {
+                    yield break;
+                }
+
+                if (elapsed >= nextHeartbeat)
+                {
+                    nextHeartbeat += 5f;
+                }
 
                 if (_serverPeer != null && _serverPeer.ConnectionState == ConnectionState.Connected)
                 {
@@ -228,9 +244,13 @@ namespace ONI_Together.Networking.Transport.Lan
                 elapsed += 0.5f;
             }
 
+            if (generation != _connectionGeneration)
+                yield break;
+
             if (!_connectedEventDelivered)
             {
-                DebugConsole.LogError("[LiteNetLibClient] Connection timed out before host identity exchange completed.");
+                DebugConsole.LogError("[LiteNetLibClient] Connection timed out before host identity exchange completed.");                
+                OnConnectionFailed?.Invoke();
                 Disconnect();
                 OnReturnToMenu?.Invoke(
                     STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
@@ -368,9 +388,25 @@ namespace ONI_Together.Networking.Transport.Lan
             DebugConsole.LogWarning("[LiteNetLibClient] Network error: " + socketError);
         }
 
+        private static string DiagnosticId(object value)
+        {
+            return value == null ? "null" : value.GetHashCode().ToString("X8");
+        }
+
         public override void Disconnect()
         {
             using var _ = Profiler.Scope();
+
+            ++_connectionGeneration;
+
+            if (_listener != null)
+            {
+                _listener.PeerConnectedEvent -= OnConnectedToServer;
+                _listener.PeerDisconnectedEvent -= OnDisconnectedFromServer;
+                _listener.NetworkReceiveEvent -= OnNetworkReceive;
+                _listener.NetworkErrorEvent -= OnNetworkError;
+                _listener = null;
+            }
 
             _serverPeer?.Disconnect();
             _client?.Stop();
