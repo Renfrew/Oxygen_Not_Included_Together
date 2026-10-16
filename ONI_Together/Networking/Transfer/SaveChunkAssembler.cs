@@ -118,7 +118,7 @@ namespace ONI_United.Networking.Transfer
 
 				// Show initial progress bar (0%) to client
 				string initialProgressBar = CreateClientProgressBar(0);
-                string initialDisplay = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, initialProgressBar, "0", "0", save.TotalChunks);
+                string initialDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, initialProgressBar, "0", "0", save.TotalChunks);
 				MultiplayerOverlay.Show(initialDisplay);
 			}
 
@@ -155,7 +155,7 @@ namespace ONI_United.Networking.Transfer
 
 			// Create visual progress bar for client
 			string progressBar = CreateClientProgressBar(percent);
-			string progressDisplay = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, progressBar, percent, receivedChunks, save.TotalChunks);
+			string progressDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, progressBar, percent, receivedChunks, save.TotalChunks);
 
 			MultiplayerOverlay.Show(progressDisplay);
 
@@ -176,7 +176,7 @@ namespace ONI_United.Networking.Transfer
 
 				// Show completion visual to client
 				string completeProgressBar = CreateClientProgressBar(100);
-                string completeDisplay = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOAD_COMPLETE, completeProgressBar, save.TotalChunks, save.TotalChunks);
+                string completeDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOAD_COMPLETE, completeProgressBar, save.TotalChunks, save.TotalChunks);
 				MultiplayerOverlay.Show(completeDisplay);
 
 				InProgress.Remove(chunk.FileName);
@@ -291,12 +291,12 @@ namespace ONI_United.Networking.Transfer
 			for (int i = 0; i < barLength; i++)
 			{
 				if (i < filled)
-					bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
+					bar += ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
 				else
-					bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
+					bar += ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
 			}
 
-			return string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
+			return string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
 		}
 
 		/// <summary>

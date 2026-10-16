@@ -100,13 +100,13 @@ namespace ONI_United.UI.Screens
             layout.childForceExpandWidth = true;
 
             // Title
-            CreateTMPLabel(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.TITLE, 32, TextAlignmentOptions.Center, 50);
+            CreateTMPLabel(contentGO.transform, ONI_United.STRINGS.UI.MULTIPLAYERMENU.TITLE, 32, TextAlignmentOptions.Center, 50);
 
             // Divider
             CreateDivider(contentGO.transform);
 
             // Host World Button
-            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD, ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -118,7 +118,7 @@ namespace ONI_United.UI.Screens
             CreateDivider(contentGO.transform);
 
             // Browse Lobbies Button
-            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES, ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -126,7 +126,7 @@ namespace ONI_United.UI.Screens
             });
 
             // Join by Code Button
-            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE, ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -134,7 +134,7 @@ namespace ONI_United.UI.Screens
             });
 
             // Join via Steam Button
-            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM, ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR, () =>
             {
                 SteamFriends.ActivateGameOverlay("friends");
             });
@@ -200,13 +200,13 @@ namespace ONI_United.UI.Screens
 
                 var locTexts = buttonGO.GetComponentsInChildren<LocText>(true);
                 if (locTexts.Length > 0)
-                    locTexts[0].SetText(ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BACK);
+                    locTexts[0].SetText(ONI_United.STRINGS.UI.MULTIPLAYERMENU.BACK);
                 if (locTexts.Length > 1)
                     locTexts[1].SetText("");
             }
             else
             {
-                CreateFallbackButton(parent, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BACK, () => Close());
+                CreateFallbackButton(parent, ONI_United.STRINGS.UI.MULTIPLAYERMENU.BACK, () => Close());
             }
         }
 

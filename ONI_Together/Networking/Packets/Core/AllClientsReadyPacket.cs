@@ -38,7 +38,7 @@ namespace ONI_United.Networking.Packets.Core
 		{
 			using var _ = Profiler.Scope();
 
-			MultiplayerOverlay.Show(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
+			MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
             MultiplayerOverlay.Close();
 		}
 	}

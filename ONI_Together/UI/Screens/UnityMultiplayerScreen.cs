@@ -19,7 +19,7 @@ using System.Linq;
 using ONI_United.UI.lib.FUI;
 using UI.lib.UIcmp;
 using UnityEngine;
-using static ONI_Together.STRINGS.UI;
+using static ONI_United.STRINGS.UI;
 using ONI_United;
 using ONI_United.UI;
 
@@ -414,7 +414,7 @@ namespace ONI_United.UI.Screens
 				{
 					var textComp = AdditionalLobbySettings.GetComponentInChildren<LocText>();
 					if (textComp != null)
-						textComp.SetText(ONI_Together.STRINGS.UI.MP_SCREEN.HOSTMENU.ADDITIONALSETTINGS.TEXT);
+						textComp.SetText(ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.ADDITIONALSETTINGS.TEXT);
 				}
 			}
 			catch (Exception ex)
@@ -482,19 +482,19 @@ namespace ONI_United.UI.Screens
 
 			if (string.IsNullOrEmpty(code))
 			{
-				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE);
+				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE);
 				return;
 			}
 
 			if (!LobbyCodeHelper.IsValidCodeFormat(code))
 			{
-				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE);
+				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE);
 				return;
 			}
 
 			if (!LobbyCodeHelper.TryParseCode(code, out ulong lobbyId))
 			{
-				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED);
+				DialogUtil.CreateConfirmDialogFrontend(JOINBYDIALOGMENU.JOIN_BY_CODE, ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED);
 				return;
 			}
 
@@ -608,7 +608,7 @@ namespace ONI_United.UI.Screens
 
 			//string text = isPrivate ? STRINGS.UI.MP_SCREEN.HOSTMENU.FRIENDSONLY.LOBBY_VISIBILITY_FRIENDSONLY : STRINGS.UI.MP_SCREEN.HOSTMENU.FRIENDSONLY.LOBBY_VISIBILITY_PUBLIC;
 			//LobbyStateInfo.SetText(Utils.ColorText(text, isPrivate ? PrivateLobbyTint : PublicLobbyTint));
-			string text = isPrivate ? ONI_Together.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_FRIENDSONLY : ONI_Together.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_PUBLIC;
+			string text = isPrivate ? ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_FRIENDSONLY : ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_PUBLIC;
 			FriendsOnlyStateInfo.SetText(Utils.ColorText(text, isPrivate ? PrivateLobbyTint : PublicLobbyTint));
 		}
 
@@ -681,13 +681,13 @@ namespace ONI_United.UI.Screens
 		void ShowLobbySettings()
 		{
 			AddOrGetLobbySettingsEntry_Toggle("HardSyncToggle", ToggleHardSyncSetting,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START)
+				ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START,
+				ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START)
 				.SetOnFromCode(Configuration.Instance.Host.Server.HardSyncAtCycleStart);
 
 			AddOrGetLobbySettingsEntry_Toggle("PauseSimOnPlayerLeft", TogglePauseSimOnPlayerLeftSetting,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT)
+				ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT,
+				ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT)
 				.SetOnFromCode(Configuration.Instance.Host.Server.PauseSimOnPlayerDisconnect);
 
 			var tickRateOptions = new List<FCycle.Option>
@@ -701,8 +701,8 @@ namespace ONI_United.UI.Screens
 			};
 
 			AddOrGetLobbySettingsEntry_Cycle("ServerTickRate", tickRateOptions, OnTickRateChanged,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE)
+				ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE,
+				ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE)
 				.SetValueById(Configuration.Instance.Host.Server.TickRate.ToString());
 
 			var lanTransportOptions = new List<FCycle.Option>
@@ -712,14 +712,14 @@ namespace ONI_United.UI.Screens
 			};
 
 			var lanTransportCycle = AddOrGetLobbySettingsEntry_Cycle("LanTransport", lanTransportOptions, OnLanTransportChanged,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT);
+				ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT,
+				ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT);
 			lanTransportCycle.SetValueById(Configuration.Instance.Host.LanSettings.Transport.ToString());
 			lanTransportCycle.gameObject.SetActive(CurrentHostMode == HostMode.LAN);
 
 			var lanDisplayNameInput = AddOrGetLobbySettingsEntry_TextInput("LanDisplayName", OnLanDisplayNameChanged,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME,
-				ONI_Together.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME,
+				ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME,
+				ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME,
 				placeholder: "Player <id>",
 				value: Configuration.Instance.Host.LanSettings.DisplayName,
 				characterLimit: Utils.MaxLocalPlayerNameLength);

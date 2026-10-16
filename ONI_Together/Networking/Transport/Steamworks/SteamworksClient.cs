@@ -246,12 +246,12 @@ namespace ONI_United.Networking.Transport.Steamworks
                     if (remote.m_SteamID == MultiplayerSession.HostUserID)
                     {
                         // Invoke(reason, message)
-                        NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
+                        NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
                     }
                     break;
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
                     // Something went wrong locally
-                    NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
+                    NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
                     break;
             }
 

@@ -1,5 +1,4 @@
 using KSerialization;
-using ONI_Together;
 using ONI_United;
 using ONI_United.Misc;
 using ONI_United.Networking;
@@ -168,7 +167,7 @@ public class OxySyncChat : NetworkBehaviour
     {
         DebugConsole.Log("Chat history: Target RPC triggered!");
         // Really what we should do is add a history list to UnityChatBox and process it after Init
-        AddSystemMessage(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
+        AddSystemMessage(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
 
         using var reader = new BinaryReader(new MemoryStream(data));
         int count = reader.ReadInt32();

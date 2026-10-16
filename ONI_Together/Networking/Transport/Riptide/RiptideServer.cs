@@ -63,7 +63,7 @@ namespace ONI_United.Networking.Transport.Riptide
             if (_server != null)
                 return;
 
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Riptide (LAN)"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Riptide (LAN)"));
 
             string ip = Configuration.Instance.Host.LanSettings.Ip;
             int port = Configuration.Instance.Host.LanSettings.Port;
@@ -104,7 +104,7 @@ namespace ONI_United.Networking.Transport.Riptide
 
             int id = e.Client.Id;
             DebugConsole.Log("[RiptideServer] A client failed to connect to the server.");
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_FAILED, "A client"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_FAILED, "A client"));
         }
 
         private void OnLocalClientConnected(object sender, EventArgs e)
@@ -117,7 +117,7 @@ namespace ONI_United.Networking.Transport.Riptide
             MultiplayerSession.RegisterAsHost();
 
             string hostName = Utils.GetLocalPlayerName();
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, hostName));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, hostName));
         }
 
         private void OnLocalClientDisconnected(object sender, DisconnectedEventArgs e)
@@ -255,7 +255,7 @@ namespace ONI_United.Networking.Transport.Riptide
             if (!_server.IsRunning)
                 return;
 
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "LAN"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "LAN"));
 
             if (!_client.IsNotConnected)
             {
@@ -327,7 +327,7 @@ namespace ONI_United.Networking.Transport.Riptide
 
             ClientList.Remove(id);
             string name = MultiplayerSession.GetPlayer(id)?.PlayerName ?? $"Player {id}";
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
             Utils.PauseSimOnPlayerLeft();
 			var boxedId = Boxed<ulong>.Get(id);
 			Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);

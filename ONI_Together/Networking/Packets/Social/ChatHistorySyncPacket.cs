@@ -60,7 +60,7 @@ namespace ONI_United.Networking.Packets.Social
 			if (UnityChatBoxUI.Instance != null)
 			{
 				var ts = DateTimeOffset.FromUnixTimeMilliseconds(0).DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
-				UnityChatBoxUI.Instance.SendNewChatMessage("System", ts, ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
+				UnityChatBoxUI.Instance.SendNewChatMessage("System", ts, ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
 			}
 
 			foreach (var msg in Messages)

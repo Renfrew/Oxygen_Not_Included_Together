@@ -20,12 +20,12 @@ using UI.lib.UIcmp;
 using UnityEngine;
 using UnityEngine.UI;
 using static Klei.FileUtil;
-using static ONI_Together.STRINGS.UI;
-using static ONI_Together.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE;
-using static ONI_Together.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS;
-using static ONI_Together.STRINGS.UI.MP_SCREEN.HOSTMENU;
-using static ONI_Together.STRINGS.UI.MP_SCREEN.MAINMENU;
-using static ONI_Together.STRINGS.UI.PAUSESCREEN;
+using static ONI_United.STRINGS.UI;
+using static ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE;
+using static ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS;
+using static ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU;
+using static ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU;
+using static ONI_United.STRINGS.UI.PAUSESCREEN;
 using static PathFinder;
 using ONI_United;
 

@@ -1,5 +1,4 @@
-﻿using ONI_Together;
-using ONI_United;
+﻿using ONI_United;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Session;
 using Shared.Profiling;
@@ -86,7 +85,7 @@ public static class MultiplayerPopup
 	{
 		using var _ = Profiler.Scope();
 
-		MultiplayerOverlay.Show(ONI_Together.STRINGS.UI.MP_OVERLAY.HOST.STARTINGHOSTING);
+		MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.HOST.STARTINGHOSTING);
 		string text;
 		if (!KPlayerPrefs.HasKey("AutoResumeSaveFile"))
 		{

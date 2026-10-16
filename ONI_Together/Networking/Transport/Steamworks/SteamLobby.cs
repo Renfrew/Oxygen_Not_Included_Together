@@ -265,7 +265,7 @@ namespace ONI_United.Networking.Transport.Steamworks
                 }
 
 				DebugConsole.Log($"[SteamLobby] {name} joined the lobby.");
-				OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
+				OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
                 var boxedId = Boxed<ulong>.Get(userId);
 				Game.Instance?.Trigger(MP_HASHES.OnPlayerJoined, boxedId);
 				boxedId.Release();
@@ -280,7 +280,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 				RefreshLobbyMembers();
 				DebugConsole.Log($"[SteamLobby] {name} left the lobby.");
-                OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
+                OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
                 Utils.PauseSimOnPlayerLeft();
 				var boxedId = Boxed<ulong>.Get(userId);
 				Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);

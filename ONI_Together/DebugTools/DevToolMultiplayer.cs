@@ -14,7 +14,7 @@ using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Networking.Packets.Architecture;
 using UnityEngine;
-using static ONI_Together.STRINGS.UI;
+using static ONI_United.STRINGS.UI;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;

@@ -1,7 +1,7 @@
 
 using Steamworks;
 
-namespace ONI_Together
+namespace ONI_United
 {
 	internal class STRINGS
 	{

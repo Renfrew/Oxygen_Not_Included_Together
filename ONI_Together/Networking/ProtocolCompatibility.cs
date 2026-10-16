@@ -67,25 +67,25 @@ namespace ONI_United.Networking
 
             if (!hasMetadata)
             {
-                return ONI_Together.STRINGS.UI.PROTOCOL.NO_METADATA;
+                return ONI_United.STRINGS.UI.PROTOCOL.NO_METADATA;
             }
 
             if (remoteProtocolVersion != CurrentProtocolVersion)
             {
-                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH, CurrentProtocolVersion, remoteProtocolVersion);
+                return string.Format(ONI_United.STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH, CurrentProtocolVersion, remoteProtocolVersion);
             }
 
             if (remotePacketFingerprint != PacketFingerprint)
             {
-                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH, PacketFingerprint, remotePacketFingerprint);
+                return string.Format(ONI_United.STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH, PacketFingerprint, remotePacketFingerprint);
             }
 
             if (!string.IsNullOrEmpty(remoteModVersion) && remoteModVersion != ModVersion)
             {
-                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH, ModVersion, remoteModVersion);
+                return string.Format(ONI_United.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH, ModVersion, remoteModVersion);
             }
 
-            return ONI_Together.STRINGS.UI.PROTOCOL.INCOMPATIBLE;
+            return ONI_United.STRINGS.UI.PROTOCOL.INCOMPATIBLE;
         }
 	}
 }

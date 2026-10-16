@@ -13,7 +13,7 @@ using System.Collections;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Session.States;
 using Shared;
-using static ONI_Together.STRINGS.UI.MP_OVERLAY;
+using static ONI_United.STRINGS.UI.MP_OVERLAY;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
@@ -313,7 +313,7 @@ namespace ONI_United.Networking.Transport.Riptide
             ClientList.Remove(id);
 
             string name = MultiplayerSession.KnownPlayerNames.TryGetValue(id, out var cached) ? cached : $"Player {id}";
-            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
             Utils.PauseSimOnPlayerLeft();
 
 			var boxedId = Boxed<ulong>.Get(id);

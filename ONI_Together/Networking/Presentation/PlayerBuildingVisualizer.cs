@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using static ONI_Together.STRINGS.UI.MP_CHATWINDOW;
+using static ONI_United.STRINGS.UI.MP_CHATWINDOW;
 namespace ONI_United.Networking.Presentation
 {
 	/// <summary>

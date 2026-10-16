@@ -68,7 +68,7 @@ namespace ONI_United.Networking.Packets.Core
 				else
 				{
 					OxySyncChat.AddSystemMessage(
-						string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, PlayerName));
+						string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, PlayerName));
 				}
 				return;
 			}
@@ -110,7 +110,7 @@ namespace ONI_United.Networking.Packets.Core
 			if (NetworkConfig.IsLanConfig() && nameChanged)
 			{
 				OxySyncChat.AddSystemMessage(
-					string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));
+					string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));
 
 				PacketSender.SendToAllClients(new ClientReadyStatusPacket
 				{

@@ -16,8 +16,8 @@ using UI.lib.UIcmp;
 using UnityEngine;
 using UnityEngine.UI;
 using static AnimEventHandler;
-using static ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON;
-using static ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT;
+using static ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON;
+using static ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT;
 using static global::STRINGS.UI.CLUSTERMAP;
 using ONI_United;
 

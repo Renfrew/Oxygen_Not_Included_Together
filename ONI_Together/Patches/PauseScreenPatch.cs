@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using ONI_United.Networking;
 using ONI_United.Networking.Session;
-using ONIStrings = ONI_Together.STRINGS;
+using ONIStrings = ONI_United.STRINGS;
 using ONI_United.UI.Screens;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,5 @@
 using HarmonyLib;
 using Klei;
-using ONI_Together;
 using ONI_United;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
@@ -145,7 +144,7 @@ public static class SaveHelper
 		{
 			if (msg == null)
 			{
-				msg = ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION;
+				msg = ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION;
 			}
 
 			MultiplayerOverlay.Show(msg);
@@ -327,15 +326,15 @@ public static class SaveHelper
 		if (spacedOutSave != DlcManager.IsExpansion1Active())
 		{
 			errorMsg = spacedOutSave
-				? ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_BASEGAME
-				: ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_SPACEDOUT;
+				? ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_BASEGAME
+				: ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_SPACEDOUT;
 			return false;
 		}
 
 
 		if (missingDLCs.Any())
 		{
-			errorMsg = ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_LISTHEADER + "\n" + string.Join(", ", missingDLCs.Select(id => DlcManager.GetDlcTitleNoFormatting(id)));
+			errorMsg = ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_LISTHEADER + "\n" + string.Join(", ", missingDLCs.Select(id => DlcManager.GetDlcTitleNoFormatting(id)));
 			return false;
 		}
 		return true;
@@ -452,7 +451,7 @@ public static class SaveHelper
 
 		if (!File.Exists(targetFile))
 		{
-			MultiplayerOverlay.Show(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.MISSING_SAVE_FILE);
+			MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MISSING_SAVE_FILE);
 			DebugConsole.LogError($"[SaveHelper] Could not find file to load: {targetFile}");
 			return;
 		}

@@ -92,7 +92,7 @@ namespace ONI_United.Networking.Transfer
                                     return;
                                 var bar = CreateClientProgressBar(percent);
                                 string message = string.Format(
-                                    ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE,
+                                    ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE,
                                     bar,
                                     percent,
                                     FormatTime(timeRemaining)
@@ -151,12 +151,12 @@ namespace ONI_United.Networking.Transfer
             for (int i = 0; i < barLength; i++)
             {
                 if (i < filled)
-                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
+                    bar += ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
                 else
-                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
+                    bar += ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
             }
 
-            return string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
+            return string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
         }
 
         private static string FormatTime(double seconds)

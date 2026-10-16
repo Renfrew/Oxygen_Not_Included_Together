@@ -247,8 +247,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                     OnConnectionFailed?.Invoke();
                     Disconnect();
                     OnReturnToMenu?.Invoke(
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
                 }
             }
@@ -306,21 +306,21 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 case DisconnectReason.Timeout:
                     return (
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC
                     );
 
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
                     return (
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC
                     );
 
                 case DisconnectReason.ConnectionRejected:
                     return (
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC
                     );
 
                 case DisconnectReason.ConnectionFailed:
@@ -328,14 +328,14 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 case DisconnectReason.NetworkUnreachable:
                 case DisconnectReason.UnknownHost:
                     return (
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
 
                 default:
                     return (
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN,
-                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN,
+                        ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC
                     );
             }
         }

@@ -21,7 +21,7 @@ namespace ONI_United.Patches
 			public static void Postfix()
             {
 	            using var _ = Profiler.Scope();
-				Translate(typeof(ONI_Together.STRINGS), true);
+				Translate(typeof(ONI_United.STRINGS), true);
             }
 
 			static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

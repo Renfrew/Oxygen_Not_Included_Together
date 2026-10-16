@@ -115,7 +115,7 @@ namespace ONI_United.UI.Screens
             CreateLobbyList();
 
             // Status text
-            _statusText = CreateLabel(_screenGO.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES, 14, 25);
+            _statusText = CreateLabel(_screenGO.transform, ONI_United.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES, 14, 25);
             _statusText.color = new Color(0.7f, 0.7f, 0.7f);
 
             // Bottom buttons
@@ -145,7 +145,7 @@ namespace ONI_United.UI.Screens
             titleRT.sizeDelta = new Vector2(250, 50);
 
             var titleTmp = titleGO.GetComponent<TextMeshProUGUI>();
-            titleTmp.text = ONI_Together.STRINGS.UI.SERVERBROWSER.TITLE;
+            titleTmp.text = ONI_United.STRINGS.UI.SERVERBROWSER.TITLE;
             titleTmp.fontSize = 26;
             titleTmp.alignment = TextAlignmentOptions.Center;
             titleTmp.color = Color.white;
@@ -155,7 +155,7 @@ namespace ONI_United.UI.Screens
             CreateSearchField(headerGO.transform);
 
             // Refresh button
-            CreateButton(headerGO.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.REFRESH, () => RefreshLobbyList(), 100, 40);
+            CreateButton(headerGO.transform, ONI_United.STRINGS.UI.SERVERBROWSER.REFRESH, () => RefreshLobbyList(), 100, 40);
         }
 
         private TMP_InputField _searchInput;
@@ -192,7 +192,7 @@ namespace ONI_United.UI.Screens
             placeholderRT.sizeDelta = Vector2.zero;
 
             var placeholderTMP = placeholderGO.GetComponent<TextMeshProUGUI>();
-            placeholderTMP.text = string.Format(ONI_Together.STRINGS.UI.SERVERBROWSER.SEARCH, "🔍");
+            placeholderTMP.text = string.Format(ONI_United.STRINGS.UI.SERVERBROWSER.SEARCH, "🔍");
             placeholderTMP.fontSize = 14;
             placeholderTMP.color = new Color(0.5f, 0.5f, 0.5f);
             placeholderTMP.alignment = TextAlignmentOptions.MidlineLeft;
@@ -249,12 +249,12 @@ namespace ONI_United.UI.Screens
             rt.sizeDelta = new Vector2(0, 40);
 
             // Column headers - Mixed flexible and fixed widths
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.COLONY, 0, 1f);      // Flexible
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.HOST, 0, 0.8f);      // Flexible
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.PLAYERS, 65, 0);     // Fixed
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.CYCLE, 55, 0);       // Fixed
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.DUPES, 55, 0);       // Fixed
-            CreateHeaderCell(headerContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.HEADERS.PING, 55, 0);        // Fixed
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.COLONY, 0, 1f);      // Flexible
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.HOST, 0, 0.8f);      // Flexible
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PLAYERS, 65, 0);     // Fixed
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.CYCLE, 55, 0);       // Fixed
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.DUPES, 55, 0);       // Fixed
+            CreateHeaderCell(headerContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PING, 55, 0);        // Fixed
             CreateHeaderCell(headerContainer.transform, "", 70, 0);            // Join button
         }
 
@@ -347,7 +347,7 @@ namespace ONI_United.UI.Screens
             rt.sizeDelta = new Vector2(0, 55);
 
             // Join by Code button
-            CreateButton(buttonContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.JOIN_BY_CODE, () =>
+            CreateButton(buttonContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BY_CODE, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -355,14 +355,14 @@ namespace ONI_United.UI.Screens
             }, 140, 45);
 
             // Back button
-            CreateButton(buttonContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.BACK, () => Close(), 100, 45);
+            CreateButton(buttonContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.BACK, () => Close(), 100, 45);
         }
 
         private void RefreshLobbyList()
         {
             using var _ = Profiler.Scope();
 
-            _statusText.text = ONI_Together.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES;
+            _statusText.text = ONI_United.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES;
             ClearLobbyRows();
 
             SteamLobby.RequestLobbyList(OnLobbyListReceived);
@@ -380,11 +380,11 @@ namespace ONI_United.UI.Screens
 
             if (lobbyCount == 0)
             {
-                _statusText.text = ONI_Together.STRINGS.UI.SERVERBROWSER.NO_PUBLIC_LOBBIES_FOUND;
+                _statusText.text = ONI_United.STRINGS.UI.SERVERBROWSER.NO_PUBLIC_LOBBIES_FOUND;
             }
             else
             {
-                _statusText.text = string.Format(ONI_Together.STRINGS.UI.SERVERBROWSER.FOUND_X_LOBBIES, lobbyCount);
+                _statusText.text = string.Format(ONI_United.STRINGS.UI.SERVERBROWSER.FOUND_X_LOBBIES, lobbyCount);
             }
         }
 
@@ -492,7 +492,7 @@ namespace ONI_United.UI.Screens
 
             // Join button
             bool join_interactable = !lobby.IsPrivate || SteamFriends.HasFriend(lobby.HostSteamId.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate);
-            string label = join_interactable ? ONI_Together.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON : ONI_Together.STRINGS.UI.SERVERBROWSER.FRIEND_ONLY;
+            string label = join_interactable ? ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON : ONI_United.STRINGS.UI.SERVERBROWSER.FRIEND_ONLY;
             CreateButton(rowGO.transform, label, () => JoinLobby(lobby), 70, 30, join_interactable);
 
             return rowGO;
@@ -593,7 +593,7 @@ namespace ONI_United.UI.Screens
             var titleRT = titleGO.GetComponent<RectTransform>();
             titleRT.sizeDelta = new Vector2(0, 30);
             var titleTMP = titleGO.GetComponent<TextMeshProUGUI>();
-            titleTMP.text = ONI_Together.STRINGS.UI.SERVERBROWSER.PASSWORD_REQUIRED;
+            titleTMP.text = ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_REQUIRED;
             titleTMP.fontSize = 20;
             titleTMP.alignment = TextAlignmentOptions.Center;
             titleTMP.color = Color.white;
@@ -654,7 +654,7 @@ namespace ONI_United.UI.Screens
             btnLayout.childControlWidth = false;
 
             // Join button
-            CreateButton(btnContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON, () =>
+            CreateButton(btnContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON, () =>
             {
                 string password = inputField.text;
                 if (SteamLobby.ValidateLobbyPassword(lobbyID, password))
@@ -668,12 +668,12 @@ namespace ONI_United.UI.Screens
                 }
                 else
                 {
-                    errorTMP.text = ONI_Together.STRINGS.UI.SERVERBROWSER.PASSWORD_INCORRECT;
+                    errorTMP.text = ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_INCORRECT;
                 }
             }, 100, 35);
 
             // Cancel button
-            CreateButton(btnContainer.transform, ONI_Together.STRINGS.UI.SERVERBROWSER.CANCEL, () =>
+            CreateButton(btnContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.CANCEL, () =>
             {
                 Destroy(dialogGO);
             }, 100, 35);

@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using ONIStrings = ONI_Together.STRINGS;
+using ONIStrings = ONI_United.STRINGS;
 using ONI_United.UI.Screens;
 using System;
 using System.Collections.Generic;

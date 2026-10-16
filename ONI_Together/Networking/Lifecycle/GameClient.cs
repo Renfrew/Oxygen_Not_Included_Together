@@ -237,7 +237,7 @@ namespace ONI_United.Networking.Lifecycle
 				{
 					hostName = $"{ip}:{port}";
                 }
-					MultiplayerOverlay.Show(string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST, hostName));
+					MultiplayerOverlay.Show(string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST, hostName));
 			}
 
 			if (!Handle(ClientEvent.BeginConnect))
@@ -338,23 +338,23 @@ namespace ONI_United.Networking.Lifecycle
 
 			if (!SaveHelper.SteamModListSynced(packet.ActiveModIds, out var notEnabled, out var notDisabled, out var missingMods))
 			{
-				string text = ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TEXT + "\n\n";
+				string text = ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TEXT + "\n\n";
 				if (notEnabled.Any())
-					text += string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TOENABLE, notEnabled.Count) +"\n";
+					text += string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TOENABLE, notEnabled.Count) +"\n";
 				if (notDisabled.Any())
-					text += string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TODISABLE, notDisabled.Count) + "\n";
+					text += string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TODISABLE, notDisabled.Count) + "\n";
 				if (missingMods.Any())
-					text += string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.MISSING, missingMods.Count) + "\n";
+					text += string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.MISSING, missingMods.Count) + "\n";
 
 				// Ignore this if we're in game already
 				if (Utils.IsInMenu())
 				{
-					DialogUtil.CreateConfirmDialogFrontend(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE, text,
-		   ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC,
+					DialogUtil.CreateConfirmDialogFrontend(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE, text,
+		   ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC,
 					() => { SaveHelper.SyncModsAndRestart(notEnabled, notDisabled, missingMods); },
-					ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL,
+					ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL,
 					BackToMainMenu,
-					ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.DENY_SYNC,
+					ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.DENY_SYNC,
 					ContinueConnectionFlow);
 					DebugConsole.Log("mods not synced!");
 				}
@@ -375,32 +375,32 @@ namespace ONI_United.Networking.Lifecycle
 				return true;
 			}
 
-			reason = ONI_Together.STRINGS.UI.PROTOCOL.VALIDATION.TITLE;
+			reason = ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.TITLE;
 			message = string.Empty;
 
 			if (!packet.HasProtocolMetadata)
 			{
-				message = ONI_Together.STRINGS.UI.PROTOCOL.VALIDATION.NO_METADATA;
+				message = ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.NO_METADATA;
 				return false;
 			}
 
 			if (!packet.ProtocolAccepted)
 			{
 				message = string.IsNullOrEmpty(packet.ProtocolFailureReason)
-					? ONI_Together.STRINGS.UI.PROTOCOL.VALIDATION.REJECTED
+					? ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.REJECTED
 					: packet.ProtocolFailureReason;
 				return false;
 			}
 
 			if (packet.ProtocolVersion != ProtocolCompatibility.CurrentProtocolVersion)
 			{
-				message = string.Format(ONI_Together.STRINGS.UI.PROTOCOL.VALIDATION.PROTOCOL_MISMATCH, packet.ProtocolVersion, ProtocolCompatibility.CurrentProtocolVersion);
+				message = string.Format(ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.PROTOCOL_MISMATCH, packet.ProtocolVersion, ProtocolCompatibility.CurrentProtocolVersion);
 				return false;
 			}
 
 			if (packet.PacketRegistryFingerprint != ProtocolCompatibility.PacketFingerprint)
 			{
-				message = string.Format(ONI_Together.STRINGS.UI.PROTOCOL.VALIDATION.FINGERPRINT_MISMATCH, packet.PacketRegistryFingerprint, ProtocolCompatibility.PacketFingerprint);
+				message = string.Format(ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.FINGERPRINT_MISMATCH, packet.PacketRegistryFingerprint, ProtocolCompatibility.PacketFingerprint);
 				return false;
 			}
 
@@ -410,7 +410,7 @@ namespace ONI_United.Networking.Lifecycle
 			if (!string.IsNullOrEmpty(packet.ModVersion)
 				&& packet.ModVersion != ProtocolCompatibility.ModVersion)
 			{
-				message = string.Format(ONI_Together.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH,
+				message = string.Format(ONI_United.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH,
 					ProtocolCompatibility.ModVersion, packet.ModVersion);
 				return false;
 			}
@@ -443,7 +443,7 @@ namespace ONI_United.Networking.Lifecycle
 			if (Utils.IsInMenu())
 			{
 				DebugConsole.Log("[GameClient] Client is in menu - requesting save file or sending ready status");
-				MultiplayerOverlay.Show(string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.WAITING_FOR_PLAYER, SteamFriends.GetFriendPersonaName(MultiplayerSession.HostUserID.AsCSteamID())));
+				MultiplayerOverlay.Show(string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.WAITING_FOR_PLAYER, SteamFriends.GetFriendPersonaName(MultiplayerSession.HostUserID.AsCSteamID())));
 				DebugConsole.Log("[GameClient] Requesting synchronized save file from host");
 				PacketSender.SendToHost(new SynchronizationRequestPacket { Requester = MultiplayerSession.LocalUserID });
 			}
@@ -517,7 +517,7 @@ namespace ONI_United.Networking.Lifecycle
 			string displayText;
 			if (string.IsNullOrEmpty(reason) && string.IsNullOrEmpty(message))
 			{
-				displayText = ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION;
+				displayText = ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION;
 			}
 			else if (string.IsNullOrEmpty(reason))
 			{

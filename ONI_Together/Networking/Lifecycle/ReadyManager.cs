@@ -164,7 +164,7 @@ namespace ONI_United.Networking.Lifecycle
 			SaveFileRequestPacket.ClearPendingSynchronizationTransfers();
 			GameplayDrainUntil = 0f;
 			GameServerHardSync.OnSynchronizationCompleted();
-			MultiplayerOverlay.Show(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
+			MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
 			CoroutineRunner.RunOne(CloseHostOverlayAfterGrace(synchronizationId));
 		}
 
@@ -239,7 +239,7 @@ namespace ONI_United.Networking.Lifecycle
 
 			int readyCount = GetReadyCount();
 			int maxPlayers = IsSynchronizing ? Participants.Count + 1 : MultiplayerSession.ConnectedPlayers.Count;
-			string message = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC, readyCount, maxPlayers);
+			string message = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC, readyCount, maxPlayers);
 			foreach (MultiplayerPlayer player in MultiplayerSession.ConnectedPlayers.Values)
 			{
 				if (IsSynchronizing && player.PlayerId != MultiplayerSession.HostUserID && !Participants.Contains(player.PlayerId))
@@ -273,13 +273,13 @@ namespace ONI_United.Networking.Lifecycle
 			switch (readyState)
 			{
 				case ClientReadyState.Ready:
-					return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY;
+					return ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY;
 				case ClientReadyState.Unready:
-					return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY;
+					return ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY;
 				case ClientReadyState.Loading:
 					return global::STRINGS.UI.FRONTEND.LOADING;
 			}
-			return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN;
+			return ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN;
 		}
 
 		private static void UpdateReadyStateTracking(CSteamID id)

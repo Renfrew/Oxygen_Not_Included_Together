@@ -16,7 +16,7 @@ using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Social;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using static ONI_Together.STRINGS.UI.MP_OVERLAY;
+using static ONI_United.STRINGS.UI.MP_OVERLAY;
 using System.Net.Sockets;
 namespace ONI_United.DebugTools.IntegrationTests
 {
