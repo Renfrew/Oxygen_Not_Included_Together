@@ -1,7 +1,9 @@
 using Shared.Replication;
 using Shared.Replication.Attributes;
 
-namespace ONI_Together.Networking.OxySync.StateMachines
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.StateMachines
 {
     [SkipSaveFileSerialization]
     public class GraveStateSyncer : StateMachineSyncer

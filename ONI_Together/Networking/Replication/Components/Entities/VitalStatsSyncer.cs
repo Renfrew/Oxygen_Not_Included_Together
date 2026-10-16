@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using Klei.AI;
 using ONI_Together.DebugTools;
+using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+namespace ONI_United.Networking.Replication.Components.Entities
 {
     [FixedInterestGroup]
     public class VitalStatsSyncer : NetworkBehaviour

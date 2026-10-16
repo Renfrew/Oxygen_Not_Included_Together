@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using ONI_Together.Networking.OxySync.Packets;
+using ONI_United.Networking.Replication.Packets;
+using ONI_Together.Networking;
 using Steamworks;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
     public static class InterestGroupManager
     {

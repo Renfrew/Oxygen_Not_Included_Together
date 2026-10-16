@@ -2,7 +2,7 @@ using KSerialization;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 
-namespace ONI_Together.Networking.OxySync.StateMachines
+namespace ONI_United.Networking.Replication.Components
 {
     [SkipSaveFileSerialization]
     public class EdibleConsumptionSyncer : NetworkBehaviour

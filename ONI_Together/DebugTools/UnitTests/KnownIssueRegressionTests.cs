@@ -9,7 +9,8 @@ using ONI_Together.Patches.Critters;
 using ONI_Together.Patches.World;
 using ONI_Together.Patches.World.Buildings;
 using ONI_Together.Patches.OxySync;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Entities;
 
 namespace ONI_Together.DebugTools.UnitTests
 {

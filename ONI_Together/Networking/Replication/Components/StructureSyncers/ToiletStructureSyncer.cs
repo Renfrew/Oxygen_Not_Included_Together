@@ -4,7 +4,9 @@ using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.StructureSyncers
 {
     [SkipSaveFileSerialization]
     public class ToiletStructureSyncer : NetworkBehaviour

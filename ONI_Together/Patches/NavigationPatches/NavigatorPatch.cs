@@ -1,7 +1,7 @@
 using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components.Entities;
+using ONI_United.Networking.Replication.Components.Entities;
 using Shared.Profiling;
 using System;
 

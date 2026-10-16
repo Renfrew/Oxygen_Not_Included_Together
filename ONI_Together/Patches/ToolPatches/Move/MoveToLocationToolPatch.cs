@@ -2,7 +2,7 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components.Tools;
+using ONI_United.Networking.Replication.Components.Tools;
 using Shared.Profiling;
 
 namespace ONI_Together.Patches.ToolPatches.Move

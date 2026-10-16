@@ -1,9 +1,10 @@
 using System.IO;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_Together.Networking;
 using ONI_Together.Networking.Packets.Architecture;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.OxySync.Packets
+namespace ONI_United.Networking.Replication.Packets
 {
     // Currently unused, the host now manages interest groups. This can technically be deleted
     public class InterestGroupSubscribePacket : IPacket

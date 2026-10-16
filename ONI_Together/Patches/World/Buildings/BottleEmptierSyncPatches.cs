@@ -1,6 +1,7 @@
 using HarmonyLib;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Profiling;
 
 namespace ONI_Together.Patches.OxySync

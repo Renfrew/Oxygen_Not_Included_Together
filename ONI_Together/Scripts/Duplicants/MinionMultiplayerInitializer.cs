@@ -1,7 +1,7 @@
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
-using ONI_Together.Networking.OxySync.Components.Entities;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Entities;
 using System.Collections;
 using Shared.Profiling;
 using UnityEngine;

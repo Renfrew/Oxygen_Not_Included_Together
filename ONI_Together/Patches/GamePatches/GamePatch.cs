@@ -2,8 +2,10 @@
 using ONI_Together.Misc.World;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
-using ONI_Together.Networking.OxySync.Components.Tools;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Plants;
+using ONI_United.Networking.Replication.Components.StructureSyncers;
+using ONI_United.Networking.Replication.Components.Tools;
 using ONI_Together.UI;
 using Shared.Profiling;
 

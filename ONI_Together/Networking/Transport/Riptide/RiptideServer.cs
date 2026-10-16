@@ -8,7 +8,7 @@ using ONI_Together.Networking.Packets.Architecture;
 using Shared.Profiling;
 using ONI_Together.Networking.Transfer;
 using System.Collections.Generic;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using ONI_Together.UI;
 using Shared;
 using Steamworks;

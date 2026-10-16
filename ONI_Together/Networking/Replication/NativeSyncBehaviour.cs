@@ -2,7 +2,7 @@ using System;
 using Shared.Replication;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
     /// <summary>
     /// Adapts a native (ONI Together) <see cref="NetworkBehaviour"/> to <see cref="ISyncBehaviour"/>.

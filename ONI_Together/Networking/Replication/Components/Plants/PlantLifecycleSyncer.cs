@@ -8,7 +8,9 @@ using System.Collections;
 using Shared.Helpers;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.Plants
 {
     public enum PlantLifecycleOperation : byte
     {

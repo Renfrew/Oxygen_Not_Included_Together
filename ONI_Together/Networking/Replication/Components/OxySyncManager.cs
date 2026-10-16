@@ -5,14 +5,16 @@ using System.Reflection;
 using ONI_Together.DebugTools;
 using ONI_Together.Misc;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Packets;
+using ONI_United.Networking.Replication.Packets;
 using Shared.Helpers;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components
 {
     public class OxySyncManager : MonoBehaviour
     {

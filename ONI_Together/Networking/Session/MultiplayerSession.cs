@@ -233,7 +233,7 @@ namespace ONI_Together.Networking
 			using var _ = Profiler.Scope();
 
 			EndSession(null);
-			ONI_Together.Networking.OxySync.InterestGroupManager.Clear();
+			ONI_United.Networking.Replication.InterestGroupManager.Clear();
 			WorkProgressPatch.ClearTracking();
 			RemoteProgressRegistry.ClearAll();
 

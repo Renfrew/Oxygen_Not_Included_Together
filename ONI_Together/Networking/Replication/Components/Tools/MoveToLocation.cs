@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using ONI_Together.DebugTools;
+using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components.Tools
+namespace ONI_United.Networking.Replication.Components.Tools
 {
     [SkipSaveFileSerialization]
     [FixedInterestGroup]

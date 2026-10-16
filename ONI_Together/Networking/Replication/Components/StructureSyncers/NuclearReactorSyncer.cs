@@ -1,11 +1,13 @@
 using KSerialization;
 using ONI_Together.Misc;
-using ONI_Together.Networking.OxySync.StateMachines;
+using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.StructureSyncers
 {
     [SkipSaveFileSerialization]
     public class NuclearReactorSyncer : StateMachineSyncer

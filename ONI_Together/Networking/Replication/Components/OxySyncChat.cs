@@ -18,7 +18,7 @@ using ONI_Together.DebugTools;
 using Shared;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components;
+namespace ONI_United.Networking.Replication.Components;
 
 [SkipSaveFileSerialization]
 [FixedInterestGroup]
@@ -166,7 +166,7 @@ public class OxySyncChat : NetworkBehaviour
     {
         DebugConsole.Log("Chat history: Target RPC triggered!");
         // Really what we should do is add a history list to UnityChatBox and process it after Init
-        AddSystemMessage(STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
+        AddSystemMessage(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
 
         using var reader = new BinaryReader(new MemoryStream(data));
         int count = reader.ReadInt32();

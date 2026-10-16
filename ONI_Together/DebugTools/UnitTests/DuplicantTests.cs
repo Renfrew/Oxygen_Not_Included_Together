@@ -1,6 +1,6 @@
 ﻿using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components.Entities;
+using ONI_United.Networking.Replication.Components.Entities;
 using ONI_Together.Scripts.Duplicants;
 
 namespace ONI_Together.DebugTools.UnitTests

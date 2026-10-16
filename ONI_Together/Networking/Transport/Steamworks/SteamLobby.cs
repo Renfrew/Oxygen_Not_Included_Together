@@ -1,7 +1,7 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Misc;
 using ONI_Together.Patches.ToolPatches;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using ONI_Together.UI;
 using Steamworks;
 using System;

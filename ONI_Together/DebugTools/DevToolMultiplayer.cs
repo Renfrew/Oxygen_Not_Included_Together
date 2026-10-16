@@ -23,8 +23,9 @@ using ONI_Together.Tests;
 using static STRINGS.BUILDINGS.PREFABS;
 using Steamworks;
 using ONI_Together.Networking.Transport.Steamworks;
-using ONI_Together.Networking.OxySync;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Packets;
 using Shared.Replication;
 using System.Linq;
 using Shared;
@@ -1368,7 +1369,7 @@ namespace ONI_Together.DebugTools
                     ImGui.SameLine();
                     if (ImGui.SmallButton("Call"))
                     {
-                        var packet = new Networking.OxySync.Packets.CommandPacket
+                        var packet = new ONI_United.Networking.Replication.Packets.CommandPacket
                         {
                             NetId = behaviour.NetId,
                             MethodHash = cmd.Hash,
@@ -1408,7 +1409,7 @@ namespace ONI_Together.DebugTools
                     {
                         if (MultiplayerSession.IsHost)
                         {
-                            var packet = new Networking.OxySync.Packets.ClientRpcPacket
+                            var packet = new ONI_United.Networking.Replication.Packets.ClientRpcPacket
                             {
                                 NetId = behaviour.NetId,
                                 MethodHash = rpc.Hash,
@@ -1444,7 +1445,7 @@ namespace ONI_Together.DebugTools
                             {
                                 if (player.Value.PlayerId == MultiplayerSession.HostUserID) continue;
 
-                                var packet = new Networking.OxySync.Packets.ClientRpcPacket
+                                var packet = new ONI_United.Networking.Replication.Packets.ClientRpcPacket
                                 {
                                     NetId = behaviour.NetId,
                                     MethodHash = rpc.Hash,

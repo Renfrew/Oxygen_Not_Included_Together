@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
     /// <summary>
     /// A neutral read/write descriptor for a single SyncVar field, decoupled from

@@ -6,7 +6,7 @@ using ONI_Together.Networking.Components;
 using ONI_Together.Scripts.Duplicants;
 using Shared.Profiling;
 using UnityEngine;
-using VitalStatsSyncer = ONI_Together.Networking.OxySync.Components.VitalStatsSyncer;
+using VitalStatsSyncer = ONI_United.Networking.Replication.Components.Entities.VitalStatsSyncer;
 
 [HarmonyPatch(typeof(BaseMinionConfig), nameof(BaseMinionConfig.BaseMinion))]
 public static class DuplicantPatch

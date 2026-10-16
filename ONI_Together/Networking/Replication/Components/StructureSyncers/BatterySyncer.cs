@@ -5,7 +5,7 @@ using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components
+namespace ONI_United.Networking.Replication.Components.StructureSyncers
 {
     [SkipSaveFileSerialization]
     public class BatterySyncer : NetworkBehaviour

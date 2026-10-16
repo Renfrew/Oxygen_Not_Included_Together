@@ -10,7 +10,7 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync;
+using ONI_United.Networking.Replication;
 using ONI_Together.Networking.Overlay;
 
 namespace ONI_Together.Networking

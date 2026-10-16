@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.StateMachines;
+using ONI_United.Networking.Replication.Components.StateMachines;
 using UnityEngine;
 
 namespace ONI_Together.Patches.OxySync

@@ -1,12 +1,12 @@
 using System.IO;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using ONI_Together.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.OxySync.Packets
+namespace ONI_United.Networking.Replication.Packets
 {
     public class CommandPacket : IPacket
     {

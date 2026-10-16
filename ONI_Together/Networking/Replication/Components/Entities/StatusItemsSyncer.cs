@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ONI_Together.Networking.OxySync.Components
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.Entities
 {
     [SkipSaveFileSerialization]
     public class StatusItemsSyncer : NetworkBehaviour

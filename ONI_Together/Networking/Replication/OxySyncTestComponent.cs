@@ -2,7 +2,7 @@ using ONI_Together.DebugTools;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
     public class OxySyncTestComponent : NetworkBehaviour
     {

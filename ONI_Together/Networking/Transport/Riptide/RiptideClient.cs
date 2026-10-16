@@ -10,7 +10,7 @@ using ONI_Together.Menus;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using ONI_Together.Networking.States;
 using Shared;
 using static ONI_Together.STRINGS.UI.MP_OVERLAY;

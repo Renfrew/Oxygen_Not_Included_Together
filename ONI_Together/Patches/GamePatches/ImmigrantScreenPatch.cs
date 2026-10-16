@@ -2,7 +2,8 @@ using Database;
 using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.StructureSyncers;
 using ONI_Together.Networking.Packets.Social;
 using System.Collections;
 using System.Collections.Generic;
@@ -330,4 +331,3 @@ namespace ONI_Together.Patches.GamePatches
 		}
 	}
 }
-

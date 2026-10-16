@@ -16,7 +16,8 @@ using Shared.Profiling;
 using UnityEngine;
 using PeterHan.PLib.Core;
 using PeterHan.PLib.Options;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Plants;
 using System.Threading;
 
 namespace ONI_Together

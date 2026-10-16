@@ -3,7 +3,9 @@ using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.StateMachines
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.StateMachines
 {
     /// <summary>
     /// Handles syncing for the bulk of Oxygen Diffuser's and Sublimator's function. (some of it is handled by the syncer for ElementConverters)

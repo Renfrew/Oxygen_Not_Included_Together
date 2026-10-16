@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Plants;
+using ONI_United.Networking.Replication.Components.StructureSyncers;
 using Shared.Profiling;
 
 namespace ONI_Together.Patches.World

@@ -9,7 +9,9 @@ using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.Components.Entities
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.Entities
 {
     [SkipSaveFileSerialization]
     [FixedInterestGroup]

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components.Entities;
+using ONI_United.Networking.Replication.Components.Entities;
 using ONI_Together.Networking.Packets.Architecture;
 using ONI_Together.Networking.Packets.Core;
 using ONI_Together.Networking.Packets.World;

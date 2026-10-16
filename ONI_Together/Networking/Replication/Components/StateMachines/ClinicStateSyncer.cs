@@ -3,7 +3,7 @@ using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync.StateMachines
+namespace ONI_United.Networking.Replication.Components.StateMachines
 {
     [SkipSaveFileSerialization]
     public class ClinicStateSyncer : StateMachineSyncer

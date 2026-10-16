@@ -1,6 +1,6 @@
 using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using ONI_Together.UI.Components;
 using System;
 using System.Collections;

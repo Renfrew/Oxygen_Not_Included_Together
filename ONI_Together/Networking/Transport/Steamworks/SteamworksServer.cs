@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
 using Steamworks;
 
 namespace ONI_Together.Networking.Transport.Steam

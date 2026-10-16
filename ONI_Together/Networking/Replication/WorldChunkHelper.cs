@@ -2,7 +2,7 @@ using Shared.Profiling;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
 	public static class WorldChunkHelper
 	{

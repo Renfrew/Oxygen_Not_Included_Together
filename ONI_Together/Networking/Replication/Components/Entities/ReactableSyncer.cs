@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using ONI_Together.Networking.Components;
 
-namespace ONI_Together.Networking.OxySync.Components.Entities
+using ONI_Together.Networking;
+
+namespace ONI_United.Networking.Replication.Components.Entities
 {
     [SkipSaveFileSerialization]
     [FixedInterestGroup]

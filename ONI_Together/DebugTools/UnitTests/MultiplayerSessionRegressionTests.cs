@@ -1,7 +1,7 @@
 using System;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.OxySync;
+using ONI_United.Networking.Replication;
 using ONI_Together.Networking.States;
 using Shared;
 

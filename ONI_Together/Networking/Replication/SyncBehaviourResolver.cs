@@ -1,7 +1,8 @@
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_Together.Networking;
+using ONI_United.Networking.Replication.Components;
 
-namespace ONI_Together.Networking.OxySync
+namespace ONI_United.Networking.Replication
 {
     /// <summary>
     /// Resolves a behaviour for an inbound OxySync packet, checking the manager registry first

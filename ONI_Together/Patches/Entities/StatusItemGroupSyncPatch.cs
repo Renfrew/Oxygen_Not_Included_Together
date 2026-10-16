@@ -1,6 +1,7 @@
 using HarmonyLib;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.OxySync.Components;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Entities;
 
 namespace ONI_Together.Patches.OxySync
 {
