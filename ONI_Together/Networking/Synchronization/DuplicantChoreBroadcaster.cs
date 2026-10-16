@@ -1,5 +1,6 @@
 using HarmonyLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.Chores;
 using Shared.Profiling;
 using System;
@@ -7,8 +8,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	public class DuplicantChoreBroadcaster : KMonoBehaviour, IRender200ms
 	{

@@ -1,8 +1,8 @@
 ﻿using Shared.Profiling;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Runtime
 {
-	using ONI_Together.DebugTools;
+	using ONI_United.DebugTools;
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;

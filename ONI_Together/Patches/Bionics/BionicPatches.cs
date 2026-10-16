@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 using Klei.AI;
-using ONI_Together.Menus;
-using ONI_Together.Networking;
+using ONI_United.UI.Screens;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Patches.Bionics
 {

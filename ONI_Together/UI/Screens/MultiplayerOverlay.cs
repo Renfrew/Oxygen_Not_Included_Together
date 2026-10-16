@@ -1,11 +1,11 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Patches.LoadingOverlayPatches;
 using System;
 using Shared.Profiling;
 using TMPro;
 using UnityEngine;
 
-namespace ONI_Together.Menus
+namespace ONI_United.UI.Screens
 {
 	class MultiplayerOverlay
 	{

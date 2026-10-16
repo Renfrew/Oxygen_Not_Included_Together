@@ -5,13 +5,14 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ClipperLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using Steamworks;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Steam
+namespace ONI_United.Networking.Transport.Steamworks
 {
     public class SteamworksPacketSender : TransportPacketSender
     {

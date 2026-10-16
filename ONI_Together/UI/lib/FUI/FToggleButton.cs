@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UI.lib.UIcmp;
 
-namespace UI.lib.UI.FUI
+namespace ONI_United.UI.lib.FUI
 {
 	public class FToggleButton : KMonoBehaviour, IEventSystemHandler, IPointerUpHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 	{

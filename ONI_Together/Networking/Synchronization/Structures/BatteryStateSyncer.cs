@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Patches.World;
 using Shared.Replication;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components.StructureStateSyncers
+namespace ONI_United.Networking.Synchronization.Structures
 {
     public class BatteryStateSyncer : StructureSyncerBase
     {

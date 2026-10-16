@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
-using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using ONI_United.Networking.Synchronization;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.World
 {

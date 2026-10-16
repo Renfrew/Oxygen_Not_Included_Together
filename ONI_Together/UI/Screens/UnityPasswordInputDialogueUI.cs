@@ -1,9 +1,18 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Steamworks;
-using ONI_Together.UI.Components;
-using ONI_Together.UI.lib.FUI;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.Transfer;
+using ONI_United.Networking.WorldSync;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.UI.Components;
+using ONI_United.UI.lib.FUI;
 using Shared.Helpers;
 using Steamworks;
 using System;
@@ -22,8 +31,9 @@ using static ONI_Together.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS;
 using static ONI_Together.STRINGS.UI.MP_SCREEN.HOSTMENU;
 using static ONI_Together.STRINGS.UI.MP_SCREEN.MAINMENU;
 using static ONI_Together.STRINGS.UI.PAUSESCREEN;
+using ONI_United;
 
-namespace ONI_Together.UI
+namespace ONI_United.UI.Screens
 {
 	internal class UnityPasswordInputDialogueUI : FScreen
 	{

@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Synchronization
+namespace ONI_United.Networking.Synchronization
 {
 	public class ResourceSyncer : MonoBehaviour
 	{

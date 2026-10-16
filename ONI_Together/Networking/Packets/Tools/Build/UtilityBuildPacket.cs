@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
 using Steamworks;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using static TUNING.BUILDINGS.UPGRADES;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Tools.Build
 {

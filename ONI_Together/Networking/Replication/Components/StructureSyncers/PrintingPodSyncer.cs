@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using KSerialization;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Social;
 using ONI_United.Patches.GamePatches;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Shared.Profiling;
 
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components.StructureSyncers
 {

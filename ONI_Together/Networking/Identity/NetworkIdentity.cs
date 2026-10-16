@@ -1,9 +1,10 @@
 using KSerialization;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using System.IO;
 using Shared.Profiling;
+using ONI_United.Networking.Synchronization.Trackers;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Identity
 {
 	[SerializationConfig(MemberSerialization.OptIn)]
 	public class NetworkIdentity : KMonoBehaviour

@@ -1,11 +1,12 @@
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Shared.Profiling;
 using System;
 using UnityEngine;
 
-using ONI_Together.Networking;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components.Entities
 {

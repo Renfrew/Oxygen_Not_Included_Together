@@ -1,7 +1,7 @@
 using Shared.Replication;
 using Shared.Replication.Attributes;
 
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components.StateMachines
 {

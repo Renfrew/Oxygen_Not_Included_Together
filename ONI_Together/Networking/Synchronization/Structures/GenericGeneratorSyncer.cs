@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ONI_United.Networking.Packets.World;
 
-namespace ONI_Together.Networking.Components.StructureStateSyncers
+namespace ONI_United.Networking.Synchronization.Structures
 {
     public class GenericGeneratorSyncer : StructureSyncerBase
     {

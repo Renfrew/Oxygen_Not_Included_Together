@@ -1,13 +1,16 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Core;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared.Profiling;
 using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Presentation
 {
 	public class CursorManager : MonoBehaviour
 	{

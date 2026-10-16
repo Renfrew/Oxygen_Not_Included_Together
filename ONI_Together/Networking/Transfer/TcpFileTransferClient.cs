@@ -3,12 +3,13 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using ONI_Together.DebugTools;
-using ONI_Together.Menus;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.UI.Screens;
+using ONI_United.Networking.Runtime;
 using Shared.Profiling;
+using ONI_United;
 
-namespace ONI_Together.Networking.Transfer
+namespace ONI_United.Networking.Transfer
 {
 	public static class TcpFileTransferClient
 	{
@@ -91,7 +92,7 @@ namespace ONI_Together.Networking.Transfer
                                     return;
                                 var bar = CreateClientProgressBar(percent);
                                 string message = string.Format(
-                                    STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE,
+                                    ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE,
                                     bar,
                                     percent,
                                     FormatTime(timeRemaining)
@@ -150,12 +151,12 @@ namespace ONI_Together.Networking.Transfer
             for (int i = 0; i < barLength; i++)
             {
                 if (i < filled)
-                    bar += STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
+                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // Filled
                 else
-                    bar += STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
+                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // Empty
             }
 
-            return string.Format(STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
+            return string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
         }
 
         private static string FormatTime(double seconds)

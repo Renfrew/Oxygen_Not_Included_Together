@@ -1,4 +1,4 @@
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Identity;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Shared.Profiling;
 using UnityEngine;
 
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking
 {
 	public static class Extensions
 	{

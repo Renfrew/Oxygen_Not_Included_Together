@@ -1,6 +1,6 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Architecture;
+﻿using ONI_United.DebugTools;
+using ONI_United.Networking.Identity;
+using Shared.Interfaces.Networking;
 using System.IO;
 using System.Linq;
 using Shared.Profiling;

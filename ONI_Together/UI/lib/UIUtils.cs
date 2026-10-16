@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using UnityEngine;
 using static DetailsScreen;
 using static KAnim.Build;
 
-namespace ONI_Together.UI.lib
+namespace ONI_United.UI.lib
 {
 
 	public static class UIUtils

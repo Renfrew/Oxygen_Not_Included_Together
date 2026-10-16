@@ -1,8 +1,8 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using Shared.Profiling;
 using Steamworks;
 
-namespace ONI_Together.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transport.Steamworks
 {
 	public static class SteamRichPresence
 	{

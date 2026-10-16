@@ -1,13 +1,15 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.World;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	// Periodic sync of pipe (gas + liquid) contents from host to clients.
 	// Client sim is frozen (per oni-architecture.md), so pipes show stale or

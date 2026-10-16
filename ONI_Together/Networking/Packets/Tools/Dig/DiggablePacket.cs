@@ -2,7 +2,7 @@
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Tools.Dig
 {

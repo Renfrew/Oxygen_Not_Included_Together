@@ -3,10 +3,11 @@ using System.IO;
 using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Components.StructureStateSyncers;
+using ONI_United.Networking.Synchronization.Structures;
 using System.Collections.Generic;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.World
 {

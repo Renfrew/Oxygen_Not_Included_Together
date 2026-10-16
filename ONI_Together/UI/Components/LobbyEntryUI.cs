@@ -1,4 +1,5 @@
-﻿using ONI_Together.Networking;
+﻿using ONI_United.Networking;
+using ONI_United.Networking.Session.Lobbies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using Shared.Profiling;
 using UI.lib.UIcmp;
 using UnityEngine;
 
-namespace ONI_Together.UI.Components
+namespace ONI_United.UI.Components
 {
 	internal class LobbyEntryUI : KMonoBehaviour
 	{

@@ -1,6 +1,6 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking.States;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Session.States;
 using Steamworks;
 using System.Collections.Generic;
 using ONI_United.Networking.Replication;
@@ -8,8 +8,10 @@ using Shared.Profiling;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Presentation
 {
 	public class PlayerCursor : KMonoBehaviour
 	{

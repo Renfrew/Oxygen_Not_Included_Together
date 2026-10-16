@@ -1,12 +1,12 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using System;
 using System.IO;
 using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
 
 namespace ONI_United.Networking.Packets.DuplicantActions
 {

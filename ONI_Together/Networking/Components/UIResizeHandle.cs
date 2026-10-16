@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+namespace ONI_United.Networking.Components;
+
 [Flags]
 public enum ResizeEdge
 {

@@ -1,19 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using ONI_Together.Misc;
-using ONI_Together.Networking.States;
-using ONI_Together.Networking.Transport;
-using ONI_Together.Networking.Transport.Lan;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Misc;
+using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.Networking.Transport.Riptide;
+using ONI_United.Networking.Transport.Steamworks;
 using ONI_United.Patches.ToolPatches;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared;
 using Shared.Profiling;
 using Steamworks;
 using UnityEngine;
+using ONI_United;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using GameServer = ONI_United.Networking.Lifecycle.GameServer;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking
 {
     public static class NetworkConfig
     {

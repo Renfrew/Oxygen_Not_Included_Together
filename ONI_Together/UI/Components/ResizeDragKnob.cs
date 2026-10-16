@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace ONI_Together.UI.Components
+namespace ONI_United.UI.Components
 {
 
 	internal class ResizeDragKnob : KMonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler

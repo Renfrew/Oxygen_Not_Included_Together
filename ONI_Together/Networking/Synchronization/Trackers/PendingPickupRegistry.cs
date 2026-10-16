@@ -1,8 +1,8 @@
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using System.Collections.Generic;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Synchronization.Trackers
 {
 	/// <summary>
 	/// Keeps track of packets waiting to be picked up and processed.

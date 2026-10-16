@@ -1,7 +1,7 @@
-using ONI_Together.Misc;
-using ONI_Together.Networking;
+using ONI_United.Misc;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.UI.Components;
+using ONI_United.UI.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,16 +11,17 @@ using System.Text;
 using Shared;
 using TMPro;
 using TUNING;
-using UI.lib.UI.FUI;
+using ONI_United.UI.lib.FUI;
 using UI.lib.UIcmp;
 using UnityEngine;
 using UnityEngine.UI;
 using static AnimEventHandler;
 using static ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON;
 using static ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT;
-using static STRINGS.UI.CLUSTERMAP;
+using static global::STRINGS.UI.CLUSTERMAP;
+using ONI_United;
 
-namespace ONI_Together.UI
+namespace ONI_United.UI.Screens
 {
 	internal class UnityChatBoxUI : KScreen//, IRender1000ms
 	{

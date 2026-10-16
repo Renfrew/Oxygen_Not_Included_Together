@@ -10,7 +10,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using ONI_Together.Networking;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components.Entities
 {

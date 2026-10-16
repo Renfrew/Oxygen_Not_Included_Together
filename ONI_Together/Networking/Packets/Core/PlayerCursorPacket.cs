@@ -1,8 +1,9 @@
-﻿using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+﻿using ONI_United.Misc;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Steamworks;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using ONI_United.Networking.Replication.Components;
 using Shared.Profiling;
 using UnityEngine;
 using YamlDotNet.Core;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Core
 {

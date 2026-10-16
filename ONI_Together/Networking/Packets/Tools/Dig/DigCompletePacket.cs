@@ -1,5 +1,5 @@
-﻿using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Architecture;
+﻿using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;

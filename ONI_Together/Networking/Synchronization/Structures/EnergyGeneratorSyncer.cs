@@ -3,7 +3,7 @@ using ONI_United.Networking.Packets.World;
 using Shared.Replication;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components.StructureStateSyncers
+namespace ONI_United.Networking.Synchronization.Structures
 {
     public class EnergyGeneratorSyncer : StructureSyncerBase
     {

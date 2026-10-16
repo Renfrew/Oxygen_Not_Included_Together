@@ -1,7 +1,7 @@
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
 	/// <summary>
 	/// Centralized sync metrics for debug display.

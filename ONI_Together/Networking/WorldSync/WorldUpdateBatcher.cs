@@ -1,5 +1,7 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+﻿using ONI_United.DebugTools;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.World;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Misc.World
+namespace ONI_United.Networking.WorldSync
 {
 	public static class WorldUpdateBatcher
 	{

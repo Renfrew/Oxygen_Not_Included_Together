@@ -1,12 +1,14 @@
-using ONI_Together.Misc;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Social;
 using Shared.Profiling;
 using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Presentation
 {
 	public class PingManager : MonoBehaviour
 	{

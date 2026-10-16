@@ -1,10 +1,10 @@
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Presentation;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using System.IO;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.Social
 {

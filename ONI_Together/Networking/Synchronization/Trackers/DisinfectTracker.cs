@@ -2,7 +2,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.Trackers
+namespace ONI_United.Networking.Synchronization.Trackers
 {
 	public static class DisinfectTracker
 	{

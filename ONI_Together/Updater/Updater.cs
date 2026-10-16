@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared.Helpers;
 using Shared.Profiling;
 using Steamworks;
@@ -9,7 +9,7 @@ using UnityEngine;
 using YamlDotNet.RepresentationModel;
 using Version = System.Version;
 
-namespace ONI_Together.ModUpdater
+namespace ONI_United.Updater
 {
     public static class Updater
     {

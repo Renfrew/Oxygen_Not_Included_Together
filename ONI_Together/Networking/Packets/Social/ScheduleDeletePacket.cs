@@ -1,10 +1,10 @@
 using HarmonyLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Social
 {

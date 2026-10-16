@@ -5,7 +5,7 @@ using System.Text;
 using ONI_United.Networking.Packets.Architecture;
 using static ONI_United.Patches.World.MeterScreenPatches;
 using static Operational;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.World
 {

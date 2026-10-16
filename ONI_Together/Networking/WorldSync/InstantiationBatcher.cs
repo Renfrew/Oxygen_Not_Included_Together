@@ -1,11 +1,11 @@
-﻿using ONI_Together.Networking;
+﻿using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Misc.World
+namespace ONI_United.Networking.WorldSync
 {
 	public static class InstantiationBatcher
 	{

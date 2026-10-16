@@ -1,6 +1,6 @@
 ﻿using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Networking.States;
-using ONI_Together.Scripts.Buildings;
+using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.World.Buildings
 {

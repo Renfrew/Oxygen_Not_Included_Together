@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	internal static class AnimSyncEligibility
 	{

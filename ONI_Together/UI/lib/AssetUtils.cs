@@ -1,11 +1,11 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace ONI_Together.UI.lib
+namespace ONI_United.UI.lib
 {
 	public class AssetUtils
 	{

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using ONI_United.Networking.Replication.Components;
 using Steamworks;
+using ONI_United;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Steam
+namespace ONI_United.Networking.Transport.Steamworks
 {
     public class SteamworksServer : TransportServer
     {
@@ -34,7 +37,7 @@ namespace ONI_Together.Networking.Transport.Steam
         {
             using var _ = Profiler.Scope();
 
-            OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Steam"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Steam"));
 
             // Create listen socket for P2P
             var options = new SteamNetworkingConfigValue_t[2];
@@ -78,7 +81,7 @@ namespace ONI_Together.Networking.Transport.Steam
         {
             using var _ = Profiler.Scope();
 
-            OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "Steam"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "Steam"));
 
             if (PollGroup.m_HSteamNetPollGroup != 0)
                 SteamNetworkingSockets.DestroyPollGroup(PollGroup);

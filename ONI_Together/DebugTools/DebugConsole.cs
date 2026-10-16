@@ -5,7 +5,7 @@ using ImGuiNET;
 using System.Linq;
 using Shared.Profiling;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public class DebugConsole
     {

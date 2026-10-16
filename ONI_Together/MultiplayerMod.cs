@@ -1,13 +1,17 @@
 ﻿using HarmonyLib;
 using KMod;
-using ONI_Together.Components;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Overlay;
+using ONI_United.Networking.Presentation;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Synchronization;
+using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transport.Steamworks;
 using PeterHan.PLib.AVC;
 using System;
 using System.Collections.Generic;
@@ -20,7 +24,7 @@ using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Plants;
 using System.Threading;
 
-namespace ONI_Together
+namespace ONI_United
 {
 	//Template: https://github.com/O-n-y/OxygenNotIncludedModTemplate
 

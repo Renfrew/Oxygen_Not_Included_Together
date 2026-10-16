@@ -1,7 +1,9 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.EventSystems;
+
+namespace ONI_United.Networking.Components;
 
 public class UIDragHandler : MonoBehaviour, IPointerDownHandler, IDragHandler, IEndDragHandler
 {

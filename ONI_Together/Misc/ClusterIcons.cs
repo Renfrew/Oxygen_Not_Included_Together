@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Klei.CustomSettings;
 using ProcGen;
 
-namespace ONI_Together.Misc;
+namespace ONI_United.Misc;
 
 public static class ClusterIcons
     {

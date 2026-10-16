@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
 
     [AttributeUsage(AttributeTargets.Method)]

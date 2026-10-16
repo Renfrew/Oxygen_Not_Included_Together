@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Steam;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;
 using Steamworks;
-using SteamClient = ONI_Together.Networking.Transport.Steam.SteamworksClient;
+using SteamClient = ONI_United.Networking.Transport.Steamworks.SteamworksClient;
 using UnityEngine;
-
-namespace ONI_Together.Menus
+namespace ONI_United.UI.Screens
 {
     public class NetworkIndicatorsScreen
     {
@@ -84,17 +84,17 @@ namespace ONI_Together.Menus
             tooltipStyle.enableWordWrapping = true;
             tooltipStyle.textColor = Color.white;
 
-            AddTooltipTo(networkJitter_DEGRADED, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_JITTER);
-            AddTooltipTo(networkJitter_BAD, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_JITTER);
+            AddTooltipTo(networkJitter_DEGRADED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_JITTER);
+            AddTooltipTo(networkJitter_BAD, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_JITTER);
 
-            AddTooltipTo(latency_DEGRADED, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_LATENCY);
-            AddTooltipTo(latency_BAD, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_LATENCY);
+            AddTooltipTo(latency_DEGRADED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_LATENCY);
+            AddTooltipTo(latency_BAD, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_LATENCY);
 
-            AddTooltipTo(packetloss_DEGRADED, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_PACKETLOSS);
-            AddTooltipTo(packetloss_BAD, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_PACKETLOSS);
+            AddTooltipTo(packetloss_DEGRADED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_PACKETLOSS);
+            AddTooltipTo(packetloss_BAD, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_PACKETLOSS);
 
-            AddTooltipTo(serverPerformance_DEGRADED, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_SERVERPERFORMANCE);
-            AddTooltipTo(serverPerformance_BAD, STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_SERVERPERFORMANCE);
+            AddTooltipTo(serverPerformance_DEGRADED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_SERVERPERFORMANCE);
+            AddTooltipTo(serverPerformance_BAD, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_SERVERPERFORMANCE);
 
             // Default to good, hiding the icons
             UpdateIndicatorIconState(NetworkState.GOOD, networkJitter_DEGRADED, networkJitter_BAD);

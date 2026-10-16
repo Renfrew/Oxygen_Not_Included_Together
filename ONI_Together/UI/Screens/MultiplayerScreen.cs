@@ -1,12 +1,20 @@
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.Transfer;
+using ONI_United.Networking.WorldSync;
+using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using Steamworks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-namespace ONI_Together.Menus
+namespace ONI_United.UI.Screens
 {
     /// <summary>
     /// Main multiplayer screen with all lobby options.
@@ -92,13 +100,13 @@ namespace ONI_Together.Menus
             layout.childForceExpandWidth = true;
 
             // Title
-            CreateTMPLabel(contentGO.transform, STRINGS.UI.MULTIPLAYERMENU.TITLE, 32, TextAlignmentOptions.Center, 50);
+            CreateTMPLabel(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.TITLE, 32, TextAlignmentOptions.Center, 50);
 
             // Divider
             CreateDivider(contentGO.transform);
 
             // Host World Button
-            CreateMenuButton(contentGO.transform, STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD, STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -110,7 +118,7 @@ namespace ONI_Together.Menus
             CreateDivider(contentGO.transform);
 
             // Browse Lobbies Button
-            CreateMenuButton(contentGO.transform, STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES, STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -118,7 +126,7 @@ namespace ONI_Together.Menus
             });
 
             // Join by Code Button
-            CreateMenuButton(contentGO.transform, STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE, STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR, () =>
             {
                 var parent = _screenGO.transform.parent;
                 Close();
@@ -126,7 +134,7 @@ namespace ONI_Together.Menus
             });
 
             // Join via Steam Button
-            CreateMenuButton(contentGO.transform, STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM, STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR, () =>
+            CreateMenuButton(contentGO.transform, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR, () =>
             {
                 SteamFriends.ActivateGameOverlay("friends");
             });
@@ -192,13 +200,13 @@ namespace ONI_Together.Menus
 
                 var locTexts = buttonGO.GetComponentsInChildren<LocText>(true);
                 if (locTexts.Length > 0)
-                    locTexts[0].SetText(STRINGS.UI.MULTIPLAYERMENU.BACK);
+                    locTexts[0].SetText(ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BACK);
                 if (locTexts.Length > 1)
                     locTexts[1].SetText("");
             }
             else
             {
-                CreateFallbackButton(parent, STRINGS.UI.MULTIPLAYERMENU.BACK, () => Close());
+                CreateFallbackButton(parent, ONI_Together.STRINGS.UI.MULTIPLAYERMENU.BACK, () => Close());
             }
         }
 

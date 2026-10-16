@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ImGuiNET;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
+using ONI_United.Misc;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public class PacketTracker
     {

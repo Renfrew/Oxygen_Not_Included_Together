@@ -1,8 +1,8 @@
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Identity
 {
 	public static class NetIdHelper
 	{

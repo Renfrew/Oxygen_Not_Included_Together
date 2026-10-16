@@ -1,21 +1,26 @@
 ﻿using System;
 using Riptide;
 using Riptide.Utils;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Misc;
+using ONI_United.Misc;
 using System.Collections.Concurrent;
-using ONI_Together.Menus;
+using ONI_United.UI.Screens;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared;
 using static ONI_Together.STRINGS.UI.MP_OVERLAY;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.Riptide
 {
     public class RiptideClient : TransportClient
     {
@@ -308,7 +313,7 @@ namespace ONI_Together.Networking.Transport.Lan
             ClientList.Remove(id);
 
             string name = MultiplayerSession.KnownPlayerNames.TryGetValue(id, out var cached) ? cached : $"Player {id}";
-            OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
             Utils.PauseSimOnPlayerLeft();
 
 			var boxedId = Boxed<ulong>.Get(id);

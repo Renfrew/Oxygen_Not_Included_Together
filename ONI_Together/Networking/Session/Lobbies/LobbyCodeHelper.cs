@@ -1,12 +1,12 @@
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
 using Steamworks;
 using System;
 using System.Numerics;
 using System.Text;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Session.Lobbies
 {
     /// <summary>
     /// Helper class to convert Steam Lobby IDs to human-readable codes and back.

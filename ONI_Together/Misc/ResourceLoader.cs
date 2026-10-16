@@ -1,10 +1,11 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using System.IO;
 using System.Reflection;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United;
 
-namespace ONI_Together.Misc
+namespace ONI_United.Misc
 {
 	public static class ResourceLoader
 	{

@@ -1,5 +1,6 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Runtime;
 using Rendering;
 using Rendering.World;
 using System;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using static ONI_Together.STRINGS.UI.MP_CHATWINDOW;
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Presentation
 {
 	/// <summary>
 	/// KNOWN ISSUE: If the simulation is paused, other player visualizers act strange

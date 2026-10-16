@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,9 +6,11 @@ using System.IO;
 using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
-using ONI_Together;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United;
 
 namespace ONI_United.Networking.Packets.Handshake
 {

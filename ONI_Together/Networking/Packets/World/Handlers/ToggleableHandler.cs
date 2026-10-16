@@ -1,6 +1,9 @@
 ﻿using HarmonyLib;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

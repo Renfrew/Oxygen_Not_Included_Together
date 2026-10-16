@@ -1,17 +1,19 @@
 using DiscordRPC;
 using DiscordRPC.Message;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Steamworks;
-using ONI_Together.UI;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.UI.Screens;
 using Steamworks;
 using System;
 using System.Collections;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together
+namespace ONI_United
 {
     public class DiscordRichPresence : MonoBehaviour
     {

@@ -1,10 +1,10 @@
-﻿using ONI_Together.Menus;
-using ONI_Together.Networking;
+﻿using ONI_United.UI.Screens;
+using ONI_United.Networking.Session;
 using System.Reflection;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Components
+namespace ONI_United.Networking.Presentation
 {
 	public class UIVisibilityController : MonoBehaviour
 	{

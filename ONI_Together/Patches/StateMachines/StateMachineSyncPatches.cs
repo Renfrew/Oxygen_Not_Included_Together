@@ -1,5 +1,6 @@
 using HarmonyLib;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Synchronization;
 using Shared.Profiling;
 
 namespace ONI_United.Patches.StateMachines

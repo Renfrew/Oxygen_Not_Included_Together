@@ -1,8 +1,9 @@
 using Shared.Profiling;
 using System.Collections.Generic;
 using UnityEngine;
+using ONI_United.Networking.Identity;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Synchronization.Trackers
 {
 	internal enum RemoteProgressKind
 	{

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.UI
+namespace ONI_United.UI
 {
 	internal class UI_Patches
 	{

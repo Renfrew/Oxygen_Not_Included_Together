@@ -3,8 +3,10 @@ using ONI_United.Networking.Packets.World;
 using System.Collections.Generic;
 using Shared.Replication;
 using UnityEngine;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
     public class LogicStateSyncer : KMonoBehaviour
     {

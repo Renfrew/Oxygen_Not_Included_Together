@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Interfaces.Networking;
 using System;
@@ -8,8 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.Animation
 {

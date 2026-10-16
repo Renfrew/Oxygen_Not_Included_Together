@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Tests
+namespace ONI_United.DebugTools.IntegrationTests
 {
     public class TestPacket : IPacket
     {

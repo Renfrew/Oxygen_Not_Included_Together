@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using ONI_Together;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+using ONI_United;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,9 +1,9 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Menus;
-using ONI_Together.Misc;
+﻿using ONI_United.DebugTools;
+using ONI_United.UI.Screens;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Core;
-using ONI_Together.Networking.States;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Transport.Steamworks;
 using Steamworks;
 using Shared.Profiling;
 using System.Collections;
@@ -11,8 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Misc.World;
+using ONI_United.Networking.Session;
+using ONI_United.Networking;
+using ONI_United.Networking.WorldSync;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Lifecycle
 {
 	public class ReadyManager
 	{
@@ -159,7 +164,7 @@ namespace ONI_Together.Networking
 			SaveFileRequestPacket.ClearPendingSynchronizationTransfers();
 			GameplayDrainUntil = 0f;
 			GameServerHardSync.OnSynchronizationCompleted();
-			MultiplayerOverlay.Show(STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
+			MultiplayerOverlay.Show(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
 			CoroutineRunner.RunOne(CloseHostOverlayAfterGrace(synchronizationId));
 		}
 
@@ -234,7 +239,7 @@ namespace ONI_Together.Networking
 
 			int readyCount = GetReadyCount();
 			int maxPlayers = IsSynchronizing ? Participants.Count + 1 : MultiplayerSession.ConnectedPlayers.Count;
-			string message = string.Format(STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC, readyCount, maxPlayers);
+			string message = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC, readyCount, maxPlayers);
 			foreach (MultiplayerPlayer player in MultiplayerSession.ConnectedPlayers.Values)
 			{
 				if (IsSynchronizing && player.PlayerId != MultiplayerSession.HostUserID && !Participants.Contains(player.PlayerId))
@@ -268,13 +273,13 @@ namespace ONI_Together.Networking
 			switch (readyState)
 			{
 				case ClientReadyState.Ready:
-					return STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY;
+					return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY;
 				case ClientReadyState.Unready:
-					return STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY;
+					return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY;
 				case ClientReadyState.Loading:
 					return global::STRINGS.UI.FRONTEND.LOADING;
 			}
-			return STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN;
+			return ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN;
 		}
 
 		private static void UpdateReadyStateTracking(CSteamID id)

@@ -1,6 +1,6 @@
 using HarmonyLib;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Synchronization;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization;
 using Shared.Profiling;
 
 namespace ONI_United.Patches.World

@@ -1,6 +1,7 @@
 using HarmonyLib;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Social;
 using Shared.Profiling;

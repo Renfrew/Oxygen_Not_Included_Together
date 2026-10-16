@@ -1,10 +1,19 @@
 using HarmonyLib;
-using ONI_Together.DebugTools;
-using ONI_Together.Menus;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.UI.Screens;
+using ONI_United.Misc;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.Transfer;
+using ONI_United.Networking.WorldSync;
+using Shared.Interfaces.Networking;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.UI;
 using Shared.Profiling;
 using UnityEngine;
 

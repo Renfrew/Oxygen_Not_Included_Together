@@ -1,13 +1,17 @@
 using System.IO;
 using System.Text;
-using ONI_Together.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Replication.Components.Entities;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.World;
 using UnityEngine;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
 	public static class SyncTests
 	{

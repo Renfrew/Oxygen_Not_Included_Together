@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;

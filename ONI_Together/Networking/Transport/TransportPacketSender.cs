@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Core;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
+using ONI_United;
 
-namespace ONI_Together.Networking.Transport
+namespace ONI_United.Networking.Transport
 {
     public abstract class TransportPacketSender
     {

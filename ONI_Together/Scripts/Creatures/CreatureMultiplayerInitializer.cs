@@ -1,5 +1,7 @@
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Entities;
 using ONI_United.Networking.Packets.World;
@@ -8,7 +10,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Scripts.Creatures
+namespace ONI_United.Scripts.Creatures
 {
 	internal class CreatureMultiplayerInitializer : KMonoBehaviour
 	{

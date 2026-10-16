@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public enum TestState
     {

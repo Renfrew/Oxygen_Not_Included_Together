@@ -1,8 +1,9 @@
 using HarmonyLib;
 using KSerialization;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.Social;
 using System.Collections.Generic;
 using Shared.Profiling;

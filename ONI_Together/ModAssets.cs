@@ -1,6 +1,6 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.UI;
-using ONI_Together.UI.lib;
+﻿using ONI_United.DebugTools;
+using ONI_United.UI.Screens;
+using ONI_United.UI.lib;
 using Shared.Profiling;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UI.lib;
 using UnityEngine;
 
-namespace ONI_Together
+namespace ONI_United
 {
 	public static class ModAssets
 	{

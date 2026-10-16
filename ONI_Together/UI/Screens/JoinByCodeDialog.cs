@@ -1,14 +1,15 @@
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;
 using Steamworks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ONI_United.Networking;
 
-namespace ONI_Together.Menus
+namespace ONI_United.UI.Screens
 {
     /// <summary>
     /// Dialog for joining a lobby by entering a code.
@@ -91,11 +92,11 @@ namespace ONI_Together.Menus
             using var _ = Profiler.Scope();
 
             // Title
-            CreateLabel(_dialogGO.transform, STRINGS.UI.JOINBYDIALOGMENU.JOIN_BY_CODE, 22, FontStyles.Bold, 30);
+            CreateLabel(_dialogGO.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.JOIN_BY_CODE, 22, FontStyles.Bold, 30);
 
             // Code input section
-            CreateLabel(_dialogGO.transform, STRINGS.UI.JOINBYDIALOGMENU.ENTER_LOBBY_CODE, 14, FontStyles.Normal, 20);
-            _codeInput = CreateInputField(_dialogGO.transform, STRINGS.UI.JOINBYDIALOGMENU.DEFAULT_CODE, 40);
+            CreateLabel(_dialogGO.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ENTER_LOBBY_CODE, 14, FontStyles.Normal, 20);
+            _codeInput = CreateInputField(_dialogGO.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.DEFAULT_CODE, 40);
             _codeInput.characterLimit = 16;
 
             // Password section (initially hidden)
@@ -109,8 +110,8 @@ namespace ONI_Together.Menus
             passLayout.childControlHeight = false;
             passLayout.childControlWidth = true;
 
-            CreateLabel(_passwordContainer.transform, STRINGS.UI.JOINBYDIALOGMENU.PASSWORD_REQUIRED, 14, FontStyles.Normal, 20);
-            _passwordInput = CreateInputField(_passwordContainer.transform, STRINGS.UI.JOINBYDIALOGMENU.ENTER_PASSWORD, 40);
+            CreateLabel(_passwordContainer.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.PASSWORD_REQUIRED, 14, FontStyles.Normal, 20);
+            _passwordInput = CreateInputField(_passwordContainer.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ENTER_PASSWORD, 40);
             _passwordInput.contentType = TMP_InputField.ContentType.Password;
 
             _passwordContainer.SetActive(false); // Hidden initially
@@ -135,8 +136,8 @@ namespace ONI_Together.Menus
             var buttonContainerRT = buttonContainer.GetComponent<RectTransform>();
             buttonContainerRT.sizeDelta = new Vector2(0, 50);
 
-            CreateButton(buttonContainer.transform, STRINGS.UI.JOINBYDIALOGMENU.JOIN, OnJoinClicked, 120, 42);
-            CreateButton(buttonContainer.transform, STRINGS.UI.JOINBYDIALOGMENU.CANCEL, () => Close(), 100, 42);
+            CreateButton(buttonContainer.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.JOIN, OnJoinClicked, 120, 42);
+            CreateButton(buttonContainer.transform, ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.CANCEL, () => Close(), 100, 42);
         }
 
         private void OnJoinClicked()
@@ -157,24 +158,24 @@ namespace ONI_Together.Menus
 
             if (string.IsNullOrEmpty(code))
             {
-                _errorText.text = STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE;
+                _errorText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE;
                 return;
             }
 
             if (!LobbyCodeHelper.IsValidCodeFormat(code))
             {
-                _errorText.text = STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE;
+                _errorText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE;
                 return;
             }
 
             if (!LobbyCodeHelper.TryParseCode(code, out ulong lobbyId))
             {
-                _errorText.text = STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED;
+                _errorText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED;
                 return;
             }
 
             _pendingLobbyId = lobbyId;
-            _statusText.text = STRINGS.UI.JOINBYDIALOGMENU.CHECKING_LOBBY;
+            _statusText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.CHECKING_LOBBY;
 
             // We need to join the lobby to get its metadata (including password status)
             // But first, let's check if we can get the data by requesting lobby data
@@ -196,7 +197,7 @@ namespace ONI_Together.Menus
             if (hasPassword == "1")
             {
                 // Show password input
-                _statusText.text = STRINGS.UI.JOINBYDIALOGMENU.LOBBY_REQUIRES_PASSWORD;
+                _statusText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.LOBBY_REQUIRES_PASSWORD;
                 _passwordContainer.SetActive(true);
                 _awaitingPasswordRetry = true;
 
@@ -219,7 +220,7 @@ namespace ONI_Together.Menus
 
             if (string.IsNullOrEmpty(password))
             {
-                _errorText.text = STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ENTER_PASSWORD;
+                _errorText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ENTER_PASSWORD;
                 return;
             }
 
@@ -229,7 +230,7 @@ namespace ONI_Together.Menus
             {
                 if (!PasswordHelper.VerifyPassword(password, storedHash))
                 {
-                    _errorText.text = STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ERR_INCORRECT_PASSWORD;
+                    _errorText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ERR_INCORRECT_PASSWORD;
                     _passwordInput.text = "";
                     return;
                 }
@@ -243,7 +244,7 @@ namespace ONI_Together.Menus
         {
             using var _ = Profiler.Scope();
 
-            _statusText.text = STRINGS.UI.JOINBYDIALOGMENU.JOINING;
+            _statusText.text = ONI_Together.STRINGS.UI.JOINBYDIALOGMENU.JOINING;
             _errorText.text = "";
 
             SteamLobby.JoinLobby(lobbyId.AsCSteamID(), (joinedId) =>

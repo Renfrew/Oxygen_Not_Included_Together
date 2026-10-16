@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ONI_Together
+namespace ONI_United
 {
 	///<summary>
 	///An attribute placed on an a method or field that is reflected for by the mod api.

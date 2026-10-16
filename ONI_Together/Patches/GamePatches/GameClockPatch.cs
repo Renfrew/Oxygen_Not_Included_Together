@@ -1,7 +1,8 @@
 using HarmonyLib;
-using ONI_Together;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+using ONI_United;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Replication.Components;
 using System;
 using System.Collections;

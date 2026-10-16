@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Presentation
 {
 	public class PingMarker : MonoBehaviour
 	{

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Replication.Packets;
 using Shared.Helpers;
 using Shared.Replication;
@@ -12,7 +12,9 @@ using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 
-using ONI_Together.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_United.Networking.Replication.Components

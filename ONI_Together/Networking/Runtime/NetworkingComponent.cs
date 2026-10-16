@@ -1,9 +1,11 @@
-using ONI_Together.Misc;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Runtime
 {
 	public class NetworkingComponent : MonoBehaviour
 	{
@@ -47,7 +49,7 @@ namespace ONI_Together.Networking.Components
 				if (MultiplayerSession.IsClient && MultiplayerSession.HostUserID.IsValid())
 				{
 					// Check for inactive transfers and request missing chunks
-					ONI_Together.Misc.World.SaveChunkAssembler.CheckInactiveTransfers();
+					ONI_United.Networking.Transfer.SaveChunkAssembler.CheckInactiveTransfers();
 				}
 			}
             NetworkConfig.TransportPacketSender.Flush();

@@ -1,15 +1,19 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Handshake;
 using Shared.Profiling;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared;
 using System;
-using ONI_Together.Networking.Components;
-using ONI_Together.Misc;
+using ONI_United.Networking.Presentation;
+using ONI_United.Misc;
 using UnityEngine;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Transfer;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Lifecycle
 {
 	public static class GameServer
 	{

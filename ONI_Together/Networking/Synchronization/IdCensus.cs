@@ -1,10 +1,13 @@
 using System.Collections.Generic;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Core;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
     /// <summary>
     /// Ask continuously, and for every kind of object at once, whether the client has what

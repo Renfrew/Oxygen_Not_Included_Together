@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Trackers
+namespace ONI_United.Networking.Synchronization.Trackers
 {
 	public static class MopTracker
 	{

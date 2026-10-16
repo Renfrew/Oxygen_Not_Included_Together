@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ONI_Together.Networking;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.World;
-using ONI_Together.Networking.Transport.Lan;
+using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
     public static class NetworkingTests
     {

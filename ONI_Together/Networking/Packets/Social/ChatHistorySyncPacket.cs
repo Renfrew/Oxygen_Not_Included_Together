@@ -1,12 +1,12 @@
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.UI;
+using ONI_United.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Social
 {

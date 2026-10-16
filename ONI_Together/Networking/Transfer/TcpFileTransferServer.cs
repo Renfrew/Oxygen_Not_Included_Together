@@ -5,10 +5,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.Transfer
+namespace ONI_United.Networking.Transfer
 {
 	public class TcpFileTransferServer
 	{

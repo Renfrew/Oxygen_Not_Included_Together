@@ -1,7 +1,8 @@
 ﻿using System;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking.States;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session.States;
 using ONI_United.Patches;
 using Shared.Profiling;
 using System.Collections.Generic;
@@ -9,8 +10,12 @@ using Shared;
 using UnityEngine;
 using YamlDotNet.Core;
 using Object = UnityEngine.Object;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Synchronization.Trackers;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Session
 {
 	public static class MultiplayerSession
 	{

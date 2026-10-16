@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using ONI_Together.Networking;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.World.Buildings;
-using ONI_Together.Scripts.Buildings;
+using ONI_United.Networking.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

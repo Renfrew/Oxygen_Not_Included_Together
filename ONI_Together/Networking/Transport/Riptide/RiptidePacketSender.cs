@@ -1,11 +1,13 @@
 ﻿using System;
 using Riptide;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.Riptide
 {
     public class RiptidePacketSender : TransportPacketSender
     {
@@ -28,7 +30,7 @@ namespace ONI_Together.Networking.Transport.Lan
         {
             MessageSendMode sendMode = ConvertSendType(sendType);
             int id = PacketRegistry.GetPacketId(packet);
-            Riptide.Message msg = Riptide.Message.Create(sendMode, 1);
+            global::Riptide.Message msg = global::Riptide.Message.Create(sendMode, 1);
             msg.AddBytes(bytes);
 
             if (MultiplayerSession.IsHost)

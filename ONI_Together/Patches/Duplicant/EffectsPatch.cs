@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Klei.AI;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.DuplicantActions;
 using System;
 using System.Collections.Generic;

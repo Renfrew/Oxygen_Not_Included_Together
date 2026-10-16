@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Shared.Profiling;
 
-namespace ONI_Together.Misc
+namespace ONI_United.Misc
 {
 	public static class SecurePath
 	{

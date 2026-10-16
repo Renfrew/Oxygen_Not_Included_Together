@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.LiteNetLib
 {
     public struct LanDiscoveredHost
     {

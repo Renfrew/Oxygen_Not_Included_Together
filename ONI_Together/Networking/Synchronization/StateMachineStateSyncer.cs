@@ -4,8 +4,10 @@ using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	/// <summary>
 	/// Replicates host-authoritative state machines that are not covered by the

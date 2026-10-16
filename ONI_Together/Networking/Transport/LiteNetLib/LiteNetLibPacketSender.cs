@@ -1,11 +1,12 @@
 using LiteNetLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using System;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.LiteNetLib
 {
     public class LiteNetLibPacketSender : TransportPacketSender
     {

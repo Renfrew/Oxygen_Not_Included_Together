@@ -1,9 +1,10 @@
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.Chores;
 using Shared.Profiling;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	public class ClientReceiver_ChoreErrands : KMonoBehaviour
 	{

@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Packets.Chores;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
     public static class ChorePacketTests
     {

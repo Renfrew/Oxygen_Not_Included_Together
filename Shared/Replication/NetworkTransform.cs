@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
 using Shared.Replication.Attributes;
 using UnityEngine;
 

@@ -2,10 +2,9 @@
 using System.IO;
 using HarmonyLib;
 using Shared.Replication;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using UnityEngine;
-
-namespace ONI_Together.Misc
+namespace ONI_United.Misc
 {
     public static class BuildingUtils
     {

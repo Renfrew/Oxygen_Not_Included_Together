@@ -1,12 +1,13 @@
 ﻿using HarmonyLib;
-using ONI_Together.Misc.World;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Plants;
 using ONI_United.Networking.Replication.Components.StructureSyncers;
 using ONI_United.Networking.Replication.Components.Tools;
-using ONI_Together.UI;
+using ONI_United.UI.Screens;
 using Shared.Profiling;
 
 namespace ONI_United.Patches.GamePatches

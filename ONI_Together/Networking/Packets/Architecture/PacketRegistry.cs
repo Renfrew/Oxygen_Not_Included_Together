@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using KSerialization;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.DuplicantActions;
 using ONI_United.Networking.Packets.Events;
@@ -22,7 +22,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Architecture
 {

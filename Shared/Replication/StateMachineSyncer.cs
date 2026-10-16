@@ -1,5 +1,5 @@
 using KSerialization;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 

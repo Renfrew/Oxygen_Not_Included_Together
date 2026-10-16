@@ -1,5 +1,5 @@
 using UnityEngine;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared.Profiling;
 
 namespace ONI_United.Networking.Packets.World.Handlers

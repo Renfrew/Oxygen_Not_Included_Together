@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UI.lib.UIcmp;
 using UnityEngine.UI;
 
-namespace ONI_Together.UI.lib.FUI
+namespace ONI_United.UI.lib.FUI
 {
 	internal class PasswordInputToggle : KMonoBehaviour
 	{

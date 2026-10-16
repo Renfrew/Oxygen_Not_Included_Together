@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared;
 using Steamworks;
 using UnityEngine;
-using static ONI_Together.Menus.NetworkIndicatorsScreen;
+using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Steam
+namespace ONI_United.Networking.Transport.Steamworks
 {
     public class SteamworksClient : TransportClient
     {
@@ -241,12 +246,12 @@ namespace ONI_Together.Networking.Transport.Steam
                     if (remote.m_SteamID == MultiplayerSession.HostUserID)
                     {
                         // Invoke(reason, message)
-                        NetworkConfig.TransportClient.OnReturnToMenu.Invoke(STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
+                        NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
                     }
                     break;
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
                     // Something went wrong locally
-                    NetworkConfig.TransportClient.OnReturnToMenu.Invoke(STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
+                    NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
                     break;
             }
 

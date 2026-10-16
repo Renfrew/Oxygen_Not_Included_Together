@@ -1,9 +1,11 @@
 using KSerialization;
 using ONI_Together;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
-using ONI_Together.UI;
+using ONI_United;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Presentation;
+using ONI_United.UI.Screens;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Steamworks;
@@ -14,7 +16,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Shared;
 using UnityEngine;
 

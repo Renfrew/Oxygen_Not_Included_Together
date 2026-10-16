@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Shared.Replication;
-using ONI_Together.Misc;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.World;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components.StructureStateSyncers
+namespace ONI_United.Networking.Synchronization.Structures
 {
     public class ToiletSyncer : StructureSyncerBase
     {

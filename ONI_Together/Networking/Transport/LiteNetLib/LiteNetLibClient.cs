@@ -1,8 +1,8 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using ONI_Together.DebugTools;
-using ONI_Together.Menus;
-using ONI_Together.Misc;
+using ONI_United.DebugTools;
+using ONI_United.UI.Screens;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
 using Shared;
 using Shared.Profiling;
@@ -13,9 +13,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
-using static ONI_Together.Menus.NetworkIndicatorsScreen;
+using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.LiteNetLib
 {
     public class LiteNetLibClient : TransportClient
     {
@@ -243,8 +247,8 @@ namespace ONI_Together.Networking.Transport.Lan
                     OnConnectionFailed?.Invoke();
                     Disconnect();
                     OnReturnToMenu?.Invoke(
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
                 }
             }
@@ -302,21 +306,21 @@ namespace ONI_Together.Networking.Transport.Lan
             {
                 case DisconnectReason.Timeout:
                     return (
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC
                     );
 
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
                     return (
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC
                     );
 
                 case DisconnectReason.ConnectionRejected:
                     return (
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC
                     );
 
                 case DisconnectReason.ConnectionFailed:
@@ -324,14 +328,14 @@ namespace ONI_Together.Networking.Transport.Lan
                 case DisconnectReason.NetworkUnreachable:
                 case DisconnectReason.UnknownHost:
                     return (
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
 
                 default:
                     return (
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN,
-                        STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN,
+                        ONI_Together.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC
                     );
             }
         }

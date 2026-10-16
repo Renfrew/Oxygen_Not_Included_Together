@@ -1,10 +1,13 @@
 ﻿using ONI_Together;
-using ONI_Together.DebugTools;
-using ONI_Together.Menus;
-using ONI_Together.Networking;
+using ONI_United;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Session;
 using Shared.Profiling;
 using Steamworks;
 using UnityEngine;
+using ONI_United.Networking;
+
+namespace ONI_United.UI.Screens;
 
 public static class MultiplayerPopup
 {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Shared.Profiling;
 
-namespace ONI_Together.Misc.World
+namespace ONI_United.Networking.WorldSync
 {
 	public class ChunkData
 	{

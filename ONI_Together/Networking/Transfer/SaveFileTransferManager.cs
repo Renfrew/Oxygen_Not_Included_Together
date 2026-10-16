@@ -1,12 +1,13 @@
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Lifecycle;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Transfer
 {
     /// <summary>
     /// Manages transfers with ACK system

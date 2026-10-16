@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ONI_Together.UI.Components
+namespace ONI_United.UI.Components
 {
 	internal class ChatMessageContainer : KMonoBehaviour
 	{

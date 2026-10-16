@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using System;
 using Shared.Profiling;
 
-namespace ONI_Together.Misc
+namespace ONI_United.Misc
 {
 	public static class SafeSerializer
 	{

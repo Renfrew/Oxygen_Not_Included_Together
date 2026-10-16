@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
 using JetBrains.Annotations;
-using ONI_Together.Networking;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
 using ONIStrings = ONI_Together.STRINGS;
-using ONI_Together.UI;
+using ONI_United.UI.Screens;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -55,7 +56,7 @@ namespace ONI_United.Patches
 						if (canvas != null)
 						{
 							UnityMultiplayerScreen.OpenFromPauseScreen();
-							ONI_Together.Menus.HostLobbyConfigScreen.Show(canvas.transform, () =>
+							ONI_United.UI.Screens.HostLobbyConfigScreen.Show(canvas.transform, () =>
 							{
 								NetworkConfig.StartServer();
 							});
@@ -74,7 +75,7 @@ namespace ONI_United.Patches
 					var canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
 					if (canvas != null)
 					{
-						ONI_Together.Menus.MultiplayerInfoScreen.Show(canvas.transform);
+						ONI_United.UI.Screens.MultiplayerInfoScreen.Show(canvas.transform);
 					}
 				});
             }

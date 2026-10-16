@@ -1,12 +1,13 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Components;
+﻿using ONI_United.DebugTools;
 using System;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.World;
+using ONI_United;
+using ONI_United.Networking.Synchronization.Trackers;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Identity
 {
 	public static class NetworkIdentityRegistry
 	{

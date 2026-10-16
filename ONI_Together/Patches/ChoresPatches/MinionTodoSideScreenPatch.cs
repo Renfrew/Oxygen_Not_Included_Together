@@ -1,13 +1,14 @@
 using HarmonyLib;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Packets.Chores;
 using Shared.Profiling;
 using System.Collections.Generic;
 using System.Reflection;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking;
 
 namespace ONI_United.Patches.ChoresPatches
 {

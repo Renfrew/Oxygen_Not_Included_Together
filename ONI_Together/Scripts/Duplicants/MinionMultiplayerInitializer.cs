@@ -1,12 +1,13 @@
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Entities;
 using System.Collections;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Scripts.Duplicants
+namespace ONI_United.Scripts.Duplicants
 {
 	internal class MinionMultiplayerInitializer : KMonoBehaviour
 	{

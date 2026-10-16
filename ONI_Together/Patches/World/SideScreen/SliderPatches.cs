@@ -1,9 +1,9 @@
 using HarmonyLib;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Identity;
 using System.Collections;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 
 namespace ONI_United.Patches.World.SideScreen
 {

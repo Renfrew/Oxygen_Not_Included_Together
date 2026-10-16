@@ -1,4 +1,4 @@
-namespace ONI_Together.Misc;
+namespace ONI_United.Misc;
 
 public static class BitUtils
 {

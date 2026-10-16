@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,6 @@ using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using UnityEngine;
 using static STRINGS.INPUT_BINDINGS;
-using ONI_Together.Networking.Packets.Architecture;
 
 namespace ONI_United.Networking.Packets.Tools
 {

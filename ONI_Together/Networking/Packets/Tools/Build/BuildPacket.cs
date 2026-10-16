@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Steamworks;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using Shared.Profiling;
 using UnityEngine;
 using static PathFinder;
 using static STRINGS.MISC;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Tools.Build
 {

@@ -1,13 +1,17 @@
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.World;
-using ONI_Together.Networking.Trackers;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.Transport.Steamworks;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	public class WorldStateSyncer : MonoBehaviour
 	{
@@ -782,7 +786,7 @@ namespace ONI_Together.Networking.Components
 			}
 
 			// Flush the batcher
-			int packetSize = ONI_Together.Misc.World.WorldUpdateBatcher.Flush();
+			int packetSize = ONI_United.Networking.WorldSync.WorldUpdateBatcher.Flush();
 
 			sw.Stop();
 			SyncStats.RecordSync(SyncStats.Gas, cellsScanned, packetSize, sw.ElapsedMilliseconds);
@@ -838,7 +842,7 @@ namespace ONI_Together.Networking.Components
 						_shadowMass[cell] = currentMass;
 
 						// Queue for Network
-						ONI_Together.Misc.World.WorldUpdateBatcher.Queue(new WorldUpdatePacket.CellUpdate
+						ONI_United.Networking.WorldSync.WorldUpdateBatcher.Queue(new WorldUpdatePacket.CellUpdate
 						{
 							Cell = cell,
 							ElementIdx = currentElement,

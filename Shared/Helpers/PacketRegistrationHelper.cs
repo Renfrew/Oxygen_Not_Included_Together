@@ -1,4 +1,4 @@
-﻿using ONI_Together.Networking.Packets.Architecture;
+﻿using Shared.Interfaces.Networking;
 using System;
 using System.Collections.Generic;
 using System.Linq;

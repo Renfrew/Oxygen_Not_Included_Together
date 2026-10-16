@@ -1,7 +1,10 @@
 using HarmonyLib;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Synchronization;
 using PeterHan.PLib.Core;
 using System;
 using System.Collections.Generic;
@@ -9,8 +12,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Shared.Replication;
 using UnityEngine;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Overlay
+namespace ONI_United.Networking.Overlay
 {
 	public static class NetworkingOverlayPatches
 	{
@@ -150,10 +155,10 @@ namespace ONI_Together.Networking.Overlay
 				info.getTooltipText = () =>
 				{
 					var list = new List<Tuple<string, TextStyleSetting>>();
-					list.Add(new Tuple<string, TextStyleSetting>(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME,
+					list.Add(new Tuple<string, TextStyleSetting>(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME,
 						ToolTipScreen.Instance.defaultTooltipHeaderStyle));
 					string hotkey = "<b><color=#F44A4A>[SHIFT + F5]</b></color>";
-					list.Add(new Tuple<string, TextStyleSetting>($"{STRINGS.UI.OVERLAYS.NETWORKACTIVITY.TOOLTIP} {hotkey}",
+					list.Add(new Tuple<string, TextStyleSetting>($"{ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.TOOLTIP} {hotkey}",
 						ToolTipScreen.Instance.defaultTooltipBodyStyle));
 					if (MultiplayerSession.IsClient && NetworkConfig.TransportClient != null)
 					{
@@ -221,7 +226,7 @@ namespace ONI_Together.Networking.Overlay
 					{
 						var args = new object[ps.Length];
 						args[0] = sprite;
-						args[1] = STRINGS.UI.OVERLAYS.NETWORKACTIVITY.DESCRIPTION;
+						args[1] = ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.DESCRIPTION;
 						args[2] = Color.white;
 						args[3] = Color.white;
 						for (int i = 4; i < ps.Length; i++)
@@ -300,8 +305,8 @@ namespace ONI_Together.Networking.Overlay
 
 				var behaviour = hover.GetComponent<NetworkBehaviour>();
 				string syncMode = behaviour != null
-					? STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_OXYSYNC
-					: STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_ADHOC;
+					? ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_OXYSYNC
+					: ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_ADHOC;
 
 				float lastTime = behaviour != null
 					? behaviour._lastActiveSyncTime
@@ -311,19 +316,19 @@ namespace ONI_Together.Networking.Overlay
 				{
 					float elapsed = Time.unscaledTime - lastTime;
 					if (elapsed < 1f)
-						lastSynced = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NOW);
+						lastSynced = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NOW);
 					else if (elapsed < 60f)
-						lastSynced = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_SECS, (int)elapsed);
+						lastSynced = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_SECS, (int)elapsed);
 					else
-						lastSynced = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_MINS, (int)(elapsed / 60f));
+						lastSynced = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_MINS, (int)(elapsed / 60f));
 				}
 				else
 				{
-					lastSynced = STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NEVER;
+					lastSynced = ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NEVER;
 				}
 
 				__instance.BeginShadowBar(false);
-				__instance.DrawText(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME,
+				__instance.DrawText(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME,
 					ToolTipScreen.Instance.defaultTooltipHeaderStyle);
 				__instance.NewLine();
 
@@ -332,19 +337,19 @@ namespace ONI_Together.Networking.Overlay
 				{
 					string formatted = Utils.FormatBytes((long)bps);
 					if (bps >= NetworkingOverlayMode.HIGH_ACTIVITY_THRESHOLD)
-						usageStr = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_HIGH, formatted);
+						usageStr = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_HIGH, formatted);
 					else if (bps >= NetworkingOverlayMode.MEDIUM_ACTIVITY_THRESHOLD)
-						usageStr = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_MEDIUM, formatted);
+						usageStr = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_MEDIUM, formatted);
 					else
-						usageStr = string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_LOW, formatted);
+						usageStr = string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_LOW, formatted);
 				}
 				else
 				{
-					usageStr = STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_IDLE;
+					usageStr = ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_IDLE;
 				}
 
 				__instance.DrawText(
-					string.Format(STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_TOOLTIP, usageStr, identity.NetId, syncMode, lastSynced),
+					string.Format(ONI_Together.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_TOOLTIP, usageStr, identity.NetId, syncMode, lastSynced),
 					ToolTipScreen.Instance.defaultTooltipBodyStyle);
 				__instance.EndShadowBar();
 			}

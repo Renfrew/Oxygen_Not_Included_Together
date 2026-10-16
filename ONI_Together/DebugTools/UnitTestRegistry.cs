@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public static class UnitTestRegistry
     {

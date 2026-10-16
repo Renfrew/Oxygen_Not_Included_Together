@@ -1,9 +1,11 @@
 using System.Linq;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Lan;
-using ONI_Together.Networking.Transport.Steam;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
 	public static class TransportTests
 	{

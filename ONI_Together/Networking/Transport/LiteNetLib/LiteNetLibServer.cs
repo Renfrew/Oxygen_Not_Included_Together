@@ -1,11 +1,11 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Networking.States;
-using ONI_Together.Networking.Transfer;
+using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Transfer;
 using Shared.Profiling;
 using System;
 using System.Collections.Concurrent;
@@ -13,8 +13,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using ONI_United.Misc.World;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Lan
+namespace ONI_United.Networking.Transport.LiteNetLib
 {
     public class LiteNetLibServer : TransportServer
     {
@@ -59,7 +64,7 @@ namespace ONI_Together.Networking.Transport.Lan
             if (_server != null)
                 return;
 
-            OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
 
             string ip = Configuration.Instance.Host.LanSettings.Ip;
             int port = Configuration.Instance.Host.LanSettings.Port;
@@ -118,7 +123,7 @@ namespace ONI_Together.Networking.Transport.Lan
             ClientList.Clear();
             ClientList.Add(hostId);
 
-            OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
+            OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
         }
 
         private void OnConnectionRequest(ConnectionRequest request)

@@ -2,8 +2,9 @@ using System.IO;
 using System.Text;
 using ONI_United.Networking.Packets.Tools.Sandbox;
 using UnityEngine;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
     public static class SandboxToolTests
     {

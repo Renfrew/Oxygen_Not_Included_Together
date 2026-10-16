@@ -1,7 +1,7 @@
 using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
-using ONI_Together.Networking.Packets.Architecture;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Core
 {

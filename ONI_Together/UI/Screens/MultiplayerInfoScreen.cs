@@ -1,12 +1,14 @@
-using ONI_Together.DebugTools;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.DebugTools;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-namespace ONI_Together.Menus
+namespace ONI_United.UI.Screens
 {
     /// <summary>
     /// In-game multiplayer info screen with host controls.
@@ -152,7 +154,7 @@ namespace ONI_Together.Menus
             layout.childControlWidth = true;
 
             // Title
-            CreateLabel(STRINGS.UI.SERVERBROWSER.MULTIPLAYER_SESSION_TITLE, 24, FontStyles.Bold, 35);
+            CreateLabel(ONI_Together.STRINGS.UI.SERVERBROWSER.MULTIPLAYER_SESSION_TITLE, 24, FontStyles.Bold, 35);
 
             // Divider
             CreateDivider();
@@ -194,7 +196,7 @@ namespace ONI_Together.Menus
             var labelRT = labelGO.GetComponent<RectTransform>();
             labelRT.sizeDelta = new Vector2(100, 40);
             var labelTMP = labelGO.GetComponent<TextMeshProUGUI>();
-            labelTMP.text = STRINGS.UI.SERVERBROWSER.LOBBY_CODE;
+            labelTMP.text = ONI_Together.STRINGS.UI.SERVERBROWSER.LOBBY_CODE;
             labelTMP.fontSize = 16;
             labelTMP.alignment = TextAlignmentOptions.MidlineRight;
             labelTMP.color = new Color(0.7f, 0.7f, 0.7f);
@@ -245,7 +247,7 @@ namespace ONI_Together.Menus
             textRT.anchorMax = Vector2.one;
             textRT.sizeDelta = Vector2.zero;
             var textTMP = textGO.GetComponent<TextMeshProUGUI>();
-            textTMP.text = STRINGS.UI.SERVERBROWSER.COPY;
+            textTMP.text = ONI_Together.STRINGS.UI.SERVERBROWSER.COPY;
             textTMP.fontSize = 14;
             textTMP.alignment = TextAlignmentOptions.Center;
             textTMP.color = Color.white;
@@ -254,7 +256,7 @@ namespace ONI_Together.Menus
             button.onClick.AddListener(() =>
             {
                 GUIUtility.systemCopyBuffer = textToCopy;
-                textTMP.text = STRINGS.UI.SERVERBROWSER.COPIED;
+                textTMP.text = ONI_Together.STRINGS.UI.SERVERBROWSER.COPIED;
                 // Reset after delay
                 StartCoroutine(ResetCopyButtonText(textTMP));
             });
@@ -266,7 +268,7 @@ namespace ONI_Together.Menus
 
             yield return new WaitForSeconds(1.5f);
             if (tmp != null)
-                tmp.text = STRINGS.UI.SERVERBROWSER.COPY;
+                tmp.text = ONI_Together.STRINGS.UI.SERVERBROWSER.COPY;
         }
 
         private void CreatePlayersSection()
@@ -287,7 +289,7 @@ namespace ONI_Together.Menus
 
             var tmp = textGO.GetComponent<TextMeshProUGUI>();
             int playerCount = MultiplayerSession.PlayerCount;
-            tmp.text = string.Format(STRINGS.UI.SERVERBROWSER.CONNECTED_PLAYERS, playerCount);
+            tmp.text = string.Format(ONI_Together.STRINGS.UI.SERVERBROWSER.CONNECTED_PLAYERS, playerCount);
             tmp.fontSize = 16;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = new Color(0.8f, 0.8f, 0.8f);
@@ -312,7 +314,7 @@ namespace ONI_Together.Menus
             if (MultiplayerSession.IsHost)
             {
                 // Invite button
-                CreateActionButton(container.transform, STRINGS.UI.PAUSESCREEN.INVITE.LABEL, () =>
+                CreateActionButton(container.transform, ONI_Together.STRINGS.UI.PAUSESCREEN.INVITE.LABEL, () =>
                 {
                     Steamworks.SteamFriends.ActivateGameOverlayInviteDialog(SteamLobby.CurrentLobby);
                 });
@@ -320,7 +322,7 @@ namespace ONI_Together.Menus
                 // Hard Sync button
                 if (!GameServerHardSync.hardSyncDoneThisCycle)
                 {
-                    CreateActionButton(container.transform, STRINGS.UI.PAUSESCREEN.DOHARDSYNC.LABEL, () =>
+                    CreateActionButton(container.transform, ONI_Together.STRINGS.UI.PAUSESCREEN.DOHARDSYNC.LABEL, () =>
                     {
                         Close();
                         if (MultiplayerSession.ConnectedPlayers.Count > 0)
@@ -335,11 +337,11 @@ namespace ONI_Together.Menus
                 }
                 else
                 {
-                    CreateActionButton(container.transform, STRINGS.UI.PAUSESCREEN.HARDSYNCNOTAVAILABLE.LABEL, null, true);
+                    CreateActionButton(container.transform, ONI_Together.STRINGS.UI.PAUSESCREEN.HARDSYNCNOTAVAILABLE.LABEL, null, true);
                 }
 
                 // End Session button
-                CreateActionButton(container.transform, STRINGS.UI.PAUSESCREEN.ENDSESSION.LABEL, () =>
+                CreateActionButton(container.transform, ONI_Together.STRINGS.UI.PAUSESCREEN.ENDSESSION.LABEL, () =>
                 {
                     Close();
                     NetworkConfig.Stop();
@@ -348,7 +350,7 @@ namespace ONI_Together.Menus
             else
             {
                 // Leave Session button for clients
-                CreateActionButton(container.transform, STRINGS.UI.PAUSESCREEN.LEAVESESSION.LABEL, () =>
+                CreateActionButton(container.transform, ONI_Together.STRINGS.UI.PAUSESCREEN.LEAVESESSION.LABEL, () =>
                 {
                     Close();
                     NetworkConfig.Stop();

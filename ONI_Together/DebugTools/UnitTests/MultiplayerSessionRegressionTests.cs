@@ -1,11 +1,14 @@
 using System;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
+using ONI_United.Misc;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Replication;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using Shared;
+using ONI_United.DebugTools;
+using ONI_United.Networking;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
 	public static class MultiplayerSessionRegressionTests
 	{

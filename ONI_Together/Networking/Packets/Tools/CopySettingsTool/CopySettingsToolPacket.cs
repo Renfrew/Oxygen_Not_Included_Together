@@ -1,9 +1,8 @@
 ﻿using System.IO;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Tools.CopySettingsTool;
 

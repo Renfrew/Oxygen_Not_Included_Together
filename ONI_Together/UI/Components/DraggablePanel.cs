@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace ONI_Together.UI.Components
+namespace ONI_United.UI.Components
 {
 	internal class DraggablePanel : KMonoBehaviour, IBeginDragHandler, IDragHandler
 	{

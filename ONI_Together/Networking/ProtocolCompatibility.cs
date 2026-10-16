@@ -1,7 +1,6 @@
 ﻿using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-
-namespace ONI_Together.Networking
+namespace ONI_United.Networking
 {
 	internal static class ProtocolCompatibility
 	{
@@ -31,7 +30,7 @@ namespace ONI_Together.Networking
 			{
 				using var _ = Profiler.Scope();
 
-				return _modVersion ??= ONI_Together.ModUpdater.Updater.GetVersion();
+				return _modVersion ??= ONI_United.Updater.Updater.GetVersion();
 			}
 		}
 
@@ -68,25 +67,25 @@ namespace ONI_Together.Networking
 
             if (!hasMetadata)
             {
-                return STRINGS.UI.PROTOCOL.NO_METADATA;
+                return ONI_Together.STRINGS.UI.PROTOCOL.NO_METADATA;
             }
 
             if (remoteProtocolVersion != CurrentProtocolVersion)
             {
-                return string.Format(STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH, CurrentProtocolVersion, remoteProtocolVersion);
+                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH, CurrentProtocolVersion, remoteProtocolVersion);
             }
 
             if (remotePacketFingerprint != PacketFingerprint)
             {
-                return string.Format(STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH, PacketFingerprint, remotePacketFingerprint);
+                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH, PacketFingerprint, remotePacketFingerprint);
             }
 
             if (!string.IsNullOrEmpty(remoteModVersion) && remoteModVersion != ModVersion)
             {
-                return string.Format(STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH, ModVersion, remoteModVersion);
+                return string.Format(ONI_Together.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH, ModVersion, remoteModVersion);
             }
 
-            return STRINGS.UI.PROTOCOL.INCOMPATIBLE;
+            return ONI_Together.STRINGS.UI.PROTOCOL.INCOMPATIBLE;
         }
 	}
 }

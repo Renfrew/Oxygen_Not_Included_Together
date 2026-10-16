@@ -1,4 +1,4 @@
-namespace ONI_Together.Networking.Packets.Architecture
+namespace Shared.Interfaces.Networking
 {
 	/// <summary>
 	/// Marks packets safe to dispatch without a loaded world and during synchronization.

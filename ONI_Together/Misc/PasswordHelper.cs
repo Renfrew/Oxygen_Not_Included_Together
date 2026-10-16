@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Shared.Profiling;
 
-namespace ONI_Together.Misc
+namespace ONI_United.Misc
 {
     /// <summary>
     /// Utility class for password hashing and verification.

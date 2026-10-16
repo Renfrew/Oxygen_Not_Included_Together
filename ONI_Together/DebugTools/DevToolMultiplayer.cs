@@ -6,31 +6,36 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using ImGuiNET;
-using ONI_Together.Networking;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Networking.Components;
 using UnityEngine;
-using static STRINGS.UI;
-using ONI_Together.Menus;
-using ONI_Together.Misc;
+using static ONI_Together.STRINGS.UI;
+using ONI_United.UI.Screens;
+using ONI_United.Misc;
+using ONI_United.Networking.Runtime;
 using Shared.Profiling;
 using System.Text;
 using ONI_United.Patches.ToolPatches;
-using ONI_Together.Networking.Transport;
-using ONI_Together.Networking.Transport.Lan;
-using ONI_Together.Tests;
-using static STRINGS.BUILDINGS.PREFABS;
+using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.DebugTools.IntegrationTests;
+using static global::STRINGS.BUILDINGS.PREFABS;
 using Steamworks;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transport.Steamworks;
 using ONI_United.Networking.Replication;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Packets;
 using Shared.Replication;
 using System.Linq;
 using Shared;
+using ONI_United;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public class DevToolMultiplayer : DevTool
     {
@@ -299,7 +304,7 @@ namespace ONI_Together.DebugTools
                         try
                         {
                             DebugConsole.Log("Starting GameServer...");
-                            Networking.GameServer.Start();
+                            ONI_United.Networking.Lifecycle.GameServer.Start();
                             DebugConsole.Log("GameServer started successfully.");
                         }
                         catch (Exception ex)
@@ -314,7 +319,7 @@ namespace ONI_Together.DebugTools
                     if (ImGui.Button("Stop Lan"))
                     {
                         if (MultiplayerSession.IsHost)
-                            Networking.GameServer.Shutdown();
+                            ONI_United.Networking.Lifecycle.GameServer.Shutdown();
 
                         if (MultiplayerSession.IsClient)
                             GameClient.Disconnect();
@@ -1175,10 +1180,10 @@ namespace ONI_Together.DebugTools
             if (ImGui.Button("Spawn Test Entity"))
             {
                 var go = new GameObject("OxySync_TestEntity");
-                go.AddComponent<Networking.Components.NetworkIdentity>();
+                go.AddComponent<ONI_United.Networking.Identity.NetworkIdentity>();
                 go.AddComponent<OxySyncTestComponent>();
                 UnityEngine.Object.DontDestroyOnLoad(go);
-                NetworkIdentityRegistry.TryGet(go.GetComponent<ONI_Together.Networking.Components.NetworkIdentity>().NetId, out _);
+                NetworkIdentityRegistry.TryGet(go.GetComponent<ONI_United.Networking.Identity.NetworkIdentity>().NetId, out _);
                 DebugConsole.Log("[OxySync] Spawned test entity at runtime");
             }
 
@@ -1191,7 +1196,7 @@ namespace ONI_Together.DebugTools
                     var go = selected.gameObject;
                     if (go.GetComponent<OxySyncTestComponent>() == null)
                     {
-                        go.AddComponent<Networking.Components.NetworkIdentity>();
+                        go.AddComponent<ONI_United.Networking.Identity.NetworkIdentity>();
                         go.AddComponent<OxySyncTestComponent>();
                         DebugConsole.Log($"[OxySync] Attached test component to {go.name}");
                     }

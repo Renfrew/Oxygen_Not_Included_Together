@@ -1,6 +1,6 @@
 using System;
 
-namespace ONI_Together.Networking.Transport
+namespace ONI_United.Networking.Transport
 {
     public enum TransportProtocol
     {

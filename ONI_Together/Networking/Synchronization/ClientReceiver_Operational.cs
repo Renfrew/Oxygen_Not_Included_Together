@@ -1,7 +1,7 @@
-﻿using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+﻿using ONI_United.Networking.Session;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.World.Buildings;
-using ONI_Together.Networking.States;
+using ONI_United.Networking.Session.States;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Scripts.Buildings
+namespace ONI_United.Networking.Synchronization
 {
 	internal class ClientReceiver_Operational : KMonoBehaviour
 	{

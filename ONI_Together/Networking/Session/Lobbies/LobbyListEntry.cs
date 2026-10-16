@@ -1,7 +1,7 @@
 using Shared.Profiling;
 using Steamworks;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Session.Lobbies
 {
 	/// <summary>
 	/// Represents a lobby entry in the lobby browser list.

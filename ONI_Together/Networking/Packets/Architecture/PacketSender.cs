@@ -1,5 +1,5 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Networking.Packets;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Core;
@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Components;
-using ONI_Together.Networking;
+using ONI_United.Networking.Synchronization;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Replication;
-using ONI_Together.Networking.Overlay;
-using States = ONI_Together.Networking.States;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Overlay;
+using States = ONI_United.Networking.Session.States;
 
 namespace ONI_United.Networking.Packets.Architecture
 {

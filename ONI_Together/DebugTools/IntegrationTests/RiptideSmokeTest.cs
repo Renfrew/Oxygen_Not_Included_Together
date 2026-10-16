@@ -1,17 +1,24 @@
 ﻿#if DEBUG
 using System;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using Riptide;
 using Riptide.Utils;
-using ONI_Together.Networking;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Synchronization.Trackers;
+using ONI_United.Networking.Transfer;
+using ONI_United.Networking.WorldSync;
+using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Social;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using static ONI_Together.STRINGS.UI.MP_OVERLAY;
 using System.Net.Sockets;
-using ONI_Together.Networking.Packets.Architecture;
-
-namespace ONI_Together.Tests
+namespace ONI_United.DebugTools.IntegrationTests
 {
     public static class RiptideSmokeTest
     {

@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using ONI_Together.Scripts.Buildings;
+using ONI_United.Networking.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿namespace ONI_Together.Networking.States
+﻿namespace ONI_United.Networking.Session.States
 {
 	public enum CursorState
 	{

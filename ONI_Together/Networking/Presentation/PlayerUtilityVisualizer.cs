@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using ONI_Together.Misc;
+using ONI_United.Misc;
 using UnityEngine;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Presentation
 {
 	public class PlayerUtilityVisualizer
 	{

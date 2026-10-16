@@ -1,6 +1,7 @@
-using ONI_Together.DebugTools;
-using ONI_Together.Misc;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.Misc;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication;
 using ONI_United.Networking.Replication.Components;
 using Shared.Replication;
@@ -10,8 +11,10 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Overlay
+namespace ONI_United.Networking.Overlay
 {
 	public class NetworkingOverlayMode : OverlayModes.Mode
 	{
@@ -23,7 +26,7 @@ namespace ONI_Together.Networking.Overlay
 			{
 				if (_overlayIcon == null)
 				{
-					var tex = Misc.ResourceLoader.LoadEmbeddedTexture(
+					var tex = ONI_United.Misc.ResourceLoader.LoadEmbeddedTexture(
 						"ONI_Together.Assets.network_overlay_icon.png");
 					if (tex != null)
 					{
@@ -95,7 +98,7 @@ namespace ONI_Together.Networking.Overlay
 			{
 				if (_syncIconSprite == null)
 				{
-					var tex = Misc.ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.sync_icon.png");
+					var tex = ONI_United.Misc.ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.sync_icon.png");
 					if (tex != null)
 					{
 						tex.filterMode = FilterMode.Bilinear;

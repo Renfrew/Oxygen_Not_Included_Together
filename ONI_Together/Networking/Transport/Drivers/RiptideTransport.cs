@@ -1,6 +1,7 @@
-using ONI_Together.Networking.Transport.Lan;
+using ONI_United.Networking.Transport.Riptide;
+using ONI_United.Networking.Transport;
 
-namespace ONI_Together.Networking.Transport.Drivers
+namespace ONI_United.Networking.Transport.Drivers
 {
     public class RiptideTransport : ITransport
     {

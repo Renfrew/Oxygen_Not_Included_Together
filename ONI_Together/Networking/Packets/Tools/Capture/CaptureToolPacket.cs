@@ -1,12 +1,12 @@
 ﻿using System.IO;
 using HarmonyLib;
-using ONI_Together.DebugTools;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using Steamworks;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.Tools.Capture;
 

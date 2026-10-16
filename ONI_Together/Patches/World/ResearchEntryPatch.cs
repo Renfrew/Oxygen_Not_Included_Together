@@ -1,5 +1,5 @@
 using HarmonyLib;
-using ONI_Together.Networking;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
@@ -25,7 +25,7 @@ namespace ONI_United.Patches.World
 					TechId = targetTech.Id
 				};
 				PacketSender.SendToHost(packet);
-				ONI_Together.DebugTools.DebugConsole.Log($"[Client] Requested research: {targetTech.Id}");
+				ONI_United.DebugTools.DebugConsole.Log($"[Client] Requested research: {targetTech.Id}");
 			}
 
 			// Suppress local sound/state change until confirmed?

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UI.lib.UIcmp;
-using ONI_Together.UI.lib;
+using ONI_United.UI.lib;
 
-namespace UI.lib.UI.FUI
+namespace ONI_United.UI.lib.FUI
 {
 	public class FOrderByParamToggle : KMonoBehaviour
 	{

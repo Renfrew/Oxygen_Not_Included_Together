@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
 	public class HierarchyViewer : MonoBehaviour
 	{

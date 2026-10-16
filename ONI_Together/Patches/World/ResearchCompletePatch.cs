@@ -1,5 +1,5 @@
 using HarmonyLib;
-using ONI_Together.Networking;
+using ONI_United.Networking.Session;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
@@ -30,7 +30,7 @@ namespace ONI_United.Patches.World
 			};
 
 			PacketSender.SendToAllClients(packet);
-			ONI_Together.DebugTools.DebugConsole.Log($"[ResearchCompletePatch] Sent completion for: {__instance.tech.Name}");
+			ONI_United.DebugTools.DebugConsole.Log($"[ResearchCompletePatch] Sent completion for: {__instance.tech.Name}");
 		}
 	}
 }

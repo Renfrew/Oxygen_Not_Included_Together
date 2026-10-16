@@ -1,6 +1,6 @@
 using Klei.AI;
-using ONI_Together.DebugTools;
-using ONI_Together.Networking.Components;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.DuplicantActions;
@@ -8,9 +8,11 @@ using Shared.Profiling;
 using System;
 using System.Diagnostics;
 using UnityEngine;
-using static STRINGS.DUPLICANTS.STATS;
+using static global::STRINGS.DUPLICANTS.STATS;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
 
-namespace ONI_Together.Networking.Synchronization
+namespace ONI_United.Networking.Synchronization
 {
 	// Attached to minions on the Host side.
 	// Periodically sends vitals to clients. One packet per dupe per second,

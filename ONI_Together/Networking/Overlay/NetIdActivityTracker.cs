@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Overlay
+namespace ONI_United.Networking.Overlay
 {
 	public class NetIdActivityTracker : MonoBehaviour
 	{

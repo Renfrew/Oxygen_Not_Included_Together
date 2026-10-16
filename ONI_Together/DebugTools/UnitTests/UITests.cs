@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Presentation;
 using ONI_United.Networking.Packets.Core;
-using ONI_Together.Networking.States;
-using ONI_Together.UI;
+using ONI_United.Networking.Session.States;
+using ONI_United.UI.Screens;
 using UnityEngine;
+using ONI_United.DebugTools;
 
-namespace ONI_Together.DebugTools.UnitTests
+namespace ONI_United.DebugTools.UnitTests
 {
     public static class UITests
     {

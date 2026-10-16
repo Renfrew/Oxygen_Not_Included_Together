@@ -7,8 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Packets.Animation
 {

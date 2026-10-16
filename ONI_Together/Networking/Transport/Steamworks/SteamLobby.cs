@@ -1,16 +1,23 @@
-﻿using ONI_Together.DebugTools;
-using ONI_Together.Misc;
+﻿using ONI_United.DebugTools;
+using ONI_United.Misc;
 using ONI_United.Patches.ToolPatches;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.UI;
+using ONI_United.Networking.Session.Lobbies;
+using ONI_United.UI.Screens;
+using GameServer = ONI_United.Networking.Lifecycle.GameServer;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using Shared;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Session;
+using ONI_United;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Lifecycle;
 
-namespace ONI_Together.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transport.Steamworks
 {
 	public static class SteamLobby
 	{
@@ -258,7 +265,7 @@ namespace ONI_Together.Networking.Transport.Steamworks
                 }
 
 				DebugConsole.Log($"[SteamLobby] {name} joined the lobby.");
-				OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
+				OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
                 var boxedId = Boxed<ulong>.Get(userId);
 				Game.Instance?.Trigger(MP_HASHES.OnPlayerJoined, boxedId);
 				boxedId.Release();
@@ -273,7 +280,7 @@ namespace ONI_Together.Networking.Transport.Steamworks
 
 				RefreshLobbyMembers();
 				DebugConsole.Log($"[SteamLobby] {name} left the lobby.");
-                OxySyncChat.AddSystemMessage(string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
+                OxySyncChat.AddSystemMessage(string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
                 Utils.PauseSimOnPlayerLeft();
 				var boxedId = Boxed<ulong>.Get(userId);
 				Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);

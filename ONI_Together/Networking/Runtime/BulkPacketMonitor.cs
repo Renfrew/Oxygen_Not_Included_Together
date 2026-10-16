@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Session;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Runtime
 {
 	internal class BulkPacketMonitor : MonoBehaviour
 	{

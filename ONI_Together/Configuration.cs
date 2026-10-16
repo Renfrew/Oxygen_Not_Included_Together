@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using PeterHan.PLib.Options;
 using UnityEngine;
 
-namespace ONI_Together
+namespace ONI_United
 {
     [Serializable]
     [ConfigFile(SharedConfigLocation: true)]

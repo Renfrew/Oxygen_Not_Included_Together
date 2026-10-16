@@ -1,7 +1,7 @@
-using ONI_Together.Misc;
+using ONI_United.Misc;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Components
+namespace ONI_United.Networking.Synchronization
 {
 	public class LogicPortManager : KMonoBehaviour
 	{

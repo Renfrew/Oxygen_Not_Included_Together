@@ -1,13 +1,15 @@
-using ONI_Together.Networking;
-using ONI_Together.Networking.States;
-using ONI_Together.Networking.Transport.Steamworks;
+using ONI_United.Networking;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Transport.Steamworks;
 using Steamworks;
 using ONI_United.Patches.ToolPatches;
 using System;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
 	public class DebugMenu : MonoBehaviour
 	{

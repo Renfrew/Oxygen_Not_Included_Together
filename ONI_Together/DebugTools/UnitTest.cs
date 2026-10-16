@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using static UnityEngine.LowLevelPhysics2D.PhysicsQuery;
 
-namespace ONI_Together.DebugTools
+namespace ONI_United.DebugTools
 {
     public class UnitTest
     {

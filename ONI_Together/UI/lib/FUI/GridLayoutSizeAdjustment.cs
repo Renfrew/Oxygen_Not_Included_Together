@@ -1,4 +1,4 @@
-﻿using ONI_Together.DebugTools;
+﻿using ONI_United.DebugTools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI.lib.UI.FUI
+namespace ONI_United.UI.lib.FUI
 {
 	public class GridLayoutSizeAdjustment : KMonoBehaviour
 	{

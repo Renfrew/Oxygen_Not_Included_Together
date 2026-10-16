@@ -1,8 +1,8 @@
 using HarmonyLib;
-using ONI_Together.Networking;
-using ONI_Together.Networking.Components;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.World;
-using ONI_Together.Scripts.Creatures;
+using ONI_United.Scripts.Creatures;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;

@@ -1,7 +1,9 @@
-﻿using ONI_Together.Misc;
-using ONI_Together.Networking;
-using ONI_Together.Networking.States;
+﻿using ONI_United.Misc;
+using ONI_United.Networking;
+using ONI_United.Networking.Session.States;
 using Steamworks;
+
+namespace ONI_United.Networking.Session;
 
 public class MultiplayerPlayer
 {
