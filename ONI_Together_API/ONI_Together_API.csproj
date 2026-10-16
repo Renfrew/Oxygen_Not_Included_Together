@@ -5,14 +5,15 @@
     <IsPacked>true</IsPacked>
     <DoNotBuildAsMod>true</DoNotBuildAsMod>
 
-    <PackageId>ONI_Together_API</PackageId>
+    <PackageId>ONI_United_API</PackageId>
+    <AssemblyName>ONI_United_API</AssemblyName>
     <Version>0.9.0</Version>
     <Authors>Lyraedan, Sgt_Imalas</Authors>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <Description>API for third-party mods to add multiplayer features to Multiplayer: ONI United. Enables mods to detect multiplayer sessions, access network state, and integrate with the ONI United ecosystem.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Lyraedan/Oxygen_Not_Included_Together</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Lyraedan/Oxygen_Not_Included_Together</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Renfrew/Oxygen_Not_Included_Together</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Renfrew/Oxygen_Not_Included_Together</RepositoryUrl>
     <PackageTags>oni;oxygen-not-included;oxygen-not-included-together;oxygen-not-included-multiplayer;oni-together;onitogether;oni-multiplayer</PackageTags>
     <PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

@@ -50,7 +50,7 @@ namespace ONI_Together.Networking.OxySync.Components
         }
 
         /// <summary>
-        /// Behaviours that came from the ONI_Together_API assembly, exposed for the debug inspector.
+        /// Behaviours that came from an ONI United API assembly, exposed for the debug inspector.
         /// </summary>
         public IReadOnlyList<ForeignSyncBehaviour> ForeignBehaviours
         {

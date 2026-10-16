@@ -1503,7 +1503,7 @@ namespace ONI_Together.DebugTools
         }
 
         /// <summary>
-        /// Read-only inspector for behaviours bridged in from the ONI_Together_API assembly.
+        /// Read-only inspector for behaviours bridged in from the ONI United API assembly.
         /// These live in a different runtime type identity and cannot use the native dev-tool surface.
         /// Mirrors the native OxySync layout: NetId groups / behaviours / detail.
         /// </summary>

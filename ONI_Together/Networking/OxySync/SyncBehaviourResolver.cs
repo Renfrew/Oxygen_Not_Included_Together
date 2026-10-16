@@ -30,7 +30,7 @@ namespace ONI_Together.Networking.OxySync
                 }
             }
 
-            // API-bridge fallback: behaviour lives in the ONI_Together_API assembly.
+            // API-bridge fallback: behaviour lives in an ONI United API assembly.
             if (OxySync_API_Helper.TryGetForeignBehaviour(netId, behaviourId, out behaviour) && behaviour != null)
                 return true;
 

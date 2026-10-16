@@ -20,9 +20,14 @@ namespace ONI_Together_DedicatedServer
 
         public DedicatedConfig Config { get; private set; } = new DedicatedConfig();
 
-        public static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "dedicated_server_config");
+        public static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "oni_united_server_config");
 
         public static readonly string ConfigPath = Path.Combine(ConfigDirectory, "multiplayer_settings.json");
+
+        private static readonly string LegacyConfigPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "dedicated_server_config",
+            "multiplayer_settings.json");
 
         public static ServerConfiguration LoadOrCreate()
         {
@@ -30,6 +35,9 @@ namespace ONI_Together_DedicatedServer
 
             if (!Directory.Exists(ConfigDirectory))
                 Directory.CreateDirectory(ConfigDirectory);
+
+            if (!File.Exists(ConfigPath) && File.Exists(LegacyConfigPath))
+                File.Copy(LegacyConfigPath, ConfigPath);
 
             if (!File.Exists(ConfigPath))
             {

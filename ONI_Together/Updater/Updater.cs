@@ -13,7 +13,7 @@ namespace ONI_Together.ModUpdater
 {
     public static class Updater
     {
-        private static readonly PublishedFileId_t WORKSHOP_ID = new PublishedFileId_t(3630759126);
+        private static readonly PublishedFileId_t WORKSHOP_ID = new PublishedFileId_t(3787172081);
         public static string CURRENT_VERSION { get; private set; }
         public static string WORKSHOP_VERSION { get; private set; }
 
@@ -72,7 +72,7 @@ namespace ONI_Together.ModUpdater
             string localPath = Path.Combine(SteamPath, fileId.ToString());
 #if DEBUG
             SteamPath = Path.Combine(KMod.Manager.GetDirectory(), "dev"); // Goto the dev folder instead
-            localPath = Path.Combine(SteamPath, "ONI_Together_dev"); // Use the dev build instead
+            localPath = Path.Combine(SteamPath, "ONI_United"); // Use the dev build instead
 #endif
             if (!Directory.Exists(localPath))
             {

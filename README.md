@@ -43,7 +43,7 @@ Created by **Luke Rapkin** and contributors.
 
 Original repository:
 
-https://github.com/Lyraedan/Oxygen_Not_Included_Together
+https://github.com/Renfrew/Oxygen_Not_Included_Together
 
 This community fork is maintained by **Liang Chen** and contains additional fixes, compatibility updates, and multiplayer development.
 
@@ -205,7 +205,7 @@ Linux development may require .NET 6.0 for the publicizer.
 
 See the original setup documentation:
 
-https://github.com/Lyraedan/Oxygen_Not_Included_Together/wiki/Setting-up-publiciser-requirement-on-Linux
+https://github.com/Renfrew/Oxygen_Not_Included_Together/wiki/Setting-up-publiciser-requirement-on-Linux
 
 ---
 

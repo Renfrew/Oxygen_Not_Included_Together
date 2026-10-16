@@ -8,7 +8,7 @@ namespace ONI_Together.Networking.OxySync
     /// <summary>
     /// Reflection adapter that lets the ONI Together's OxySync loop drive a
     /// <c>Shared.OxySync.NetworkBehaviour</c> instance loaded from the
-    /// <c>ONI_Together_API</c> assembly (a distinct runtime Type from the ONI Together's own copy).
+    /// ONI United API assembly (a distinct runtime Type from the main mod's own copy).
     ///
     /// All members accessed here form the OxySync API; every lookup is defensive so a
     /// renamed/removed member degrades to a no-op rather than throwing.

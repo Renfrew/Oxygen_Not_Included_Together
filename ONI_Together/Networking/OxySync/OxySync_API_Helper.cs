@@ -14,12 +14,13 @@ namespace ONI_Together.Networking.OxySync
 {
     /// <summary>
     /// Runtime bridge that lets the ONI Together's OxySync system drive
-    /// <c>Shared.OxySync.NetworkBehaviour</c> instances that live in an <c>ONI_Together_API</c>
+    /// <c>Shared.OxySync.NetworkBehaviour</c> instances that live in an <c>ONI_United_API</c>
     /// assembly.
     /// </summary>
     public static class OxySync_API_Helper
     {
-        private const string ApiAssemblyName = "ONI_Together_API";
+        private const string ApiAssemblyName = "ONI_United_API";
+        private const string LegacyApiAssemblyName = "ONI_Together_API";
         private const string NetworkBehaviourTypeName = "Shared.OxySync.NetworkBehaviour";
         private const string NetIdentityHelperTypeName = "Shared.Helpers.NetIdentityHelper";
 
@@ -95,7 +96,8 @@ namespace ONI_Together.Networking.OxySync
             if (_seenAssemblies.Contains(asm))
                 return;
 
-            if (asm.GetName().Name != ApiAssemblyName)
+            var assemblyName = asm.GetName().Name;
+            if (assemblyName != ApiAssemblyName && assemblyName != LegacyApiAssemblyName)
                 return;
 
             try
@@ -136,7 +138,7 @@ namespace ONI_Together.Networking.OxySync
                     if (asm == apiAssembly) continue;
 
                     var name = asm.GetName().Name;
-                    if (name == ApiAssemblyName || name == "ONI_Together" || name == "Shared") // Skip self
+                    if (name == ApiAssemblyName || name == LegacyApiAssemblyName || name == "ONI_United" || name == "ONI_Together" || name == "Shared") // Skip self
                         continue;
 
                     foreach (var reference in asm.GetReferencedAssemblies())

@@ -49,7 +49,7 @@ namespace ONI_Together
             ModAssets.LoadAssetBundles();
 			EnsurePersistentUserId();
 
-            string logPath = System.IO.Path.Combine(Application.dataPath, "../ONI_Together_Log.txt");
+            string logPath = System.IO.Path.Combine(Application.dataPath, "../ONI_United_Log.txt");
 
 			try
 			{
@@ -271,7 +271,7 @@ namespace ONI_Together
 			PacketRegistry.RegisterDefaults();
 			InitializeAllIntegrations(); // All mods should be loaded, now find and initialize any integrations
 
-			// Bridge the OxySync surface of the ONI_Together_API assembly, if a mod using it is present.
+			// Bridge the OxySync surface of the ONI United API assembly, if a mod using it is present.
 			ONI_Together.Networking.OxySync.OxySync_API_Helper.Initialize();
 #if DEBUG
             UnitTestRegistry.DiscoverTests();

@@ -5,7 +5,7 @@ API for third-party mods to integrate with **Multiplayer: ONI United**.
 ## Installation
 
 ```
-dotnet add package ONI_Together_API
+dotnet add package ONI_United_API
 ```
 
 ## Usage
@@ -122,8 +122,8 @@ if (NetworkIdentityRegistryAPI.TryGetComponent<PrimaryElement>(netId, out var pr
 
 ## Links
 
-- [GitHub](https://github.com/Lyraedan/Oxygen_Not_Included_Together)
-- [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3630759126)
+- [GitHub](https://github.com/Renfrew/Oxygen_Not_Included_Together)
+- [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3787172081)
 - [Discord](https://discord.gg/jpxveK6mmY)
 - [Trello Board](https://trello.com/b/kq7yVWyU/oxygen-not-included-together)
 - [Ko-fi](https://ko-fi.com/lyraedan)

@@ -17,18 +17,18 @@ The last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`,
 | Area | Current definition | 0.9.0 treatment |
 | --- | --- | --- |
 | Development version | `ONI_Together/ONI_Together.csproj` `<Version>`; emitted to generated `mod_info.yaml` by `Directory.Build.targets` | Changed to `0.9.0` |
-| User-facing mod title/description | `<ModName>` and `<ModDescription>` in `ONI_Together.csproj`; generated `mod.yaml`; UI strings, translations, README, images and rich presence | Use **Multiplayer: ONI United**; retain inherited internal identifiers |
-| Workshop identity | `3630759126` in `ONI_Together/Updater/Updater.cs` and the Workshop link in `README_NUGET.md` | Retain temporarily; decide whether `0.9.0` continues the existing item or uses a new item before changing it |
-| Mod/static identity | `Directory.Build.targets` emits `staticID: $(AssemblyName)` | Retain to avoid installation, enablement, configuration, and save/mod-list compatibility risk |
-| Main assembly identity | `ONI_Together_experimental` in `ONI_Together.csproj` | Retain temporarily; it also determines generated static ID and the development deployment folder |
-| Package identities | `ItsLukesMultiplayerMod` and `ONI_Together_API` in project files | Retain until package migration and consumer compatibility are planned |
+| User-facing mod title/description | `<ModName>` and `<ModDescription>` in `ONI_Together.csproj`; generated `mod.yaml`; UI strings, translations, README, images and rich presence | Use **Multiplayer: ONI United** |
+| Workshop identity | `3787172081` in `ONI_Together/Updater/Updater.cs` and the Workshop link in `README_NUGET.md` | Use the independent project's Workshop item; `0.8.0.5` remains associated with its historical release item |
+| Mod/static identity | `Directory.Build.targets` emits `staticID: $(AssemblyName)` | Changed to `ONI_United`; existing enabled-mod lists may require users to re-enable the mod |
+| Main assembly identity | `ONI_United` in `ONI_Together.csproj` | Changed with the generated static ID; code namespaces remain unchanged |
+| Package identities | `MultiplayerONIUnited` and `ONI_United_API` in project files | Changed; the API bridge continues accepting the legacy `ONI_Together_API` assembly name |
 | Namespaces and type names | `ONI_Together`, `ONI_Together_API`, and `Shared` across source | Retain; API reflection strings contain assembly-qualified inherited names |
-| API reflection contract | `ONI_Together_API` uses strings such as `ONI_Together.MultiplayerMod, ONI_Together` | Retain until aliases/shims and a consumer migration are designed |
+| API reflection contract | Public namespaces remain `ONI_Together_API`; the runtime bridge accepts `ONI_United_API` and legacy `ONI_Together_API` assemblies | Preserve namespaces and legacy assembly recognition while consumers migrate |
 | Configuration identity | PLib `[ConfigFile(SharedConfigLocation: true)]` on `ONI_Together.Configuration`; JSON property names are persisted | Retain class/namespace/assembly identity and property names until PLib path derivation and migration behavior are runtime-verified |
-| Dedicated-server configuration | `dedicated_server_config/multiplayer_settings.json` | Retain to preserve existing server configuration |
-| Save compatibility | ONI save paths remain game-owned; transferred saves preserve active-mod labels/default static IDs; multiplayer sync components use inherited serialized type identity, with many runtime-only components marked `SkipSaveFileSerialization` | Retain static ID, namespaces, serialized type names, and active-mod-label behavior pending save migration tests |
-| Local diagnostics/development paths | `ONI_Together_Log.txt`, `ONI_Together_dev`, and local build-folder settings | Retain for continuity; rename later only with explicit fallback/migration behavior |
-| Repository and support links | Upstream and fork URLs appear in README, NuGet metadata/workflow, UI/update code, and historical documents | Historical upstream links remain attribution; choose canonical independent-project URLs before changing active support links |
+| Dedicated-server configuration | `oni_united_server_config/multiplayer_settings.json` | Changed; copy the legacy file on first load when the new path does not yet exist |
+| Save compatibility | ONI save paths remain game-owned; transferred saves preserve active-mod labels/default static IDs; multiplayer sync components use inherited serialized type identity, with many runtime-only components marked `SkipSaveFileSerialization` | The static ID changes to `ONI_United`; retain namespaces and serialized type names, then verify upgrade behavior with representative saves and enabled-mod lists |
+| Local diagnostics/development paths | `ONI_United_Log.txt`, `ONI_United`, and local build-folder settings | Changed for the independent line |
+| Repository and support links | Active project links use `Renfrew/Oxygen_Not_Included_Together`; historical upstream links remain for attribution | Use the independent repository for active project and package links |
 | Assets and translations | Inherited `oni_together_*` assets, embedded-resource names, translation contexts and user-facing strings | Update visible text now; retain inherited resource/key names until replacement assets and compatibility review are complete |
 
 ## Safe immediate changes
@@ -36,7 +36,7 @@ The last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`,
 - Set the development version to `0.9.0`.
 - Record the independent-development and licensing boundary.
 - Preserve the MIT license, upstream attribution, third-party notices, and asset provenance.
-- Use **Multiplayer: ONI United** for public display text while retaining compatibility-sensitive inherited identifiers.
+- Use **Multiplayer: ONI United** for public display text and `ONI_United` for new assembly/static identity while retaining code namespaces and explicit compatibility paths.
 
 ## Remaining branding decisions
 
@@ -44,14 +44,14 @@ The public name is settled. Decisions remain for replacement logo/mascot/link ar
 
 ## Migration work still required
 
-1. Decide whether the existing Workshop item remains the distribution identity for the independent line.
+1. Verify the `3787172081` Workshop item metadata and first `0.9.0` upload procedure before publishing.
 2. Confirm how ONI and PLib derive mod/config identity from static ID, assembly, type, and distribution label at runtime.
 3. Test upgrade behavior from `0.8.0.5` with an existing enabled-mod list, shared configuration, dedicated-server configuration, and representative saves.
-4. Inventory serialized/reflected type consumers and third-party `ONI_Together_API` integrations; design forwarding types, aliases, or shims before any internal rename.
-5. Select canonical independent repository and support URLs.
+4. Inventory serialized/reflected type consumers and third-party `ONI_Together_API` integrations; the bridge recognizes the legacy API assembly, but package consumers still need migration guidance.
+5. Verify all active support and workflow destinations use the independent repository while preserving historical attribution links.
 6. Replace or rebrand user-facing assets and translation content with documented provenance; do not silently rename compatibility keys.
 7. Resolve the existing copied-source and historical proprietary-binary compliance items documented in `RELEASE_LEGAL.md` before a future release.
 
 ## Safest next development change
 
-Continue centralizing user-facing branding for generated metadata and UI text while keeping the inherited internal identities listed above. Validate an in-place `0.8.0.5` to `0.9.0` upgrade before considering any assembly, namespace, static-ID, configuration, save, Workshop, or API/package migration.
+Validate an in-place `0.8.0.5` to `0.9.0` upgrade with the new assembly/static ID, migrated dedicated-server configuration, and legacy API-assembly recognition. Keep the inherited C# namespaces until a separately designed source- and binary-compatibility migration is ready.
