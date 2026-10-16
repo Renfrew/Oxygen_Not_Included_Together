@@ -16,11 +16,11 @@ The last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`,
 
 | Area | Current definition | 0.9.0 treatment |
 | --- | --- | --- |
-| Development version | `ONI_Together/ONI_Together.csproj` `<Version>`; emitted to generated `mod_info.yaml` by `Directory.Build.targets` | Changed to `0.9.0` |
-| User-facing mod title/description | `<ModName>` and `<ModDescription>` in `ONI_Together.csproj`; generated `mod.yaml`; UI strings, translations, README, images and rich presence | Use **Multiplayer: ONI United** |
-| Workshop identity | `3787172081` in `ONI_Together/Updater/Updater.cs` | Use the independent project's Workshop item; `0.8.0.5` remains associated with its historical release item |
+| Development version | `ONI_United/ONI_United.csproj` `<Version>`; emitted to generated `mod_info.yaml` by `Directory.Build.targets` | Changed to `0.9.0` |
+| User-facing mod title/description | `<ModName>` and `<ModDescription>` in `ONI_United.csproj`; generated `mod.yaml`; UI strings, translations, README, images and rich presence | Use **Multiplayer: ONI United** |
+| Workshop identity | `3787172081` in `ONI_United/Updater/Updater.cs` | Use the independent project's Workshop item; `0.8.0.5` remains associated with its historical release item |
 | Mod/static identity | `Directory.Build.targets` emits `staticID: $(AssemblyName)` | Changed to `ONI_United`; existing enabled-mod lists may require users to re-enable the mod |
-| Main assembly identity | `ONI_United` in `ONI_Together.csproj` | Changed with the generated static ID; code namespaces remain unchanged |
+| Main assembly identity | `ONI_United` in `ONI_United.csproj` | Changed with the generated static ID; code namespaces remain unchanged |
 | Package identity | `MultiplayerONIUnited` in the main project | Changed for the independent line; the former external API package is discontinued and removed |
 | Namespaces and type names | `ONI_Together` and `Shared` across the retained source | Retain; namespace renaming is outside this transition |
 | External mod API | Former `ONI_Together_API` / `ONI_United_API` project and reflection bridge | Permanently discontinued and removed in `0.9.0` |

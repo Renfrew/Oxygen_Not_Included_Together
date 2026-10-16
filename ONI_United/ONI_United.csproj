@@ -26,6 +26,7 @@
 		<!--Merges dlls into one, becomes relevant if PLib is added, does not play nice with gDrives transitive nuget requirements-->
 		<IsPacked>true</IsPacked>
 		<AssemblyName>ONI_United</AssemblyName>
+		<RootNamespace>ONI_United</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -42,18 +43,42 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Assets\mod_mascot.png" />
-		<EmbeddedResource Include="Assets\oni_together_logo.png" />
-		<EmbeddedResource Include="Assets\oni_together_link_chat.png" />
-		<EmbeddedResource Include="Assets\discord.png" />
-		<EmbeddedResource Include="Assets\bundles\playercursor_win.bundle" />
-		<EmbeddedResource Include="Assets\bundles\playercursor_mac.bundle" />
-		<EmbeddedResource Include="Assets\bundles\playercursor_lin.bundle" />
-		<EmbeddedResource Include="Assets\bundles\networkindicators_lin.bundle" />
-		<EmbeddedResource Include="Assets\bundles\networkindicators_mac.bundle" />
-		<EmbeddedResource Include="Assets\bundles\networkindicators_win.bundle" />
-		<EmbeddedResource Include="Assets\network_overlay_icon.png" />
-		<EmbeddedResource Include="Assets\sync_icon.png" />
+		<EmbeddedResource Include="Assets\mod_mascot.png">
+			<LogicalName>ONI_Together.Assets.mod_mascot.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\oni_together_logo.png">
+			<LogicalName>ONI_Together.Assets.oni_together_logo.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\oni_together_link_chat.png">
+			<LogicalName>ONI_Together.Assets.oni_together_link_chat.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\discord.png">
+			<LogicalName>ONI_Together.Assets.discord.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_win.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_win.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_mac.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_mac.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_lin.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_lin.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_lin.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_lin.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_mac.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_mac.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_win.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_win.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\network_overlay_icon.png">
+			<LogicalName>ONI_Together.Assets.network_overlay_icon.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\sync_icon.png">
+			<LogicalName>ONI_Together.Assets.sync_icon.png</LogicalName>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -15,21 +15,21 @@ This is a downstream-license finding, not a claim that this project created the 
 
 | Asset | Purpose | Verified source | Clearance |
 |---|---|---|---|
-| `ONI_Together/Assets/mod_mascot.png` | Loading/mascot art | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/oni_together_logo.png` | Project logo | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/oni_together_link_chat.png` | UI link graphic | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/discord.png` | Discord UI icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/network_overlay_icon.png` | Network overlay icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/sync_icon.png` | Synchronization icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/bundles/playercursor_{win,mac,lin}.bundle` | Player cursor assets | All three bundles identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/bundles/networkindicators_{win,mac,lin}.bundle` | Network indicator assets | All three bundles identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/mod_mascot.png` | Loading/mascot art | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/oni_together_logo.png` | Project logo | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/oni_together_link_chat.png` | UI link graphic | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/discord.png` | Discord UI icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/network_overlay_icon.png` | Network overlay icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/sync_icon.png` | Synchronization icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/bundles/playercursor_{win,mac,lin}.bundle` | Player cursor assets | All three bundles identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/bundles/networkindicators_{win,mac,lin}.bundle` | Network indicator assets | All three bundles identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
 
 ## Tracked but not currently embedded by the main project
 
 | Asset | Purpose | Verified source | Clearance |
 |---|---|---|---|
-| `ONI_Together/Assets/fni_logo.png` | Experimental/legacy logo | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together/Assets/network_overlay_icon_old.png` | Legacy overlay icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/fni_logo.png` | Experimental/legacy logo | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
+| `ONI_United/Assets/network_overlay_icon_old.png` | Legacy overlay icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
 
 ## Future independent releases
 
