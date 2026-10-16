@@ -49,8 +49,16 @@
 	</Target>
 
 	<PropertyGroup>
-		<TargetFolder>$([System.IO.Path]::GetFullPath('$(ModFolder)\$(TargetName)_dev'))</TargetFolder>
+		<TargetFolder>$([System.IO.Path]::GetFullPath('$(ModFolder)\$(TargetName)'))</TargetFolder>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<ReleaseModAssets
+			Include=".\ModAssets\**\*.*"
+			Exclude=".\**\*.afphoto;.\**\*.mo;.\**\*.afphoto~lock~"
+			/>
+		<ReleaseNotices Include="$(SolutionDir)LICENSE.md;$(SolutionDir)THIRD_PARTY_NOTICES.md;$(SolutionDir)ASSET_PROVENANCE.md"/>
+	</ItemGroup>
 
 	<!--Copies the mod dll, the two yaml files and everything inside the ModAssets folder to the target mod folder-->
 	<Target Name="CopyModsToDevFolder" AfterTargets="ILRepack" Condition="'$(DoNotBuildAsMod)' != 'true'">
@@ -84,6 +92,26 @@
 		<Copy SourceFiles="@(ModAssets)" DestinationFolder="$(TargetFolder)\%(RecursiveDir)" SkipUnchangedFiles="false" Condition="'$(GameLibsFolder)' == '../Lib' Or '$(SkipAssetClone)' != 'true'"/>
 
 		<Message Text="Copied build files" Importance="High" />
+
+	</Target>
+
+	<!--Copies runtime assets and distribution notices into Release output for standalone packaging-->
+	<Target Name="CopyReleasePackageFiles"
+		AfterTargets="ILRepack"
+		Condition="'$(Configuration)' == 'Release' and '$(DoNotBuildAsMod)' != 'true'"
+		Inputs="@(ReleaseModAssets);@(ReleaseNotices)"
+		Outputs="@(ReleaseModAssets->'$(TargetDir)%(RecursiveDir)%(Filename)%(Extension)');@(ReleaseNotices->'$(TargetDir)%(Filename)%(Extension)')"
+		>
+
+		<Message Text="Copying Release packaging files to $(TargetDir)" Importance="High" />
+
+		<Copy SourceFiles="@(ReleaseModAssets)"
+			DestinationFiles="@(ReleaseModAssets->'$(TargetDir)%(RecursiveDir)%(Filename)%(Extension)')"
+			SkipUnchangedFiles="true" />
+
+		<Copy SourceFiles="@(ReleaseNotices)"
+			DestinationFolder="$(TargetDir)"
+			SkipUnchangedFiles="true" />
 
 	</Target>
 		

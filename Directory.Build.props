@@ -9,7 +9,7 @@
 		<!--required when using publicizer or the game gets sad about mismatched access modifiers-->
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<!--gives access to fun newer c# syntax sugar-->
-		<LangVersion>preview</LangVersion>
+		<LangVersion>14.0</LangVersion>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
