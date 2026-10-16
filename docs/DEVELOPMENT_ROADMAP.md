@@ -1,7 +1,7 @@
 # Multiplayer: ONI United — Development Roadmap
 
 **Created:** 2026-09-27  
-**Last updated:** 2026-10-15  
+**Last updated:** 2026-10-16  
 **Status:** Planning and progress guide; verified results retain the evidence limits stated here and in `STATUS.md`  
 **References:** `ARCHITECTURE.md`, `DECISIONS.md`, `STATUS.md`
 
@@ -28,6 +28,19 @@ Release-scope outcomes:
 - Historical Navigator, StandardWorker, and AnimSyncer evidence remains preserved for its original tested builds.
 
 The completed release does not imply that all deferred synchronization features are solved.
+
+## Current priority — development-environment and lifecycle walkthrough
+
+**Status:** Next session.  
+**Objective:** Review the project from its development-environment foundation, then proceed through the mod lifecycle while testing each stage.
+
+Start with project setup and baseline developer experience, including ESLint, default settings, and related tooling/configuration. Record which settings are authoritative, inherited, generated, or local-only before changing them. After the environment baseline is understood, walk through initialization, connection, loading/synchronization, gameplay admission, ordinary runtime behavior, and shutdown/disconnection in order.
+
+The October 16 N9–N11 cleanup sequence is recorded as committed, with the associated identifier audit and source build reported as passing. Exact hashes and full command output are not present in the uploaded Project evidence, so they remain evidence details to capture from the authoritative repository rather than values to infer.
+
+The reported runtime result was **connection only**. It passed for that scope, but it does not satisfy later lifecycle stages. No additional standalone connection test is currently required; connection can be re-exercised naturally during the lifecycle walkthrough.
+
+**Acceptance:** For each reviewed stage, record the exact source/Git state, configuration findings, build result, runtime scenario, and evidence limits. Do not promote a connection-only result to loading, synchronization, gameplay, reconnect, or release-artifact verification.
 
 ## Historical completed track — PR #83 lifecycle/readiness and join overlay
 
@@ -181,10 +194,11 @@ The current lifecycle/speed and session-centralization decisions may also affect
 
 ## Next-session starter prompt
 
-> In the authoritative repository, first verify current Git state and review PR #86 for regressions against current `develop`, preserving current lifecycle, synchronization, identity, and transport behavior. If the review passes, establish the exact intended release baseline. Then perform a read-only legal/licensing/compliance and release-content audit before modifying licenses, notices, version/tag metadata, or packaging. After approved remediation, build and runtime-test the exact clean release commit; do not promote historical tests or the earlier 0-error/203-warning lifecycle-speed build to verification of that artifact.
+> In the authoritative repository, begin with development-environment setup: inspect the project configuration, ESLint setup, default settings, and related baseline tooling without changing them. Record the exact Git state and distinguish repository defaults from generated or local-only settings. Then walk through the mod lifecycle in order and test each stage as it is reviewed. Preserve the October 16 N9–N11 audit/build result as reported evidence, capture the exact commit hashes and command output if available, and treat the passing runtime result as connection-only—not as loading, synchronization, gameplay, reconnect, or release-artifact verification. Do not schedule a redundant standalone connection test unless the walkthrough reveals a reason.
 
 ## Revision history
 
+- **2026-10-16:** Recorded the completed N9–N11 identifier-migration cleanup sequence, reported passing audit/build evidence, and the passing connection-only runtime result with strict scope limits. Replaced the immediate next-session release-preparation prompt with a development-environment-first walkthrough beginning with ESLint, default settings, and baseline tooling, followed by lifecycle-stage testing. Exact cleanup hashes and full audit/build output remain to be captured from the authoritative repository.
 - **2026-10-15 (reconciliation):** Reclassified PR #83 lifecycle/readiness as historical verified evidence, recognized the later transport-preserving lifecycle rebuild in current `develop`, converted the old unimplemented transport-preserving milestone into a deferred conformance/runtime audit, and kept PR #86 review plus legal/compliance and exact-artifact verification as the active release path.
 - **2026-10-15:** Replaced the stale next-session transport-preserving-loading priority with the current release sequence: PR #86 regression review, exact baseline selection, legal/licensing/compliance audit, approved remediation, exact-artifact build/runtime verification, then release. Retained the transport-preserving design as deferred and preserved the older `develop`→`experiment` plan as superseded historical context.
 - **2026-10-07:** Made transport-preserving normal world loading the active milestone. Added the host pause-or-catch-up prerequisite, ordered implementation plan, diagnostics, incremental build/test expectations, LiteNetLib plus Steam completion gate, and scope controls; deferred `develop` → `experiment` release integration behind this work.
