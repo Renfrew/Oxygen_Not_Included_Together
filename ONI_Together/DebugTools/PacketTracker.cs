@@ -6,7 +6,7 @@ using ImGuiNET;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Packets.Architecture;
-using Shared.OxySync;
+using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using ONI_Together.Networking;
-using Shared.OxySync.Attributes;
+using Shared.Replication.Attributes;
 using UnityEngine;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public class NetworkTransform : NetworkBehaviour
     {

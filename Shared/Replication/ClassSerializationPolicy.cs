@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public static class ClassSerializationPolicy
     {

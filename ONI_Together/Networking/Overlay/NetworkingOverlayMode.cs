@@ -3,7 +3,7 @@ using ONI_Together.Misc;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.OxySync;
 using ONI_Together.Networking.OxySync.Components;
-using Shared.OxySync;
+using Shared.Replication;
 using System;
 using System.Collections.Generic;
 using System.Linq;

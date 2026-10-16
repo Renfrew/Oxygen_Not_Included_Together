@@ -1,6 +1,6 @@
 using ONI_Together.Networking.Packets.Architecture;
 using System.IO;
-using Shared.OxySync;
+using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_Together.Networking.Components.StructureStateSyncers;

@@ -4,7 +4,7 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.Packets.Architecture;
-using Shared.OxySync;
+using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
 

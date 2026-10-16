@@ -1,5 +1,5 @@
 using System;
-using Shared.OxySync;
+using Shared.Replication;
 using UnityEngine;
 
 namespace ONI_Together.Networking.OxySync

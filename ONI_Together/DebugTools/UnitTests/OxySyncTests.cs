@@ -7,8 +7,8 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.OxySync;
 using ONI_Together.Networking.OxySync.Components;
 using ONI_Together.Networking.OxySync.Packets;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 using UnityEngine;
 
 namespace ONI_Together.DebugTools.UnitTests

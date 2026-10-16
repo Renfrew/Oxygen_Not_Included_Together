@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Packets.World;
-using Shared.OxySync;
+using Shared.Replication;
 using UnityEngine;
 
 namespace ONI_Together.Networking.Components.StructureStateSyncers

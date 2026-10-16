@@ -7,7 +7,7 @@ namespace ONI_Together.Networking.OxySync
 {
     /// <summary>
     /// A neutral read/write descriptor for a single SyncVar field, decoupled from
-    /// <see cref="Shared.OxySync.NetworkBehaviour.SyncVarField"/> so the sync loop can
+    /// <see cref="Shared.Replication.NetworkBehaviour.SyncVarField"/> so the sync loop can
     /// handle both native behaviours and behaviours that live in the ONI Together API assembly.
     /// </summary>
     public struct SyncVarDescriptor
@@ -52,7 +52,7 @@ namespace ONI_Together.Networking.OxySync
 
     /// <summary>
     /// A neutral descriptor for a Command / ClientRpc / TargetRpc method, decoupled from
-    /// <c>Shared.OxySync.NetworkBehaviour.CachedMethod</c> so the debug tool can present and
+    /// <c>Shared.Replication.NetworkBehaviour.CachedMethod</c> so the debug tool can present and
     /// invoke both native and API-bridged behaviours.
     /// </summary>
     public struct RpcDescriptor

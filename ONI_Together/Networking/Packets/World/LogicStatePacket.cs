@@ -2,7 +2,7 @@ using ONI_Together.Networking.Components;
 using ONI_Together.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
-using Shared.OxySync;
+using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.OxySync.Attributes
+namespace Shared.Replication.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class InterestGroupAttribute : Attribute

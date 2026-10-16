@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.OxySync.Attributes
+namespace Shared.Replication.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class SyncVarAttribute : Attribute

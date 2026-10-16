@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shared.OxySync;
+using Shared.Replication;
 using ONI_Together.Misc;
 using ONI_Together.Networking.Packets.World;
 using UnityEngine;

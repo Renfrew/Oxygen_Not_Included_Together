@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Klei.AI;
 using UnityEngine;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public static class FrozenStateMachineTracker
     {

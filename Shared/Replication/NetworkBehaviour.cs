@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Linq.Expressions;
-using Shared.OxySync.Attributes;
+using Shared.Replication.Attributes;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public abstract class NetworkBehaviour : KMonoBehaviour
     {

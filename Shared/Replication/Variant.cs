@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using UnityEngine;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     /// <summary>
     /// A type-safe tagged union that holds one value of multiple possible types (Float, Int, Byte, String, Boolean, Vector3, Vector2) at a time,

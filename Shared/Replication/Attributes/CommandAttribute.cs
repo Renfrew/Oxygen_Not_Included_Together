@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.OxySync.Attributes
+namespace Shared.Replication.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class CommandAttribute : Attribute

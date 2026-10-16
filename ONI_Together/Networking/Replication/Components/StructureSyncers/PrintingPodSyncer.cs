@@ -5,8 +5,8 @@ using KSerialization;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Packets.Social;
 using ONI_Together.Patches.GamePatches;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 using Shared.Profiling;
 
 namespace ONI_Together.Networking.OxySync.Components

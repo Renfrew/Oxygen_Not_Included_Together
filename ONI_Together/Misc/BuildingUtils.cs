@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using HarmonyLib;
-using Shared.OxySync;
+using Shared.Replication;
 using ONI_Together.DebugTools;
 using UnityEngine;
 

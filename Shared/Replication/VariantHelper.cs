@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public static class VariantHelper
     {

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     /// <summary>
     /// Maps remote packet timestamps onto the receiver's monotonic clock.

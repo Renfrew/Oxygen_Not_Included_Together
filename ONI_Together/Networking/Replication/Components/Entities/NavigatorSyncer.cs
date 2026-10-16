@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ONI_Together.DebugTools;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 using System;

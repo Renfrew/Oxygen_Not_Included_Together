@@ -1,6 +1,6 @@
 using ONI_Together.Networking.Packets.World;
 using System.Collections.Generic;
-using Shared.OxySync;
+using Shared.Replication;
 using UnityEngine;
 
 namespace ONI_Together.Networking.Components

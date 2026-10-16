@@ -25,7 +25,7 @@ using Steamworks;
 using ONI_Together.Networking.Transport.Steamworks;
 using ONI_Together.Networking.OxySync;
 using ONI_Together.Networking.OxySync.Components;
-using Shared.OxySync;
+using Shared.Replication;
 using System.Linq;
 using Shared;
 
@@ -1372,7 +1372,7 @@ namespace ONI_Together.DebugTools
                         {
                             NetId = behaviour.NetId,
                             MethodHash = cmd.Hash,
-                            Args = Shared.OxySync.RpcSerializer.Serialize(System.Array.Empty<object>(), cmd.ArgTypes),
+                            Args = Shared.Replication.RpcSerializer.Serialize(System.Array.Empty<object>(), cmd.ArgTypes),
                         };
 
                         if (MultiplayerSession.IsHost)
@@ -1412,7 +1412,7 @@ namespace ONI_Together.DebugTools
                             {
                                 NetId = behaviour.NetId,
                                 MethodHash = rpc.Hash,
-                                Args = Shared.OxySync.RpcSerializer.Serialize(System.Array.Empty<object>(), rpc.ArgTypes),
+                                Args = Shared.Replication.RpcSerializer.Serialize(System.Array.Empty<object>(), rpc.ArgTypes),
                                 TargetPlayerId = ulong.MaxValue,
                             };
                             PacketSender.SendToAllClients(packet);
@@ -1448,7 +1448,7 @@ namespace ONI_Together.DebugTools
                                 {
                                     NetId = behaviour.NetId,
                                     MethodHash = rpc.Hash,
-                                    Args = Shared.OxySync.RpcSerializer.Serialize(System.Array.Empty<object>(), rpc.ArgTypes),
+                                    Args = Shared.Replication.RpcSerializer.Serialize(System.Array.Empty<object>(), rpc.ArgTypes),
                                     TargetPlayerId = player.Value.PlayerId,
                                 };
                                 PacketSender.SendToPlayer(player.Value.PlayerId, packet);

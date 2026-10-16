@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using Shared.OxySync;
+using Shared.Replication;
 using UnityEngine;
 
 namespace ONI_Together.Networking.Overlay

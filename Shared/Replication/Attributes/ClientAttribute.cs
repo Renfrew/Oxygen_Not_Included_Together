@@ -1,6 +1,6 @@
 using System;
 
-namespace Shared.OxySync.Attributes
+namespace Shared.Replication.Attributes
 {
     /// <summary>
     /// Tag marker for methods that should only execute on clients.

@@ -5,8 +5,8 @@ using System.IO;
 using Klei.AI;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 

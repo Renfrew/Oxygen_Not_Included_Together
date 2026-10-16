@@ -1,6 +1,6 @@
 using KSerialization;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 
 namespace ONI_Together.Networking.OxySync.Components
 {

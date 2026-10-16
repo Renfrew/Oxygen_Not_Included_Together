@@ -21,7 +21,7 @@ namespace ONI_Together.Networking.OxySync
             if (NetworkIdentityRegistry.TryGet(netId, out var identity)
                 && !identity.IsNullOrDestroyed() && !identity.gameObject.IsNullOrDestroyed())
             {
-                foreach (var native in identity.gameObject.GetComponents<Shared.OxySync.NetworkBehaviour>())
+                foreach (var native in identity.gameObject.GetComponents<Shared.Replication.NetworkBehaviour>())
                 {
                     if (native.IsNullOrDestroyed() || native.BehaviourId != behaviourId)
                         continue;

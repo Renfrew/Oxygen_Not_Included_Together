@@ -1,5 +1,5 @@
 using HarmonyLib;
-using Shared.OxySync;
+using Shared.Replication;
 
 namespace ONI_Together.Patches.OxySync
 {

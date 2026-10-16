@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using Shared.OxySync;
-using Shared.OxySync.Attributes;
+using Shared.Replication;
+using Shared.Replication.Attributes;
 using UnityEngine;
 
 namespace ONI_Together.Networking.OxySync.Components.Tools

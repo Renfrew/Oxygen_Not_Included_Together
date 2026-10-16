@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Shared.OxySync
+namespace Shared.Replication
 {
     public static class RpcSerializer
     {
