@@ -170,7 +170,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(IsPacked)' == 'true'">
-		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="*">
+		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.48">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
