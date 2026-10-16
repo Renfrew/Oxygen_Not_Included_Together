@@ -39,7 +39,6 @@ namespace ONI_United.Networking.Session
 
 		private static bool _inActiveSession = false;
 		private static bool _isHost;
-		private static bool _clientConnectedHashPublished;
 		public static bool InActiveSession
 		{
 			get => _inActiveSession;
@@ -62,7 +61,6 @@ namespace ONI_United.Networking.Session
 
 		public static readonly Dictionary<ulong, string> KnownPlayerNames = new Dictionary<ulong, string>();
 
-		public static event Action<ulong> OnClientConnected;
 		public static event Action<ulong> OnClientDisconnected;
 
 		private static void SetInActiveSession(bool value)
@@ -125,7 +123,6 @@ namespace ONI_United.Networking.Session
 			}
 
 			DebugConsole.Log($"[MultiplayerSession][REGISTER_CLIENT] client {clientId} with state {player.readyState}");
-			OnClientConnected?.Invoke(clientId);
 		}
 
 		public static bool UnregisterClient(ulong clientId, Action<object> close, object connection = null)
@@ -156,22 +153,12 @@ namespace ONI_United.Networking.Session
 			using var _ = Profiler.Scope();
 
 			SetIsHost(false);
-			_clientConnectedHashPublished = false;
 			HostUserID = hostId;
 			SetInActiveSession(true);
 			ConnectedPlayers[hostId] = new MultiplayerPlayer(hostId) { Connection = connection };
 			KnownPlayerNames[LocalUserID] = Utils.GetLocalPlayerName();
 
 			DebugConsole.Log($"[MultiplayerSession] Connected to host {hostId}; Local player ID = {LocalUserID}");
-		}
-
-		internal static void PublishClientConnected()
-		{
-			if (!InActiveSession || IsHost || GameClient.State != ClientState.Connected || _clientConnectedHashPublished)
-				return;
-
-			_clientConnectedHashPublished = true;
-			Game.Instance?.Trigger(MP_HASHES.OnConnected);
 		}
 
 		public static void OnDisconnectedFromHost(Action<object> close)
@@ -191,7 +178,6 @@ namespace ONI_United.Networking.Session
 			ClearConnectedPlayers(close);
 			KnownPlayerNames.Clear();
 			ReadyManager.ResetSynchronizationState();
-			_clientConnectedHashPublished = false;
 
 			if (wasActive)
 				Game.Instance?.Trigger(MP_HASHES.OnDisconnected);
@@ -296,8 +282,6 @@ namespace ONI_United.Networking.Session
 
 			PlayerCursors[steamID] = playerCursor;
 			DebugConsole.Log($"[MultiplayerSession] Created new cursor for {steamID}");
-
-			Game.Instance?.Trigger(MP_HASHES.OnPlayerCursorCreated, Boxed<ulong>.Get(steamID));
 		}
 
 		public static void CreateConnectedPlayerCursors()

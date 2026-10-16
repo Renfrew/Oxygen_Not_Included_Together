@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Shared.Replication
 {
     /// <summary>
@@ -17,9 +15,6 @@ namespace Shared.Replication
 		private double _arrivalJitterMs;
 
 		public double EstimatedJitterMilliseconds => _arrivalJitterMs;
-
-        public static double MonotonicMilliseconds =>
-            Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency;
 
         public double ToLocalTime(long remoteTimestampMs, double localArrivalTimeMs)
         {

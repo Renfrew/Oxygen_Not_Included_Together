@@ -285,13 +285,7 @@ namespace ONI_United.DebugTools
             {
                 case NetworkConfig.NetworkTransport.STEAMWORKS:
                     if (ImGui.Button("Create Lobby"))
-                    {
-                        SteamLobby.CreateLobby(onSuccess: () =>
-                        {
-                            //SpeedControlScreen.Instance?.Unpause(false);
-                            Game.Instance.Trigger(MP_HASHES.OnMultiplayerGameSessionInitialized);
-                        });
-                    }
+                        SteamLobby.CreateLobby();
 
                     ImGui.SameLine();
                     if (ImGui.Button("Leave Lobby"))
@@ -312,7 +306,6 @@ namespace ONI_United.DebugTools
                             DebugConsole.LogError($"GameServer.Start() failed: {ex}");
                         }
                         SelectToolPatch.UpdateColor();
-                        Game.Instance.Trigger(MP_HASHES.OnMultiplayerGameSessionInitialized);
                     }
 
                     ImGui.SameLine();

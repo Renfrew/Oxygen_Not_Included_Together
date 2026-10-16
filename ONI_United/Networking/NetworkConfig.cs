@@ -71,7 +71,6 @@ namespace ONI_United.Networking
             {
                 //SpeedControlScreen.Instance?.Unpause(false);
                 SpeedControlScreen.Instance.Pause(true);
-                Game.Instance.Trigger(MP_HASHES.OnMultiplayerGameSessionInitialized);
             });
         }
 
@@ -93,7 +92,6 @@ namespace ONI_United.Networking
                 DebugConsole.LogError($"Failed to start LAN game server: {ex.Message}\n{ex.StackTrace}");
             }
             SelectToolPatch.UpdateColor();
-            Game.Instance.Trigger(MP_HASHES.OnMultiplayerGameSessionInitialized);
             SpeedControlScreen.Instance.Pause(true);
         }
 

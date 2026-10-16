@@ -282,9 +282,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 				DebugConsole.Log($"[SteamLobby] {name} left the lobby.");
                 OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
                 Utils.PauseSimOnPlayerLeft();
-				var boxedId = Boxed<ulong>.Get(userId);
-				Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);
-				boxedId.Release();
             }
 		}
 

@@ -506,7 +506,6 @@ namespace ONI_United.Networking.Lifecycle
 				return false;
 			ActiveSynchronizationId = 0;
 			SaveChunkAssembler.Clear();
-			Game.Instance?.Trigger(MP_HASHES.GameClient_OnConnectedInGame);
 			MultiplayerSession.CreateConnectedPlayerCursors();
 			SelectToolPatch.UpdateColor();
 			return true;

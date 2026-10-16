@@ -40,9 +40,6 @@ namespace ONI_United.DebugTools.IntegrationTests
                 _server.MessageReceived += OnServerMessageReceived;
                 _server.Start(port, 1, useMessageHandlers: false);
 
-                //Game.Instance?.Trigger(MP_HASHES.OnConnected);
-                //Game.Instance?.Trigger(MP_HASHES.GameServer_OnServerStarted);
-
                 _client = new Client("Host client");
                 _client.Connected += OnClientConnected;
                 _client.Disconnected += OnClientDisconnected;

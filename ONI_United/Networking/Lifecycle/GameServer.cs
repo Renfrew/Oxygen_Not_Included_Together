@@ -34,7 +34,6 @@ namespace ONI_United.Networking.Lifecycle
 			{
 				_state = newState;
 				DebugConsole.Log($"[GameServer] State changed to: {_state}");
-				Game.Instance?.Trigger(MP_HASHES.GameServer_OnStateChanged);
 			}
 		}
 
@@ -83,8 +82,6 @@ namespace ONI_United.Networking.Lifecycle
 			NetworkConfig.TransportServer.Start();
 
 			DebugConsole.Log("[GameServer] Game Server started!");
-			Game.Instance?.Trigger(MP_HASHES.OnConnected);
-			Game.Instance?.Trigger(MP_HASHES.GameServer_OnServerStarted);
 
 			SetState(ServerState.Started);
 		}

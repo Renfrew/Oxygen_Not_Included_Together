@@ -46,7 +46,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         private static NetManager _discoveryClient;
         private static EventBasedNetListener _discoveryListener;
         public static readonly Dictionary<string, LanDiscoveredHost> DiscoveredHosts = new Dictionary<string, LanDiscoveredHost>();
-        public static event System.Action OnDiscoveredHostsChanged;
 
         public static NetManager Client => _client;
         public static NetPeer ServerPeer => _serverPeer;
@@ -135,7 +134,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
                     string key = remoteEndPoint.Address.ToString() + ":" + host.Port;
                     DiscoveredHosts[key] = host;
-                    OnDiscoveredHostsChanged?.Invoke();
                 }
             }
             catch (Exception ex)
@@ -280,7 +278,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             MultiplayerSession.OnConnectedToHost(MultiplayerSession.HostUserID, _serverPeer);
 
             OnClientConnected?.Invoke();
-            MultiplayerSession.PublishClientConnected();
             DebugConsole.Log("[LiteNetLibClient] Connected to host! Assigned Client ID: " + MultiplayerSession.LocalUserID);
             OnRequestStateOrReturn?.Invoke();
         }

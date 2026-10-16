@@ -112,9 +112,6 @@ namespace ONI_United.UI.Screens
 				Instance.Init();
 
 				Game.Instance?.Subscribe(MP_HASHES.OnInSessionChanged, OnSessionChanged);
-				//Game.Instance.Subscribe(MP_HASHES.GameClient_OnConnectedInGame, ShowOnNewSession);
-				//Game.Instance.Subscribe(MP_HASHES.GameServer_OnServerStarted, ShowOnNewSession);
-				//Game.Instance.Subscribe(MP_HASHES.OnDisconnected, HideOnDisconnect);
 				Instance.Show(false);
 				if (IsToggleValid())
 				{
@@ -129,20 +126,6 @@ namespace ONI_United.UI.Screens
 			//bool show = ((Boxed<bool>)data).value;
 			Instance.Show(MultiplayerSession.InActiveSession);
 		}
-
-		static void ShowOnNewSession(object _)
-		{
-			InitScreen();
-			Instance.Show(MultiplayerSession.InActiveSession);
-		}
-		static void HideOnDisconnect(object _)
-		{
-			if (Instance == null)
-				return;
-			if (!Utils.IsInGame())
-				Instance.Show(false);
-		}
-
 
 		public override void OnShow(bool show)
 		{

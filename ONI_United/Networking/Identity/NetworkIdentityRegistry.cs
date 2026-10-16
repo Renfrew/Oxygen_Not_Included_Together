@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_United.Networking.Packets.World;
 using ONI_United;
 using ONI_United.Networking.Synchronization.Trackers;
 
@@ -12,7 +11,6 @@ namespace ONI_United.Networking.Identity
 	public static class NetworkIdentityRegistry
 	{
 		private static readonly Dictionary<int, NetworkIdentity> identities = new Dictionary<int, NetworkIdentity>();
-		private static readonly System.Random rng = new System.Random();
 
 		private static int _lookupFailCount = 0;
 		private static float _lastFailLogTime = 0f;
@@ -105,22 +103,6 @@ namespace ONI_United.Networking.Identity
 			return identities.Count;
 		}
 
-
-
-		public static bool TryGetGameObject(int netId, out GameObject gameObject)
-		{
-			using var _ = Profiler.Scope();
-
-			gameObject = null;
-			if (!TryGet(netId, out var identity))
-				return false;
-			if (identity.IsNullOrDestroyed() || identity.gameObject.IsNullOrDestroyed())
-				return false;
-
-			gameObject = identity.gameObject;
-			return true;
-		}
-
 		public static bool TryGet(int netId, out NetworkIdentity entity)
 		{
 			using var _ = Profiler.Scope();
@@ -157,16 +139,6 @@ namespace ONI_United.Networking.Identity
 				return false;
 			return ni.gameObject.TryGetComponent<T>(out component);
 		}
-		public static bool TryGetComponent<T>(NetworkIdentity ni, out T component)
-		{
-			using var _ = Profiler.Scope();
-
-			component = default(T);
-			if (ni.IsNullOrDestroyed() || ni.gameObject.IsNullOrDestroyed())
-				return false;
-			return ni.gameObject.TryGetComponent<T>(out component);
-		}
-
 		public static void Clear()
 		{
 			using var _ = Profiler.Scope();

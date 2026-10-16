@@ -129,7 +129,6 @@ namespace ONI_United.Networking.Transport.Riptide
 
             MultiplayerSession.OnConnectedToHost(1, conn); // Host's client is always 1
             OnClientConnected.Invoke();
-            MultiplayerSession.PublishClientConnected();
 
             DebugConsole.Log($"[Riptide] Connected to server with Client ID: {CLIENT_ID}");
 
@@ -315,10 +314,6 @@ namespace ONI_United.Networking.Transport.Riptide
             string name = MultiplayerSession.KnownPlayerNames.TryGetValue(id, out var cached) ? cached : $"Player {id}";
             OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
             Utils.PauseSimOnPlayerLeft();
-
-			var boxedId = Boxed<ulong>.Get(id);
-			Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);
-            boxedId.Release();
         }
 
         public override NetworkIndicatorsScreen.NetworkState GetJitterState()

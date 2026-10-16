@@ -33,7 +33,6 @@ namespace ONI_United
 
 		public static readonly Dictionary<string, AssetBundle> LoadedBundles = new Dictionary<string, AssetBundle>();
 
-		public static System.Action OnPostSceneLoaded;
 		public static Harmony Harmony;
 
 		public static bool UseSteamOverlay = true; // Will be false for non steam instances
@@ -170,11 +169,6 @@ namespace ONI_United
 		private void SetupListeners()
 		{
 			using var _ = Profiler.Scope();
-
-			App.OnPostLoadScene += () =>
-			{
-				OnPostSceneLoaded?.Invoke();
-			};
 
 			ReadyManager.SetupListeners();
 		}

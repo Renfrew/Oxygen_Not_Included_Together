@@ -329,9 +329,6 @@ namespace ONI_United.Networking.Transport.Riptide
             string name = MultiplayerSession.GetPlayer(id)?.PlayerName ?? $"Player {id}";
             OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
             Utils.PauseSimOnPlayerLeft();
-			var boxedId = Boxed<ulong>.Get(id);
-			Game.Instance?.Trigger(MP_HASHES.OnPlayerLeft, boxedId);
-            boxedId.Release();
         }
         public ulong GetClientID()
         {
