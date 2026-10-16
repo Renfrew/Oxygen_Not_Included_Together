@@ -1,4 +1,4 @@
-namespace ONI_Together.Networking.Packets.Architecture
+namespace Shared.Interfaces.Networking
 {
 	/// <summary>
 	/// Marker for small ordered events whose application-level sequence makes it

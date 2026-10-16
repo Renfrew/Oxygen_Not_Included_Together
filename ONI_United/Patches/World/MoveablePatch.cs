@@ -1,0 +1,39 @@
+﻿using HarmonyLib;
+using ONI_United.DebugTools;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Identity;
+using Shared.Profiling;
+using UnityEngine;
+
+namespace ONI_United.Patches.World;
+
+[HarmonyPatch(typeof(Movable), "OnSpawn")]
+public static class MoveablePatch
+{
+	public static void Postfix(Movable __instance)
+	{
+		using var _ = Profiler.Scope();
+
+		__instance.onPickupComplete += OnPickup;
+		//DebugConsole.Log($"[Movable.OnSpawn] Attached to: {STRINGS.UI.StripLinkFormatting(__instance.gameObject.GetProperName())} ({__instance.GetInstanceID()})");
+	}
+	static void OnPickup(GameObject go)
+	{
+		using var _ = Profiler.Scope();
+
+		//DebugConsole.Log($"[Movable.onPickupComplete] Picked up {go.name}");
+
+		if (!MultiplayerSession.IsHost)
+			return;
+
+		if (go == null)
+			return;
+
+		if (!go.TryGetComponent<NetworkIdentity>(out var identity))
+			return;
+
+		//DebugConsole.Log($"[Movable.onPickupComplete] Picked up NetID {identity.NetId}");
+
+		// Optional: PacketSender.SendToAll(new DespawnPacket { NetId = identity.NetId });
+	}
+}

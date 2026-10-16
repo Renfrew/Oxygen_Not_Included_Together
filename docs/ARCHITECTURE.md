@@ -1,4 +1,4 @@
-# Oxygen Not Included Together — Architecture
+# Multiplayer: ONI United — Architecture
 
 **Last updated:** 2026-10-15  
 **Document status:** Recovered and consolidated reference. This document preserves the existing architecture recorded in the `game mod` ChatGPT Project and the local repository; it is not a redesign.

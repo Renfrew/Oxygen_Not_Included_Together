@@ -1,0 +1,150 @@
+using HarmonyLib;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Social;
+using Shared.Profiling;
+
+namespace ONI_United.Patches.Duplicant
+{
+	internal class ThoughtGraph_Patches
+	{
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.HasThoughts))]
+		public static class ThoughtGraph_HasThoughts_Patch
+		{
+			public static bool Prefix(ThoughtGraph.Instance __instance, ref bool __result)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsClient)
+					return true;
+
+				__instance.thoughts?.Clear();
+				__result = false;
+				return false;
+			}
+		}
+
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.AddThought))]
+		public static class ThoughtGraph_AddThought_Patch
+		{
+			public static bool Prefix()
+			{
+				using var _ = Profiler.Scope();
+
+				return !MultiplayerSession.IsClient;
+			}
+		}
+
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.HasImmediateThought))]
+		public static class ThoughtGraph_HasImmediateThought_Patch
+		{
+			public static bool Prefix(ThoughtGraph.Instance __instance, ref bool __result)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsClient)
+					return true;
+
+				__instance.thoughts?.Clear();
+				__result = false;
+				return false;
+			}
+		}
+
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.RemoveThought))]
+		public static class ThoughtGraph_RemoveThought_Patch
+		{
+			public static bool Prefix()
+			{
+				using var _ = Profiler.Scope();
+
+				return !MultiplayerSession.IsClient;
+			}
+		}
+
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.CreateBubble))]
+		public static class ThoughtGraph_CreateBubble_Patch
+		{
+			public static bool Prefix(ThoughtGraph.Instance __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (MultiplayerSession.IsClient)
+				{
+					__instance.thoughts?.Clear();
+					return false;
+				}
+				return true;
+			}
+
+			public static void Postfix(ThoughtGraph.Instance __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsHost)
+					return;
+
+				var thought = __instance.currentThought;
+				if (thought == null)
+					return;
+
+				var go = __instance.master.gameObject;
+				if (go.IsNullOrDestroyed())
+					return;
+
+				if (!go.TryGetComponent<NetworkIdentity>(out var identity))
+					return;
+				
+				var packet = new ThoughtBubblePacket
+				{
+					NetId = identity.NetId,
+					IsVisible = true,
+					IsConvo = thought.modeSprite != null,
+					ThoughtId = thought.Id ?? string.Empty,
+					HoverText = (string)thought.hoverText ?? string.Empty,
+					BubbleSpriteName = thought.bubbleSprite?.name ?? string.Empty,
+					TopicSpriteName = thought.sprite?.name ?? string.Empty,
+					ModeSpriteName = thought.modeSprite?.name ?? string.Empty
+				};
+
+				PacketSender.SendToAllClients(packet, PacketSendMode.Reliable);
+			}
+		}
+
+		[HarmonyPatch(typeof(ThoughtGraph.Instance), nameof(ThoughtGraph.Instance.DestroyBubble))]
+		public static class ThoughtGraph_DestroyBubble_Patch
+		{
+			public static bool Prefix()
+			{
+				using var _ = Profiler.Scope();
+
+				return !MultiplayerSession.IsClient;
+			}
+
+			public static void Postfix(ThoughtGraph.Instance __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsHost)
+					return;
+
+				var go = __instance.master.gameObject;
+				if (go.IsNullOrDestroyed())
+					return;
+
+				if (!go.TryGetComponent<NetworkIdentity>(out var identity))
+					return;
+
+				var packet = new ThoughtBubblePacket
+				{
+					NetId = identity.NetId,
+					IsVisible = false
+				};
+
+				PacketSender.SendToAllClients(packet, PacketSendMode.Reliable);
+			}
+		}
+	}
+}

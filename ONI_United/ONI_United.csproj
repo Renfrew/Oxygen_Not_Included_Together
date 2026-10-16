@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- General Package Properties -->
+	<PropertyGroup>
+		<PackageId>MultiplayerONIUnited</PackageId>
+		<Version>0.9.0</Version>
+		<Authors>ItsLuke,Sgt_Lmalas,Renfrew</Authors>
+		<Copyright>$(AssemblyCopyright)</Copyright>
+	</PropertyGroup>
+
+	<!-- Mod Info, used to generate yaml files on the fly -->
+	<PropertyGroup>
+		<ModName>Multiplayer: ONI United</ModName>
+		<ModDescription>Build, survive, and manage the colony together in Oxygen Not Included.</ModDescription>
+		<MinimumSupportedBuild>$(TargetGameVersion)</MinimumSupportedBuild>
+		<APIVersion>2</APIVersion>
+	</PropertyGroup>
+
+	<!-- Build Properties -->
+	<PropertyGroup>
+		<ImplicitUsings>false</ImplicitUsings>
+		<!--exports the mod to the deployment folder-->
+		<IsMod>true</IsMod>
+		<!--Generates Yaml files-->
+		<GenerateMetadata>true</GenerateMetadata>
+		<!--Merges dlls into one, becomes relevant if PLib is added, does not play nice with gDrives transitive nuget requirements-->
+		<IsPacked>true</IsPacked>
+		<AssemblyName>ONI_United</AssemblyName>
+		<RootNamespace>ONI_United</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<DefineConstants>OS_WINDOWS</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+		<DefineConstants>OS_LINUX</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('FreeBSD'))">
+		<DefineConstants>OS_FREEBSD</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<DefineConstants>OS_MAC</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\mod_mascot.png">
+			<LogicalName>ONI_Together.Assets.mod_mascot.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\oni_together_logo.png">
+			<LogicalName>ONI_Together.Assets.oni_together_logo.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\oni_together_link_chat.png">
+			<LogicalName>ONI_Together.Assets.oni_together_link_chat.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\discord.png">
+			<LogicalName>ONI_Together.Assets.discord.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_win.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_win.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_mac.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_mac.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\playercursor_lin.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.playercursor_lin.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_lin.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_lin.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_mac.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_mac.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\bundles\networkindicators_win.bundle">
+			<LogicalName>ONI_Together.Assets.bundles.networkindicators_win.bundle</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\network_overlay_icon.png">
+			<LogicalName>ONI_Together.Assets.network_overlay_icon.png</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\sync_icon.png">
+			<LogicalName>ONI_Together.Assets.sync_icon.png</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Shared\Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ModAssets\translations\" />
+	  <Folder Include="Networking\Visualizers\" />
+	  <Folder Include="Networking\Packets\BulkDataPackets\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
+		<PackageReference Include="LiteNetLib" Version="1.3.1" />
+		<PackageReference Include="RiptideNetworking.Riptide" Version="2.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="PLib" Version="4.22.0" />
+	</ItemGroup>
+
+</Project>

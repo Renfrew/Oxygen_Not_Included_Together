@@ -1,0 +1,76 @@
+﻿using HarmonyLib;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Synchronization;
+using ONI_United.Networking.Replication.Components;
+using ONI_United.Networking.Replication.Components.Plants;
+using ONI_United.Networking.Replication.Components.StructureSyncers;
+using ONI_United.Networking.Replication.Components.Tools;
+using ONI_United.UI.Screens;
+using Shared.Profiling;
+
+namespace ONI_United.Patches.GamePatches
+{
+
+    /// <summary>
+    /// General cleanup patch
+    /// </summary>
+    [HarmonyPatch(typeof(Game), nameof(Game.OnLoadLevel))]
+    public class Game_OnLoadLevel_Patch
+    {
+        public static void Postfix()
+        {
+            UnityChatBoxUI.DestroyInstance();
+		}
+    }
+
+  /// <summary>
+  /// Patch Game.Update to run the two batchers if host
+  /// </summary>
+  [HarmonyPatch(typeof(Game), "Update")]
+  public static class GameUpdatePatch
+  {
+    public static void Postfix()
+    {
+      using var _ = Profiler.Scope();
+
+      if (MultiplayerSession.IsHost)
+      {
+        InstantiationBatcher.Update();
+        WorldUpdateBatcher.Update();
+      }
+    }
+  }
+
+  /// <summary>
+  /// Complete client synchronization after the loaded world finishes spawning
+  /// </summary>
+  [HarmonyPatch(typeof(Game), nameof(Game.OnSpawn))]
+  public static class GameOnSpawnPatch
+  {
+    public static void Postfix()
+    {
+      using var _ = Profiler.Scope();
+
+      Game.Instance.gameObject.AddComponent<LogicPortManager>();
+
+      PlantLifecycleSyncer.Instance?.SetNetworkIdentity();
+      MoveToLocationToolSyncer.RegisterNetId(Game.Instance.gameObject);
+
+      WorkableSyncer.RegisterNetId(Game.Instance.gameObject);
+
+      Game.Instance.OnSpawnComplete += OnSpawnComplete;
+    }
+
+    private static void OnSpawnComplete()
+    {
+      using var _ = Profiler.Scope();
+
+      if (MultiplayerSession.IsHost)
+        return;
+
+      GameClient.OnWorldSpawnComplete();
+    }
+  }
+}

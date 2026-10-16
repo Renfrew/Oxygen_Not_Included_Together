@@ -1,0 +1,102 @@
+﻿using HarmonyLib;
+using ONI_United.Networking.Session;
+using Shared.Interfaces.Networking;
+using ONI_United.Networking.Packets.World;
+using ONI_United.Networking.Packets.World.Buildings;
+using Shared.Profiling;
+using System.Collections.Generic;
+using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking;
+
+namespace ONI_United.Patches.World.Buildings
+{
+	internal class ComplexFabricator_Patches
+	{
+		private const float SEND_INTERVAL = 0.15f;
+		private static readonly Dictionary<int, float> _nextSendTime = new();
+
+		[HarmonyPatch(typeof(ComplexFabricatorWorkable), nameof(ComplexFabricatorWorkable.UpdateOrderProgress))]
+		public class ComplexFabricatorWorkable_UpdateOrderProgress_Patch
+		{
+			public static void Postfix(ComplexFabricatorWorkable __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsHost || !MultiplayerSession.InActiveSession || __instance.IsNullOrDestroyed())
+					return;
+
+				if (!__instance.TryGetComponent<ComplexFabricator>(out var fabricator) || fabricator == null || fabricator.IsNullOrDestroyed())
+					return;
+
+				int netId = fabricator.GetNetId();
+				if (netId == 0)
+					return;
+
+				float now = Time.time;
+				if (_nextSendTime.TryGetValue(netId, out float next) && now < next)
+					return;
+
+				_nextSendTime[netId] = now + SEND_INTERVAL;
+				PacketSender.SendToAllClients(WorkableProgressPacket.CreateComplexFabricator(fabricator, showProgressBar: true), PacketSendMode.Unreliable);
+			}
+		}
+
+		[HarmonyPatch(typeof(ComplexFabricator), nameof(ComplexFabricator.CancelWorkingOrder))]
+		public class ComplexFabricator_CancelWorkingOrder_Patch
+		{
+			public static void Postfix(ComplexFabricator __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.IsHost || !MultiplayerSession.InActiveSession || __instance.IsNullOrDestroyed())
+					return;
+
+				PacketSender.SendToAllClients(WorkableProgressPacket.CreateComplexFabricator(__instance, showProgressBar: false), PacketSendMode.ReliableImmediate);
+			}
+		}
+
+		[HarmonyPatch(typeof(ComplexFabricator), nameof(ComplexFabricator.SpawnOrderProduct))]
+		public class ComplexFabricator_SpawnOrderProduct_Patch
+		{
+			public static void Postfix(ComplexFabricator __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.InActiveSession || !MultiplayerSession.IsHost)
+					return;
+
+				PacketSender.SendToAllClients(WorkableProgressPacket.CreateComplexFabricator(__instance, showProgressBar: false), PacketSendMode.ReliableImmediate);
+				PacketSender.SendToAllClients(new ComplexFabricatorSpawnProductPacket(__instance));
+			}
+		}
+
+		[HarmonyPatch(typeof(ComplexFabricatorSideScreen), nameof(ComplexFabricatorSideScreen.HasAllRecipeRequirements))]
+		public static class ComplexFabricatorSideScreen_HasAllRecipeRequirements_Patch
+		{
+			public static bool Prefix(ComplexFabricatorSideScreen __instance, ComplexRecipe recipe, ref bool __result)
+			{
+				using var _ = Profiler.Scope();
+
+				var fabricator = __instance?.targetFab;
+				if (recipe != null && fabricator != null && !fabricator.IsNullOrDestroyed() &&
+					fabricator.inStorage != null && fabricator.buildStorage != null && fabricator.GetMyWorld() != null)
+					return true;
+
+				__result = false;
+				return false;
+			}
+		}
+
+		[HarmonyPatch(typeof(ComplexFabricatorSideScreen), nameof(ComplexFabricatorSideScreen.RefreshIngredientAvailabilityVis))]
+		public static class ComplexFabricatorSideScreen_RefreshIngredientAvailabilityVis_Patch
+		{
+			public static bool Prefix(ComplexFabricatorSideScreen __instance)
+			{
+				using var _ = Profiler.Scope();
+				return __instance != null && __instance.targetFab != null &&
+					!__instance.targetFab.IsNullOrDestroyed() && __instance.recipeCategoryToggleMap != null;
+			}
+		}
+	}
+}

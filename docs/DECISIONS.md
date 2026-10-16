@@ -1,4 +1,4 @@
-# Oxygen Not Included Together — Architecture Decision Log
+# Multiplayer: ONI United — Architecture Decision Log
 
 **Last updated:** 2026-10-15  
 **Status:** Recovered decisions from the `game mod` Project and local repository. Decision status and implementation status are separate: accepting a decision does not mean its implementation is complete.
@@ -12,6 +12,27 @@
 - **Deferred:** Intentionally postponed.
 
 Implementation status uses only: **Implemented and tested**, **Implemented but further testing required**, **Partially implemented**, **Not implemented**, or **Not independently verified**. These labels report available evidence rather than changing the architectural decision.
+
+## D-000 — Independent development begins with 0.9.0
+
+**Decision status:** Confirmed
+
+**Implementation status:** Partially implemented
+
+**Decision:** `0.8.0.5` is the final upstream-tracking release and the final inherited baseline from the upstream project's MIT-licensed history. Development version `0.9.0` begins an independent project line. No upstream change after the verified MIT baseline may be copied or imported without separately verified compatible licensing or written permission.
+
+**Compatibility policy:** The independent line uses new package, assembly/static, configuration, development-folder, repository, and Workshop identities. Existing C# namespaces remain unchanged. The external mod-integration API and standalone dedicated server are discontinued in `0.9.0` rather than carried forward as compatibility surfaces.
+
+**Naming status:** The permanent public name is **Multiplayer: ONI United**. The main assembly/static identity is `ONI_United`; inherited C# namespaces remain unchanged.
+
+**Removed modules:** The external ONI Together API project, its reflection bridge, and the standalone dedicated-server project are not part of the independent `0.9.0` product.
+
+**Deferred migration:** Verify PLib configuration behavior and save/enabled-mod upgrade behavior after the identity changes. Namespace migration remains out of scope.
+
+**Rationale:** Removing unsupported auxiliary products reduces an untested compatibility burden while preserving the main multiplayer implementation, `Shared`, internal networking, and OxySync.
+
+**Evidence:** `docs/INDEPENDENT_DEVELOPMENT.md`; Git ancestry and identifier audit performed 2026-10-15.
+
 
 ## D-001 — Host-authoritative simulation
 

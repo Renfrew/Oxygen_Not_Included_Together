@@ -1,0 +1,26 @@
+﻿using HarmonyLib;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Packets.Tools;
+using ONI_United.Networking.Packets.Tools.Cancel;
+using Shared.Profiling;
+using ONI_United.Networking.Packets.Architecture;
+
+namespace ONI_United.Patches.ToolPatches.Cancel
+{
+	[HarmonyPatch(typeof(CancelTool), nameof(CancelTool.OnDragTool))]
+	public static class CancelToolPatch
+	{
+		public static void Postfix(int cell, int distFromOrigin)
+		{
+			using var _ = Profiler.Scope();
+
+			if (!MultiplayerSession.InActiveSession)
+				return;
+
+			//prevent recursion
+			if (CancelPacket.ProcessingIncoming)
+				return;
+			PacketSender.SendToAllOtherPeers(new CancelPacket() { cell = cell, distFromOrigin = distFromOrigin });
+		}
+	}
+}

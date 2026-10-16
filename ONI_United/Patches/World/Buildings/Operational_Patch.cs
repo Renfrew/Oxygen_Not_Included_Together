@@ -1,0 +1,158 @@
+﻿using HarmonyLib;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Packets.World.Buildings;
+using ONI_United.Networking.Synchronization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Shared.Profiling;
+using ONI_United.Networking.Packets.Architecture;
+
+namespace ONI_United.Patches.World.Buildings
+{
+	internal class Operational_Patch
+	{
+		///Server sends state updates to clients
+		///
+
+		[HarmonyPatch(typeof(Operational), nameof(Operational.IsOperational), MethodType.Setter)]
+		public class Operational_IsOperational_Setter_Patch
+		{
+			public static void Postfix(Operational __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.InActiveSession || !MultiplayerSession.IsHost)
+					return;
+				if (__instance == null || __instance.IsNullOrDestroyed())
+					return;
+				PacketSender.SendToAllClients(new OperationalStatePacket(__instance));
+			}
+		}
+		[HarmonyPatch(typeof(Operational), nameof(Operational.IsActive), MethodType.Setter)]
+		public class Operational_IsOperational_IsActive_Patch
+		{
+			public static void Postfix(Operational __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.InActiveSession || !MultiplayerSession.IsHost)
+					return;
+				if (__instance == null || __instance.IsNullOrDestroyed())
+					return;
+				PacketSender.SendToAllClients(new OperationalStatePacket(__instance));
+			}
+		}
+		[HarmonyPatch(typeof(Operational), nameof(Operational.IsFunctional), MethodType.Setter)]
+		public class Operational_IsOperational_IsFunctional_Patch
+		{
+			public static void Postfix(Operational __instance)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.InActiveSession || !MultiplayerSession.IsHost)
+					return;
+				if (__instance == null || __instance.IsNullOrDestroyed())
+					return;
+				PacketSender.SendToAllClients(new OperationalStatePacket(__instance));
+			}
+		}
+
+		[HarmonyPatch(typeof(Operational), nameof(Operational.SetFlag))]
+		public class Operational_SetFlag_Patch
+		{
+			public static void Postfix(Operational __instance, Operational.Flag flag)
+			{
+				using var _ = Profiler.Scope();
+
+				if (!MultiplayerSession.InActiveSession || !MultiplayerSession.IsHost)
+					return;
+
+				if (flag != EnergyConsumer.PoweredFlag)
+					return;
+
+				if (__instance == null || __instance.IsNullOrDestroyed())
+					return;
+
+				PacketSender.SendToAllClients(new OperationalStatePacket(__instance));
+			}
+		}
+
+		/// <summary>
+		/// Clients receive their states from the server
+		/// </summary>
+		///
+
+        [HarmonyPatch(typeof(Operational), nameof(Operational.IsOperational), MethodType.Getter)]
+        public class Operational_IsOperational_Patch
+        {
+            public static bool Prefix(Operational __instance, ref bool __result)
+            {
+	            using var _ = Profiler.Scope();
+
+                if (__instance.IsNullOrDestroyed())
+                {
+                    __result = false;
+                    return false;
+                }
+
+                if (!MultiplayerSession.IsClient)
+                    return true;
+
+                if(__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap) && wrap.HasHostState)
+                {
+                    __result = wrap.IsOperational;
+					return false;
+                }
+                return true;
+            }
+        }
+
+
+        [HarmonyPatch(typeof(Operational), nameof(Operational.IsActive), MethodType.Getter)]
+		public class Operational_IsActive_Patch
+        {
+			public static bool Prefix(Operational __instance, ref bool __result)
+			{
+				using var _ = Profiler.Scope();
+
+				if (__instance == null ||__instance.IsNullOrDestroyed())
+					return true;
+
+				if (!MultiplayerSession.IsClient)
+					return true;
+
+				if (__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap) && wrap.HasHostState)
+				{
+					__result = wrap.IsActive;
+					return false;
+				}
+				return true;
+			}
+		}
+
+		[HarmonyPatch(typeof(Operational), nameof(Operational.IsFunctional), MethodType.Getter)]
+		public class Operational_IsFunctional_Patch
+		{
+			public static bool Prefix(Operational __instance, ref bool __result)
+			{
+				using var _ = Profiler.Scope();
+
+                if (__instance == null || __instance.IsNullOrDestroyed())
+                    return true;
+
+				if (!MultiplayerSession.IsClient)
+					return true;
+
+				if (__instance.TryGetComponent<ClientReceiver_Operational>(out var wrap) && !wrap.HasHostState)
+				{
+					__result = wrap.IsFunctional;
+					return false;
+				}
+				return true;
+			}
+		}
+	}
+}

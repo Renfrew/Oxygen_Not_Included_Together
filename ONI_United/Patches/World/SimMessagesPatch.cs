@@ -1,0 +1,41 @@
+﻿using HarmonyLib;
+using ONI_United.Networking.WorldSync;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Packets.World;
+using Shared.Profiling;
+
+namespace ONI_United.Patches.World
+{
+	[HarmonyPatch(typeof(SimMessages), nameof(SimMessages.ModifyCell))]
+	public static class SimMessagesPatch
+	{
+		[HarmonyPrefix]
+		public static void Prefix(
+				int gameCell,
+				ushort elementIdx,
+				float temperature,
+				float mass,
+				byte disease_idx,
+				int disease_count,
+				SimMessages.ReplaceType replace_type,
+				bool do_vertical_solid_displacement,
+				int callbackIdx
+		)
+		{
+			using var _ = Profiler.Scope();
+
+			if (!MultiplayerSession.IsHost || !Grid.IsValidCell(gameCell)) return;
+
+			// Enqueue update to batcher
+			WorldUpdateBatcher.Queue(new WorldUpdatePacket.CellUpdate
+			{
+				Cell = gameCell,
+				ElementIdx = elementIdx,
+				Temperature = temperature,
+				Mass = mass,
+				DiseaseIdx = disease_idx,
+				DiseaseCount = disease_count
+			});
+		}
+	}
+}

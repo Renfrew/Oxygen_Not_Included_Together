@@ -1,0 +1,112 @@
+using HarmonyLib;
+using ONI_United.Networking.Session;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Packets.World;
+using Shared.Profiling;
+using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
+
+namespace ONI_United.Patches.World.SideScreen
+{
+	/// <summary>
+	/// Patches for filter side screens (FilterSideScreen, TreeFilterable)
+	/// </summary>
+
+	/// <summary>
+	/// Sync filter element selection
+	/// </summary>
+	[HarmonyPatch(typeof(FilterSideScreen), nameof(FilterSideScreen.SetFilterTag))]
+	public static class FilterSideScreen_SetFilterTag_Patch
+	{
+		public static void Postfix(FilterSideScreen __instance, Tag tag)
+		{
+			using var _ = Profiler.Scope();
+
+			if (BuildingConfigPacket.IsApplyingPacket) return;
+			if (!MultiplayerSession.InActiveSession) return;
+			if (__instance.targetFilterable == null) return;
+
+			var targetGO = (__instance.targetFilterable as Component)?.gameObject;
+			if (targetGO == null) return;
+
+			var identity = targetGO.AddOrGet<NetworkIdentity>();
+			identity.RegisterIdentity();
+
+			// Use string-based tag name instead of hash for proper reconstruction
+			var packet = new BuildingConfigPacket
+			{
+				NetId = identity.NetId,
+				Cell = Grid.PosToCell(targetGO),
+				ConfigHash = "FilterTagString".GetHashCode(),
+				Value = 0,
+				ConfigType = BuildingConfigType.String,
+				StringValue = tag.Name
+			};
+
+			if (MultiplayerSession.IsHost) PacketSender.SendToAllClients(packet);
+			else PacketSender.SendToHost(packet);
+		}
+	}
+
+	/// <summary>
+	/// Sync storage filter add tag
+	/// </summary>
+	[HarmonyPatch(typeof(TreeFilterable), nameof(TreeFilterable.AddTagToFilter))]
+	public static class TreeFilterable_AddTagToFilter_Patch
+	{
+		public static void Postfix(TreeFilterable __instance, Tag t)
+		{
+			using var _ = Profiler.Scope();
+
+			if (BuildingConfigPacket.IsApplyingPacket) return;
+			if (!MultiplayerSession.InActiveSession) return;
+
+			var identity = __instance.gameObject.AddOrGet<NetworkIdentity>();
+			identity.RegisterIdentity();
+
+			var packet = new BuildingConfigPacket
+			{
+				NetId = identity.NetId,
+				Cell = Grid.PosToCell(__instance.gameObject),
+				ConfigHash = "StorageFilterAdd".GetHashCode(),
+				Value = 0,
+				ConfigType = BuildingConfigType.String,
+				StringValue = t.Name
+			};
+
+			if (MultiplayerSession.IsHost) PacketSender.SendToAllClients(packet);
+			else PacketSender.SendToHost(packet);
+		}
+	}
+
+	/// <summary>
+	/// Sync storage filter remove tag
+	/// </summary>
+	[HarmonyPatch(typeof(TreeFilterable), nameof(TreeFilterable.RemoveTagFromFilter))]
+	public static class TreeFilterable_RemoveTagFromFilter_Patch
+	{
+		public static void Postfix(TreeFilterable __instance, Tag t)
+		{
+			using var _ = Profiler.Scope();
+
+			if (BuildingConfigPacket.IsApplyingPacket) return;
+			if (!MultiplayerSession.InActiveSession) return;
+
+			var identity = __instance.gameObject.AddOrGet<NetworkIdentity>();
+			identity.RegisterIdentity();
+
+			var packet = new BuildingConfigPacket
+			{
+				NetId = identity.NetId,
+				Cell = Grid.PosToCell(__instance.gameObject),
+				ConfigHash = "StorageFilterRemove".GetHashCode(),
+				Value = 0,
+				ConfigType = BuildingConfigType.String,
+				StringValue = t.Name
+			};
+
+			if (MultiplayerSession.IsHost) PacketSender.SendToAllClients(packet);
+			else PacketSender.SendToHost(packet);
+		}
+	}
+}
