@@ -173,72 +173,6 @@ namespace ONI_United
 				public static LocString SEARCH = "{0} Search...";
 			}
 
-			public class MODCOMPATIBILITY
-			{
-				public class MANAGER
-				{
-					public static LocString WARNING_MOD_HASH_MISMATCH = "Mod hash mismatch - possible mod order difference";
-					public static LocString MISSING_MODS = "{0} missing mods";
-					public static LocString EXTRA_MODS = "{0} extra mods";
-					public static LocString VERSION_MISMATCHES = "{0} version mismatches";
-					public static LocString MOD_INCOMPATIBILITY = "Mod incompatibility: {0}";
-				}
-
-				public class COMPATIBILITYDIALOG
-				{
-					public static LocString HEADER_TITLE = "Mod Compatibility Error";
-					public static LocString HEADER_TITLE_ERROR = "Mod Compatibility Error: {0}";
-					public static LocString DISABLE_MODS = "DISABLED MODS (enable these):";
-					public static LocString MISSING_MODS = "MISSING MODS (install these):";
-					public static LocString EXTRA_MODS = "EXTRA MODS (disable these):";
-					public static LocString VERSION_MISMATCHES = "VERSION MISMATCHES (update these):";
-					public static LocString YOU_HAVE_EXTRA_MODS_ALLOWED = "You have extra mods (this is allowed):";
-					public static LocString EXTRA_MODS_YOU_HAVE = "EXTRA MODS (you have these):";
-					public static LocString ENSURE_HOST_CONFIG = "Please ensure your mods match the host's configuration.";
-
-					public static LocString BUTTON_INSTALL = "Install";
-					public static LocString BUTTON_INSTALL_ALL = "Install All";
-					public static LocString BUTTON_VIEW = "View";
-					public static LocString BUTTON_UPDATE = "Update";
-					public static LocString BUTTON_OK = "Ok";
-					public static LocString BUTTON_ENABLE = "Enable";
-					public static LocString BUTTON_ENABLE_ALL = "Enable All";
-					public static LocString BUTTON_CLOSE = "Close";
-
-					public static LocString INSTRUCTIONS = "Install/disable the required mods, then try connecting again.";
-					public static LocString CONNECTION_ALLOWED = "Connection allowed. Your extra mods shouldn't cause issues.";
-
-					public static LocString CONNECTION_ALLOWED_HEADER = "Connection Allowed";
-
-					public static LocString YOU_HAVE_EXTRA_MODS = "You have {0} extra mod(s) that the host doesn't have.";
-					public static LocString ALLOWED_SHOULDNT_CAUSE_ISSUES = "This is allowed and shouldn't cause issues.";
-					public static LocString YOUR_EXTRA_MODS = "Your extra mods:";
-					public static LocString MOD_ENTRY = "• {0}";
-
-					public static LocString MODS_ENABLED_SUCCESSFULLY = "Mods enabled successfully!\nPlease restart the game for changes to take effect.";
-					public static LocString ALL_MODS_ENABLED = "All mods have been enabled!";
-					public static LocString RESTART = "Close this window to restart the game and apply changes.";
-					public static LocString MODS_CHANGED = "Mods have been enabled. Close this window to restart the game.";
-
-					public static LocString INSTALL_DISABLE_RECONNECT = "Install/disable mods, then reconnect.\nPress ESC to close.";
-				}
-
-				public class COMPATIBILITYRESULT
-				{
-					public static LocString APPROVED = "Approved";
-					public static LocString APPROVED_EXTRA = "Compatible (client has {0} extra mod(s))";
-					public static LocString APPROVED_COMPATIBLE = "Compatible";
-					public static LocString REJECT_NOT_A_HOST = "Internal error: not a host";
-					public static LocString REJECT_GAME_VERSION_MISMATCH = "Game version mismatch: Host={0}, Client={1}";
-					public static LocString COMPATIBILITY_ISCOMPATIBLE = "Compatible: {0}";
-					public static LocString COMPATIBILITY_INCOMPATIBLE = "Incompatible: {0} ({1})";
-					public static LocString COMPATIBILITY_MISSING = "{0} missing";
-					public static LocString COMPATIBILITY_EXTRA = "{0} extra";
-					public static LocString COMPATIBILITY_MISMATCH = "{0} version mismatches";
-					public static LocString REJECT_VERIFICATION_ERROR = "Verification error: {0}";
-				}
-
-			}
 			public class HOSTLOBBYCONFIGSCREEN
 			{
 				public static LocString HOST_LOBBY_SETTINGS = "Host Lobby Settings";
@@ -529,7 +463,7 @@ namespace ONI_United
 				public class TOPBAR
 				{
 					public static LocString LABEL = "Chat";
-					public static LocString TOOLTIP = "Toggle the ONI-Together chat window.";
+					public static LocString TOOLTIP = "Toggle the Multiplayer: ONI United chat window.";
 					public class FILTERBUTTON
 					{
 						public static LocString TEXT = "Settings";
@@ -834,24 +768,6 @@ namespace ONI_United
 					{
 						public static LocString NAME = "Objects";
 						public static LocString TOOLTIP = "Show/hide all objects with network activity";
-					}
-
-					public class GASSYNC
-					{
-						public static LocString NAME = "Gas Sync";
-						public static LocString TOOLTIP = "Show/hide gas sync network activity";
-					}
-
-					public class LIQUIDSYNC
-					{
-						public static LocString NAME = "Liquid Sync";
-						public static LocString TOOLTIP = "Show/hide liquid sync network activity";
-					}
-
-					public class ANIMSYNC
-					{
-						public static LocString NAME = "Anim Sync";
-						public static LocString TOOLTIP = "Show/hide animation sync indicators";
 					}
 
 					public class VIEWPORTS
