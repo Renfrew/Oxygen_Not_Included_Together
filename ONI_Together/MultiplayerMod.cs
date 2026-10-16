@@ -55,7 +55,7 @@ namespace ONI_Together
 			{
 				DebugConsole.Init(); // Init console first to catch logs
 				PacketTracker.Init();
-				DebugConsole.Log("[ONI_Together] Loaded Oxygen Not Included Together Multiplayer Mod.");
+				DebugConsole.Log("[ONI_Together] Loaded Multiplayer: ONI United.");
 				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
 				DebugConsole.Log($"[ONI_Together] Version: {version}");
 

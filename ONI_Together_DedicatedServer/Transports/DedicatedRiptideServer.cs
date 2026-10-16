@@ -29,7 +29,7 @@ namespace ONI_Together_DedicatedServer.Transports
             int port = ServerConfiguration.Instance.Config.Port;
             int maxPlayers = ServerConfiguration.Instance.Config.MaxLobbySize;
 
-            _server = new Server("ONI Together: Dedicated Server");
+            _server = new Server("Multiplayer: ONI United Dedicated Server");
             _server.MessageReceived += OnServerMessageReceived;
             _server.ClientConnected += OnClientConnected;
             _server.ClientDisconnected += OnClientDisconnected;

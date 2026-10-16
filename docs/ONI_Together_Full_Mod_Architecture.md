@@ -1,4 +1,4 @@
-# ONI Together: Full Multiplayer Mod Architecture
+# Multiplayer: ONI United — Full Mod Architecture
 
 **Design proposal · 23 September 2026; architecture updated · 3 October 2026**  
 **Scope:** Whole mod: session lifecycle, simulation authority, player commands, world and entity replication, saves, time control, presentation, transport, recovery, and implementation strategy.  

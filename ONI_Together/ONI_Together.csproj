@@ -3,15 +3,15 @@
 	<!-- General Package Properties -->
 	<PropertyGroup>
 		<PackageId>ItsLukesMultiplayerMod</PackageId>
-		<Version>0.8.0.5</Version>
+		<Version>0.9.0</Version>
 		<Authors>ItsLuke,Sgt_Lmalas,Renfrew</Authors>
 		<Copyright>$(AssemblyCopyright)</Copyright>
 	</PropertyGroup>
 
 	<!-- Mod Info, used to generate yaml files on the fly -->
 	<PropertyGroup>
-		<ModName>ONI Together - experimental</ModName>
-		<ModDescription>Adds multiplayer to Oxygen Not Included! By Renfrew</ModDescription>
+		<ModName>Multiplayer: ONI United</ModName>
+		<ModDescription>Build, survive, and manage the colony together in Oxygen Not Included.</ModDescription>
 		<MinimumSupportedBuild>$(TargetGameVersion)</MinimumSupportedBuild>
 		<APIVersion>2</APIVersion>
 	</PropertyGroup>

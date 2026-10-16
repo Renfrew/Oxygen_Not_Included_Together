@@ -17,7 +17,7 @@ namespace ONI_Together
     {
         private const string APP_ID = "1511834433542688870";
         private const string LARGE_IMAGE_KEY = "oni_together_logo";
-        private const string LARGE_IMAGE_TEXT = "ONI Together";
+        private const string LARGE_IMAGE_TEXT = "Multiplayer: ONI United";
         private const float PRESENCE_UPDATE_INTERVAL = 5f;
 
         private DiscordRpcClient _client;

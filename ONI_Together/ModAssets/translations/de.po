@@ -15,10 +15,10 @@ msgstr ""
 #. ONI_Together.MP_STRINGS.UI.MAINMENU.DISCORD_INFO
 msgctxt "ONI_Together.MP_STRINGS.UI.MAINMENU.DISCORD_INFO"
 msgid ""
-"Join ONI Together\n"
+"Join Multiplayer: ONI United\n"
 "on Discord"
 msgstr ""
-"Tritt der ONI-Together Community\n"
+"Tritt der Multiplayer: ONI United-Community\n"
 "auf Discord bei"
 
 #. ONI_Together.MP_STRINGS.UI.MAINMENU.JOINGAME

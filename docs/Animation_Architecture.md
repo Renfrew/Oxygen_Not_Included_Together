@@ -1,4 +1,4 @@
-# ONI Together: Host-Authoritative Animation and Reaction Architecture
+# Multiplayer: ONI United — Host-Authoritative Animation and Reaction Architecture
 
 **Design note — 23 September 2026; architecture updated — 3 October 2026**  
 **Status:** Enduring host-authoritative presentation architecture with current integrated design boundaries and proposed migration components clearly separated.

@@ -1,4 +1,4 @@
-# Oxygen Not Included Together — Architecture Decision Log
+# Multiplayer: ONI United — Architecture Decision Log
 
 **Last updated:** 2026-10-15  
 **Status:** Recovered decisions from the `game mod` Project and local repository. Decision status and implementation status are separate: accepting a decision does not mean its implementation is complete.
@@ -12,6 +12,27 @@
 - **Deferred:** Intentionally postponed.
 
 Implementation status uses only: **Implemented and tested**, **Implemented but further testing required**, **Partially implemented**, **Not implemented**, or **Not independently verified**. These labels report available evidence rather than changing the architectural decision.
+
+## D-000 — Independent development begins with 0.9.0
+
+**Decision status:** Confirmed
+
+**Implementation status:** Partially implemented
+
+**Decision:** `0.8.0.5` is the final upstream-tracking release and the final inherited baseline from the upstream project's MIT-licensed history. Development version `0.9.0` begins an independent project line. No upstream change after the verified MIT baseline may be copied or imported without separately verified compatible licensing or written permission.
+
+**Compatibility policy:** Separate public branding from compatibility-sensitive internal identity. Retain inherited assembly names, namespaces, package IDs, Workshop identity, PLib configuration identity, reflection-qualified API names, and save/mod identifiers until each has a documented migration plan.
+
+**Naming status:** The permanent public name is **Multiplayer: ONI United**. Compatibility-sensitive inherited identifiers remain unchanged until their migrations are separately designed and tested.
+
+**Safe immediate changes:** Development-version metadata and documentation of the independent-development boundary. Public display text and descriptions may adopt the new name immediately; images and active repository links should change when replacement assets and canonical destinations are ready.
+
+**Deferred migration:** Decide whether to keep or replace the existing Workshop item; inventory runtime consumers of static IDs and assembly-qualified type names; define configuration and save migration/alias behavior; coordinate API/package compatibility; and only then consider internal renames.
+
+**Rationale:** Renaming user-visible branding does not require breaking existing installations, configuration, saves, API integrations, or reflection-based lookups.
+
+**Evidence:** `docs/INDEPENDENT_DEVELOPMENT.md`; Git ancestry and identifier audit performed 2026-10-15.
+
 
 ## D-001 — Host-authoritative simulation
 

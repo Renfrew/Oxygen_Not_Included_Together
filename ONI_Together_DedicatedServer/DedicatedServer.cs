@@ -52,7 +52,7 @@ namespace ONI_Together.DedicatedServer
         {
             using var _ = Profiler.Scope();
 
-            Console.WriteLine("ONI Together: Dedicated Server starting...");
+            Console.WriteLine("Multiplayer: ONI United dedicated server starting...");
 
             server = SetupTransport();
             stopped = false;

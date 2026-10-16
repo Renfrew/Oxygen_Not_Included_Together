@@ -1,6 +1,6 @@
-# ONI Together API
+# Multiplayer: ONI United API
 
-API for third-party mods to add multiplayer features via **Oxygen Not Included Together**.
+API for third-party mods to integrate with **Multiplayer: ONI United**.
 
 ## Installation
 
@@ -10,14 +10,14 @@ dotnet add package ONI_Together_API
 
 ## Usage
 
-### Check if ONI Together is installed and enabled
+### Check if Multiplayer: ONI United is installed and enabled
 
 ```csharp
 using ONI_Together_API;
 
 if (MP_Mod_Info.MultiplayerModPresent)
 {
-    // ONI Together is detected and enabled
+    // Multiplayer: ONI United is detected and enabled
 }
 ```
 
@@ -78,14 +78,14 @@ public void SendMyCoolPacket()
     if (SessionInfoAPI.IsClient) return;
     
     // Only the host can send this
-    ExamplePacket packet = new ExamplePacket(SessionInfoAPI.LocalUserID(), "Hello ONI Together");
+    ExamplePacket packet = new ExamplePacket(SessionInfoAPI.LocalUserID(), "Hello ONI United");
     PacketSenderAPI.SendToAllClients(packet, PacketSendMode.Reliable);
 }
 ```
 
 ### Spawning networked entities
 
-Only the host can spawn entities. Call `SpawnUtilsAPI.KNetInstantiate` and the spawn is replicated to all clients automatically. Both methods return `null` when ONI Together is not loaded.
+Only the host can spawn entities. Call `SpawnUtilsAPI.KNetInstantiate` and the spawn is replicated to all clients automatically. Both methods return `null` when Multiplayer: ONI United is not loaded.
 
 ```csharp
 using ONI_Together_API.Misc;
@@ -117,7 +117,7 @@ if (NetworkIdentityRegistryAPI.TryGetComponent<PrimaryElement>(netId, out var pr
 
 ## Requirements
 
-- Oxygen Not Included (with ONI Together mod installed)
+- Oxygen Not Included (with Multiplayer: ONI United installed)
 - .NET Standard 2.1 compatible project
 
 ## Links

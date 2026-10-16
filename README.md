@@ -1,8 +1,8 @@
 ![Logo](https://i.imgur.com/GCIbhpn.png)
 
-# Oxygen Not Included Together — Community Updated Fork
+# Multiplayer: ONI United
 
-A community-maintained fork of **Oxygen Not Included Together**, an experimental multiplayer mod for _Oxygen Not Included_.
+**Multiplayer: ONI United** is an independent, community-maintained multiplayer mod for _Oxygen Not Included_, built from the MIT-licensed history of **Oxygen Not Included Together**.
 
 This fork focuses on updating the original project, fixing multiplayer synchronization issues, improving stability, and maintaining compatibility with current versions of the game.
 
@@ -51,13 +51,16 @@ This project is an unofficial community project and is **not affiliated with, en
 
 ### Release Lineage and License Boundary
 
-The `0.8.0.5` release line represented by PR #63 is the final release intended to track and integrate changes from the original upstream repository.
+The published `0.8.0.5` release represented by PR #63 is the final release that tracks and integrates changes from the original upstream repository. The release-line merge is `2384d2bc8da37a69965b9409d047acc65af33f3e`; its `develop` parent containing the `0.8.0.5` version change is `c7e876174e0a28bd2d6bfd889a83405d07dc3220`. GitHub tag `v0.8.0.5` points to the release merge, establishing `2384d2bc8da37a69965b9409d047acc65af33f3e` as the published release boundary.
 
 The last upstream code imported into this release line is upstream commit `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`, merged on October 5, 2026 while that code was published under the MIT License. The upstream license was changed later, on October 11, 2026. Those later source-available license commits are not part of this release's Git ancestry.
 
-Future releases from this repository are intended to be developed as an independent community-maintained project. Upstream changes made after the license transition will not be incorporated unless their licensing and any required permissions are reviewed separately.
+Development version `0.9.0` begins the independent project line. Upstream changes made after the verified MIT baseline will not be incorporated unless the specific material has separately verified compatible licensing or written permission. Inherited material remains under the retained MIT License and attribution.
+
+The independent project is publicly named **Multiplayer: ONI United**. Compatibility-sensitive identifiers retain their inherited values so the rebrand does not automatically break assemblies, namespaces, configuration identity, Workshop identity, API integrations, or save/mod identifiers.
 
 See [`LICENSE.md`](LICENSE.md), [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), and [`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) for the release's license, bundled-component notices, and asset review status.
+See [`docs/INDEPENDENT_DEVELOPMENT.md`](docs/INDEPENDENT_DEVELOPMENT.md) for the `0.9.0` identifier audit and migration boundary.
 
 ---
 

@@ -1173,10 +1173,10 @@ msgstr "DOŁĄCZ DO GRY"
 #. ONI_Together.MP_STRINGS.UI.MAINMENU.DISCORD_INFO
 msgctxt "ONI_Together.STRINGS.UI.MAINMENU.DISCORD_INFO"
 msgid ""
-"Join ONI Together\n"
+"Join Multiplayer: ONI United\n"
 "on Discord"
 msgstr ""
-"Dołącz do ONI Together\n"
+"Dołącz do Multiplayer: ONI United\n"
 "na Discordzie"
 
 #. ONI_Together.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL
@@ -1907,8 +1907,8 @@ msgstr "Czat"
 #. STRINGS.UI.MP_CHATBOX.TOPBAR.TOOLTIP
 #. ONI_Together.MP_STRINGS.UI.MP_CHATBOX.TOPBAR.TOOLTIP
 msgctxt "ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.TOOLTIP"
-msgid "Toggle the ONI-Together chat window."
-msgstr "Przełącz widoczność okna czatu ONI-Together."
+msgid "Toggle the Multiplayer: ONI United chat window."
+msgstr "Przełącz widoczność okna czatu Multiplayer: ONI United."
 
 #. ONI_Together.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.TEXT
 #. STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.TEXT

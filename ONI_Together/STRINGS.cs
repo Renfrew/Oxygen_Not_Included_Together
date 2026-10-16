@@ -293,7 +293,7 @@ namespace ONI_Together
 			public class MAINMENU
 			{
 				public static LocString JOINGAME = "JOIN GAME";
-				public static LocString DISCORD_INFO = "Join ONI Together\non Discord";
+				public static LocString DISCORD_INFO = "Join Multiplayer: ONI United\non Discord";
 
 				public class MULTIPLAYER
 				{
