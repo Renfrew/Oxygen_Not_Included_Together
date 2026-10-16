@@ -157,6 +157,10 @@ Open `ONI_United.sln` in Visual Studio, or open the repository folder in VS Code
 
 The repository uses `global.json` at the solution root to select .NET SDK `10.0.401` with patch roll-forward.
 
+The repository also includes a minimal root `.editorconfig` for shared baseline editor behavior (encoding, line endings, and newline handling). Keep personal editor preferences in local user/editor settings.
+
+If you use VS Code, `.vscode/extensions.json` includes an optional C# extension recommendation. It is not required to build the project.
+
 ---
 
 ## 3. Configure Local Paths
@@ -174,6 +178,8 @@ Directory.Build.props.user
 ```
 
 `Directory.Build.props.user` contains machine-specific paths and should not be committed.
+
+`Directory.Build.props.user` is intentionally local and ignored by Git. The build imports it conditionally when present.
 
 Configure `GameLibsFolder` to point to your local Oxygen Not Included managed assemblies.
 
