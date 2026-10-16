@@ -115,12 +115,11 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (MultiplayerSession.HostUserID != Utils.NilUlong())
             {
                 DebugConsole.Log("[GameClient] Attempting to reconnect to host...");
-                //ConnectToHost(MultiplayerSession.HostSteamID);
                 ConnectToHost(string.Empty, 7777);
             }
             else
             {
-                DebugConsole.LogWarning("[GameClient] Cannot reconnect: HostSteamID is not set.");
+                DebugConsole.LogWarning("[GameClient] Cannot reconnect: HostUserID is not set.");
             }
         }
 

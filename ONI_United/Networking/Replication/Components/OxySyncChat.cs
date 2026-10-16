@@ -55,11 +55,6 @@ public class OxySyncChat : NetworkBehaviour
         }
     }
 
-    //public void Update()
-    //{
-    //    UnityChatBoxUI.Instance?.Show(MultiplayerSession.InSession);
-    //}
-
     public override void OnCleanUp()
     {
         if (Game.Instance != null)

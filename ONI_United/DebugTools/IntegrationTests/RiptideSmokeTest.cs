@@ -75,7 +75,6 @@ namespace ONI_United.DebugTools.IntegrationTests
         {
             using var _ = Profiler.Scope();
 
-            //MultiplayerSession.InSession = false;
             DebugConsole.Log("[RiptideSmokeTest] Client disconnected");
         }
 
@@ -85,7 +84,6 @@ namespace ONI_United.DebugTools.IntegrationTests
 
             DebugConsole.Log("[RiptideSmokeTest] Client connected");
 
-            //MultiplayerSession.InSession = true;
             //MultiplayerSession.SetHost(_client.Id);
 
             TestPacket packet = new TestPacket();

@@ -107,7 +107,6 @@ namespace ONI_United.Networking.Identity
 
 
 
-		[API_Method]
 		public static bool TryGetGameObject(int netId, out GameObject gameObject)
 		{
 			using var _ = Profiler.Scope();
@@ -147,7 +146,6 @@ namespace ONI_United.Networking.Identity
 			return found;
 		}
 
-		[API_Method]
 		public static bool TryGetComponent<T>(int netId, out T component)
 		{
 			using var _ = Profiler.Scope();

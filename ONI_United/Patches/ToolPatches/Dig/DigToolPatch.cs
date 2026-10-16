@@ -16,7 +16,7 @@ namespace ONI_United.Patches.ToolPatches.Dig
 
             if (!MultiplayerSession.InActiveSession)
             {
-                DebugConsole.LogWarning("[PlaceDig Patch] Skipped: MultiplayerSession.InSession is false");
+                DebugConsole.LogWarning("[PlaceDig Patch] Skipped: MultiplayerSession.InActiveSession is false");
                 return;
             }
 

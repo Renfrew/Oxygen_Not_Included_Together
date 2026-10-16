@@ -41,7 +41,6 @@ namespace ONI_United.Patches.Critters
 				if (identity.NetId == 0)
 					return;
 
-				// Could probably be replaced by SpawnUtils.KNetInstantiate
 				PacketSender.SendToAllClients(new SpawnPrefabPacket(
 					identity.NetId,
 					inst.PrefabID().GetHashCode(),

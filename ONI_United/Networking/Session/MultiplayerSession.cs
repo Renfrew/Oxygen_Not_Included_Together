@@ -28,15 +28,8 @@ namespace ONI_United.Networking.Session
         /// </summary>
         public static readonly Dictionary<ulong, MultiplayerPlayer> ConnectedPlayers = new Dictionary<ulong, MultiplayerPlayer>();
 
-		[API_Method]
 		public static ulong LocalUserID => NetworkConfig.GetLocalID();
 
-		[System.Obsolete] //Keep for api compatibility
-		public static ulong LocalSteamID => LocalUserID;
-		[System.Obsolete] //Keep for api compatibility
-		public static ulong HostSteamID => HostUserID;
-
-		[API_Method]
 		public static ulong HostUserID { get; set; } = Utils.NilUlong();
 
 		public static string ServerIp { get; set; } = "127.0.0.1";
@@ -50,26 +43,17 @@ namespace ONI_United.Networking.Session
 		public static bool InActiveSession
 		{
 			get => _inActiveSession;
-			[Obsolete("Use the centralized MultiplayerSession lifecycle methods.")]
-			set => SetInActiveSession(value);
 		}
-		//[Obsolete] 
-		[API_Method] private static bool InSession = false;
-		
 		public static bool SessionHasPlayers => InActiveSession && ConnectedPlayers.Count > 1;
 		public static bool NotInSession => !InActiveSession;
 
 		public static int PlayerCount => IsHost ? ConnectedPlayers.Count : ConnectedPlayers.Count + 1;
 
-		[API_Method]
 		public static bool IsHost
 		{
 			get => _isHost;
-			[Obsolete("Use the centralized MultiplayerSession lifecycle methods.")]
-			set => SetIsHost(value);
 		} //HostUserID == LocalUserID;
 
-		[API_Method]
 		public static bool IsClient => InActiveSession && !IsHost;
 
 		public static bool IsHostInSession => IsHost && InActiveSession;
@@ -87,7 +71,6 @@ namespace ONI_United.Networking.Session
 				return;
 
 			_inActiveSession = value;
-			InSession = value;
 			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, value ? BoxedBools.True : BoxedBools.False);
 		}
 
@@ -214,7 +197,6 @@ namespace ONI_United.Networking.Session
 				Game.Instance?.Trigger(MP_HASHES.OnDisconnected);
 		}
 
-		[API_Method]
 		public static bool TryGetPlayerCursorPos(ulong playerId, out Vector3 cursorPos)
 		{
 			cursorPos = default;
@@ -223,7 +205,6 @@ namespace ONI_United.Networking.Session
 			cursorPos = cursor.transform.position;
 			return true;
 		}
-		[API_Method]
 		public static bool TryGetPlayerColor(ulong playerId, out Color color)
 		{
 			color = default;

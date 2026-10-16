@@ -274,7 +274,6 @@ namespace ONI_United
 			///does weird force restarts; replaced with plib version checker that doesnt restart the game
 			//ModUpdater.Updater.CheckForUpdate();
 			PacketRegistry.RegisterDefaults();
-			InitializeAllIntegrations(); // All mods should be loaded, now find and initialize any integrations
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
 #endif
@@ -283,21 +282,6 @@ namespace ONI_United
 
             MainThreadId = Thread.CurrentThread.ManagedThreadId;
             MainThread = SynchronizationContext.Current;
-            
-            //Game.Instance.OnSpawnComplete += OnGameSpawnComplete;
-        }
-        
-        private static void OnGameSpawnComplete()
-        {
-	        if (MultiplayerSession.IsHostInSession && MultiplayerSession.SessionHasPlayers)
-	        {
-		        GameServerHardSync.PerformHardSync(false);
-	        }
-        }
-
-        public static void InitializeAllIntegrations()
-        {
-            // Integrations API removed - was unused (0 implementations). Keep as no-op for compatibility.
         }
     }
 }

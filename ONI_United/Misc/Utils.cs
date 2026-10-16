@@ -257,16 +257,6 @@ namespace ONI_United.Misc
 			return chunk;
 		}
 
-		[Obsolete("Use new FormatBytes instead!")]
-		public static string FormatBytesOld(long bytes)
-		{
-			using var _ = Profiler.Scope();
-
-			if (bytes < 1024) return $"{bytes} B";
-			if (bytes < 1024 * 1024) return $"{bytes / 1024f:F1} KB";
-			return $"{bytes / 1024f / 1024f:F2} MB";
-		}
-
 		public static string FormatBytes(long bytes)
 		{
 			using var _ = Profiler.Scope();
