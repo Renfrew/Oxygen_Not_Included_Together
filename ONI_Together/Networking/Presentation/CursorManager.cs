@@ -1,10 +1,11 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets.Core;
+using ONI_United.Networking.Packets.Core;
 using ONI_Together.Networking.States;
 using Shared.Profiling;
 using System.Collections.Generic;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking.Components
 {

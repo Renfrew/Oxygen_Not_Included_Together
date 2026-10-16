@@ -1,12 +1,14 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using System.IO;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.DuplicantActions
+namespace ONI_United.Networking.Packets.DuplicantActions
 {
 	public class DuplicantCarryItemPacket : IPacket, IBulkablePacket
 	{

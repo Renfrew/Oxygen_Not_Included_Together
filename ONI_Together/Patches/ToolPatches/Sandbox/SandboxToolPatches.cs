@@ -2,11 +2,12 @@ using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Tools.Sandbox;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.Tools.Sandbox;
+using ONI_United.Networking.Packets.World;
 using ONI_Together.Scripts.Creatures;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.ToolPatches.Sandbox
 {
@@ -126,7 +127,7 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                         {
                             var def = building.Def;
                             var pe = spawned.GetComponent<PrimaryElement>();
-                            var packet = new ONI_Together.Networking.Packets.Tools.Build.BuildCompletePacket
+                            var packet = new ONI_United.Networking.Packets.Tools.Build.BuildCompletePacket
                             {
                                 PrefabID = def.PrefabID,
                                 Cell = cell,
@@ -165,8 +166,8 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                                 stats.Name = minionIdentity.name;
                                 stats.voiceIdx = minionIdentity.voiceIdx;
 
-                                var entry = ONI_Together.Networking.Packets.Social.ImmigrantOptionEntry.FromGameDeliverable(stats);
-                                var packet2 = new ONI_Together.Networking.Packets.World.TelepadEntitySpawnPacket
+                                var entry = ONI_United.Networking.Packets.Social.ImmigrantOptionEntry.FromGameDeliverable(stats);
+                                var packet2 = new ONI_United.Networking.Packets.World.TelepadEntitySpawnPacket
                                 {
                                     NetId = identity.NetId,
                                     Pos = spawned.transform.position,

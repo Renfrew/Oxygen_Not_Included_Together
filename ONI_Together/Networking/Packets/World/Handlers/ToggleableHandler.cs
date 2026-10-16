@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Packets.World.Handlers
+namespace ONI_United.Networking.Packets.World.Handlers
 {
     public class ToggleableHandler : IBuildingConfigHandler
     {

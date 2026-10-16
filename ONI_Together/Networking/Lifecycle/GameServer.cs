@@ -1,6 +1,6 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Handshake;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Handshake;
 using Shared.Profiling;
 using ONI_Together.Networking.States;
 using Shared;

@@ -4,7 +4,7 @@ using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.StructureSyncers;
-using ONI_Together.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Social;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,9 +2,9 @@ using System.IO;
 using System.Text;
 using ONI_Together.Networking;
 using ONI_United.Networking.Replication.Components.Entities;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Core;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Core;
+using ONI_United.Networking.Packets.World;
 using UnityEngine;
 
 namespace ONI_Together.DebugTools.UnitTests

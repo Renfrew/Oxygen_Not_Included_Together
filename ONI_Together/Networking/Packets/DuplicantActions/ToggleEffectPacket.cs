@@ -1,7 +1,7 @@
 using Klei.AI;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Patches.Duplicant;
 using Shared.Interfaces.Networking;
 using System;
@@ -11,8 +11,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.DuplicantActions
+namespace ONI_United.Networking.Packets.DuplicantActions
 {
 	internal class ToggleEffectPacket : IPacket, IBulkablePacket
 	{

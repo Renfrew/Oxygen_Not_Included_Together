@@ -1,7 +1,7 @@
 using Shared.Profiling;
 using System.IO;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
     public struct StatusItemEntry
     {

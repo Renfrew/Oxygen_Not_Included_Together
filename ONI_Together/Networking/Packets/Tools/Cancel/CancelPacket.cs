@@ -1,6 +1,6 @@
 ﻿using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Tools.Cancel
+namespace ONI_United.Networking.Packets.Tools.Cancel
 {
 	public class CancelPacket : DragToolPacket
 	{

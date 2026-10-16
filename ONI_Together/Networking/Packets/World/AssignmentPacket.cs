@@ -1,11 +1,13 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	/// <summary>
 	/// Synchronizes building assignments (Outhouse, Lavatory, Triage Cot, Massage Table, etc.)

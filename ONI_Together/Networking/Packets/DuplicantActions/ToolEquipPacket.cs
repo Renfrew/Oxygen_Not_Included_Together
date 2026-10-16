@@ -1,12 +1,14 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System;
 using System.IO;
 using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.DuplicantActions
+namespace ONI_United.Networking.Packets.DuplicantActions
 {
 	public class ToolEquipPacket : IPacket
 	{

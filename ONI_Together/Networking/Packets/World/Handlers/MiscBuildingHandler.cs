@@ -2,8 +2,9 @@ using UnityEngine;
 using HarmonyLib;
 using ONI_Together.DebugTools;
 using Shared.Profiling;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World.Handlers
+namespace ONI_United.Networking.Packets.World.Handlers
 {
 	/// <summary>
 	/// Handles miscellaneous buildings that don't fit into other categories.

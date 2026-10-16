@@ -1,10 +1,12 @@
 using System.IO;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Tools.Sandbox
+namespace ONI_United.Networking.Packets.Tools.Sandbox
 {
     public class SandboxModePacket : IPacket
     {

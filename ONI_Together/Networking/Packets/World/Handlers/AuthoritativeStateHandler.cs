@@ -2,7 +2,7 @@ using ONI_Together.Networking.Components;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Packets.World.Handlers
+namespace ONI_United.Networking.Packets.World.Handlers
 {
 	/// <summary>Applies small host-authoritative building and state-machine values.</summary>
 	public sealed class AuthoritativeStateHandler : IBuildingConfigHandler

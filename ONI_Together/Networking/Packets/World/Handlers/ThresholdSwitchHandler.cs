@@ -2,7 +2,7 @@ using UnityEngine;
 using ONI_Together.DebugTools;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.World.Handlers
+namespace ONI_United.Networking.Packets.World.Handlers
 {
 	/// <summary>
 	/// Handles IThresholdSwitch buildings (temperature, pressure, gas, etc. sensors).

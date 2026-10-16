@@ -1,8 +1,9 @@
 ﻿using System;
 using Riptide;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking.Transport.Lan
 {

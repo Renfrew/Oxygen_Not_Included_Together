@@ -2,13 +2,14 @@
 using Klei.AI;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.DuplicantActions;
+using ONI_United.Networking.Packets.DuplicantActions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.Duplicant
 {

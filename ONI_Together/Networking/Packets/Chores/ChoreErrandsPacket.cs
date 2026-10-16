@@ -1,11 +1,13 @@
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Chores
+namespace ONI_United.Networking.Packets.Chores
 {
 	public class ChoreErrandsPacket : IPacket
 	{

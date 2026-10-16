@@ -1,9 +1,11 @@
 using System.IO;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.Components.StructureStateSyncers;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World;
+namespace ONI_United.Networking.Packets.World;
 
 public class StructureStateRequestPacket : IPacket
 {

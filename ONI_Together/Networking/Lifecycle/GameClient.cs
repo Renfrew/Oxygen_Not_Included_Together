@@ -3,9 +3,9 @@ using ONI_Together.Menus;
 using ONI_Together.Misc;
 using ONI_Together.Misc.World;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Handshake;
-using ONI_Together.Networking.Packets.Core;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.Handshake;
+using ONI_United.Networking.Packets.Core;
+using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_Together.Networking.States;
 using ONI_Together.Patches.ToolPatches;
@@ -15,6 +15,7 @@ using Steamworks;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking
 {

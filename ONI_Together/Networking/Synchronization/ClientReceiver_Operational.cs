@@ -1,6 +1,6 @@
 ﻿using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.World.Buildings;
+using ONI_United.Networking.Packets.World.Buildings;
 using ONI_Together.Networking.States;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Scripts.Buildings
 {

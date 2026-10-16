@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Tools
+namespace ONI_United.Networking.Packets.Tools
 {
 	internal class EmptyPipePacket : DragToolPacket
 	{

@@ -1,7 +1,7 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Menus;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets.Core;
+using ONI_United.Networking.Packets.Core;
 using ONI_Together.Networking.States;
 using ONI_Together.Networking.Transport.Steamworks;
 using Steamworks;
@@ -9,7 +9,8 @@ using Shared.Profiling;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking
 {

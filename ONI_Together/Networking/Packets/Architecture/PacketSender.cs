@@ -1,8 +1,8 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Core;
+using ONI_United.Networking.Packets;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Core;
 using Shared.Interfaces.Networking;
 using System;
 using System.Collections.Generic;
@@ -10,10 +10,13 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_Together.Networking.Components;
+using ONI_Together.Networking;
 using ONI_United.Networking.Replication;
 using ONI_Together.Networking.Overlay;
+using States = ONI_Together.Networking.States;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking
+namespace ONI_United.Networking.Packets.Architecture
 {
 	public static class PacketSender
 	{
@@ -136,7 +139,7 @@ namespace ONI_Together.Networking
 			int packetId = PacketRegistry.GetPacketId(packet);
 			int maxPacketNumberPerPacket = bp.MaxPackSize;
 
-			if (packet is ONI_Together.Networking.Packets.Tools.DragToolPacket)
+			if (packet is ONI_United.Networking.Packets.Tools.DragToolPacket)
 				DragToolBulkPacketIds.Add(packetId);
 
 			if (!UpdateRunners.ContainsKey(packetId))

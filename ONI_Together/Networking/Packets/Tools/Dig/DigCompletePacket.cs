@@ -4,6 +4,8 @@ using System.IO;
 using Shared.Profiling;
 using UnityEngine;
 
+namespace ONI_United.Networking.Packets.Tools.Dig;
+
 public class DigCompletePacket : IPacket
 {
 	public int Cell;

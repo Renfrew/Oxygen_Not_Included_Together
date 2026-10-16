@@ -5,7 +5,7 @@ using System.Text;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Core;
+using ONI_United.Networking.Packets.Core;
 using ONI_Together.Networking.States;
 using ONI_Together.UI;
 using UnityEngine;

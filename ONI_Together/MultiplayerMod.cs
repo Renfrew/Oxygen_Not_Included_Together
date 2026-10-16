@@ -6,7 +6,7 @@ using ONI_Together.Misc;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_Together.Networking.Overlay;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.Transport.Steamworks;
 using PeterHan.PLib.AVC;
 using System;

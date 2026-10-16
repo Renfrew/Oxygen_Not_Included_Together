@@ -1,6 +1,6 @@
 ﻿using Shared.Replication;
 using System.Collections.Generic;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
 
 namespace ONI_Together.Networking.Components.StructureStateSyncers
 {

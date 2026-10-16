@@ -1,11 +1,12 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Core
+namespace ONI_United.Networking.Packets.Core
 {
 	internal class BulkSenderPacket : IPacket, IAllowedWithoutWorldPacket
 	{

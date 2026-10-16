@@ -1,13 +1,16 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
+using ONI_Together;
 
-namespace ONI_Together.Networking.Packets.Handshake
+namespace ONI_United.Networking.Packets.Handshake
 {
 	public class GameStateRequestPacket : IPacket, IAllowedWithoutWorldPacket
 	{

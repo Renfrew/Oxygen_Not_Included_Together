@@ -1,4 +1,4 @@
-﻿using ONI_Together.Networking.Packets.Architecture;
+﻿using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 
 namespace ONI_Together.Networking
@@ -9,7 +9,8 @@ namespace ONI_Together.Networking
 		// Version 2 introduces deterministic OxySync field/RPC hashes, dedicated
 		// TargetRpc dispatch, and bounded/null-aware RPC and Variant framing.
 		// Version 1 peers must not connect because their wire identifiers differ.
-		public const int CurrentProtocolVersion = 3;
+		// Version 4 changes packet namespace identities and their resulting packet IDs.
+		public const int CurrentProtocolVersion = 4;
 
 		private static int? _packetFingerprint;
 		private static string _modVersion;

@@ -1,6 +1,6 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Patches.DuplicantActions;
 using ONI_Together.Patches.World;
 using ONI_Together.Patches.World.Buildings;
@@ -12,8 +12,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	internal class MinionIdentitySetNamePacket : IPacket
 	{

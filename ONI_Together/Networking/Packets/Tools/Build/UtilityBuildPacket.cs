@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using ONI_Together.DebugTools;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Steamworks;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +9,9 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using static TUNING.BUILDINGS.UPGRADES;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Tools.Build
+namespace ONI_United.Networking.Packets.Tools.Build
 {
 	public class UtilityBuildPacket : IPacket
 	{

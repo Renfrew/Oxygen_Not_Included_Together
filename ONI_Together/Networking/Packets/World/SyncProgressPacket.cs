@@ -1,13 +1,15 @@
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.Components;
 using ONI_Together.Menus;
 using Steamworks;
 using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
     /// <summary>
     /// Client sends sync progress for host to visualize
@@ -90,7 +92,7 @@ namespace ONI_Together.Networking.Packets.World
             try
             {
                 var progressLines = new List<string>();
-                progressLines.Add(STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_PROGRESS);
+                progressLines.Add(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_PROGRESS);
                 progressLines.Add("");
 
                 foreach (var kvp in ClientProgress)
@@ -108,15 +110,15 @@ namespace ONI_Together.Networking.Packets.World
                         clientName = SteamFriends.GetFriendPersonaName(client.AsCSteamID());
                     }
 
-                    string clientLine = string.Format(STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_PROGRESS, clientName, progressBar, info.ProgressPercent);
+                    string clientLine = string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_PROGRESS, clientName, progressBar, info.ProgressPercent);
 
                     if (info.ProgressPercent < 100)
                     {
-                        clientLine += $" {string.Format(STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_CHUNK_SYNC_DATA, info.ReceivedChunks, info.TotalChunks)}";
+                        clientLine += $" {string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_CHUNK_SYNC_DATA, info.ReceivedChunks, info.TotalChunks)}";
                     }
                     else
                     {
-                        clientLine += $" {STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_COMPLETE}";
+                        clientLine += $" {ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_COMPLETE}";
                     }
 
                     progressLines.Add(clientLine);
@@ -136,7 +138,7 @@ namespace ONI_Together.Networking.Packets.World
                 if (allComplete && ClientProgress.Count > 0)
                 {
                     progressLines.Add("");
-                    progressLines.Add(STRINGS.UI.MP_OVERLAY.SYNC.ALL_CLIENTS_SYNCED);
+                    progressLines.Add(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.ALL_CLIENTS_SYNCED);
 
                     // Clear progress display after completion
                     // Note: Could schedule removal after delay, but keeping simple for now
@@ -162,12 +164,12 @@ namespace ONI_Together.Networking.Packets.World
             for (int i = 0; i < barLength; i++)
             {
                 if (i < filled)
-                    bar += STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // ASCII - funciona sempre
+                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED;  // ASCII - funciona sempre
                 else
-                    bar += STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // ASCII - funciona sempre
+                    bar += ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY;  // ASCII - funciona sempre
             }
 
-            return string.Format(STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
+            return string.Format(ONI_Together.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR, bar);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Core;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +9,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets
+namespace ONI_United.Networking.Packets
 {
 	internal class API_Helper
 	{

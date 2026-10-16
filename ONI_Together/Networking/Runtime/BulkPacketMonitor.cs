@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking.Components
 {

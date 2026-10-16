@@ -1,6 +1,6 @@
 ﻿using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Tools.Harvest;
+namespace ONI_United.Networking.Packets.Tools.Harvest;
 
 public class HarvestToolPacket : DragToolPacket
 {

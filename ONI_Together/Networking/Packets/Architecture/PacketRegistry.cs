@@ -1,19 +1,19 @@
 ﻿using HarmonyLib;
 using KSerialization;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Core;
-using ONI_Together.Networking.Packets.DuplicantActions;
-using ONI_Together.Networking.Packets.Events;
-using ONI_Together.Networking.Packets.Handshake;
-using ONI_Together.Networking.Packets.Social;
-using ONI_Together.Networking.Packets.Tools;
-using ONI_Together.Networking.Packets.Tools.Build;
-using ONI_Together.Networking.Packets.Tools.Cancel;
-using ONI_Together.Networking.Packets.Tools.Clear;
-using ONI_Together.Networking.Packets.Tools.Deconstruct;
-using ONI_Together.Networking.Packets.Tools.Dig;
-using ONI_Together.Networking.Packets.Tools.Disinfect;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.Core;
+using ONI_United.Networking.Packets.DuplicantActions;
+using ONI_United.Networking.Packets.Events;
+using ONI_United.Networking.Packets.Handshake;
+using ONI_United.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Tools;
+using ONI_United.Networking.Packets.Tools.Build;
+using ONI_United.Networking.Packets.Tools.Cancel;
+using ONI_United.Networking.Packets.Tools.Clear;
+using ONI_United.Networking.Packets.Tools.Deconstruct;
+using ONI_United.Networking.Packets.Tools.Dig;
+using ONI_United.Networking.Packets.Tools.Disinfect;
+using ONI_United.Networking.Packets.World;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,8 +22,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Architecture
+namespace ONI_United.Networking.Packets.Architecture
 {
 	public static class PacketRegistry
 	{

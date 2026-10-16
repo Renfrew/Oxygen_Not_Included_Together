@@ -1,9 +1,10 @@
-﻿using ONI_Together.Networking.Packets.Architecture;
+﻿using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Tools.Dig
+namespace ONI_United.Networking.Packets.Tools.Dig
 {
     public class DiggablePacket : IPacket
     {

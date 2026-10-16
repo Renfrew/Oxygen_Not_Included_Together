@@ -1,5 +1,5 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
@@ -7,8 +7,10 @@ using static Storage;
 using Klei;
 using Shared.Interfaces.Networking;
 using System.ComponentModel;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
     /// <summary>
     /// Modified version of GroundItemPickedUpPacket

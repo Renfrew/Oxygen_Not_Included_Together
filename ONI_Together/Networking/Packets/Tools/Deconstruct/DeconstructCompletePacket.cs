@@ -1,10 +1,11 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Tools.Deconstruct
+namespace ONI_United.Networking.Packets.Tools.Deconstruct
 {
 	public class DeconstructCompletePacket : IPacket
 	{

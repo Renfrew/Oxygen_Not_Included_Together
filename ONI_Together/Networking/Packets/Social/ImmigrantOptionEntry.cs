@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Social
+namespace ONI_United.Networking.Packets.Social
 {
 
 	public struct ImmigrantOptionEntry

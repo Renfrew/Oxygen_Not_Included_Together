@@ -5,10 +5,11 @@ using System.Reflection;
 using ImGuiNET;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
 
 namespace ONI_Together.DebugTools
 {

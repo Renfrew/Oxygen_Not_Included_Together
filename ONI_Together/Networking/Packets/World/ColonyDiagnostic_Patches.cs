@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using ONI_Together.Networking.Packets.Events;
+using ONI_United.Networking.Packets.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 using static ColonyDiagnostic;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	internal class ColonyDiagnostic_Patches
 	{

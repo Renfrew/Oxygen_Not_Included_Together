@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using Shared.Profiling;
 
+namespace ONI_United.Networking.Packets.Animation;
+
 public class ToggleMinionKanimEffectPacket : IPacket
 {
 	public int NetId;

@@ -1,6 +1,6 @@
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.World.Handlers;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.World.Handlers;
 using ONI_Together.DebugTools;
 using System.IO;
 using UnityEngine;
@@ -9,8 +9,10 @@ using Shared.Profiling;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using ONI_Together.Misc;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	public enum BuildingConfigType : byte
 	{

@@ -1,11 +1,12 @@
 using HarmonyLib;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Social
+namespace ONI_United.Networking.Packets.Social
 {
 	public class ScheduleDeletePacket : IPacket
 	{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using KSerialization;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Social;
 using ONI_Together.Patches.GamePatches;
 using Shared.Replication;
 using Shared.Replication.Attributes;

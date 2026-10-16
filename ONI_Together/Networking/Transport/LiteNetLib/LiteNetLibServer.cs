@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 using ONI_Together.DebugTools;
 using ONI_Together.Misc;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.States;
 using ONI_Together.Networking.Transfer;
 using Shared.Profiling;

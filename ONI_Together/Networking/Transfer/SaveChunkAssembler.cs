@@ -1,7 +1,8 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Menus;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -307,7 +308,7 @@ namespace ONI_Together.Misc.World
 				// Get local player name to display on host
 				string playerName = Utils.GetLocalPlayerName();
 
-				var progressPacket = new ONI_Together.Networking.Packets.World.SyncProgressPacket
+				var progressPacket = new ONI_United.Networking.Packets.World.SyncProgressPacket
 				{
 					ClientSteamID = MultiplayerSession.LocalUserID,
 					ClientName = playerName,

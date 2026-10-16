@@ -1,12 +1,14 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Misc.World;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	public class WorldDataPacket : IPacket
 	{

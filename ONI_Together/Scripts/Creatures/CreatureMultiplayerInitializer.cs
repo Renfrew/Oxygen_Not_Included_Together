@@ -2,10 +2,11 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Entities;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
 using System.Collections;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Scripts.Creatures
 {
@@ -81,7 +82,7 @@ namespace ONI_Together.Scripts.Creatures
 
 				if (identity.NetId != 0)
 				{
-					var packet = new ONI_Together.Networking.Packets.World.SpawnPrefabPacket(
+					var packet = new ONI_United.Networking.Packets.World.SpawnPrefabPacket(
 						identity.NetId,
 						go.PrefabID().GetHashCode(),
 						go.transform.position,

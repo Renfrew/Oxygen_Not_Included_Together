@@ -1,12 +1,14 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Misc;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.States;
 using ONI_United.Networking.Replication.Components;
 using Shared.Profiling;
 using System.IO;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Core
+namespace ONI_United.Networking.Packets.Core
 {
 	class ClientReadyStatusPacket : IPacket, IAllowedWithoutWorldPacket
 	{
@@ -64,7 +66,7 @@ namespace ONI_Together.Networking.Packets.Core
 				else
 				{
 					OxySyncChat.AddSystemMessage(
-						string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, PlayerName));
+						string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, PlayerName));
 				}
 				return;
 			}
@@ -106,7 +108,7 @@ namespace ONI_Together.Networking.Packets.Core
 			if (NetworkConfig.IsLanConfig() && nameChanged)
 			{
 				OxySyncChat.AddSystemMessage(
-					string.Format(STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));
+					string.Format(ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));
 
 				PacketSender.SendToAllClients(new ClientReadyStatusPacket
 				{

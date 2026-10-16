@@ -1,6 +1,6 @@
 ﻿using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Tools.Clear
+namespace ONI_United.Networking.Packets.Tools.Clear
 {
 	public class ClearPacket : DragToolPacket
 	{

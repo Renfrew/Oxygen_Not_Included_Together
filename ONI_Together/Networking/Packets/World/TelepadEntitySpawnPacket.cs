@@ -1,13 +1,15 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Social;
 using ONI_Together.Scripts.Duplicants;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World
+namespace ONI_United.Networking.Packets.World
 {
 	/// <summary>
 	/// Packet to spawn entities (duplicants or items) on clients with matching NetIds.

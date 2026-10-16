@@ -3,10 +3,11 @@ using KSerialization;
 using ONI_Together.DebugTools;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Social;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.Social
 {

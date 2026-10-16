@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
 
 namespace ONI_Together.Networking
 {

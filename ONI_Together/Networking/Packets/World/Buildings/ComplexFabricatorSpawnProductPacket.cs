@@ -1,5 +1,5 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.World.Buildings
+namespace ONI_United.Networking.Packets.World.Buildings
 {
 	internal class ComplexFabricatorSpawnProductPacket : IPacket
 	{

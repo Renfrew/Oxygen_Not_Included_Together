@@ -1,12 +1,14 @@
 ﻿using System.IO;
 using HarmonyLib;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using Steamworks;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Tools.Attack;
+namespace ONI_United.Networking.Packets.Tools.Attack;
 
 public class AttackToolPacket : IPacket
 {

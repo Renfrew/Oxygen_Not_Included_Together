@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using ONI_United.Networking.Replication.Packets;
 using ONI_Together.Networking;
 using Steamworks;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_United.Networking.Replication
 {

@@ -2,7 +2,8 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Events;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Core;
 using System;
 using Shared.Profiling;
 using UnityEngine;

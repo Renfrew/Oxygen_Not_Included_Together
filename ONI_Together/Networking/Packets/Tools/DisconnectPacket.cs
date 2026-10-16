@@ -1,7 +1,7 @@
 ﻿using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.Tools.Clear;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Tools.Clear;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Networking.Packets.Tools
+namespace ONI_United.Networking.Packets.Tools
 {
 	internal class DisconnectPacket : DragToolPacket
 	{

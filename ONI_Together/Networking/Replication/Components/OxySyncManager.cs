@@ -13,6 +13,7 @@ using Shared.Profiling;
 using UnityEngine;
 
 using ONI_Together.Networking;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_United.Networking.Replication.Components
 {

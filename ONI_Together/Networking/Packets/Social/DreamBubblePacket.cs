@@ -1,11 +1,13 @@
 using Database;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Social
+namespace ONI_United.Networking.Packets.Social
 {
 	public class DreamBubblePacket : IPacket
 	{

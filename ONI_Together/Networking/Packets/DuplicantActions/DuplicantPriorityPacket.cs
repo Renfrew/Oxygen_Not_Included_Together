@@ -1,11 +1,13 @@
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.IO;
 using HarmonyLib;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.DuplicantActions
+namespace ONI_United.Networking.Packets.DuplicantActions
 {
 	public class DuplicantPriorityPacket : IPacket
 	{

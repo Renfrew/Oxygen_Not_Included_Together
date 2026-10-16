@@ -1,9 +1,9 @@
 using Klei.AI;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets;
-using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.DuplicantActions;
+using ONI_United.Networking.Packets;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.DuplicantActions;
 using Shared.Profiling;
 using System;
 using System.Diagnostics;

@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Social
+namespace ONI_United.Networking.Packets.Social
 {
 	public class ChatHistorySyncPacket : IPacket, IAllowedWithoutWorldPacket
 	{
@@ -59,7 +60,7 @@ namespace ONI_Together.Networking.Packets.Social
 			if (UnityChatBoxUI.Instance != null)
 			{
 				var ts = DateTimeOffset.FromUnixTimeMilliseconds(0).DateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
-				UnityChatBoxUI.Instance.SendNewChatMessage("System", ts, STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
+				UnityChatBoxUI.Instance.SendNewChatMessage("System", ts, ONI_Together.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED);
 			}
 
 			foreach (var msg in Messages)

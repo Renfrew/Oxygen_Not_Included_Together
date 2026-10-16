@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Tools.Disinfect;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Tools.Disinfect;
 using Shared.Profiling;
 
 [HarmonyPatch(typeof(DisinfectTool), "OnDragTool")]

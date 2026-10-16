@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Chores;
+using ONI_United.Networking.Packets.Chores;
 
 namespace ONI_Together.DebugTools.UnitTests
 {

@@ -1,7 +1,7 @@
 using Shared.Profiling;
 using System.IO;
 
-namespace ONI_Together.Networking.Packets.Chores
+namespace ONI_United.Networking.Packets.Chores
 {
 	public struct ErrandEntry
 	{

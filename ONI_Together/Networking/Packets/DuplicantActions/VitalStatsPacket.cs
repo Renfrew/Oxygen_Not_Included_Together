@@ -1,13 +1,15 @@
 using Klei.AI;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
 using UnityEngine;
 using static STRINGS.UI.OUTFITS;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.DuplicantActions
+namespace ONI_United.Networking.Packets.DuplicantActions
 {
 	// Host -> Client only. Vitals are simulated on Host.
 	public class VitalStatsPacket : IPacket

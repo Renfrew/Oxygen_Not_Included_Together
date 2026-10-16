@@ -1,5 +1,5 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Interfaces.Networking;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Animation
+namespace ONI_United.Networking.Packets.Animation
 {
 	internal class SymbolOverridePacket : IPacket, IBulkablePacket
 	{

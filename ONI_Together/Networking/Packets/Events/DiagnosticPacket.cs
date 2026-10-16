@@ -1,5 +1,5 @@
-﻿using ONI_Together.Networking.Packets.Architecture;
-using ONI_Together.Networking.Packets.World;
+﻿using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.World;
 using Shared.Interfaces.Networking;
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using static ColonyDiagnostic;
 using static ColonyDiagnostic.DiagnosticResult;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Events
+namespace ONI_United.Networking.Packets.Events
 {
 	internal class DiagnosticPacket : IPacket//, IBulkablePacket
 	{

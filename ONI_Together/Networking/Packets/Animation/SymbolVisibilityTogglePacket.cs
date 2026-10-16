@@ -1,4 +1,4 @@
-﻿using ONI_Together.Networking.Packets.Architecture;
+﻿using ONI_United.Networking.Packets.Architecture;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets.Animation
+namespace ONI_United.Networking.Packets.Animation
 {
 	internal class SymbolVisibilityTogglePacket : IPacket
 	{

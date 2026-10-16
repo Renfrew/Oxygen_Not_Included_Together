@@ -1,12 +1,14 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_Together.Networking.Packets.Architecture;
+using ONI_Together.Networking;
 
-namespace ONI_Together.Networking.Packets
+namespace ONI_United.Networking.Packets
 {
 	public class InstantiationsPacket : IPacket
 	{

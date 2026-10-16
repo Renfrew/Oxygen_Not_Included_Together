@@ -1,6 +1,6 @@
 ﻿using Shared.Profiling;
 
-namespace ONI_Together.Networking.Packets.Tools.Disinfect
+namespace ONI_United.Networking.Packets.Tools.Disinfect
 {
     public class DisinfectPacket : DragToolPacket
     {

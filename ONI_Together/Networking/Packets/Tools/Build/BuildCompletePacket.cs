@@ -1,5 +1,5 @@
 ﻿using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,8 +7,9 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_Together.Networking.Components;
 using Rendering;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Tools.Build
+namespace ONI_United.Networking.Packets.Tools.Build
 {
     public class BuildCompletePacket : IPacket
     {

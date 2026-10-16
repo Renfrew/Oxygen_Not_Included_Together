@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Tools.Harvest;
+using ONI_United.Networking.Packets.Tools.Harvest;
 using Shared.Profiling;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.ToolPatches.Harvest;
 

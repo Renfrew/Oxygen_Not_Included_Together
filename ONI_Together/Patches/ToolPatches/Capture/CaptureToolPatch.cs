@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Tools.Capture;
+using ONI_United.Networking.Packets.Tools.Capture;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.ToolPatches.Capture;
 

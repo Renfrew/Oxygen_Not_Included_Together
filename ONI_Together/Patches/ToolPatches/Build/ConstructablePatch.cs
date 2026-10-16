@@ -1,7 +1,8 @@
 ﻿using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Tools.Build;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Tools.Build;
 using System.Linq;
 using Shared.Profiling;
 using ONI_Together.Misc;
@@ -70,4 +71,3 @@ public static class ConstructablePatch
 		DebugConsole.Log($"[Host] Sent BuildCompletePacket for {def.PrefabID} at cell {cell}");
 	}
 }
-

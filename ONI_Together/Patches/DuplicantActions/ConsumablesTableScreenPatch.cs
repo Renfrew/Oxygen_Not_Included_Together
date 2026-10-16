@@ -1,9 +1,10 @@
 using HarmonyLib;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.DuplicantActions;
+using ONI_United.Networking.Packets.DuplicantActions;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.DuplicantActions
 {

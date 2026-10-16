@@ -2,9 +2,10 @@ using System.IO;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;
+using ONI_Together.Networking.Packets.Architecture;
 
 namespace ONI_United.Networking.Replication.Packets
 {

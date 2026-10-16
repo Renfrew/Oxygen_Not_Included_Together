@@ -1,10 +1,11 @@
 using HarmonyLib;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
 using ONI_Together.Scripts.Creatures;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Patches.Critters
 {

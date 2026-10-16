@@ -1,6 +1,7 @@
 ﻿using ONI_Together.Misc;
+using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Architecture;
 using ONI_Together.Networking.States;
 using Steamworks;
 using System.Collections;
@@ -11,8 +12,9 @@ using ONI_United.Networking.Replication.Components;
 using Shared.Profiling;
 using UnityEngine;
 using YamlDotNet.Core;
+using ONI_Together.Networking.Packets.Architecture;
 
-namespace ONI_Together.Networking.Packets.Core
+namespace ONI_United.Networking.Packets.Core
 {
 	public class PlayerCursorPacket : IPacket
 	{

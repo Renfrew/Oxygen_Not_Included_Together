@@ -1,10 +1,11 @@
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.World;
+using ONI_United.Networking.Packets.World;
 using ONI_Together.Networking.Trackers;
 using ONI_Together.Networking.Transport.Steamworks;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking.Components
 {
@@ -189,9 +190,9 @@ namespace ONI_Together.Networking.Components
 
 			// Bidirectional: host broadcasts to all, client requests to host (host will rebroadcast)
 			if (MultiplayerSession.IsHost)
-				PacketSender.SendToAll(new ONI_Together.Networking.Packets.Tools.Sandbox.SandboxModePacket(_lastSandboxEnabled));
+				PacketSender.SendToAll(new ONI_United.Networking.Packets.Tools.Sandbox.SandboxModePacket(_lastSandboxEnabled));
 			else
-				PacketSender.SendToHost(new ONI_Together.Networking.Packets.Tools.Sandbox.SandboxModePacket(_lastSandboxEnabled));
+				PacketSender.SendToHost(new ONI_United.Networking.Packets.Tools.Sandbox.SandboxModePacket(_lastSandboxEnabled));
 
 			DebugConsole.Log($"[WorldStateSyncer] Synced sandbox mode change: {_lastSandboxEnabled} (IsHost={MultiplayerSession.IsHost})");
 		}

@@ -4,11 +4,12 @@ using ONI_Together.DebugTools;
 using Riptide;
 using Riptide.Utils;
 using ONI_Together.Networking;
-using ONI_Together.Networking.Packets.Social;
-using ONI_Together.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Social;
+using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using static ONI_Together.STRINGS.UI.MP_OVERLAY;
 using System.Net.Sockets;
+using ONI_Together.Networking.Packets.Architecture;
 
 namespace ONI_Together.Tests
 {

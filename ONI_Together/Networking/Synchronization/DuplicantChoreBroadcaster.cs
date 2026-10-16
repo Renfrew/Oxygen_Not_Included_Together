@@ -1,11 +1,12 @@
 using HarmonyLib;
 using ONI_Together.DebugTools;
-using ONI_Together.Networking.Packets.Chores;
+using ONI_United.Networking.Packets.Chores;
 using Shared.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using ONI_United.Networking.Packets.Architecture;
 
 namespace ONI_Together.Networking.Components
 {

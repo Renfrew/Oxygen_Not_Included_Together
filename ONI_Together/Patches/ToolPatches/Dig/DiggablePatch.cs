@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
+using ONI_United.Networking.Packets.Architecture;
+using ONI_United.Networking.Packets.Tools.Dig;
 using Shared.Profiling;
 
 namespace ONI_Together.Patches.ToolPatches.Dig
