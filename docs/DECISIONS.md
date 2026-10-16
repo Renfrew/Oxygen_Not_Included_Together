@@ -21,15 +21,15 @@ Implementation status uses only: **Implemented and tested**, **Implemented but f
 
 **Decision:** `0.8.0.5` is the final upstream-tracking release and the final inherited baseline from the upstream project's MIT-licensed history. Development version `0.9.0` begins an independent project line. No upstream change after the verified MIT baseline may be copied or imported without separately verified compatible licensing or written permission.
 
-**Compatibility policy:** Separate public branding from compatibility-sensitive internal identity. Retain inherited assembly names, namespaces, package IDs, Workshop identity, PLib configuration identity, reflection-qualified API names, and save/mod identifiers until each has a documented migration plan.
+**Compatibility policy:** The independent line uses new package, assembly/static, configuration, development-folder, repository, and Workshop identities. Existing C# namespaces remain unchanged. The external mod-integration API and standalone dedicated server are discontinued in `0.9.0` rather than carried forward as compatibility surfaces.
 
-**Naming status:** The permanent public name is **Multiplayer: ONI United**. Compatibility-sensitive inherited identifiers remain unchanged until their migrations are separately designed and tested.
+**Naming status:** The permanent public name is **Multiplayer: ONI United**. The main assembly/static identity is `ONI_United`; inherited C# namespaces remain unchanged.
 
-**Safe immediate changes:** Development-version metadata and documentation of the independent-development boundary. Public display text and descriptions may adopt the new name immediately; images and active repository links should change when replacement assets and canonical destinations are ready.
+**Removed modules:** The external ONI Together API project, its reflection bridge, and the standalone dedicated-server project are not part of the independent `0.9.0` product.
 
-**Deferred migration:** Decide whether to keep or replace the existing Workshop item; inventory runtime consumers of static IDs and assembly-qualified type names; define configuration and save migration/alias behavior; coordinate API/package compatibility; and only then consider internal renames.
+**Deferred migration:** Verify PLib configuration behavior and save/enabled-mod upgrade behavior after the identity changes. Namespace migration remains out of scope.
 
-**Rationale:** Renaming user-visible branding does not require breaking existing installations, configuration, saves, API integrations, or reflection-based lookups.
+**Rationale:** Removing unsupported auxiliary products reduces an untested compatibility burden while preserving the main multiplayer implementation, `Shared`, internal networking, and OxySync.
 
 **Evidence:** `docs/INDEPENDENT_DEVELOPMENT.md`; Git ancestry and identifier audit performed 2026-10-15.
 

@@ -57,7 +57,7 @@ The last upstream code imported into this release line is upstream commit `1c9d7
 
 Development version `0.9.0` begins the independent project line. Upstream changes made after the verified MIT baseline will not be incorporated unless the specific material has separately verified compatible licensing or written permission. Inherited material remains under the retained MIT License and attribution.
 
-The independent project is publicly named **Multiplayer: ONI United**. Compatibility-sensitive identifiers retain their inherited values so the rebrand does not automatically break assemblies, namespaces, configuration identity, Workshop identity, API integrations, or save/mod identifiers.
+The independent project is publicly named **Multiplayer: ONI United**. Its package, assembly, static, configuration, development-folder, repository, and Workshop identities have moved to the independent project line. The inherited C# namespaces remain unchanged for now. The former external mod-integration API and dedicated-server application are not supported in `0.9.0`.
 
 See [`LICENSE.md`](LICENSE.md), [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), and [`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) for the release's license, bundled-component notices, and asset review status.
 See [`docs/INDEPENDENT_DEVELOPMENT.md`](docs/INDEPENDENT_DEVELOPMENT.md) for the `0.9.0` identifier audit and migration boundary.

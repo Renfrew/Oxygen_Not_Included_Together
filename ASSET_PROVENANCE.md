@@ -30,7 +30,6 @@ This is a downstream-license finding, not a claim that this project created the 
 |---|---|---|---|
 | `ONI_Together/Assets/fni_logo.png` | Experimental/legacy logo | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
 | `ONI_Together/Assets/network_overlay_icon_old.png` | Legacy overlay icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
-| `ONI_Together_DedicatedServer/Assets/dedi-icon.png` | Dedicated-server icon | Identical to upstream MIT commit `1c9d722...` | **MIT-COVERED (INHERITED)** |
 
 ## Future independent releases
 

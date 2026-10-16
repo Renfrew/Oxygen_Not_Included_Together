@@ -1888,67 +1888,6 @@ namespace ONI_Together.DebugTools.UnitTests
             finally { UnityEngine.Object.Destroy(behaviour.gameObject); }
         }
 
-        [UnitTest(name: "Foreign adapter reads/writes a wrapped behaviour", category: "OxySync")]
-        public static UnitTestResult ForeignAdapterBridgesSyncVars()
-        {
-            var behaviour = CreateBehaviour();
-            try
-            {
-                // Treat the ONI Together behaviour as if it came from another assembly.
-                var adapter = new ForeignSyncBehaviour(behaviour);
-                adapter.RefreshSyncVars();
-
-                if (adapter.SyncVarCount != 2)
-                    return UnitTestResult.Fail($"Foreign adapter expected 2 SyncVars, got {adapter.SyncVarCount}");
-
-                var valueField = adapter.GetSyncVar(0);
-                if (valueField.Name != "_value" || valueField.FieldType != typeof(int))
-                    return UnitTestResult.Fail($"Unexpected foreign field descriptor: {valueField.Name}/{valueField.FieldType}");
-
-                adapter.ApplySyncVar(valueField.Hash, 77, 0);
-                adapter.RefreshSyncVars();
-                if ((int)(adapter.GetSyncVar(0).GetValue() ?? -1) != 77)
-                    return UnitTestResult.Fail("ApplySyncVar did not write through the foreign adapter");
-
-                if (adapter.UnderlyingType != typeof(AdapterTestBehaviour))
-                    return UnitTestResult.Fail("UnderlyingType mismatch for foreign adapter");
-
-                if (adapter.GameObject != behaviour.gameObject)
-                    return UnitTestResult.Fail("GameObject mismatch for foreign adapter");
-
-                return UnitTestResult.Pass("Foreign adapter reads/writes the wrapped behaviour by reflection");
-            }
-            finally { UnityEngine.Object.Destroy(behaviour.gameObject); }
-        }
-
-        [UnitTest(name: "Foreign adapter resolves SyncVar descriptors by hash", category: "OxySync")]
-        public static UnitTestResult ForeignAdapterResolvesByHash()
-        {
-            var behaviour = CreateBehaviour();
-            try
-            {
-                var adapter = new ForeignSyncBehaviour(behaviour);
-                adapter.RefreshSyncVars();
-
-                int targetHash = adapter.GetSyncVar(1).Hash;
-                bool found = false;
-                for (int i = 0; i < adapter.SyncVarCount; i++)
-                {
-                    if (adapter.GetSyncVar(i).Hash == targetHash)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                    return UnitTestResult.Fail("Could not resolve the second SyncVar by hash");
-
-                return UnitTestResult.Pass("Foreign adapter resolves descriptors by hash");
-            }
-            finally { UnityEngine.Object.Destroy(behaviour.gameObject); }
-        }
-
         [UnitTest(name: "SyncBehaviourResolver falls back to native registry", category: "OxySync")]
         public static UnitTestResult ResolverFallsBackToNative()
         {

@@ -34,15 +34,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 The original repository copy is retained at `ONI_Together/UI/lib/FUI/Unity_UI_Extensions/LICENSE.md`.
 
-## Dedicated-server distribution
-
-If the dedicated server is distributed, it also contains:
-
-- Newtonsoft.Json 13.0.4 — Copyright (c) 2007 James Newton-King — MIT License — https://github.com/JamesNK/Newtonsoft.Json
-- Riptide Networking 2.2.1 — Copyright © 2022 Tom Weiland — MIT License — https://github.com/RiptideNetworking/Riptide
-
-The MIT terms above apply to these components.
-
 ## Game-provided and development-only assemblies
 
 Oxygen Not Included, Unity, Harmony, FMOD, Steamworks.NET, and other assemblies referenced from the installed game are development references and are not licensed or redistributed by this notice. They must not be included in a release package merely because the project references them.

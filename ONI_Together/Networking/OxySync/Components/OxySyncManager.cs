@@ -50,25 +50,8 @@ namespace ONI_Together.Networking.OxySync.Components
         }
 
         /// <summary>
-        /// Behaviours that came from an ONI United API assembly, exposed for the debug inspector.
-        /// </summary>
-        public IReadOnlyList<ForeignSyncBehaviour> ForeignBehaviours
-        {
-            get
-            {
-                var result = new List<ForeignSyncBehaviour>(_behaviours.Count);
-                for (int i = 0; i < _behaviours.Count; i++)
-                {
-                    if (_behaviours[i] is ForeignSyncBehaviour foreign && !foreign.IsDestroyed)
-                        result.Add(foreign);
-                }
-                return result;
-            }
-        }
-
-        /// <summary>
         /// Adds or fetches a <see cref="NetworkIdentity"/> on a GameObject and resolves its NetId,
-        /// preferring a supplied override. Shared by the native OxySync path and the API bridge.
+        /// preferring a supplied override for the native OxySync path.
         /// </summary>
         public static int SetOrGetIdentity(GameObject go, int netId)
         {
@@ -236,8 +219,7 @@ namespace ONI_Together.Networking.OxySync.Components
 		}
 
         /// <summary>
-        /// Registers an already-adapted behaviour. Used by the native path (via <see cref="Register"/>)
-        /// and by <c>OxySync_API_Helper</c> for behaviours loaded from the ONI Together API assembly.
+        /// Registers an already-adapted native behaviour via <see cref="Register"/>.
         /// </summary>
         public void RegisterSyncBehaviour(ISyncBehaviour behaviour)
         {
@@ -282,7 +264,7 @@ namespace ONI_Together.Networking.OxySync.Components
         }
 
         /// <summary>
-        /// Unregisters an adapted behaviour. Used by the native path and the API bridge.
+        /// Unregisters an adapted native behaviour.
         /// </summary>
         public void UnregisterSyncBehaviour(ISyncBehaviour behaviour)
         {

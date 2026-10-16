@@ -18,14 +18,14 @@ The last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`,
 | --- | --- | --- |
 | Development version | `ONI_Together/ONI_Together.csproj` `<Version>`; emitted to generated `mod_info.yaml` by `Directory.Build.targets` | Changed to `0.9.0` |
 | User-facing mod title/description | `<ModName>` and `<ModDescription>` in `ONI_Together.csproj`; generated `mod.yaml`; UI strings, translations, README, images and rich presence | Use **Multiplayer: ONI United** |
-| Workshop identity | `3787172081` in `ONI_Together/Updater/Updater.cs` and the Workshop link in `README_NUGET.md` | Use the independent project's Workshop item; `0.8.0.5` remains associated with its historical release item |
+| Workshop identity | `3787172081` in `ONI_Together/Updater/Updater.cs` | Use the independent project's Workshop item; `0.8.0.5` remains associated with its historical release item |
 | Mod/static identity | `Directory.Build.targets` emits `staticID: $(AssemblyName)` | Changed to `ONI_United`; existing enabled-mod lists may require users to re-enable the mod |
 | Main assembly identity | `ONI_United` in `ONI_Together.csproj` | Changed with the generated static ID; code namespaces remain unchanged |
-| Package identities | `MultiplayerONIUnited` and `ONI_United_API` in project files | Changed; the API bridge continues accepting the legacy `ONI_Together_API` assembly name |
-| Namespaces and type names | `ONI_Together`, `ONI_Together_API`, and `Shared` across source | Retain; API reflection strings contain assembly-qualified inherited names |
-| API reflection contract | Public namespaces remain `ONI_Together_API`; the runtime bridge accepts `ONI_United_API` and legacy `ONI_Together_API` assemblies | Preserve namespaces and legacy assembly recognition while consumers migrate |
+| Package identity | `MultiplayerONIUnited` in the main project | Changed for the independent line; the former external API package is discontinued and removed |
+| Namespaces and type names | `ONI_Together` and `Shared` across the retained source | Retain; namespace renaming is outside this transition |
+| External mod API | Former `ONI_Together_API` / `ONI_United_API` project and reflection bridge | Permanently discontinued and removed in `0.9.0` |
 | Configuration identity | PLib `[ConfigFile(SharedConfigLocation: true)]` on `ONI_Together.Configuration`; JSON property names are persisted | Retain class/namespace/assembly identity and property names until PLib path derivation and migration behavior are runtime-verified |
-| Dedicated-server configuration | `oni_united_server_config/multiplayer_settings.json` | Changed; copy the legacy file on first load when the new path does not yet exist |
+| Dedicated server | Former standalone dedicated-server project and configuration | Permanently discontinued and removed in `0.9.0` |
 | Save compatibility | ONI save paths remain game-owned; transferred saves preserve active-mod labels/default static IDs; multiplayer sync components use inherited serialized type identity, with many runtime-only components marked `SkipSaveFileSerialization` | The static ID changes to `ONI_United`; retain namespaces and serialized type names, then verify upgrade behavior with representative saves and enabled-mod lists |
 | Local diagnostics/development paths | `ONI_United_Log.txt`, `ONI_United`, and local build-folder settings | Changed for the independent line |
 | Repository and support links | Active project links use `Renfrew/Oxygen_Not_Included_Together`; historical upstream links remain for attribution | Use the independent repository for active project and package links |
@@ -40,18 +40,18 @@ The last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`,
 
 ## Remaining branding decisions
 
-The public name is settled. Decisions remain for replacement logo/mascot/link art, asset and resource filenames, canonical repository and issue URLs, package/support/workflow destinations, Workshop title/description and item strategy, and whether a future public API package should adopt the new name.
+The public name is settled. Decisions remain for replacement logo/mascot/link art, asset and resource filenames, canonical issue/support destinations, and Workshop title/description.
 
 ## Migration work still required
 
 1. Verify the `3787172081` Workshop item metadata and first `0.9.0` upload procedure before publishing.
 2. Confirm how ONI and PLib derive mod/config identity from static ID, assembly, type, and distribution label at runtime.
-3. Test upgrade behavior from `0.8.0.5` with an existing enabled-mod list, shared configuration, dedicated-server configuration, and representative saves.
-4. Inventory serialized/reflected type consumers and third-party `ONI_Together_API` integrations; the bridge recognizes the legacy API assembly, but package consumers still need migration guidance.
+3. Test upgrade behavior from `0.8.0.5` with an existing enabled-mod list, shared configuration, and representative saves.
+4. Document the removal of the external API and dedicated server in release notes so integrators and operators are not given a false compatibility expectation.
 5. Verify all active support and workflow destinations use the independent repository while preserving historical attribution links.
 6. Replace or rebrand user-facing assets and translation content with documented provenance; do not silently rename compatibility keys.
 7. Resolve the existing copied-source and historical proprietary-binary compliance items documented in `RELEASE_LEGAL.md` before a future release.
 
 ## Safest next development change
 
-Validate an in-place `0.8.0.5` to `0.9.0` upgrade with the new assembly/static ID, migrated dedicated-server configuration, and legacy API-assembly recognition. Keep the inherited C# namespaces until a separately designed source- and binary-compatibility migration is ready.
+Validate an in-place `0.8.0.5` to `0.9.0` upgrade with the new assembly/static ID. Keep the inherited C# namespaces and the main mod's internal OxySync implementation; do not restore the discontinued external API bridge or dedicated-server application.

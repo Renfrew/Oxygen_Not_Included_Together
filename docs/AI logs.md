@@ -30,7 +30,7 @@ ONI loads ONI Together assembly
 → subscribes global Unity/AppDomain error handlers
 → OnAllModsLoaded
 → registers packet types
-→ initializes OxySync API bridge
+→ initializes the main mod's native OxySync services
 → forces transport selection to Steamworks
 → records main thread and synchronization context
 → database/prefab construction begins
