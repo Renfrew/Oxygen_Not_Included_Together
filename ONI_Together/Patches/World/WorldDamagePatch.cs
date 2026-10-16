@@ -8,7 +8,7 @@ using System;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(WorldDamage), nameof(WorldDamage.OnDigComplete))]
 	public static class WorldDamagePatch

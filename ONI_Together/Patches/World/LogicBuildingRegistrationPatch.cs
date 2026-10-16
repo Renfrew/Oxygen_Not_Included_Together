@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     // Registers logic/automation buildings with LogicStateSyncer on spawn
     // and ensures they have a NetworkIdentity for packet routing.

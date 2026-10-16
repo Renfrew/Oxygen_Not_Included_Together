@@ -5,6 +5,8 @@ using ONI_Together.Misc;
 using UnityEngine;
 using UnityEngine.UI;
 
+namespace ONI_United.Patches.LoadingOverlayPatches;
+
 [HarmonyPatch(typeof(LoadingOverlay), nameof(LoadingOverlay.Load))]
 public class LoadingOverlayPatch
 {

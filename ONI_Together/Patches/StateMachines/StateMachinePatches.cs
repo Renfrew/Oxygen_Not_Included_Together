@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 
-namespace ONI_Together.Patches.StateMachines
+namespace ONI_United.Patches.StateMachines
 {
     public class StateMachinePatches
     {

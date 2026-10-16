@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	[HarmonyPatch(typeof(Uprootable), nameof(Uprootable.MarkForUproot))]
 	public static class Uprootable_MarkForUproot_Patch

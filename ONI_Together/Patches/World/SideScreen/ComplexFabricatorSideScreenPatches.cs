@@ -7,7 +7,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	[HarmonyPatch(typeof(ComplexFabricatorSideScreen), nameof(ComplexFabricatorSideScreen.Update))]
 	public static class ComplexFabricatorSideScreen_Update_Patch

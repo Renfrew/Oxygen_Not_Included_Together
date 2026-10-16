@@ -4,7 +4,7 @@ using ONI_United.Networking.Replication.Components.Entities;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.DuplicantActions
+namespace ONI_United.Patches.DuplicantActions
 {
 	internal class StandardWorker_Patches
 	{

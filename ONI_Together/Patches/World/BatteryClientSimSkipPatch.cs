@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_Together.Networking;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	// Clients receive joules snapshots from the host via StructureStateSyncer.
 	// If the local power sim also runs, it overwrites those snapshots every 200ms,

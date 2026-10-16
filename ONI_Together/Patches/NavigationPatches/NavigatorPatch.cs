@@ -5,7 +5,7 @@ using ONI_United.Networking.Replication.Components.Entities;
 using Shared.Profiling;
 using System;
 
-namespace ONI_Together.Patches.Navigation
+namespace ONI_United.Patches.NavigationPatches
 {
 	[HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
 	public static class NavigatorPatch

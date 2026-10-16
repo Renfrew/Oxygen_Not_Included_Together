@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using JetBrains.Annotations;
 using ONI_Together.Networking;
+using ONIStrings = ONI_Together.STRINGS;
 using ONI_Together.UI;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Reflection;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	[HarmonyPatch]
 	public static class PauseScreenPatch
@@ -44,7 +45,7 @@ namespace ONI_Together.Patches
                 // Only in multiplayer
                 if (!MultiplayerSession.InActiveSession)
 				{
-					AddButton(__instance, STRINGS.UI.PAUSESCREEN.HOSTGAME.LABEL, () =>
+					AddButton(__instance, ONIStrings.UI.PAUSESCREEN.HOSTGAME.LABEL, () =>
 					{
 						PauseScreen.Instance.Show(false); // Hide pause screen
 						UnityMultiplayerScreen.OpenFromPauseScreen();
@@ -64,7 +65,7 @@ namespace ONI_Together.Patches
 				}
 
 				// In multiplayer session - show single Multiplayer button
-				AddButton(__instance, STRINGS.UI.PAUSESCREEN.MULTIPLAYER.LABEL, () =>
+				AddButton(__instance, ONIStrings.UI.PAUSESCREEN.MULTIPLAYER.LABEL, () =>
 				{
 					PauseScreen.Instance.Show(false); // Hide pause screen
 					UnityLobbyStateDialogueUI.ShowLobbyStateWindow();

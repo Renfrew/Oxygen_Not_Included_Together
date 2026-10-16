@@ -1,7 +1,7 @@
 using HarmonyLib;
 using Shared.Replication;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.StateMachines
 {
     [HarmonyPatch(typeof(StateMachine.Instance), nameof(StateMachine.Instance.GoTo), typeof(string))]
     public static class StateMachineGoToFreeze_Patch

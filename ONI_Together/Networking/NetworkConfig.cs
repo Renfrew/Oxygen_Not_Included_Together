@@ -6,7 +6,7 @@ using ONI_Together.Networking.States;
 using ONI_Together.Networking.Transport;
 using ONI_Together.Networking.Transport.Lan;
 using ONI_Together.Networking.Transport.Steamworks;
-using ONI_Together.Patches.ToolPatches;
+using ONI_United.Patches.ToolPatches;
 using ONI_Together.DebugTools;
 using Shared;
 using Shared.Profiling;

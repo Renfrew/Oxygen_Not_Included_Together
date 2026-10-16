@@ -8,7 +8,7 @@ using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_Together.Networking.States;
-using ONI_Together.Patches.ToolPatches;
+using ONI_United.Patches.ToolPatches;
 using Shared;
 using Shared.Helpers;
 using Steamworks;

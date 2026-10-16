@@ -4,7 +4,7 @@ using ONI_Together.Networking;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(SimMessages), nameof(SimMessages.ModifyCell))]
 	public static class SimMessagesPatch

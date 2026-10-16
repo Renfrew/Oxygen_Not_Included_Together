@@ -2,7 +2,7 @@
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.MainMenuScreen
+namespace ONI_United.Patches.MainMenuScreenPatches
 {
 	public static class MainMenuExtensions
 	{

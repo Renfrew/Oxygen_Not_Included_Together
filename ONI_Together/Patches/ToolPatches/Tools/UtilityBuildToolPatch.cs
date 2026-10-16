@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.ToolPatches.Build
+namespace ONI_United.Patches.ToolPatches.Tools
 {
 	// Try patching BuildPath - called when drag is complete and building is placed
 	[HarmonyPatch(typeof(BaseUtilityBuildTool), nameof(BaseUtilityBuildTool.BuildPath))]

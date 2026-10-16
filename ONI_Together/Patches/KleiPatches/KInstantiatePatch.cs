@@ -3,6 +3,8 @@ using ONI_Together.Networking;
 using Shared.Profiling;
 using UnityEngine;
 
+namespace ONI_United.Patches.KleiPatches;
+
 [HarmonyPatch(typeof(Util), nameof(Util.KInstantiate),
 		new[] {
 				typeof(GameObject),
@@ -36,13 +38,13 @@ public static class KInstantiatePatch
 		if (__result == null || original == null)
 			return;
 
-		if (ONI_Together.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.IsPlacingEntity)
+		if (ONI_United.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.IsPlacingEntity)
 		{
 			if (__result != null && !__result.name.ToLowerInvariant().Contains("placer"))
 			{
-				if (ONI_Together.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.LastSpawnedObject == null)
+				if (ONI_United.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.LastSpawnedObject == null)
 				{
-					ONI_Together.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.LastSpawnedObject = __result;
+					ONI_United.Patches.ToolPatches.Sandbox.SandboxSpawnerToolPatch.LastSpawnedObject = __result;
 				}
 			}
 		}

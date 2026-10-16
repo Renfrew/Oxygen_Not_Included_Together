@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_Together.Networking;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.Critters
+namespace ONI_United.Patches.Critters
 {
 	internal class CreatureTemperaturePatches
 	{

@@ -5,7 +5,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Capture;
+namespace ONI_United.Patches.ToolPatches.Capture;
 
 [HarmonyPatch(typeof(CaptureTool), nameof(CaptureTool.OnDragComplete))]
 public class CaptureToolPatch

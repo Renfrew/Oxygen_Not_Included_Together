@@ -6,7 +6,7 @@ using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components.Entities;
 using UnityEngine;
 
-namespace ONI_Together.Patches.Entities
+namespace ONI_United.Patches.Entities
 {
     class Reactable_Patches
     {

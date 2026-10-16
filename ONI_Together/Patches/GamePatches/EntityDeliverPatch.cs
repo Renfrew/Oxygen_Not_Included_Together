@@ -9,7 +9,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 	/// <summary>
 	/// Patch MinionStartingStats.Deliver to send EntitySpawnPacket when duplicants are spawned.

@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.Events;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.Events
+namespace ONI_United.Patches.Events
 {
 	[HarmonyPatch(typeof(NotificationScreen), "AddNotification")]
 	public static class NotificationScreenPatch

@@ -7,7 +7,7 @@ using ONI_United.Networking.Replication.Components.Plants;
 using ONI_United.Networking.Replication.Components.StructureSyncers;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     [HarmonyPatch(typeof(Battery), nameof(Battery.OnSpawn))]
     public static class BatterySpawnPatch

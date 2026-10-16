@@ -12,7 +12,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.Buildings
+namespace ONI_United.Patches.World.Buildings
 {
 	internal class UserNameablePatch
 	{

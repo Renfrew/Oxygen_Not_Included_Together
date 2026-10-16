@@ -5,7 +5,7 @@ using HarmonyLib;
 using ONI_Together.Menus;
 using ONI_Together.Networking;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     [HarmonyPatch(typeof(SuitTank), nameof(SuitTank.GetTankAmount))]
     public static class SuitTank_GetTankAmount_Patch

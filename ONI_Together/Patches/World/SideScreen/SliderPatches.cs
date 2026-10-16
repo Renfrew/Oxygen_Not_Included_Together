@@ -5,7 +5,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_Together.DebugTools;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	/// <summary>
 	/// Patches for slider-based side screens: SingleSliderSideScreen, IntSliderSideScreen, SingleCheckboxSideScreen

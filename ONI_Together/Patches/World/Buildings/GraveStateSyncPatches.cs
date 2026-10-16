@@ -4,7 +4,7 @@ using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World.Buildings
 {
 
     [HarmonyPatch(typeof(Grave), nameof(Grave.OnSpawn))]

@@ -3,7 +3,7 @@ using ONI_Together.Networking.Components;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(Substance), nameof(Substance.SpawnResource))]
 	public static class Substance_SpawnResource_Patch

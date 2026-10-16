@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
     [HarmonyPatch(typeof(Immigration), nameof(Immigration.EndImmigration))]
     public static class ImmigrationEndPatch

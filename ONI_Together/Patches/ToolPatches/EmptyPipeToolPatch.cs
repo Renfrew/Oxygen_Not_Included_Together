@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches
+namespace ONI_United.Patches.ToolPatches
 {
 	internal class EmptyPipeToolPatch
 	{

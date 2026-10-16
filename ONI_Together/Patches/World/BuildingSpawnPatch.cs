@@ -6,7 +6,7 @@ using ONI_Together.Networking.Components;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	// Adds NetworkIdentity to buildings that need it for BuildingConfigPacket or other interactions
 	// Adds NetworkIdentity to buildings that need it

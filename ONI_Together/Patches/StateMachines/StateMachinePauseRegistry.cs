@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.StateMachines
+namespace ONI_United.Patches.StateMachines
 {
     public static class StateMachinePauseRegistry
     {

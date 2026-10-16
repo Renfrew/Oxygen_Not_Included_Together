@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_Together.Networking.Components;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.StateMachines
+namespace ONI_United.Patches.StateMachines
 {
 	internal class StateMachineSyncPatches
 	{

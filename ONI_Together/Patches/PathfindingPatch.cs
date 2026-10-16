@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	[HarmonyPatch(typeof(Pathfinding), nameof(Pathfinding.UpdateNavGrids))]
 	public static class Pathfinding_UpdateNavGrids_Patch

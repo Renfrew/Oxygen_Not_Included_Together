@@ -7,6 +7,8 @@ using System.Linq;
 using Shared.Profiling;
 using ONI_Together.Misc;
 
+namespace ONI_United.Patches.ToolPatches.Build;
+
 [HarmonyPatch(typeof(Constructable), nameof(Constructable.FinishConstruction))]
 public static class ConstructablePatch
 {

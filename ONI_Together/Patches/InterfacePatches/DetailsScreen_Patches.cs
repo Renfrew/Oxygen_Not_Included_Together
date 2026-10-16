@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ONI_Together.Misc;
 using ONI_Together.Networking;
+using ONIStrings = ONI_Together.STRINGS;
 using ONI_Together.UI;
 using ONI_Together.UI.lib;
 using System;
@@ -9,7 +10,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ONI_Together.Patches.InterfacePatches
+namespace ONI_United.Patches.InterfacePatches
 {
 	internal class DetailsScreen_Patches
 	{
@@ -27,7 +28,7 @@ namespace ONI_Together.Patches.InterfacePatches
 				//SkinButton.rectTransform().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Right, 20, 33f);
 				chatLinkBtn.ClearOnClick();
 				chatLinkBtn.name = "LinkInChatButton";
-				UIUtils.AddSimpleTooltipToObject(chatLinkBtn.transform, STRINGS.UI.MP_CHATBOX.LINK_IN_CHAT.TOOLTIP, true, onBottom: true);
+				UIUtils.AddSimpleTooltipToObject(chatLinkBtn.transform, ONIStrings.UI.MP_CHATBOX.LINK_IN_CHAT.TOOLTIP, true, onBottom: true);
 				if (chatLinkBtn.transform.Find("Image").TryGetComponent<Image>(out var image))
 				{
 					image.sprite = ResourceLoader.LoadEmbeddedSprite("ONI_Together.Assets.oni_together_link_chat.png", out _);

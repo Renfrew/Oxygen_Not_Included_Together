@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_Together.Networking;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World.Buildings
+namespace ONI_United.Patches.World.Buildings
 {
 	internal class PhonoboxPatch
 	{

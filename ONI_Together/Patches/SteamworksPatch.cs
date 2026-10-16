@@ -3,7 +3,7 @@ using ONI_Together.DebugTools;
 using ONI_Together.Networking.Transport.Steamworks;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	[HarmonyPatch]
 	public static class SteamworksPatch

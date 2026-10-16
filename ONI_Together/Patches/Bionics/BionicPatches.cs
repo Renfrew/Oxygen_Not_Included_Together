@@ -8,7 +8,7 @@ using Klei.AI;
 using ONI_Together.Menus;
 using ONI_Together.Networking;
 
-namespace ONI_Together.Patches.Bionics
+namespace ONI_United.Patches.Bionics
 {
     internal class BionicPatches
     {

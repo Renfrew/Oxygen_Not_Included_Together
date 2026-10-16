@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.Social
+namespace ONI_United.Patches.Social
 {
 	// Sync assignments (Minion -> Schedule)
 	[HarmonyPatch(typeof(Schedule), "Assign")]

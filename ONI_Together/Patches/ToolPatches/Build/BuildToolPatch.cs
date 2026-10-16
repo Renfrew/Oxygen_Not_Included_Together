@@ -8,7 +8,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Build
+namespace ONI_United.Patches.ToolPatches.Build
 {
     [HarmonyPatch(typeof(BuildTool), nameof(BuildTool.TryBuild))]
     public static class BuildToolPatch

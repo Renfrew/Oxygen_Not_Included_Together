@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.Tools.Cancel;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Cancel
+namespace ONI_United.Patches.ToolPatches.Cancel
 {
 	[HarmonyPatch(typeof(CancelTool), nameof(CancelTool.OnDragTool))]
 	public static class CancelToolPatch

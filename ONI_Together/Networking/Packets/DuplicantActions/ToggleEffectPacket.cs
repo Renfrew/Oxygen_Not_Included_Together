@@ -2,7 +2,7 @@ using Klei.AI;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking.Components;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Patches.Duplicant;
+using ONI_United.Patches.Duplicant;
 using Shared.Interfaces.Networking;
 using System;
 using System.Collections.Generic;

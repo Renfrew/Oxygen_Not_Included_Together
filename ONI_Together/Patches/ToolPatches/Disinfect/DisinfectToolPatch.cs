@@ -4,6 +4,8 @@ using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Tools.Disinfect;
 using Shared.Profiling;
 
+namespace ONI_United.Patches.ToolPatches.Disinfect;
+
 [HarmonyPatch(typeof(DisinfectTool), "OnDragTool")]
 public class DisinfectToolPatch
 {

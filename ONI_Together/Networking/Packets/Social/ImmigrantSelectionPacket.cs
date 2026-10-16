@@ -54,7 +54,7 @@ namespace ONI_United.Networking.Packets.Social
 						DebugConsole.Log("[ImmigrantSelectionPacket] Client: Host made selection, closing screen and resetting Immigration");
 					}
 
-					ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
+					ONI_United.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
 
 					if (ImmigrantScreen.instance != null && ImmigrantScreen.instance.gameObject.activeInHierarchy)
 					{
@@ -95,7 +95,7 @@ namespace ONI_United.Networking.Packets.Social
 						Immigration.Instance.EndImmigration();
 					}
 
-					ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
+					ONI_United.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
 
 					// Notify all clients to close screens
 					var rejectPacket = new ImmigrantSelectionPacket { PrintingPodWorldIndex = -1 };
@@ -139,7 +139,7 @@ namespace ONI_United.Networking.Packets.Social
 					}
 
 					// Clear options and notify clients (with -2 to just close screens, EntitySpawnPacket handles spawning)
-					ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
+					ONI_United.Patches.GamePatches.ImmigrantScreenPatch.ClearOptionsLock();
 
 					// Send close screen notification
 					var notifyPacket = new ImmigrantSelectionPacket { PrintingPodWorldIndex = -2 };

@@ -3,7 +3,7 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.States;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(BatteryTracker), "UpdateData")]
 	public static class BatteryTrackerPatch

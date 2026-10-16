@@ -3,7 +3,7 @@ using System;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.Chores
+namespace ONI_United.Patches.ChoresPatches
 {
 	public static class ChoreAssignmentExtensions
 	{

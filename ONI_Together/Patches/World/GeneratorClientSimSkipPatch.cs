@@ -5,7 +5,7 @@ using Shared.Profiling;
 using static EnergyGenerator;
 using static STRINGS.BUILDINGS.PREFABS;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     internal static class GeneratorClientSimSkipPatch
     {

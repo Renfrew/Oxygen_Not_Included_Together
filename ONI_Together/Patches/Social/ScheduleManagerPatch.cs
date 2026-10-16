@@ -9,7 +9,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.Social
+namespace ONI_United.Patches.Social
 {
 	// Sync schedule definitions (name, blocks, alarm)
 

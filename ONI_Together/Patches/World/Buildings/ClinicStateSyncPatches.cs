@@ -4,7 +4,7 @@ using ONI_Together.Networking;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using UnityEngine;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World.Buildings
 {
     [HarmonyPatch(typeof(Clinic), nameof(Clinic.OnSpawn))]
     public static class Clinic_OxySync_Patch

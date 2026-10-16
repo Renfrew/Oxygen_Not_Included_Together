@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
 
+namespace ONI_United.Patches;
+
 [HarmonyPatch(typeof(Workable), nameof(Workable.WorkTick))]
 public static class WorkProgressPatch
 {

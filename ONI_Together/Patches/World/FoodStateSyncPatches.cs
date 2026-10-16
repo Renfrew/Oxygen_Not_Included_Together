@@ -5,7 +5,7 @@ using ONI_United.Networking.Replication.Components;
 using Shared.Replication;
 using UnityEngine;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World
 {
     [HarmonyPatch(typeof(Edible), nameof(Edible.OnPrefabInit))]
     public static class Edible_Syncer_Patch

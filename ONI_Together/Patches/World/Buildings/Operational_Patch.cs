@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.Buildings
+namespace ONI_United.Patches.World.Buildings
 {
 	internal class Operational_Patch
 	{

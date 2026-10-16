@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Tools.Dig;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.ToolPatches.Dig
+namespace ONI_United.Patches.ToolPatches.Dig
 {
 	[HarmonyPatch(typeof(Diggable), "OnStopWork")]
 	public static class DiggablePatch

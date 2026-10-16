@@ -3,7 +3,7 @@ using ONI_Together.Networking;
 using ONI_Together.Scripts.Buildings;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     internal static class EnergyConsumer_Patches
     {

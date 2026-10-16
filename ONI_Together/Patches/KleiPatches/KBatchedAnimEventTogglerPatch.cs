@@ -1,7 +1,10 @@
 using HarmonyLib;
 using ONI_Together.Networking;
 using ONI_Together.Networking.Components;
+using ONI_United.Patches.World;
 using Shared.Profiling;
+
+namespace ONI_United.Patches.KleiPatches;
 
 [HarmonyPatch]
 public static class KBatchedAnimEventTogglerPatch

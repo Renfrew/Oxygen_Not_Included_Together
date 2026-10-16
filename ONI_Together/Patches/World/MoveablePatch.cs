@@ -5,6 +5,8 @@ using ONI_Together.Networking.Components;
 using Shared.Profiling;
 using UnityEngine;
 
+namespace ONI_United.Patches.World;
+
 [HarmonyPatch(typeof(Movable), "OnSpawn")]
 public static class MoveablePatch
 {

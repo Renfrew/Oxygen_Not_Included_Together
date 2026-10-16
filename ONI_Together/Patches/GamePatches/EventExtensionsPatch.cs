@@ -8,7 +8,7 @@ using System;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 	[HarmonyPatch(typeof(EventExtensions))]
 	public static class EventExtensionsPatch

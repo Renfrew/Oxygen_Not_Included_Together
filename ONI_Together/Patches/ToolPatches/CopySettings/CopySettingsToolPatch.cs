@@ -6,7 +6,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.CopySettings;
+namespace ONI_United.Patches.ToolPatches.CopySettings;
 
 [HarmonyPatch(typeof(CopySettingsTool), nameof(CopySettingsTool.OnDragTool))]
 public class CopySettingsToolPatch

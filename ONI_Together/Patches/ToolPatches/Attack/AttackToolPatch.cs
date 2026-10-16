@@ -5,7 +5,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Attack;
+namespace ONI_United.Patches.ToolPatches.Attack;
 
 [HarmonyPatch(typeof(AttackTool), nameof(AttackTool.OnDragComplete))]
 public class AttackToolPatch

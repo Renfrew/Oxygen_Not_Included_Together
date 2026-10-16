@@ -11,7 +11,7 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 	// Note: ImmigrantScreen logic is complex. This is a partial implementation.
 	// We need to sync the containers (Care Packages / Duplicants)

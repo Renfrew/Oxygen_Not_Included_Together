@@ -1,7 +1,7 @@
 using HarmonyLib;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	internal class RocketPatches
 	{

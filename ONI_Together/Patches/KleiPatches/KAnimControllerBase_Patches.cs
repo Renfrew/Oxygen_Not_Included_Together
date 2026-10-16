@@ -6,7 +6,7 @@ using Shared.Profiling;
 using System;
 using System.Linq;
 
-namespace ONI_Together.Patches.KleiPatches
+namespace ONI_United.Patches.KleiPatches
 {
 	class KAnimControllerBase_Patches
 	{

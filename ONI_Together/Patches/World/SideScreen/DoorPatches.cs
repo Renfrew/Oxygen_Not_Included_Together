@@ -1,9 +1,10 @@
 using HarmonyLib;
+using ONI_Together;
 using ONI_Together.Networking;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	/// <summary>
 	/// Patches for door state synchronization

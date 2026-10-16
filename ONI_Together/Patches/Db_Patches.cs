@@ -1,5 +1,5 @@
 using HarmonyLib;
-using ONI_Together.Patches.World.SideScreen;
+using ONI_United.Patches.World.SideScreen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	internal class Db_Patches
 	{

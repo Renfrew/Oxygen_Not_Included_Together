@@ -1,4 +1,5 @@
 using HarmonyLib;
+using ONI_Together;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_United.Networking.Replication.Components;
@@ -7,7 +8,7 @@ using System.Collections;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 	[HarmonyPatch(typeof(GameClock))]
 	public static class GameClockPatch

@@ -12,6 +12,8 @@ using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.UI;
 
+namespace ONI_United.Patches.MainMenuScreenPatches;
+
 [HarmonyPatch(typeof(MainMenu), "OnPrefabInit")]
 internal static class MainMenuPatch
 {

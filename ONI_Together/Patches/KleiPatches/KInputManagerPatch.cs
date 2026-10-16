@@ -2,6 +2,8 @@
 using ONI_Together.UI;
 using Shared.Profiling;
 
+namespace ONI_United.Patches.KleiPatches;
+
 [HarmonyPatch(typeof(KInputManager), nameof(KInputManager.Update))]
 public static class KInputManagerPatch
 {

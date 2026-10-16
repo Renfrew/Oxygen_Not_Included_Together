@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.KleiPatches
+namespace ONI_United.Patches.KleiPatches
 {
 	internal class SymbolOverrideController_Patch
 	{

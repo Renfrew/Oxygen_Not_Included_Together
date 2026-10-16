@@ -4,7 +4,7 @@ using ONI_Together.Misc;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(Scenario), nameof(Scenario.SpawnPrefab), [typeof(int), typeof(int), typeof(int), typeof(string), typeof(Grid.SceneLayer)])]
 	public static class ScenarioSpawnPrefabPatch

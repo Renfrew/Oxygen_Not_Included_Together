@@ -5,7 +5,7 @@ using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components.Tools;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.ToolPatches.Move
+namespace ONI_United.Patches.ToolPatches.Move
 {
 	[HarmonyPatch(typeof(MoveToLocationTool), nameof(MoveToLocationTool.SetMoveToLocation))]
 	public static class MoveToLocationToolPatch

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.Buildings
+namespace ONI_United.Patches.World.Buildings
 {
 	internal class ComplexFabricator_Patches
 	{

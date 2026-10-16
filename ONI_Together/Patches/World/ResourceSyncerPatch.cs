@@ -3,7 +3,7 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.Synchronization;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	// Attach ResourceSyncer to the Game or World object
 	[HarmonyPatch(typeof(Game), "OnSpawn")]

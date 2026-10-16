@@ -4,7 +4,7 @@ using ONI_Together.Networking;
 using System.Reflection;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	[HarmonyPatch]
 	public static class DoLoadPatch

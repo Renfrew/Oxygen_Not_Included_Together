@@ -5,7 +5,7 @@ using ONI_Together.Networking.Components;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.ToolPatches
+namespace ONI_United.Patches.ToolPatches
 {
 	[HarmonyPatch(typeof(SelectTool), "Activate")]
 	public static class SelectToolPatch

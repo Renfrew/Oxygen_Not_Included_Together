@@ -1,6 +1,6 @@
 using ONI_Together.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_Together.Patches.GamePatches;
+using ONI_United.Patches.GamePatches;
 using System.IO;
 using Shared.Profiling;
 using ONI_Together.Networking.Packets.Architecture;

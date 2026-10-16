@@ -3,7 +3,7 @@ using ONI_Together.Networking.Components;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Entities;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.Entities
 {
     [HarmonyPatch(typeof(NetworkIdentity), nameof(NetworkIdentity.OnSpawn))]
     public static class StatusItemGroupSyncPatch

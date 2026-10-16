@@ -4,7 +4,7 @@ using Shared.Profiling;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ONI_Together.Patches.ToolPatches
+namespace ONI_United.Patches.ToolPatches
 {
 	[HarmonyPatch]
 	public static class DragToolVisualSyncPatch

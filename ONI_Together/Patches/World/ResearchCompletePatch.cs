@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	/// <summary>
 	/// Patch to detect when research completes and sync to all clients.

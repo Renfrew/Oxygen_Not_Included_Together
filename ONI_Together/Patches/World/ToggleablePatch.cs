@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
 using ONI_Together.DebugTools;
 using ONI_Together.Networking;
-using ONI_Together.Patches.World.SideScreen;
+using ONI_United.Patches.World.SideScreen;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     [HarmonyPatch(typeof(Toggleable), nameof(Toggleable.Toggle))]
     public static class QueueToggleable

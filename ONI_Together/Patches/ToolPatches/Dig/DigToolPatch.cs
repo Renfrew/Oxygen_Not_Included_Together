@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.Tools.Dig;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Dig
+namespace ONI_United.Patches.ToolPatches.Dig
 {
     [HarmonyPatch(typeof(DigTool), nameof(DigTool.PlaceDig))]
     public static class DigTool_PlaceDig_Patch

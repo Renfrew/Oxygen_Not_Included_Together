@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using STRINGS;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	internal class LocalizationPatch
 	{
@@ -21,7 +21,7 @@ namespace ONI_Together.Patches
 			public static void Postfix()
             {
 	            using var _ = Profiler.Scope();
-				Translate(typeof(STRINGS), true);
+				Translate(typeof(ONI_Together.STRINGS), true);
             }
 
 			static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

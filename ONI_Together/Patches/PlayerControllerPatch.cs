@@ -3,7 +3,7 @@ using ONI_Together.Networking.Components;
 using ONI_Together.Networking.States;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches
+namespace ONI_United.Patches
 {
 	[HarmonyPatch]
 	public static class PlayerControllerPatch

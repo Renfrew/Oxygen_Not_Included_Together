@@ -1,4 +1,6 @@
 ﻿
+namespace ONI_United.Patches.InterfacePatches;
+
 ///This is an alternative version of chat linking that puts a button at the bottom of
 ///the user menu. This allows more text, but doesnt work for natural tiles
 ///its kept here as documentation on how to do that.
@@ -10,7 +12,7 @@
 //using System.Collections.Generic;
 //using System.Text;
 
-//namespace ONI_Together.Patches.InterfacePatches
+//namespace ONI_United.Patches.InterfacePatches
 //{
 //	internal class UserMenuScreen_Patches
 //	{

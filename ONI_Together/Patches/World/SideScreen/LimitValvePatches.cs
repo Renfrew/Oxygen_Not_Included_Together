@@ -7,7 +7,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	/// <summary>
 	/// Patches for LimitValve (Meter Valve) synchronization

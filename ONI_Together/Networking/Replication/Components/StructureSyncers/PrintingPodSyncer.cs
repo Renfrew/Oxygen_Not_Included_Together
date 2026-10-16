@@ -4,7 +4,7 @@ using System.IO;
 using KSerialization;
 using ONI_Together.DebugTools;
 using ONI_United.Networking.Packets.Social;
-using ONI_Together.Patches.GamePatches;
+using ONI_United.Patches.GamePatches;
 using Shared.Replication;
 using Shared.Replication.Attributes;
 using Shared.Profiling;

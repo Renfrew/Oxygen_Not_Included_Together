@@ -4,7 +4,7 @@ using ONI_Together.DebugTools;
 using System;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.KleiPatches
+namespace ONI_United.Patches.KleiPatches
 {
     /// <summary>
     /// Patches FMOD audio event lookups to handle cross-platform compatibility issues.

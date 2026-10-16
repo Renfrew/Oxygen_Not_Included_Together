@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Social;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.Duplicant
+namespace ONI_United.Patches.Duplicant
 {
 	internal class ThoughtGraph_Patches
 	{

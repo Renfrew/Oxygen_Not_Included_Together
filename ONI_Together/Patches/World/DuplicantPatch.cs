@@ -10,6 +10,8 @@ using Shared.Profiling;
 using UnityEngine;
 using VitalStatsSyncer = ONI_United.Networking.Replication.Components.Entities.VitalStatsSyncer;
 
+namespace ONI_United.Patches.World;
+
 [HarmonyPatch(typeof(BaseMinionConfig), nameof(BaseMinionConfig.BaseMinion))]
 public static class DuplicantPatch
 {

@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World.SideScreen
+namespace ONI_United.Patches.World.SideScreen
 {
 	/// <summary>
 	/// Patches for capacity control side screens (batteries, gas reservoirs, etc.)

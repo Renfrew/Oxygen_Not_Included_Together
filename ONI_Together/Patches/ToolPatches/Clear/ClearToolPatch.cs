@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.Tools.Clear;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Clear
+namespace ONI_United.Patches.ToolPatches.Clear
 {
 	[HarmonyPatch(typeof(ClearTool), "OnDragTool")]
 	public static class ClearTool_OnDragTool_Patch

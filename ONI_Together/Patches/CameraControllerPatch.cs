@@ -2,6 +2,8 @@
 using ONI_Together.UI;
 using Shared.Profiling;
 
+namespace ONI_United.Patches;
+
 [HarmonyPatch(typeof(CameraController), nameof(CameraController.OnKeyDown))]
 public static class CameraControllerPatch
 {

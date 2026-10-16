@@ -6,7 +6,7 @@ using ONI_Together.Networking.Components;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	// Event-driven fast path for "empty -> non-empty" pipe transitions
 	// (valve opens, freshly built pipe receives its first packet, storage

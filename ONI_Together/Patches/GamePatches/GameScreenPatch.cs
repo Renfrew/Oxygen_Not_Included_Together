@@ -8,7 +8,7 @@ using ONI_Together.UI;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 	[HarmonyPatch(typeof(GameScreenManager), nameof(GameScreenManager.OnSpawn))]
 	public static class GameScreenPatch

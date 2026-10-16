@@ -7,7 +7,7 @@ using ONI_United.Networking.Packets.Tools.Deconstruct;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Deconstruct
+namespace ONI_United.Patches.ToolPatches.Deconstruct
 {
 	// All "mark for deconstruction" paths funnel through QueueDeconstruction:
 	//   - DeconstructTool drag → gameObject.Trigger(GameHashes.Deconstruct) → OnDeconstruct → QueueDeconstruction

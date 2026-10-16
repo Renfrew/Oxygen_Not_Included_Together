@@ -3,7 +3,7 @@ using ONI_Together.DebugTools;
 using ONI_Together.Networking;
 using ONI_United.Networking.Replication.Components;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch(typeof(SpeedControlScreen))]
 	public static class SpeedControlPatch

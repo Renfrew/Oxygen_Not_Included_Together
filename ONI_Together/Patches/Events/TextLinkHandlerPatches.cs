@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
+using ONI_Together;
 using Shared.Profiling;
 using Steamworks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace ONI_Together.Patches.Events
+namespace ONI_United.Patches.Events
 {
     public class TextLinkHandlerPatches
     {

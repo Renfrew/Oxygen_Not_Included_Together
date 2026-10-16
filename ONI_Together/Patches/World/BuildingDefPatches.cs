@@ -5,7 +5,7 @@ using HarmonyLib;
 using ONI_Together.Networking;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
     public static class BuildingDefPatches
     {

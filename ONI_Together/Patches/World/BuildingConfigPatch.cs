@@ -7,7 +7,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	public static class BuildingConfigPatch
 	{

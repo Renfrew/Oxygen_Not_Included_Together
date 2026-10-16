@@ -6,7 +6,7 @@ using ONI_United.Networking.Replication.Components.Plants;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.World.Plants
+namespace ONI_United.Patches.World.Plants
 {
 	[HarmonyPatch]
 	internal static class PlantLifecyclePatches

@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_Together.Networking;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.Duplicant
+namespace ONI_United.Patches.Duplicant
 {
 	internal class DupeGreetingManager_Patches
 	{

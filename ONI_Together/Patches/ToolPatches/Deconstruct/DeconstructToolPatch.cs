@@ -5,7 +5,7 @@ using ONI_United.Networking.Packets.Tools.Deconstruct;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Deconstruct
+namespace ONI_United.Patches.ToolPatches.Deconstruct
 {
 	[HarmonyPatch(typeof(DeconstructTool), nameof(DeconstructTool.OnDragTool))]
 	public static class DeconstructToolPatch

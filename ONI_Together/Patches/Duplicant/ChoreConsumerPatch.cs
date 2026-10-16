@@ -6,7 +6,7 @@ using ONI_United.Networking.Packets.DuplicantActions;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.Duplicant
+namespace ONI_United.Patches.Duplicant
 {
 	// Sync personal priorities (the 0-9 matrix)
 	[HarmonyPatch(typeof(ChoreConsumer), "SetPersonalPriority")]

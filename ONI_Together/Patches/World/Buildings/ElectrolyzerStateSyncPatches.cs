@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World.Buildings
 {
     [HarmonyPatch(typeof(Electrolyzer), nameof(Electrolyzer.OnSpawn))]
     public static class Electrolyzer_OxySync_Patch

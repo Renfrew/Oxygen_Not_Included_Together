@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.Duplicant
+namespace ONI_United.Patches.Duplicant
 {
 	internal class ConversationManager_Patches
 	{

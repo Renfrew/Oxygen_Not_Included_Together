@@ -4,7 +4,7 @@ using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World.Buildings
 {
     [HarmonyPatch(typeof(BottleEmptier), nameof(BottleEmptier.OnSpawn))]
     public static class BottleEmptierSpawnPatch

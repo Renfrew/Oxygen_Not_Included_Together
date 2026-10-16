@@ -5,7 +5,7 @@ using ONI_Together.Networking;
 using ONI_Together.Networking.Transport.Steamworks;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	[HarmonyPatch]
 	public static class SaveLoaderPatch

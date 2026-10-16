@@ -59,15 +59,15 @@ namespace ONI_United.Networking.Packets.Social
 			}
 
 			// Check if options are already locked (first-opener-wins)
-			if (ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.OptionsLocked)
+			if (ONI_United.Patches.GamePatches.ImmigrantScreenPatch.OptionsLocked)
 			{
 				DebugConsole.Log("[ImmigrantOptionsPacket] Options already locked, ignoring packet");
 				return;
 			}
 
 			// Store and lock options
-			ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.AvailableOptions = Options;
-			ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.OptionsLocked = true;
+			ONI_United.Patches.GamePatches.ImmigrantScreenPatch.AvailableOptions = Options;
+			ONI_United.Patches.GamePatches.ImmigrantScreenPatch.OptionsLocked = true;
 
 			if (MultiplayerSession.IsHost)
 			{
@@ -80,7 +80,7 @@ namespace ONI_United.Networking.Packets.Social
 			if (ImmigrantScreen.instance != null && ImmigrantScreen.instance.gameObject.activeInHierarchy)
 			{
 				DebugConsole.Log("[ImmigrantOptionsPacket] ImmigrantScreen is open, applying options immediately");
-				ONI_Together.Patches.GamePatches.ImmigrantScreenPatch.ApplyOptionsToScreen(ImmigrantScreen.instance);
+				ONI_United.Patches.GamePatches.ImmigrantScreenPatch.ApplyOptionsToScreen(ImmigrantScreen.instance);
 			}
 			else
 			{

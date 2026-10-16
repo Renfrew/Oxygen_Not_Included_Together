@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.Tools.Harvest;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Harvest;
+namespace ONI_United.Patches.ToolPatches.Harvest;
 
 [HarmonyPatch(typeof(HarvestTool), nameof(HarvestTool.OnDragTool))]
 public class HarvestToolPatch

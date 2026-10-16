@@ -2,7 +2,7 @@ using HarmonyLib;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.OxySync
+namespace ONI_United.Patches.World.Buildings
 {
 
     [HarmonyPatch(typeof(RustDeoxidizer), nameof(RustDeoxidizer.OnSpawn))]

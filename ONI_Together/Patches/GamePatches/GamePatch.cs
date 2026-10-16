@@ -9,7 +9,7 @@ using ONI_United.Networking.Replication.Components.Tools;
 using ONI_Together.UI;
 using Shared.Profiling;
 
-namespace ONI_Together.Patches.GamePatches
+namespace ONI_United.Patches.GamePatches
 {
 
     /// <summary>

@@ -6,7 +6,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.DuplicantActions
+namespace ONI_United.Patches.DuplicantActions
 {
     [HarmonyPatch(typeof(ConsumablesTableScreen), nameof(ConsumablesTableScreen.set_value_consumable_info))]
     public static class ConsumablesTableScreenPatch

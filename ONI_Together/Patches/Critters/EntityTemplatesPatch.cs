@@ -6,7 +6,7 @@ using ONI_Together.Scripts.Creatures;
 using Shared.Profiling;
 using UnityEngine;
 
-namespace ONI_Together.Patches.Critters
+namespace ONI_United.Patches.Critters
 {
 	internal class EntityTemplatesPatch
 	{

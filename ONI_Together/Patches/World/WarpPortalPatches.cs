@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace ONI_Together.Patches.World;
+namespace ONI_United.Patches.World;
 
 public class WarpPortalPatches
 {

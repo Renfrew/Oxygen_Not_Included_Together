@@ -5,10 +5,10 @@ using ONI_United.Networking.Packets.Events;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Networking.Packets.World.Handlers;
 using ONI_Together.Networking.Components;
-using ONI_Together.Patches.Critters;
-using ONI_Together.Patches.World;
-using ONI_Together.Patches.World.Buildings;
-using ONI_Together.Patches.OxySync;
+using ONI_United.Patches.Critters;
+using ONI_United.Patches.World;
+using ONI_United.Patches.World.Buildings;
+using ONI_United.Patches.Entities;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Entities;
 

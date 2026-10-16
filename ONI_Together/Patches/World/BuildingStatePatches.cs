@@ -7,7 +7,7 @@ using Shared.Interfaces.Networking;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.World
+namespace ONI_United.Patches.World
 {
 	internal class BuildingStatePatches
 	{

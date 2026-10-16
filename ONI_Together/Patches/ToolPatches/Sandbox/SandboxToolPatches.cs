@@ -9,7 +9,7 @@ using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.ToolPatches.Sandbox
+namespace ONI_United.Patches.ToolPatches.Sandbox
 {
     internal static class SandboxToolSync
     {
@@ -149,7 +149,7 @@ namespace ONI_Together.Patches.ToolPatches.Sandbox
                         var minionIdentity = spawned.GetComponent<MinionIdentity>();
                         if (minionIdentity != null)
                         {
-                            spawned.AddOrGet<Scripts.Duplicants.MinionMultiplayerInitializer>();
+                            spawned.AddOrGet<ONI_Together.Scripts.Duplicants.MinionMultiplayerInitializer>();
 
                             // Build full ImmigrantOptionEntry from live duplicant to preserve textures/traits
                             try

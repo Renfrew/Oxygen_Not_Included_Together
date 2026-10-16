@@ -9,7 +9,7 @@ using ONI_Together.DebugTools;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 
-namespace ONI_Together.Patches.Chores
+namespace ONI_United.Patches.ChoresPatches
 {
 	public static class MinionTodoSideScreenPatch
 	{
