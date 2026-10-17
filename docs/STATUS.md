@@ -1,7 +1,8 @@
 # Multiplayer: ONI United — Development Status
 
-**Last updated:** 2026-10-16  
-**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and point-in-time GitHub/Git evidence through 2026-10-16. Historical runtime/build evidence remains tied to the exact scope in which it was obtained.
+**Last updated:** 2026-10-17
+
+**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and point-in-time GitHub/Git evidence through 2026-10-17. Historical runtime/build evidence remains tied to the exact scope in which it was obtained.
 
 ## Executive summary
 
@@ -28,7 +29,45 @@
 - **Current client lifecycle is the later transport-preserving rebuild.** Git/source ancestry shows the old pending-join/loading-cache/cached-reconnect mechanisms were removed and normal synchronization/world replacement now preserves the transport connection. Exact conformance to every October 7 generation/reset/admission proposal and the complete cross-transport runtime matrix remain unverified.
 - **Synchronization pause ownership is known, full-interval coverage is not.** The host pauses after accepted `BeginSynchronization` in `GameServerHardSync.PerformHardSync`, the client pauses in `GameClient.BeginSynchronization`, and there is no automatic unpause. The source build passed with 0 errors / 203 warnings, but this does not by itself prove that host advancement is blocked for the entire snapshot/load/admission interval.
 - The PR #83 disconnect/reconnect and pending-join behavior remains verified historical implementation evidence; it is not the current normal-load architecture.
-- **Active next work:** begin the development-environment walkthrough from project setup—ESLint, default settings, and related baseline tooling/configuration—then continue through the mod lifecycle and test each stage as it is reviewed. A separate repeat of the connection-only check is not currently planned; later lifecycle work must still record the exact scope and result of each test.
+- **N14 closure:** the startup/configuration/framework cleanup is implemented and committed on `refactor/mod-lifecycle` through `810e0fde0e62900e6ecc240d8d335e94e80b66ca`. The checkout then had no outstanding N14 source changes. Debug/Release builds succeeded; no ONI runtime test was run. Synchronization integration testing remained required Level 3 work; the later N15 plan now makes N15-C the next test-infrastructure increment after N15-B merges.
+- **N15-B standalone test foundation:** Independently verified and ready for user commit, but still uncommitted at the verified point. On `refactor/mod-lifecycle` at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`, the working tree adds Option 3's first `Shared.Tests` project and workflow. Five `SnapshotTimeline` tests passed in both Debug and Release. The workflow was locally validated only; no GitHub Actions run and no ONI runtime test are claimed. After N15-B is committed and merged, N15-C is the next planned test-infrastructure increment.
+
+## N15-B standalone unit-test foundation
+
+**Verdict:** PASS — ready for user commit. This is independent verification of an uncommitted working tree, not evidence of a commit, PR merge, or GitHub-hosted CI run.
+
+**Git/environment evidence:** Verification ran on `Renfrews-Studio.renfrewworld.com` in `/Users/renfrew/Projects/ONI_mods/Oxygen_Not_Included_Together`, branch `refactor/mod-lifecycle`, with HEAD unchanged at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. There were no staged changes. `ONI_United.sln` and `README.md` were modified; `.github/workflows/unit-tests.yml`, `tests/Shared.Tests/Shared.Tests.csproj`, and `tests/Shared.Tests/Replication/SnapshotTimelineTests.cs` were untracked. Test execution affected only ignored `bin`/`obj` outputs.
+
+**Agreed test architecture:** Level 1 is standalone unit testing; Level 2 is standalone integration testing; Level 3 is ONI in-game testing. The existing 92 diagnostics will be migrated incrementally where their behavior can be represented faithfully outside the game; ONI-dependent diagnostics remain Level 3.
+
+**Implemented scope:** Option 3 is in place for the first project: a separate xUnit `Shared.Tests` project targeting `net10.0`, registered under a `tests` solution folder, source-linking `Shared/Replication/SnapshotTimeline.cs`, and carrying no project references. It does not duplicate or modify production source. Evaluated MSBuild confirmed removal of inherited game-specific references and mod build/packaging behaviors. No changes were made to `UnitTestRegistry`, existing diagnostics, networking, transports, players, sessions, or other N15-C/D/E scope.
+
+**Test evidence:** All five `SnapshotTimeline` tests passed in both Debug and Release. This verifies the covered standalone timeline behavior and the tested project configuration; it does not verify ONI integration, multiplayer runtime behavior, packaging, or a release artifact.
+
+**CI evidence:** `.github/workflows/unit-tests.yml` was structurally reviewed and locally validated as clean-runner compatible. It has not run on GitHub, so CI success is not claimed.
+
+**Next step:** The user may commit and open the N15-B PR. Once N15-B is merged, advance the roadmap to N15-C without folding N15-C/D/E work into this change.
+
+## N14 startup/framework and lifecycle closeout
+
+**Repository evidence:** `refactor/mod-lifecycle` at `810e0fde0e62900e6ecc240d8d335e94e80b66ca` contains the N14 implementation commit series:
+
+| Commit | Change |
+| --- | --- |
+| `ec2fcc9b` | Correct mod startup initialization order |
+| `e6748619` | Make Steam lobby callback initialization idempotent |
+| `91d664ef` | Clean up mod startup and debug initialization |
+| `955fee1d` | Migrate Door patches to standard Harmony registration |
+| `27cb71df` | Remove obsolete mod startup code |
+| `626c2d57` | Move startup responsibilities to subsystem owners |
+| `5cdcf2f6` | Simplify mod startup and diagnostic initialization |
+| `810e0fde` | Respect the Discord Rich Presence setting during initialization |
+
+N14-A5 through N14-A9 were completed without additional source changes where review found no justified implementation change. The final current source has Harmony activation after PLib/options, required UI assets, persistent identity, and persistent component setup. Packet defaults are registered from `OnAllModsLoaded`; individual packet registration exceptions are logged and swallowed by design, so a failure can leave the registry incomplete. The earlier proposed A6 rethrow is absent.
+
+**Build evidence:** Repeated non-deploying Debug and Release builds succeeded during N14. The final A9 Debug and Release builds each reported 0 errors and 4 `MSB3277` assembly-version conflict warnings in `Shared`. These builds verify compilation only; they do not establish runtime startup, synchronization, transport behavior, or release-artifact correctness. Static review and `git diff --check` were used where recorded.
+
+**Deferred / outstanding:** No generic startup rollback was added. No ONI process was launched and no gameplay, synchronization, multiplayer transport, or in-game configuration behavior was runtime-tested during N14. Runtime verification is deferred to the synchronization/integration phase. Best-effort packet registration may continue after a packet registration failure and therefore remains an explicit partial-registry risk.
 
 ## October 16 identifier-migration closeout
 
@@ -38,7 +77,7 @@
 
 **Runtime evidence:** The user reported a passing running test and immediately bounded it to **connection only**. Treat this as a successful connection-path smoke test, not as verification of the complete mod lifecycle or multiplayer synchronization.
 
-**Next-session priority:** Start at development-environment setup, including ESLint and default project settings. Walk forward through the mod lifecycle and test during that walkthrough rather than scheduling an additional standalone connection-only test.
+**Historical next-session priority (2026-10-16):** Start at development-environment setup, including ESLint and default project settings. This recommendation predates N14 and is not the current next task; N14 is complete, and synchronization integration testing is now the next focus.
 
 ## Current rebuilt transport-preserving client lifecycle
 
@@ -441,6 +480,7 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 | Join-overlay/readiness implementation and PR review | `game mod` Project conversation; GitHub issues #78–#82 and PR #83 | PR head `cd14ac71bccb1a960f59ba92df0a4abf8cdb1c27`; GitHub merge commit `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f` | 2026-10-07 | LiteNetLib single-join runtime result; source-reviewed readiness/pending-join and cancellation paths; Steam source-only; Riptide exclusion; GitHub issue/merge states |
 | `Reactable Step One` and `Patch Reactable Synchronization` | `game mod` Project conversations | Not applicable | 2026-09-27 | Previous vanilla lifecycle observation and design discussion; not complete authorization verification |
 | `REACTABLE_SYNC_ARCHITECTURE_STATUS.md` | Recorded as `ren/test-0.8.0` | `2bb0b6b938a7e1b54ae0b7426b1a4879b6af7b07` reported in conversation; Git object not verified | 2026-09-27 | Provisional Reactable architecture/status |
+| N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | `Shared.Tests` isolation, five Debug/Release tests, local-only workflow validation, and explicit no-runtime/no-GitHub-run limits |
 
 ## Contradictions and missing evidence requiring attention
 
@@ -454,6 +494,7 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 
 ## Revision history
 
+- **2026-10-17:** Recorded N15-B as independently verified and ready for user commit while explicitly uncommitted at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. Added the Level 1/2/3 model, Option 3 `Shared.Tests` scope, incremental migration policy for 92 diagnostics, five Debug/Release `SnapshotTimeline` passes, and local-only GitHub Actions validation. No runtime, commit, merge, or GitHub CI success is claimed.
 - **2026-10-16:** Recorded completion of the N9–N11 identifier-migration cleanup sequence, the reported passing audit/build evidence, and the user-confirmed connection-only runtime result. Limited the runtime claim to the connection path and changed the active next-session priority to development-environment setup (ESLint, default settings, and baseline tooling) followed by a lifecycle walkthrough with testing at each stage. Exact N9–N11 hashes and full audit/build output were not available in the uploaded references and were not invented.
 - **2026-10-15 (reconciliation):** Reclassified the PR #83 intentional disconnect/reconnect and pending-join lifecycle as historical verified evidence; documented the later transport-preserving `develop` rebuild as the current implementation lineage; removed the stale claim that transport-preserving loading is unimplemented; and preserved uncertainty about exact October 7 design conformance and full-interval pause coverage.
 - **2026-10-15:** Recorded the verified `develop` ancestry and point-in-time SHAs; lifecycle/speed simplification build result and runtime limits; PR #86 metadata and pending regression review; session-centralization ownership boundary; and the legal/licensing/compliance audit as a pre-release gate. No merge, runtime result, or release artifact was inferred.

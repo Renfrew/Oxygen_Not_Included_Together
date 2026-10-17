@@ -57,18 +57,38 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			if (!SteamManager.Initialized) return;
 
+			int registeredCallbacks = 0;
 			try
 			{
-				_lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
-				_lobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinRequested);
-				_lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
-				_lobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create(OnLobbyChatUpdate);
+				if (_lobbyCreated == null)
+				{
+					_lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
+					registeredCallbacks++;
+				}
+				if (_lobbyJoinRequested == null)
+				{
+					_lobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinRequested);
+					registeredCallbacks++;
+				}
+				if (_lobbyEntered == null)
+				{
+					_lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
+					registeredCallbacks++;
+				}
+				if (_lobbyChatUpdate == null)
+				{
+					_lobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create(OnLobbyChatUpdate);
+					registeredCallbacks++;
+				}
 
-				DebugConsole.Log("[SteamLobby] Callbacks registered.");
+				if (registeredCallbacks > 0)
+					DebugConsole.Log($"[SteamLobby] Registered {registeredCallbacks} lobby callbacks.");
+				else
+					DebugConsole.Log("[SteamLobby] Lobby callbacks already registered.");
 			}
 			catch (Exception ex)
 			{
-				DebugConsole.LogError($"[SteamLobby] Initialization failed: {ex.Message}");
+				DebugConsole.LogError($"[SteamLobby] Initialization failed after registering {registeredCallbacks} lobby callbacks: {ex.Message}");
 				DebugConsole.LogException(ex);
 			}
 		}

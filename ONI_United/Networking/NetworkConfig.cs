@@ -145,6 +145,11 @@ namespace ONI_United.Networking
             DebugConsole.Log($"Updated network transport to: {newTransport.ToString()}");
         }
 
+        public static void ApplyConfiguredTransport()
+        {
+            UpdateTransport((NetworkTransport)Configuration.Instance.Host.NetworkTransport);
+        }
+
         public static void UpdateLanTransport()
         {
             UpdateTransport((NetworkTransport)Configuration.Instance.Host.LanSettings.Transport);

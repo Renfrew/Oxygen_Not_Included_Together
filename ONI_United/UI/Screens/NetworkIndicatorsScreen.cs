@@ -49,7 +49,7 @@ namespace ONI_United.UI.Screens
 
 			const string bundleKey = "networkindicators";
 			const string prefabPath = "assets/networkindicators/prefabs/network indicators.prefab";
-			if (!MultiplayerMod.LoadedBundles.TryGetValue(bundleKey, out var bundle) || bundle == null)
+			if (!ModAssets.LoadedBundles.TryGetValue(bundleKey, out var bundle) || bundle == null)
 			{
 				DebugConsole.LogWarning($"Skipping optional network indicators: embedded AssetBundle '{bundleKey}' is unavailable.");
 				return;

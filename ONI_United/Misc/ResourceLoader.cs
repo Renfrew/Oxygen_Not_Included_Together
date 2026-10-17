@@ -72,7 +72,7 @@ namespace ONI_United.Misc
         {
 	        using var _ = Profiler.Scope();
 
-			if(!MultiplayerMod.LoadedBundles.TryGetValue(bundleKey, out var bundle))
+			if(!ModAssets.LoadedBundles.TryGetValue(bundleKey, out var bundle))
 			{
                 DebugConsole.LogError($"LoadFromBundle: AssetBundle with key '{bundleKey}' is not loaded!");
 				return null;

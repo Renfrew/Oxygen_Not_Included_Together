@@ -258,6 +258,24 @@ If this occurs:
 3. Reopen the solution.
 4. Build again.
 
+## Testing
+
+The project uses three testing levels:
+
+- **Unit tests** in `tests/Shared.Tests/` cover deterministic logic without requiring Oxygen Not Included or Unity.
+- **Standalone integration tests** will be added under `tests/ONI_United.IntegrationTests/` to exercise component interactions without launching the game.
+- **In-game integration tests** remain separate from unit tests and will use the developer diagnostics in `ONI_United/DebugTools/IntegrationTests/` for real multiplayer scenarios.
+
+Run the standalone unit tests locally with:
+
+```bash
+dotnet test tests/Shared.Tests/Shared.Tests.csproj --configuration Debug
+dotnet test tests/Shared.Tests/Shared.Tests.csproj --configuration Release
+```
+
+Existing in-game diagnostics remain supported; migration to standalone tests is incremental. GitHub Actions initially runs only the standalone unit-test project.
+Use the test-project path rather than solution-wide `dotnet test`, which can build production projects that require local game assemblies.
+
 ---
 
 # Debugging Oxygen Not Included

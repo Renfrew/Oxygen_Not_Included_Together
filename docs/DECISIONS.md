@@ -1,6 +1,7 @@
 # Multiplayer: ONI United — Architecture Decision Log
 
-**Last updated:** 2026-10-15  
+**Last updated:** 2026-10-17
+
 **Status:** Recovered decisions from the `game mod` Project and local repository. Decision status and implementation status are separate: accepting a decision does not mean its implementation is complete.
 
 ## Decision status legend
@@ -345,6 +346,54 @@ The earlier observation that a client-local Reactable can be stored, enter `Reac
 **Rationale:** Common host/session/player state should have one authority, while lifecycle, synchronization, and transport details have distinct invariants that should not be folded into a broad session object.  
 **Review gate:** PR #86 must be reviewed against current `develop` for lifecycle, identity, cleanup, callback-ordering, and transport regressions before merge.
 
+## D-038 — Keep startup prerequisites ahead of Harmony activation
+
+**Decision status:** Confirmed
+
+**Implementation status:** Implemented but further testing required
+
+**Decision:** `MultiplayerMod.OnLoad` initializes PLib options, required UI assets, persistent configuration identity, and persistent components before calling `base.OnLoad(harmony)`. Harmony activation remains an explicit boundary after those prerequisites. Patch behavior is owned by normal Harmony attributes; startup does not manually register the migrated Door patches.
+**Rationale:** A required prerequisite failure must not activate Harmony against an incompletely initialized mod. Configuration, assets, and component owners retain their existing responsibilities; this is an ordering correction, not a new initialization framework.
+
+## D-039 — Keep default packet registration best-effort
+
+**Decision status:** Confirmed
+
+**Implementation status:** Implemented but further testing required
+
+**Decision:** `PacketRegistry.RegisterDefaults` remains in `OnAllModsLoaded`; individual registration failures are logged by `TryRegister` and are not rethrown. Do not abort remaining mod initialization because one packet fails registration.
+**Consequence:** The effective packet registry and its ID fingerprint can be incomplete after a registration failure. This is an accepted limitation of the best-effort policy, not evidence that a failed registration is harmless.
+
+## D-040 — Defer generic startup rollback
+
+**Decision status:** Deferred
+
+**Implementation status:** Not implemented
+
+**Decision:** Do not add a generic rollback framework or startup state machine as part of N14. Fatal `OnLoad` exceptions are logged and rethrown, but side effects completed before a failure are not transactionally undone. Revisit only if concrete runtime evidence demonstrates a required recovery path.
+
+## D-041 — Defer N14 runtime verification to synchronization testing
+
+**Decision status:** Confirmed
+
+**Implementation status:** Not independently verified
+
+**Decision:** N14's source review and Debug/Release builds do not establish in-game startup, multiplayer synchronization, transport parity, or release-artifact behavior. Runtime validation remains deferred until the synchronization/integration phase and must be reported with its exact tested build and scenarios.
+
+## D-042 — Adopt three verification levels and Option 3 standalone test projects
+
+**Decision status:** Confirmed
+
+**Implementation status:** Partially implemented; N15-B foundation verified in an uncommitted working tree
+
+**Decision:** Organize automated verification as Level 1 standalone unit tests, Level 2 standalone integration tests, and Level 3 in-game tests. Use Option 3: separate domain-focused projects under `tests/`, beginning with `Shared.Tests`. Eligible production files are source-linked into an isolated test project; do not duplicate production logic or add a project reference that imports ONI, Unity, Harmony, PLib, transport, packaging, or mod-build dependencies.
+
+Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic only when its behavior can be represented faithfully at Level 1 or Level 2; retain genuinely game-dependent checks at Level 3. Standalone test success never substitutes for in-game integration or exact-artifact runtime evidence.
+
+**Rationale:** This establishes fast deterministic coverage while preserving production assembly boundaries and the value of ONI-dependent diagnostics. Separate test projects can grow by domain without making game dependencies part of the standalone test runtime.
+
+**Verified first increment:** `tests/Shared.Tests` targets `net10.0`, source-links `Shared/Replication/SnapshotTimeline.cs`, has no project references, and removes inherited game/mod build items. Five `SnapshotTimeline` tests passed in Debug and Release. The workflow was locally validated and reviewed for a clean runner but has not run on GitHub. No runtime test was performed. At verification, all N15-B implementation remained uncommitted on `refactor/mod-lifecycle` at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`.
+
 ## Unresolved decisions
 
 1. Exact TTL and collision handling for Reactable authorization.
@@ -377,9 +426,13 @@ The earlier observation that a client-local Reactable can be stored, enter `Reac
 | Join-overlay/readiness session and GitHub tracking | `game mod` Project conversation; issues #78–#82; PR #83 | PR head `cd14ac71bccb1a960f59ba92df0a4abf8cdb1c27`; merge commit `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f` | 2026-10-07 | D-025–D-028 source/decision evidence; LiteNetLib single-join runtime verification; Steam source-only; Riptide exclusion; #82 deferred |
 | Transport-preserving loading source review | `game mod` Project conversation and attached Local game mod source-review reports | Not applicable; no new Git/build/runtime evidence | 2026-10-07 | D-029–D-034 approved design; implementation prerequisite and evidence limits recorded |
 | Lifecycle/speed simplification and PR #86 preparation | `game mod` Project conversation and Local game mod reports summarized there | `develop` `3ddad5ad7fcaace77292c3f4b4a2218c0aa5db1f`; PR #86 head `a32139b48031202ee41f6bd77bd16701b4b51c35` | 2026-10-15 | D-035–D-037 decision, build, Git, and PR-metadata evidence; no runtime regression verification |
+| N14 startup/framework and lifecycle closeout | Local repository `refactor/mod-lifecycle` | `810e0fde0e62900e6ecc240d8d335e94e80b66ca` | 2026-10-17 | Commit ancestry and source inspection; Debug/Release builds; no ONI runtime verification |
+| N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | Option 3 / `Shared.Tests` isolation review, five Debug/Release tests, and local-only workflow validation |
 
 ## Revision history
 
+- **2026-10-17:** Added D-042 for the agreed Level 1/2/3 verification model, Option 3 separate test projects, incremental migration of 92 existing diagnostics, and the bounded N15-B `Shared.Tests` evidence. No commit, merge, GitHub Actions success, or runtime test is claimed.
+- **2026-10-17:** Added D-038–D-041 for startup prerequisites before Harmony activation, best-effort packet registration, deferred generic startup rollback, and the N14 runtime-verification boundary.
 - **2026-10-15 (reconciliation):** Reclassified D-027/D-028 and the pending-join portions of D-025/D-026 as superseded PR #83 historical implementation evidence; updated D-029–D-033 to reflect the later transport-preserving `develop` lifecycle without asserting unverified clause-by-clause conformance; and revised D-034 to distinguish the now-known pause acquisition points from still-unverified full-interval host-advancement coverage.
 - **2026-10-15:** Added D-035–D-037: rejected lifecycle/overlay speed ownership and load-time speed resync guards; assigned pause to accepted one-shot host/client synchronization entry points with no automatic unpause; and recorded session centralization as an accepted ownership direction whose PR #86 implementation remains pending regression review.
 - **2026-10-07:** Added D-029–D-034 approving transport-preserving normal loading, per-generation gameplay admission, recursive control-only packet gating, discard-not-buffer behavior, centralized world reset, verified `WorldLoadCompleted` semantics, final-`Ready` admission, and the host-pause-or-catch-up prerequisite. The prior intentional disconnect/reconnect design remains historical verified behavior and fallback, not the desired normal path.

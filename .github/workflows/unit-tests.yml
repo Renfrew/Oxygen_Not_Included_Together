@@ -1,0 +1,40 @@
+name: Unit Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shared-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.401
+
+      - name: Restore tests
+        run: dotnet restore tests/Shared.Tests/Shared.Tests.csproj
+
+      - name: Build tests
+        run: dotnet build tests/Shared.Tests/Shared.Tests.csproj --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test tests/Shared.Tests/Shared.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=shared-tests.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-unit-test-results
+          path: TestResults
+          if-no-files-found: ignore
