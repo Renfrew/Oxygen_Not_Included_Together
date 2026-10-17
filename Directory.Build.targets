@@ -18,7 +18,7 @@
 		<ItemGroup>
 			<ModInfoLines Include="minimumSupportedBuild: $(TargetGameVersion)"/>
 			<ModInfoLines Include="version: $(Version)"/>
-			<ModInfoLines Include="APIVersion: 2"/>
+			<ModInfoLines Include="APIVersion: $(APIVersion)"/>
 			<ModInfoLines Include="requiredDlcIds:" Condition="'$(RequiredDlcIds)' != ''"/>
 			<ModInfoLines Include="$([System.String]::Copy('$(RequiredDlcIds)').Insert(0,' - ').Replace(',','%0a- '))" Condition="'$(RequiredDlcIds)' != ''"/>
 			<ModInfoLines Include="forbiddenDlcIds:" Condition="'$(ForbiddenDlcIds)' != ''"/>
