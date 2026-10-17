@@ -16,13 +16,31 @@ The N14 implementation commits are `ec2fcc9b`, `e6748619`, `91d664ef`, `955fee1d
 
 Non-deploying Debug and Release builds succeeded during N14. The final A9 builds each had 0 errors and 4 `MSB3277` assembly-version conflict warnings. No ONI runtime/gameplay testing was performed; these builds and source reviews are not evidence of synchronization or release readiness. Default packet registration remains best-effort and logs individual failures without rethrowing. Generic startup rollback remains deferred.
 
-## Current priority — synchronization integration testing
+## N15-B — standalone unit-test foundation
 
-**Status:** Next development focus; runtime work is deferred until the synchronization phase.
+**Status:** Implementation independently verified and ready for user commit; uncommitted at the verified point and not yet merged.
 
-**Objective:** Validate the implemented startup/session/world-load path in game, then exercise multiplayer synchronization and the relevant transport scenarios without reopening completed N14 source investigations.
+**Objective:** Establish Option 3's first isolated Level 1 test project without importing game dependencies or changing production behavior.
 
-Begin with a controlled integration run that verifies mod startup, configured transport, session entry, world load, and synchronization completion. Continue with the outstanding synchronization coverage already recorded in `STATUS.md` and the relevant domain milestones in this roadmap. Include the unresolved host-advancement/pause-coverage question and exercise applicable join, reconnect, and cross-transport paths. Record exact build/commit, scenario, result, and limitations; do not infer successful synchronization from connection-only evidence.
+The agreed verification model is Level 1 standalone unit tests, Level 2 standalone integration tests, and Level 3 in-game tests. Existing 92 in-game diagnostics migrate incrementally only when their subject can be represented faithfully outside ONI.
+
+Implemented N15-B scope:
+
+- `tests/Shared.Tests` is a separate `net10.0` xUnit project under the solution's `tests` folder.
+- It source-links the real `Shared/Replication/SnapshotTimeline.cs`, has no project references, and removes inherited game/mod references and build behavior.
+- Five `SnapshotTimeline` tests passed in Debug and Release.
+- The GitHub Actions workflow was structurally reviewed and locally validated for a clean runner, but it has not run on GitHub.
+- Production boundaries remain clean; no existing diagnostics or N15-C/D/E runtime/networking scope changed.
+
+Verification was performed on `refactor/mod-lifecycle` at unchanged HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. The implementation was unstaged/uncommitted. N15-B is not recorded as committed, merged, or CI-successful.
+
+## Current priority after N15-B integration — N15-C
+
+**Status:** Next planned test-infrastructure increment after the user commits and merges N15-B; do not begin it inside the N15-B documentation/PR.
+
+**Objective:** Continue the approved incremental test-infrastructure plan from the isolated Level 1 foundation. Preserve the three-level model, clean production boundaries, and incremental treatment of the existing 92 diagnostics. Define N15-C's exact test candidates and acceptance evidence from the authoritative repository before implementation; do not infer runtime coverage from N15-B.
+
+The previously listed synchronization integration testing remains necessary Level 3 work, but it is no longer the immediate roadmap priority after N15-B. When resumed, begin with a controlled run covering mod startup, configured transport, session entry, world load, and synchronization completion; record the exact build/commit and do not infer synchronization success from connection-only evidence.
 
 **Remaining integration/release gates:**
 
@@ -221,10 +239,11 @@ The current lifecycle/speed and session-centralization decisions may also affect
 
 ## Next-session starter prompt
 
-> In the authoritative repository, begin with development-environment setup: inspect the project configuration, ESLint setup, default settings, and related baseline tooling without changing them. Record the exact Git state and distinguish repository defaults from generated or local-only settings. Then walk through the mod lifecycle in order and test each stage as it is reviewed. Preserve the October 16 N9–N11 audit/build result as reported evidence, capture the exact commit hashes and command output if available, and treat the passing runtime result as connection-only—not as loading, synchronization, gameplay, reconnect, or release-artifact verification. Do not schedule a redundant standalone connection test unless the walkthrough reveals a reason.
+> After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
 
+- **2026-10-17:** Added the independently verified but uncommitted N15-B Option 3 foundation, its five Debug/Release `SnapshotTimeline` passes and local-only workflow validation, and changed the post-merge next priority to N15-C. Preserved synchronization integration as required Level 3 work rather than claiming it complete.
 - **2026-10-17:** Closed N14 implementation with the verified startup/framework commit series and build-only evidence; made synchronization integration testing the next development focus; recorded runtime, compliance, and exact-artifact release gates without claiming runtime verification or release readiness.
 - **2026-10-16:** Recorded the completed N9–N11 identifier-migration cleanup sequence, reported passing audit/build evidence, and the passing connection-only runtime result with strict scope limits. Replaced the immediate next-session release-preparation prompt with a development-environment-first walkthrough beginning with ESLint, default settings, and baseline tooling, followed by lifecycle-stage testing. Exact cleanup hashes and full audit/build output remain to be captured from the authoritative repository.
 - **2026-10-15 (reconciliation):** Reclassified PR #83 lifecycle/readiness as historical verified evidence, recognized the later transport-preserving lifecycle rebuild in current `develop`, converted the old unimplemented transport-preserving milestone into a deferred conformance/runtime audit, and kept PR #86 review plus legal/compliance and exact-artifact verification as the active release path.

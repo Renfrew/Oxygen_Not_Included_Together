@@ -387,6 +387,20 @@ Failure recovery follows the smallest safe scope: newer state supersedes replace
 
 For every domain compare host/client state after a known command, after a short idle interval, and after reconnect/hard sync. Paired logs include session, epoch, sequence, host tick, entity ID, command ID, and version.
 
+Verification is organized into three complementary levels:
+
+1. **Level 1 — standalone unit tests.** Test deterministic, game-independent production logic without loading ONI, Unity, Harmony, PLib, transport, or mod-packaging infrastructure. Tests may source-link narrowly selected production files into standalone test projects when this preserves the real production implementation while keeping the test assembly isolated.
+2. **Level 2 — standalone integration tests.** Exercise collaborations among game-independent multiplayer components, serialization, protocol, or other boundaries that can run outside ONI. This level is planned after the Level 1 foundation and must not be described as in-game verification.
+3. **Level 3 — in-game tests.** Retain ONI-dependent diagnostics and multiplayer runtime scenarios for Harmony/Unity/Klei integration, lifecycle ordering, transport behavior, and gameplay synchronization that cannot be established by standalone tests.
+
+The existing 92 in-game diagnostics are migrated incrementally, not replaced wholesale. Each diagnostic should move only when its subject can be tested faithfully at Level 1 or Level 2; ONI-dependent coverage stays at Level 3. Passing standalone tests do not establish mod startup, game integration, multiplayer runtime behavior, or release-artifact correctness.
+
+### N15-B standalone test-project structure
+
+The accepted Option 3 structure uses separate test projects under `tests/`, beginning with `tests/Shared.Tests`. A standalone project source-links eligible production files instead of referencing a game-dependent production project or copying production logic. This keeps production boundaries clean and allows later domain-focused test projects without forcing all tests into one assembly.
+
+The first implemented project is `Shared.Tests`, targeting `net10.0` with xUnit. It has no project references and explicitly removes inherited game/mod references and build behaviors. It source-links `Shared/Replication/SnapshotTimeline.cs`; production source is unchanged. Five `SnapshotTimeline` tests passed in both Debug and Release in the independently verified working tree. This proves the tested standalone timeline behavior and project isolation only. The GitHub Actions workflow was structurally inspected and locally validated for clean-runner use, but it has not yet run on GitHub.
+
 Minimum whole-mod scenarios cover:
 
 1. new-colony join, ready barrier, first command, disconnect;
@@ -414,6 +428,7 @@ Minimum whole-mod scenarios cover:
 | `ReactableSyncer` | Local Reactable registry and host authorization rendezvous |
 | `GameSpeedSyncer` | Revisioned ordinary pause/speed command and replay, without load-time lifecycle resync ownership |
 | Harmony patches | Observe stable vanilla boundaries and delegate; avoid owning protocol logic |
+| `tests/Shared.Tests` | Level 1 standalone xUnit coverage for eligible `Shared` production logic, using source links and no game-dependent project reference |
 
 The target code layout separates protocol, session, commands, identity, state, events, save synchronization, diagnostics, and thin ONI patches. Wire schemas should not mirror private ONI constructors or reflection signatures; version-sensitive calls stay behind adapters.
 
@@ -473,11 +488,13 @@ The maintained Project references remain `ARCHITECTURE.md`, `DECISIONS.md`, `STA
 | Milestone 2 Navigator arrival-publication investigation and runtime verification | `game mod` Project conversation plus Local game mod report | Not applicable | 2026-09-28 | Root-cause, implementation, build, and runtime evidence; exact Stop counts and sequence continuity were not traced |
 | Reactable lifecycle discussions (`Reactable Step One`, `Patch Reactable Synchronization`) | ChatGPT Project conversations | Not applicable | 2026-09-27 | Previous observations plus architectural discussion |
 | Join-overlay/readiness implementation and LiteNetLib verification | `game mod` Project session; GitHub issues #78–#81 and PR #83 | PR head `cd14ac71bccb1a960f59ba92df0a4abf8cdb1c27`; merged to `develop` as `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f` | 2026-10-07 | Source review plus single-joining-client LiteNetLib runtime evidence; Steam source-only; Riptide excluded |
+| N15-B independent verification report | `game mod` Project conversation | Working tree at verified HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle`; implementation uncommitted | 2026-10-17 | `Shared.Tests` structure/isolation review; five `SnapshotTimeline` tests passed in Debug and Release; workflow locally validated only; no ONI runtime or GitHub Actions run |
 
 `animation_sync_spec.md` is obsolete and is not evidence for this architecture.
 
 ## Revision history
 
+- **2026-10-17:** Recorded the accepted three-level verification architecture, incremental migration policy for the existing 92 diagnostics, Option 3 standalone test-project structure, and the first isolated `Shared.Tests` implementation. Preserved the evidence boundary: five `SnapshotTimeline` tests passed Debug/Release, while GitHub Actions and ONI runtime remain unverified.
 - **2026-10-17:** Recorded the completed N14 startup/framework ownership and lifecycle: PLib/configuration and asset prerequisites, persistent identity/components, Harmony activation boundary, attribute-owned patches, and best-effort packet registration. Explicitly separated build evidence from deferred runtime verification and startup rollback.
 - **2026-10-15 (reconciliation):** Reclassified the PR #83 pending-join / intentional disconnect-reconnect flow as historical verified implementation evidence rather than current lifecycle architecture. Updated the current boundary to the later transport-preserving `develop` lifecycle, preserved exact-conformance uncertainty for the October 7 generation/reset proposal, and reconciled the formerly unknown pause mechanism with the accepted one-shot host/client pause entry points while keeping full-interval advancement coverage unverified.
 - **2026-10-15:** Removed lifecycle-specific speed coupling from the accepted architecture. Kept `ReadyManager` speed-agnostic, rejected `IsSimulationLocked` and load-time `GameSpeedSyncer.RequestReSync`/guards, assigned pause initiation to the accepted host/client synchronization entry points, and specified no automatic unpause. Clarified the intended session-centralization boundary while keeping PR #86 implementation and regression status separate from accepted architecture.
