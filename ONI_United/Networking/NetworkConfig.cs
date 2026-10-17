@@ -18,6 +18,7 @@ using ONI_United.Networking.Identity;
 using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Session;
 using GameServer = ONI_United.Networking.Lifecycle.GameServer;
+using Shared.Networking;
 
 namespace ONI_United.Networking
 {
@@ -135,6 +136,8 @@ namespace ONI_United.Networking
 
         public static void UpdateTransport(NetworkTransport newTransport)
         {
+            newTransport = (NetworkTransport)TransportConfigurationMigration.NormalizeNetworkTransport((int)newTransport);
+
             if (transport.Equals(newTransport))
                 return;
             
@@ -147,12 +150,16 @@ namespace ONI_United.Networking
 
         public static void ApplyConfiguredTransport()
         {
-            UpdateTransport((NetworkTransport)Configuration.Instance.Host.NetworkTransport);
+            Configuration config = Configuration.Instance;
+            config.NormalizeTransportSettings();
+            UpdateTransport((NetworkTransport)config.Host.NetworkTransport);
         }
 
         public static void UpdateLanTransport()
         {
-            UpdateTransport((NetworkTransport)Configuration.Instance.Host.LanSettings.Transport);
+            Configuration config = Configuration.Instance;
+            config.NormalizeTransportSettings();
+            UpdateTransport((NetworkTransport)config.Host.LanSettings.Transport);
         }
 
         public static TransportServer GetTransportServer()

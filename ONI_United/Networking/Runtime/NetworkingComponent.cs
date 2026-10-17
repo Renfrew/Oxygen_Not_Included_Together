@@ -29,9 +29,7 @@ namespace ONI_United.Networking.Runtime
 					return;
 			}
 
-            if (GameServer.State == ServerState.Started &&
-                (MultiplayerSession.IsHost ||
-                 NetworkConfig.transport == NetworkConfig.NetworkTransport.RIPTIDE))
+            if (GameServer.State == ServerState.Started && MultiplayerSession.IsHost)
 			{
 				GameServer.Update();
 			}

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
+using Shared.Networking;
 using Shared.Profiling;
 using UnityEngine;
 
@@ -234,7 +235,19 @@ namespace ONI_United
 
         public void Save()
         {
+            NormalizeTransportSettings();
             POptions.WriteSettings(this);
+        }
+
+        internal bool NormalizeTransportSettings()
+        {
+            int networkTransport = Host.NetworkTransport;
+            int lanTransport = (int)Host.LanSettings.Transport;
+            bool changed = TransportConfigurationMigration.NormalizeTransportSettings(ref networkTransport, ref lanTransport);
+
+            Host.NetworkTransport = networkTransport;
+            Host.LanSettings.Transport = (LanTransportType)lanTransport;
+            return changed;
         }
 
         public IEnumerable<IOptionsEntry> CreateOptions()
@@ -244,7 +257,11 @@ namespace ONI_United
 
         public void OnOptionsChanged()
         {
+            bool changed = NormalizeTransportSettings();
             Instance = this;
+
+            if (changed)
+                Save();
         }
     }
 

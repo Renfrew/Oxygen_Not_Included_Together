@@ -708,7 +708,6 @@ namespace ONI_United.UI.Screens
 			var lanTransportOptions = new List<FCycle.Option>
 			{
 				new("LiteNetLib", "LiteNetLib", ""),
-				new("Riptide", "Riptide", ""),
 			};
 
 			var lanTransportCycle = AddOrGetLobbySettingsEntry_Cycle("LanTransport", lanTransportOptions, OnLanTransportChanged,
@@ -758,7 +757,7 @@ namespace ONI_United.UI.Screens
 			if (Enum.TryParse<LanTransportType>(option.id, out var transport))
 			{
 				var config = Configuration.Instance;
-				config.Host.LanSettings.Transport = transport;
+				config.Host.LanSettings.Transport = (LanTransportType)Shared.Networking.TransportConfigurationMigration.NormalizeLanTransport((int)transport);
 				config.Save();
 			}
 		}
