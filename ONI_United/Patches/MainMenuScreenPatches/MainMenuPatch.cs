@@ -109,7 +109,7 @@ internal static class MainMenuPatch
 			var image = logoObj.GetComponent<UnityEngine.UI.Image>();
 			if (image != null)
 			{
-				Texture2D tex = ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.oni_together_logo.png");
+				Texture2D tex = ResourceLoader.LoadEmbeddedTexture("ONI_United.Assets.ONI_United_logo.png");
 				if (tex != null)
 				{
 					Sprite newSprite = Sprite.Create(

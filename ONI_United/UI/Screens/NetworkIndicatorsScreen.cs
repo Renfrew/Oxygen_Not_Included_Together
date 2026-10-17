@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
 using ONI_United.Networking.Session;
@@ -46,13 +47,48 @@ namespace ONI_United.UI.Screens
         {
             using var _ = Profiler.Scope();
 
-            var parent = GameScreenManager.Instance.ssOverlayCanvas.transform;
-            indicators = ResourceLoader.InstantiateGameObjectFromBundle("networkindicators", "assets/networkindicators/prefabs/network indicators.prefab",
-                parent,
-                Vector3.zero, // place at bottom center of screen
-                Quaternion.identity,
-                new Vector3(0.75f, 0.75f, 0.75f));
+			const string bundleKey = "networkindicators";
+			const string prefabPath = "assets/networkindicators/prefabs/network indicators.prefab";
+			if (!MultiplayerMod.LoadedBundles.TryGetValue(bundleKey, out var bundle) || bundle == null)
+			{
+				DebugConsole.LogWarning($"Skipping optional network indicators: embedded AssetBundle '{bundleKey}' is unavailable.");
+				return;
+			}
+
+			var prefab = ResourceLoader.LoadFromBundle<GameObject>(bundleKey, prefabPath);
+			if (prefab == null)
+			{
+				DebugConsole.LogWarning($"Skipping optional network indicators: prefab '{prefabPath}' is missing from embedded AssetBundle '{bundleKey}'.");
+				return;
+			}
+
+			var parentCanvas = GameScreenManager.Instance?.ssOverlayCanvas;
+			if (parentCanvas == null)
+			{
+				DebugConsole.LogWarning("Skipping optional network indicators: the screen-space overlay canvas is unavailable.");
+				return;
+			}
+
+			indicators = UnityEngine.Object.Instantiate(
+				prefab,
+				Vector3.zero,
+				Quaternion.identity,
+				parentCanvas.transform);
+			if (indicators == null)
+			{
+				DebugConsole.LogWarning($"Skipping optional network indicators: instantiation of prefab '{prefabPath}' returned null.");
+				return;
+			}
+			indicators.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
+
             var rect = indicators.GetComponent<RectTransform>();
+			if (rect == null)
+			{
+				DebugConsole.LogWarning($"Skipping optional network indicators: instantiated prefab '{prefabPath}' has no RectTransform.");
+				UnityEngine.Object.Destroy(indicators);
+				indicators = null;
+				return;
+			}
 
             // Bottom-center anchor
             rect.anchorMin = new Vector2(0.5f, 0f);
@@ -212,4 +248,3 @@ namespace ONI_United.UI.Screens
 
     }
 }
-

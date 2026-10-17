@@ -1,0 +1,1485 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ONI_United\n"
+"POT-Creation-Date: 2026-10-17 01:10+0000\n"
+"PO-Revision-Date: 2026-10-17 01:10+0000\n"
+"Last-Translator: Multiplayer ONI United Team\n"
+"Language-Team: zh\n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Copilot SDK\n"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.A_HOST_SETTINGS"
+msgid "Host Settings"
+msgstr "主机设置"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.B_CLIENT_SETTINGS"
+msgid "Client Settings"
+msgstr "客户端设置"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS"
+msgid "General Network Settings"
+msgstr "通用网络设置"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.D_CURSOR_SETTINGS"
+msgid "Cursor Settings"
+msgstr "光标设置"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.E_MISC_SETTINGS"
+msgid "Misc Settings"
+msgstr "杂项设置"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.SERVER_SETTINGS"
+msgid "Server Settings"
+msgstr "服务器设置"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid "Max Messages Per Poll"
+msgstr "每次轮询的最大消息数"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SAVE_FILE_TRANSFER_CHUNK"
+msgid "Save Chunk Size (KB)"
+msgstr "存档数据块大小（KB）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START"
+msgid "Hard Sync On Cycle Start"
+msgstr "周期开始时强制同步"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.TIMEOUT_SECONDS"
+msgid "Connection Timeout (seconds)"
+msgstr "连接超时（秒）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT"
+msgid "Pause Simulation On Player Disconnect"
+msgstr "玩家断开时暂停模拟"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE"
+msgid "Server Tick Rate"
+msgstr "服务器 Tick 频率"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CLIENT_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid "Max Messages Per Poll"
+msgstr "每次轮询的最大消息数"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CLIENT_SETTINGS.TIMEOUT_SECONDS"
+msgid "Connection Timeout (seconds)"
+msgstr "连接超时（秒）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE"
+msgid "Enable Packet Queue"
+msgstr "启用数据包队列"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.MAX_PACKETS_PER_SECOND"
+msgid "Max Packets Per Second"
+msgstr "每秒最大数据包数"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.BYPASS_PROTOCOL_CHECKS"
+msgid "Bypass Protocol Checks"
+msgstr "绕过协议检查"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CURSOR_SETTINGS.RANDOM_COLOR"
+msgid "Use Random Color"
+msgstr "使用随机颜色"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CURSOR_SETTINGS.CURSOR_COLOR"
+msgid "Cursor Color"
+msgstr "光标颜色"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.PUFT_LOADINGSCREEN"
+msgid "Use Puft Loading Icon"
+msgstr "使用帕夫特加载图标"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.LOADINGSCREEN_COLOR"
+msgid "Use Custom Loading Screen Color"
+msgstr "使用自定义加载界面颜色"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.USE_DISCORD_RICH_PRESENCE"
+msgid "Use Discord Rich Presence"
+msgstr "启用 Discord Rich Presence"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT"
+msgid "Lan Transport"
+msgstr "局域网传输方式"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME"
+msgid "Lan Display Name"
+msgstr "局域网显示名称"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid ""
+"STEAMWORKS ONLY:\n"
+"Maximum number of incoming Steam networking messages processed per poll tick on the server.\n"
+"Higher values reduce latency spikes under heavy traffic but may increase CPU usage per frame.\n"
+"Lower values improve frame stability but can increase message backlog and delay processing during bursts.\n"
+"\n"
+"Recommended range: 32–128 (default: 128)"
+msgstr ""
+"仅限 STEAMWORKS：\n"
+"服务器每次轮询处理的 Steam 入站网络消息上限。\n"
+"较高值可降低高流量时的延迟峰值，但可能增加每帧 CPU 占用。\n"
+"较低值可提高帧稳定性，但可能造成消息积压并延迟突发流量的处理。\n"
+"\n"
+"推荐范围：32–128（默认：128）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SAVE_FILE_TRANSFER_CHUNK"
+msgid ""
+"Size (in kilobytes) of each data chunk used when transferring save files over the network.\n"
+"Smaller values reduce bandwidth spikes and improve reliability on unstable connections but increase transfer time due to more packets.\n"
+"Larger values speed up transfers but may cause higher bandwidth bursts or fragmentation.\n"
+"\n"
+"Recommended range: 16–256 KB (default: 256 KB)."
+msgstr ""
+"通过网络传输存档时每个数据块的大小（KB）。\n"
+"较小值可降低带宽峰值并提高不稳定连接下的可靠性，但会因数据包增多而延长传输时间。\n"
+"较大值可加快传输，但可能造成更高的带宽突发或数据分片。\n"
+"\n"
+"推荐范围：16–256 KB（默认：256 KB）。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START"
+msgid ""
+"Perform a hard sync at the start of every new cycle\n"
+"\n"
+"Does not use up your one hard sync per cycle"
+msgstr ""
+"在每个新周期开始时执行强制同步\n"
+"\n"
+"不会占用每周期一次的手动强制同步次数"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.TIMEOUT_SECONDS"
+msgid ""
+"How long the server waits (in seconds) for a response from a connecting or loading client before timing out.\n"
+"Increase this if your friends take a long time to load into the game.\n"
+"\n"
+"Minimum: 30. (default: 30)"
+msgstr ""
+"服务器等待正在连接或加载的客户端响应的时间（秒），超时后将断开。\n"
+"如果好友进入游戏需要较长时间，请增大此值。\n"
+"\n"
+"最小值：30（默认：30）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT"
+msgid ""
+"Automatically pauses the simulation when a player disconnects from the "
+"server."
+msgstr "玩家与服务器断开连接时自动暂停模拟。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE"
+msgid ""
+"How many times per second the server processes incoming network messages.\n"
+"Higher values reduce latency but increase CPU and bandwidth usage.\n"
+"\n"
+"Range: 20–128 TPS (default: 60)"
+msgstr ""
+"服务器每秒处理入站网络消息的次数。\n"
+"较高值可降低延迟，但会增加 CPU 和带宽使用量。\n"
+"\n"
+"范围：20–128 TPS（默认：60）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CLIENT_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid ""
+"STEAMWORKS ONLY:\n"
+"Maximum number of incoming Steam networking messages processed per poll tick on the client.\n"
+"Higher values reduce input and state update latency under heavy network load but may increase per-frame CPU usage.\n"
+"Lower values improve frame stability but can cause message backlog and delayed processing during traffic spikes.\n"
+"\n"
+"Recommended range: 8–64 (default: 16)"
+msgstr ""
+"仅限 STEAMWORKS：\n"
+"客户端每次轮询处理的 Steam 入站网络消息上限。\n"
+"网络负载较高时，较高值可降低输入和状态更新延迟，但可能增加每帧 CPU 占用。\n"
+"较低值可提高帧稳定性，但可能造成消息积压，并在流量峰值时延迟处理。\n"
+"\n"
+"推荐范围：8–64（默认：16）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CLIENT_SETTINGS.TIMEOUT_SECONDS"
+msgid ""
+"How long the client waits (in seconds) for a response from the server before timing out.\n"
+"Increase this if you are timing out while trying to connect.\n"
+"\n"
+"Minimum: 30. (default: 30)"
+msgstr ""
+"客户端等待服务器响应的时间（秒），超时后将断开。\n"
+"如果连接时经常超时，请增大此值。\n"
+"\n"
+"最小值：30（默认：30）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE"
+msgid ""
+"When enabled, outgoing packets are queued and sent at a limited rate per frame to prevent network saturation.\n"
+"When disabled, all packets are sent immediately without throttling."
+msgstr ""
+"启用后，出站数据包会排入队列，并按每帧限制的速率发送，以防网络饱和。\n"
+"禁用后，所有数据包会立即发送，不进行限流。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.MAX_PACKETS_PER_SECOND"
+msgid ""
+"Maximum number of packets to send per second per connection when the packet queue is enabled.\n"
+"Excess packets are buffered and sent in subsequent frames.\n"
+"\n"
+"Ranges: (500 - 1000)"
+msgstr ""
+"启用数据包队列时，每个连接每秒发送的数据包上限。\n"
+"超出的数据包会被缓冲，并在后续帧中发送。\n"
+"\n"
+"范围：（500 - 1000）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.BYPASS_PROTOCOL_CHECKS"
+msgid ""
+"Ignores protocol version, packet registry fingerprint, and mod version mismatches during connection handshake.\n"
+"\n"
+"Use this only for cross-platform testing between Debug and Release builds."
+msgstr ""
+"连接握手期间忽略协议版本、数据包注册表指纹和模组版本不匹配。\n"
+"\n"
+"仅用于 Debug 与 Release 构建之间的跨平台测试。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CURSOR_SETTINGS.RANDOM_COLOR"
+msgid "Select a random color for your cursor during online sessions."
+msgstr "在联机会话中为光标随机选择颜色。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CURSOR_SETTINGS.CURSOR_COLOR"
+msgid ""
+"The color of your player cursor for yourself during an online session\n"
+"(visible to other players in the session)"
+msgstr ""
+"联机会话中你的玩家光标颜色\n"
+"（会话中的其他玩家也能看到）"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.PUFT_LOADINGSCREEN"
+msgid "Override the loading icon with a Puft."
+msgstr "用帕夫特替换加载图标。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.LOADINGSCREEN_COLOR"
+msgid "Override the purple background of the loading screen with turquoise."
+msgstr "将加载界面的紫色背景替换为青绿色。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.USE_DISCORD_RICH_PRESENCE"
+msgid ""
+"Enables Discord Rich Presence integration, showing your current game state "
+"(colony name, cycle, asteroid) on your Discord profile."
+msgstr "启用 Discord Rich Presence 集成，在 Discord 个人资料中显示当前游戏状态（殖民地名称、周期和小行星）。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT"
+msgid ""
+"Which network library is used for LAN games.\n"
+"\n"
+"LiteNetLib is the modern default transport. Riptide is the legacy LAN transport."
+msgstr ""
+"局域网游戏使用的网络库。\n"
+"\n"
+"LiteNetLib 是较新的默认传输方式，Riptide 是旧版局域网传输方式。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME"
+msgid ""
+"The name shown to other players when they discover or join your LAN game.\n"
+"Leave empty to default to 'Player <id>'."
+msgstr ""
+"其他玩家发现或加入你的局域网游戏时看到的名称。\n"
+"留空时使用默认名称“Player <id>”。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.NO_METADATA"
+msgid "Peer is running a build without protocol metadata."
+msgstr "对端运行的构建不包含协议元数据。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH"
+msgid "Protocol mismatch. Host={0}, Peer={1}."
+msgstr "协议不匹配。主机={0}，对端={1}。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH"
+msgid "Packet registry mismatch. Host={0}, Peer={1}."
+msgstr "数据包注册表不匹配。主机={0}，对端={1}。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH"
+msgid "Mod version mismatch. Host={0}, Peer={1}."
+msgstr "模组版本不匹配。主机={0}，对端={1}。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.INCOMPATIBLE"
+msgid "Peer is running an incompatible build."
+msgstr "对端运行的构建不兼容。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.TITLE"
+msgid "Protocol mismatch"
+msgstr "协议不匹配"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.NO_METADATA"
+msgid ""
+"The host is running a build without protocol metadata. Update both peers to "
+"the same build."
+msgstr "主机运行的构建不包含协议元数据。请将双方更新到同一构建版本。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.REJECTED"
+msgid "The host rejected this client due to an incompatible network protocol."
+msgstr "由于网络协议不兼容，主机拒绝了此客户端。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.PROTOCOL_MISMATCH"
+msgid "Host protocol={0}, client protocol={1}."
+msgstr "主机协议={0}，客户端协议={1}。"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.FINGERPRINT_MISMATCH"
+msgid "Host packet fingerprint={0}, client fingerprint={1}."
+msgstr "主机数据包指纹={0}，客户端指纹={1}。"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.MULTIPLAYER_SESSION_TITLE"
+msgid "Multiplayer Session"
+msgstr "多人会话"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.LOBBY_CODE"
+msgid "Lobby Code:"
+msgstr "大厅代码："
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.COPY"
+msgid "Copy"
+msgstr "复制"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.COPIED"
+msgid "Copied!"
+msgstr "已复制！"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.CONNECTED_PLAYERS"
+msgid "Connected Players: {0}"
+msgstr "已连接玩家：{0}"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.TITLE"
+msgid "Public Lobby Browser"
+msgstr "公开大厅浏览器"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.COLONY"
+msgid "Colony"
+msgstr "殖民地"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.HOST"
+msgid "Host"
+msgstr "主机"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PLAYERS"
+msgid "Players"
+msgstr "玩家"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.CYCLE"
+msgid "Cycle"
+msgstr "周期"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.DUPES"
+msgid "Dupes"
+msgstr "复制人"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PING"
+msgid "Ping"
+msgstr "延迟"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BY_CODE"
+msgid "Join by Code"
+msgstr "按代码加入"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.BACK"
+msgid "Back"
+msgstr "返回"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES"
+msgid "Loading Lobbies..."
+msgstr "正在加载大厅..."
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.NO_PUBLIC_LOBBIES_FOUND"
+msgid "No public lobbies found. Try hosting your own!"
+msgstr "未找到公开大厅。试试自己开一个吧！"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.FOUND_X_LOBBIES"
+msgid "Found {0} joinable lobby(s)"
+msgstr "找到 {0} 个可加入的大厅"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON"
+msgid "Join"
+msgstr "加入"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.FRIEND_ONLY"
+msgid "Friends Only"
+msgstr "仅好友"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_REQUIRED"
+msgid "Password Required"
+msgstr "需要密码"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_INCORRECT"
+msgid "Incorrect password"
+msgstr "密码错误"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.CANCEL"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.REFRESH"
+msgid "Refresh"
+msgstr "刷新"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.SEARCH"
+msgid "{0} Search..."
+msgstr "搜索{0}..."
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.HOST_LOBBY_SETTINGS"
+msgid "Host Lobby Settings"
+msgstr "主机大厅设置"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY"
+msgid "Lobby Visibility:"
+msgstr "大厅可见性："
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY_PUBLIC"
+msgid "Public"
+msgstr "公开"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY_FRIENDSONLY"
+msgid "Friends Only"
+msgstr "仅好友"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.PASSWORD_TITLE"
+msgid "Password (optional):"
+msgstr "密码（可选）："
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.PASSWORD_NOTE"
+msgid "Leave empty for no password"
+msgstr "留空表示不设密码"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.CONTINUE"
+msgid "Continue"
+msgstr "继续"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.CANCEL"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_SIZE"
+msgid "Lobby Size:"
+msgstr "大厅人数："
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOIN_BY_CODE"
+msgid "Join By Code"
+msgstr "按代码加入"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ENTER_LOBBY_CODE"
+msgid "Enter Lobby Code:"
+msgstr "输入大厅代码："
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.DEFAULT_CODE"
+msgid "XXXX-XXXX"
+msgstr "XXXX-XXXX"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.PASSWORD_REQUIRED"
+msgid "Password Required:"
+msgstr "需要密码："
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ENTER_PASSWORD"
+msgid "Enter password"
+msgstr "输入密码"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOIN"
+msgid "Join"
+msgstr "加入"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.CANCEL"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE"
+msgid "Please enter a lobby code"
+msgstr "请输入大厅代码"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE"
+msgid "Invalid lobby code format"
+msgstr "大厅代码格式无效"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED"
+msgid "Could not parse lobby code"
+msgstr "无法解析大厅代码"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.CHECKING_LOBBY"
+msgid "Checking lobby..."
+msgstr "正在检查大厅..."
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.LOBBY_REQUIRES_PASSWORD"
+msgid "This lobby requires a password"
+msgstr "此大厅需要密码"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ENTER_PASSWORD"
+msgid "Please enter the password"
+msgstr "请输入密码"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ERR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "密码错误"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOINING"
+msgid "Joining..."
+msgstr "正在加入..."
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.TITLE"
+msgid "Multiplayer"
+msgstr "多人游戏"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD"
+msgid "Host World"
+msgstr "托管世界"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR"
+msgid "Select a save to host"
+msgstr "选择要托管的存档"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES"
+msgid "Browse Lobbies"
+msgstr "浏览大厅"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR"
+msgid "Find public games to join"
+msgstr "查找可加入的公开游戏"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE"
+msgid "Join by code"
+msgstr "按代码加入"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR"
+msgid "Enter a lobby code"
+msgstr "输入大厅代码"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM"
+msgid "Join via Steam"
+msgstr "通过 Steam 加入"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR"
+msgid "Find friends playing"
+msgstr "查找正在游玩的好友"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BACK"
+msgid "Back"
+msgstr "返回"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.JOINGAME"
+msgid "JOIN GAME"
+msgstr "加入游戏"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO"
+msgid ""
+"Join Multiplayer: ONI United\n"
+"on Discord"
+msgstr ""
+"在 Discord 上\n"
+"加入 Multiplayer: ONI United"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL"
+msgid "MULTIPLAYER"
+msgstr "多人游戏"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.MULTIPLAYER.LABEL"
+msgid "Multiplayer"
+msgstr "多人游戏"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HOSTGAME.LABEL"
+msgid "Host Game"
+msgstr "创建主机"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.INVITE.LABEL"
+msgid "Invite Friends"
+msgstr "邀请好友"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.DOHARDSYNC.LABEL"
+msgid "Perform Hard Sync"
+msgstr "执行强制同步"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HARDSYNCNOTAVAILABLE.LABEL"
+msgid "Already hard synced this cycle!"
+msgstr "本周期已执行过强制同步！"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.ENDSESSION.LABEL"
+msgid "End Session"
+msgstr "结束会话"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.LEAVESESSION.LABEL"
+msgid "Leave Session"
+msgstr "离开会话"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED"
+msgid "Chat initialized."
+msgstr "聊天已初始化。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_REJECTED"
+msgid "<color=red>{0} was rejected due to mod incompatibility: {1}</color>"
+msgstr "<color=red>{0} 因模组不兼容而被拒绝：{1}</color>"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED"
+msgid "<b>{0}</b> joined the game."
+msgstr "<b>{0}</b> 加入了游戏。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT"
+msgid "<b>{0}</b> left the game."
+msgstr "<b>{0}</b> 离开了游戏。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_FAILED"
+msgid "<color=red>{0} failed to connect to the server.</color>"
+msgstr "<color=red>{0} 连接服务器失败。</color>"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED"
+msgid "Started server over <b>{0}</b>"
+msgstr "通过 <b>{0}</b> 启动服务器"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED"
+msgid "Stopped <b>{0}</b> server"
+msgstr "已停止 <b>{0}</b> 服务器"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.RESIZE.EXPAND"
+msgid "Chat (+)"
+msgstr "聊天 (+)"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.RESIZE.RETRACT"
+msgid "Chat (-)"
+msgstr "聊天 (-)"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.HOST.STARTINGHOSTING"
+msgid "Hosting game..."
+msgstr "正在托管游戏..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.HOST.SEND_SAVE_FILE"
+msgid ""
+"Sending save file to a client!\n"
+"Please wait..."
+msgstr ""
+"正在向客户端发送存档！\n"
+"请稍候..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_GAME"
+msgid "Downloading world: {0}%"
+msgstr "正在下载世界：{0}%"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DEFAULT_LOST_CONNECTION"
+msgid ""
+msgstr ""
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION"
+msgid "Connection to the host was lost!"
+msgstr "与主机的连接已丢失！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LOST_CONNECTION"
+msgid ""
+"Connection to the host was lost: {0}\n"
+"{1}"
+msgstr ""
+"与主机的连接已丢失：{0}\n"
+"{1}"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED"
+msgid "Host disconnected"
+msgstr "主机已断开"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC"
+msgid "The host has ended the game or returned to the menu."
+msgstr "主机已结束游戏或返回菜单。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM"
+msgid "Connection lost"
+msgstr "连接中断"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC"
+msgid "A network error occurred or the connection timed out."
+msgstr "发生网络错误或连接超时。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.KICKED"
+msgid "Kicked from server"
+msgstr "已被服务器踢出"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.KICKED_DESC"
+msgid "You were removed from the session."
+msgstr "你已被移出会话。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN"
+msgid "Disconnected"
+msgstr "已断开"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN_DESC"
+msgid "An unknown network error occurred."
+msgstr "发生未知网络错误。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED"
+msgid "Connection failed"
+msgstr "连接失败"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED_DESC"
+msgid "Could not establish a connection to the server."
+msgstr "无法与服务器建立连接。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED"
+msgid "Connection rejected"
+msgstr "连接被拒绝"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED_DESC"
+msgid "The server refused the connection."
+msgstr "服务器拒绝了连接。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR"
+msgid "Network error"
+msgstr "网络错误"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR_DESC"
+msgid "A network error occurred."
+msgstr "发生网络错误。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT"
+msgid "Connection timed out"
+msgstr "连接超时"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT_DESC"
+msgid "The server did not respond in time."
+msgstr "服务器未及时响应。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED"
+msgid "Kicked from server"
+msgstr "已被服务器踢出"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED_DESC"
+msgid "You were removed from the session."
+msgstr "你已被移出会话。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED"
+msgid "Server closed"
+msgstr "服务器已关闭"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED_DESC"
+msgid "The host has stopped the server."
+msgstr "主机已停止服务器。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE"
+msgid "Connection unstable"
+msgstr "连接不稳定"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE_DESC"
+msgid "The connection quality was too poor to continue."
+msgstr "连接质量过差，无法继续。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN"
+msgid "Disconnected"
+msgstr "已断开"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN_DESC"
+msgid "An unknown network error occurred."
+msgstr "发生未知网络错误。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED"
+msgid "Connection failed"
+msgstr "连接失败"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC"
+msgid "Could not establish a connection to the host."
+msgstr "无法与主机建立连接。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED"
+msgid "Connection rejected"
+msgstr "连接被拒绝"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC"
+msgid "The host refused the connection."
+msgstr "主机拒绝了连接。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED"
+msgid "Host disconnected"
+msgstr "主机已断开"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC"
+msgid "The host has closed the game or ended the session."
+msgstr "主机已关闭游戏或结束会话。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT"
+msgid "Connection timed out"
+msgstr "连接超时"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC"
+msgid "Lost connection to the host. No response received."
+msgstr "与主机的连接已丢失。未收到响应。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.KICKED"
+msgid "Kicked from server"
+msgstr "已被服务器踢出"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.KICKED_DESC"
+msgid "You were disconnected by the host."
+msgstr "你已被主机断开连接。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN"
+msgid "Disconnected"
+msgstr "已断开"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC"
+msgid "Disconnected from host."
+msgstr "已与主机断开连接。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MISSING_SAVE_FILE"
+msgid "Downloaded save file not found."
+msgstr "未找到已下载的存档文件。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST"
+msgid "Connecting to {0}!"
+msgstr "正在连接到 {0}！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.WAITING_FOR_PLAYER"
+msgid "Waiting for {0}..."
+msgstr "正在等待 {0}..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE"
+msgid ""
+"Downloading Save File\n"
+"\n"
+"{0} {1}%\n"
+"({2}/{3} chunks)"
+msgstr ""
+"正在下载存档\n"
+"\n"
+"{0} {1}%\n"
+"（{2}/{3} 个数据块）"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE"
+msgid ""
+"Downloading LAN Save File\n"
+"\n"
+"{0} {1}%\n"
+"({2} remaining)"
+msgstr ""
+"正在下载局域网存档\n"
+"\n"
+"{0} {1}%\n"
+"（剩余 {2}）"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOAD_COMPLETE"
+msgid ""
+"Download Complete!\n"
+"\n"
+"{0} 100%\n"
+"({1}/{2} chunks)\n"
+"\n"
+"Loading world..."
+msgstr ""
+"下载完成！\n"
+"\n"
+"{0} 100%\n"
+"（{1}/{2} 个数据块）\n"
+"\n"
+"正在加载世界..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTION_FAILED"
+msgid "Failed to connect to host."
+msgstr "连接主机失败。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_JITTER"
+msgid "Network jitter is elevated"
+msgstr "网络抖动偏高"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_LATENCY"
+msgid "Latency is elevated"
+msgstr "延迟偏高"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_PACKETLOSS"
+msgid "Packet loss detected"
+msgstr "检测到丢包"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_SERVERPERFORMANCE"
+msgid "Server performance is reduced"
+msgstr "服务器性能下降"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_JITTER"
+msgid "Network jitter is very high"
+msgstr "网络抖动非常严重"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_LATENCY"
+msgid "Latency is very high"
+msgstr "延迟非常高"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_PACKETLOSS"
+msgid "Severe packet loss detected"
+msgstr "检测到严重丢包"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_SERVERPERFORMANCE"
+msgid "Server performance is critically low"
+msgstr "服务器性能严重不足"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.HARDSYNC_INPROGRESS"
+msgid "Hard sync in progress!"
+msgstr "正在进行强制同步！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC"
+msgid ""
+"All players are ready!\n"
+"Please wait..."
+msgstr ""
+"所有玩家均已准备就绪！\n"
+"请稍候..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC"
+msgid "Waiting for players ({0}/{1} ready)...\n"
+msgstr "正在等待玩家（{0}/{1} 已就绪）...\n"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_PROGRESS"
+msgid "Client Sync Progress"
+msgstr "客户端同步进度"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_PROGRESS"
+msgid "{0}: {1} {2}%"
+msgstr "{0}: {1} {2}%"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_CHUNK_SYNC_DATA"
+msgid "({0}/{1})"
+msgstr "({0}/{1})"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_COMPLETE"
+msgid "[COMPLETE]"
+msgstr "[COMPLETE]"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.ALL_CLIENTS_SYNCED"
+msgid ""
+"ALL CLIENTS SYNCHRONIZED!\n"
+"WAITING FOR THEM TO LOAD!"
+msgstr ""
+"所有客户端已同步！\n"
+"正在等待其加载！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED"
+msgid "|"
+msgstr "|"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY"
+msgid " "
+msgstr " "
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR"
+msgid "[{0}]"
+msgstr "[{0}]"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY"
+msgid "Ready"
+msgstr "已就绪"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY"
+msgid "Loading"
+msgstr "加载中"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN"
+msgid "Unknown"
+msgstr "未知"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_BASEGAME"
+msgid "Server requires Spaced Out, cannot join without SpacedOut active!"
+msgstr "服务器需要 Spaced Out，未启用 SpacedOut 时无法加入！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_SPACEDOUT"
+msgid "Server requires Base Game, cannot join with Spaced Out active!"
+msgstr "服务器需要基础游戏，启用 Spaced Out 时无法加入！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_LISTHEADER"
+msgid "Server requires the following DLCs which are not installed or active:"
+msgstr "服务器需要以下尚未安装或启用的 DLC："
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE"
+msgid "Mod Differences Detected!"
+msgstr "检测到模组差异！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TEXT"
+msgid ""
+"The game you want to join has different mods active than you.\n"
+"Do you want to synchronize your mods?"
+msgstr ""
+"你要加入的游戏启用了与你不同的模组。\n"
+"是否要同步模组？"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TODISABLE"
+msgid "• {0} mods will be disabled"
+msgstr "• 将禁用 {0} 个模组"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TOENABLE"
+msgid "• {0} mods will be enabled"
+msgstr "• 将启用 {0} 个模组"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.MISSING"
+msgid "• {0} mods are missing and will be subscribed to."
+msgstr "• 缺少 {0} 个模组，将自动订阅。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC"
+msgid "Yes, synchronize my mods and restart"
+msgstr "是，同步模组并重启"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.DENY_SYNC"
+msgid "No, connect anyway"
+msgstr "否，仍然连接"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL"
+msgid "No, go back to the main menu"
+msgstr "否，返回主菜单"
+
+msgctxt "ONI_United.STRINGS.UI.WORK_IN_PROGRESS"
+msgid ""
+"This feature is currently not finished and will be made usable in a future "
+"update."
+msgstr "此功能尚未完成，将在未来更新中开放使用。"
+
+msgctxt "ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_PUBLIC"
+msgid "Public"
+msgstr "公开"
+
+msgctxt "ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_FRIENDSONLY"
+msgid "Friends Only"
+msgstr "仅好友"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.LINK_IN_CHAT.TEXT"
+msgid "Link in Chat"
+msgstr "在聊天中链接"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.LINK_IN_CHAT.TOOLTIP"
+msgid "Links this object in the multiplayer chat window."
+msgstr "在多人聊天窗口中插入此对象的链接。"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TEXTINPUT.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Text..."
+msgstr "输入文本..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.LABEL"
+msgid "Chat"
+msgstr "聊天"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.TOOLTIP"
+msgid "Toggle the Multiplayer: ONI United chat window."
+msgstr "切换 Multiplayer: ONI United 聊天窗口。"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.TEXT"
+msgid "Settings"
+msgstr "设置"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT.RESETPOS.LABEL"
+msgid "Reset Position"
+msgstr "重置位置"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT.RESETSIZE.LABEL"
+msgid "Reset Size"
+msgstr "重置大小"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.HOSTINGTITLE"
+msgid "Hosting"
+msgstr "正在托管"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.HOSTGAMEBUTTON.TEXT"
+msgid "Host Game"
+msgstr "创建主机"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOININGTITLE"
+msgid "Joining"
+msgstr "正在加入"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.STEAM.TEXT"
+msgid "Steam"
+msgstr "Steam"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.CODE.TEXT"
+msgid "Code"
+msgstr "代码"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.LAN.TEXT"
+msgid "LAN"
+msgstr "LAN"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.STEAMJOIN.JOINVIASTEAM.TEXT"
+msgid "Join via Steam"
+msgstr "通过 Steam 加入"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.STEAMJOIN.OPENLOBBYLISTBUTTON.TEXT"
+msgid "Open Lobby Browser"
+msgstr "打开大厅浏览器"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Lobby Code..."
+msgstr "输入大厅代码..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.INPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.JOINWITHCODEBUTTON.TEXT"
+msgid "Join with Code"
+msgstr "使用代码加入"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.IPINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter IP address..."
+msgstr "输入 IP 地址..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.IPINPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.PORT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Port..."
+msgstr "输入端口..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.PORT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.JOINLANBUTTON.TEXT"
+msgid "Join LAN address"
+msgstr "加入局域网地址"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.TITLE"
+msgid "Host Lobby Settings"
+msgstr "主机大厅设置"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.HOSTVIABUTTONS.STEAM.TEXT"
+msgid "Steam Session"
+msgstr "Steam 会话"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.HOSTVIABUTTONS.LAN.TEXT"
+msgid "LAN Session"
+msgstr "局域网会话"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LABEL"
+msgid "Lobby Size:"
+msgstr "大厅人数："
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LOBBYSIZEINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Lobby Size..."
+msgstr "输入大厅人数..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LOBBYSIZEINPUT.TEXTAREA.TEXT"
+msgid "4​"
+msgstr "4​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.FRIENDSONLY.LABEL"
+msgid "Private Lobby:"
+msgstr "私人大厅："
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.FRIENDSONLY.STATE"
+msgid "Friends Only"
+msgstr "仅好友"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORD.PASSWORDTITLE"
+msgid "Password (optional):"
+msgstr "密码（可选）："
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORDINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Leave empty for no password"
+msgstr "留空表示不设密码"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORDINPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.LABEL"
+msgid "Host IP:"
+msgstr "主机 IP："
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter IP address..."
+msgstr "输入 IP 地址..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.INPUT.TEXTAREA.TEXT"
+msgid "127.0.0.1​"
+msgstr "127.0.0.1​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.LABEL"
+msgid "Port"
+msgstr "端口"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Port..."
+msgstr "输入端口..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.INPUT.TEXTAREA.TEXT"
+msgid "8080​"
+msgstr "8080​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.ADDITIONALSETTINGS.TEXT"
+msgid "Additional Lobby Settings"
+msgstr "其他大厅设置"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.BUTTONS.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.BUTTONS.STARTHOSTING.TEXT"
+msgid "Start Hosting"
+msgstr "开始托管"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.TITLE"
+msgid "Public Lobby Browser"
+msgstr "公开大厅浏览器"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SEARCHBAR.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Search Lobbies..."
+msgstr "搜索大厅..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SEARCHBAR.INPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.WORLD"
+msgid "World Name"
+msgstr "世界名称"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.HOST"
+msgid "Host"
+msgstr "主机"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.PLAYERS"
+msgid "Players"
+msgstr "玩家"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.CYCLE"
+msgid "Cycle"
+msgstr "周期"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.DUPES"
+msgid "Dupes"
+msgstr "复制人"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.PING"
+msgid "Ping"
+msgstr "延迟"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SCROLLAREA.CONTENT.NOLOBBIES.LABEL"
+msgid "No public lobbies found. Try hosting your own!"
+msgstr "未找到公开大厅。试试自己开一个吧！"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SCROLLAREA.CONTENT.ENTRYPREFAB.JOINLOBBYBUTTON.TEXT"
+msgid "Join"
+msgstr "加入"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.TOPBAR.LABEL"
+msgid "Multiplayer"
+msgstr "多人游戏"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.ADDITIONALHOSTSETTINGS.TITLE"
+msgid "Additional Lobby Settings"
+msgstr "其他大厅设置"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.TITLE"
+msgid "Password Required!"
+msgstr "需要密码！"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDTITLE"
+msgid "Enter password of Lobby:"
+msgstr "输入大厅密码："
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORD_INCORRECT"
+msgid "Incorrect password!"
+msgstr "密码错误！"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter lobby password..."
+msgstr "输入大厅密码..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDINPUT.TEXTAREA.TEXT"
+msgid ""
+msgstr ""
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS.CONFIRM.TEXT"
+msgid "Confirm"
+msgstr "确认"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.TOPBAR.LABEL"
+msgid "Joining password protected lobby"
+msgstr "正在加入受密码保护的大厅"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.TOPBAR.LABEL"
+msgid "Multiplayer Session"
+msgstr "多人会话"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.LOBBYCODETITLE"
+msgid "Lobby Code:"
+msgstr "大厅代码："
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.INVITEFRIENDS.TEXT"
+msgid "Invite Friends"
+msgstr "邀请好友"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.ENDSESSION.TEXT"
+msgid "End Session"
+msgstr "结束会话"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.OBJECTS.NAME"
+msgid "Objects"
+msgstr "对象"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.OBJECTS.TOOLTIP"
+msgid "Show/hide all objects with network activity"
+msgstr "显示/隐藏所有有网络活动的对象"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.VIEWPORTS.NAME"
+msgid "Viewports"
+msgstr "视口"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.VIEWPORTS.TOOLTIP"
+msgid "Show/hide other players' camera viewports"
+msgstr "显示/隐藏其他玩家的相机视口"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.GROUPS.NAME"
+msgid "Interest Groups"
+msgstr "兴趣组"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.GROUPS.TOOLTIP"
+msgid "Show/hide network interest group regions"
+msgstr "显示/隐藏网络兴趣组区域"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME"
+msgid "Network Activity"
+msgstr "网络活动"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.DESCRIPTION"
+msgid "Shows real-time network sync activity per object"
+msgstr "按对象显示实时网络同步活动"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.BUTTON"
+msgid "Network"
+msgstr "网络"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.TOOLTIP"
+msgid "Displays network activity per object"
+msgstr "按对象显示网络活动"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_TOOLTIP"
+msgid ""
+"Usage: {0}\n"
+"Net ID: {1}\n"
+"Sync Mode: {2}\n"
+"Last synced: {3}"
+msgstr ""
+"用量：{0}\n"
+"网络 ID：{1}\n"
+"同步模式：{2}\n"
+"上次同步：{3}"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_HIGH"
+msgid "High ({0}/s)"
+msgstr "高（{0}/秒）"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_MEDIUM"
+msgid "Medium ({0}/s)"
+msgstr "中（{0}/秒）"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_LOW"
+msgid "Low ({0}/s)"
+msgstr "低（{0}/秒）"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_IDLE"
+msgid "Idle (No activity)"
+msgstr "空闲（无活动）"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_OXYSYNC"
+msgid "OxySync"
+msgstr "OxySync"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_ADHOC"
+msgid "Ad-hoc"
+msgstr "Ad-hoc"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NOW"
+msgid "just now"
+msgstr "刚刚"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_SECS"
+msgid "{0}s ago"
+msgstr "{0} 秒前"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_MINS"
+msgid "{0}m ago"
+msgstr "{0} 分钟前"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NEVER"
+msgid "never"
+msgstr "从不"

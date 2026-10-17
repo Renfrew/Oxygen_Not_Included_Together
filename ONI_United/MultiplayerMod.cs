@@ -5,8 +5,6 @@ using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
-using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Overlay;
@@ -50,14 +48,13 @@ namespace ONI_United
             new POptions().RegisterOptions(this, typeof(Configuration));
             base.OnLoad(harmony);
 
-            ModAssets.LoadAssetBundles();
-			EnsurePersistentUserId();
-
             string logPath = System.IO.Path.Combine(Application.dataPath, "../ONI_United_Log.txt");
 
 			try
 			{
 				DebugConsole.Init(); // Init console first to catch logs
+				ModAssets.LoadAssetBundles();
+				EnsurePersistentUserId();
 				PacketTracker.Init();
 				DebugConsole.Log("[ONI_Together] Loaded Multiplayer: ONI United.");
 				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
@@ -115,6 +112,7 @@ namespace ONI_United
 			{
 				DebugConsole.LogError($"[ONI_Together] CRITICAL ERROR IN ONLOAD: {ex}");
 				DebugConsole.LogException(ex);
+				return;
 			}
 
 

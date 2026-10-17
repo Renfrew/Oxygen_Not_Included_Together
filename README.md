@@ -135,8 +135,10 @@ You will need:
 - Visual Studio with C#/.NET development support
 - .NET Framework 4.7.2
 - A local installation of Oxygen Not Included
-- .NET SDK required by the assembly publicizer tooling
+- .NET SDK 10.0.401 (configured via `global.json`)
 - Git
+
+Visual Studio installations used with this repository must support .NET SDK `10.0.401`. Verify SDK support in Visual Studio Installer for your installed edition/workloads.
 
 ---
 
@@ -151,7 +153,13 @@ cd Oxygen_Not_Included_Together
 
 ## 2. Open the Solution
 
-Open the `.sln` file in Visual Studio.
+Open `ONI_United.sln` in Visual Studio, or open the repository folder in VS Code.
+
+The repository uses `global.json` at the solution root to select .NET SDK `10.0.401` with patch roll-forward.
+
+The repository also includes a minimal root `.editorconfig` for shared baseline editor behavior (encoding, line endings, and newline handling). Keep personal editor preferences in local user/editor settings.
+
+If you use VS Code, `.vscode/extensions.json` includes an optional C# extension recommendation. It is not required to build the project.
 
 ---
 
@@ -170,6 +178,8 @@ Directory.Build.props.user
 ```
 
 `Directory.Build.props.user` contains machine-specific paths and should not be committed.
+
+`Directory.Build.props.user` is intentionally local and ignored by Git. The build imports it conditionally when present.
 
 Configure `GameLibsFolder` to point to your local Oxygen Not Included managed assemblies.
 
@@ -197,6 +207,10 @@ Run:
 dotnet tool restore
 ```
 
+> macOS SSH note  
+> In non-interactive SSH sessions, `dotnet` may not be on `PATH` even when installed at `/usr/local/share/dotnet/dotnet`.  
+> Prefer standard shell initialization so SSH sessions include .NET on `PATH`, or invoke that documented executable path explicitly in automation.
+
 The project uses an assembly publicizer so internal Oxygen Not Included game APIs can be referenced during development.
 
 ### Linux
@@ -215,11 +229,23 @@ Visual Studio will normally restore packages automatically.
 
 They can also be restored manually if necessary.
 
+For CLI/VS Code workflows, run:
+
+```bash
+dotnet restore ONI_United.sln
+```
+
 ---
 
 ## 6. Build
 
 Build the solution from Visual Studio.
+
+For CLI/VS Code workflows, run:
+
+```bash
+dotnet build ONI_United.sln
+```
 
 The first build creates the publicized Oxygen Not Included reference assemblies.
 

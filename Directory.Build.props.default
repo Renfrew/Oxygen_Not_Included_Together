@@ -1,10 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Instead of modifying this file, create a copy named Directory.Build.props.user and modify it to match the paths in your installation -->
 <Project>
-	<PropertyGroup>
-		<!--Gamedata Folder, adjust to your own ONI installation-->
-		<GameLibsFolder>E:\SteamLibrary\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed</GameLibsFolder>
-		<!--OutputModFolder, adjust it to your own dev folder-->
-		<ModFolder>$(UserProfile)\Documents\Klei\OxygenNotIncluded\mods\dev</ModFolder>
-	</PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <!-- Windows defaults -->
+    <GameFolderDefault>E:/SteamLibrary/steamapps/common/OxygenNotIncluded</GameFolderDefault>
+    <AssemblyFolder>OxygenNotIncluded_Data/Managed</AssemblyFolder>
+    <DevModsFolder>Klei/OxygenNotIncluded/mods/dev</DevModsFolder>
+
+    <!-- Registry lookup is evaluated only on full MSBuild (Visual Studio MSBuild.exe). -->
+    <GameFolderRegistryPrimary Condition="'$(MSBuildRuntimeType)' == 'Full'">$([MSBuild]::GetRegistryValue('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 457140', 'InstallLocation'))</GameFolderRegistryPrimary>
+    <GameFolderRegistrySecondary Condition="'$(MSBuildRuntimeType)' == 'Full'">$([MSBuild]::GetRegistryValue('HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 457140', 'InstallLocation'))</GameFolderRegistrySecondary>
+    <GameFolderRegistry Condition="'$(GameFolderRegistry)' == '' and '$(GameFolderRegistryPrimary)' != ''">$(GameFolderRegistryPrimary)</GameFolderRegistry>
+    <GameFolderRegistry Condition="'$(GameFolderRegistry)' == '' and '$(GameFolderRegistrySecondary)' != ''">$(GameFolderRegistrySecondary)</GameFolderRegistry>
+
+    <GameFolderRegistryManaged Condition="'$(GameFolderRegistry)' != ''">$(GameFolderRegistry)/$(AssemblyFolder)</GameFolderRegistryManaged>
+    <GameFolderRegistryValid Condition="'$(GameFolderRegistryManaged)' != '' and Exists('$(GameFolderRegistryManaged)/Assembly-CSharp.dll') and Exists('$(GameFolderRegistryManaged)/Assembly-CSharp-firstpass.dll') and Exists('$(GameFolderRegistryManaged)/UnityEngine.CoreModule.dll')">true</GameFolderRegistryValid>
+    <GameFolderDefaultManaged>$(GameFolderDefault)/$(AssemblyFolder)</GameFolderDefaultManaged>
+    <GameFolderDefaultValid Condition="Exists('$(GameFolderDefaultManaged)/Assembly-CSharp.dll') and Exists('$(GameFolderDefaultManaged)/Assembly-CSharp-firstpass.dll') and Exists('$(GameFolderDefaultManaged)/UnityEngine.CoreModule.dll')">true</GameFolderDefaultValid>
+
+    <GameInstallFolder Condition="'$(GameFolderRegistryValid)' == 'true'">$(GameFolderRegistry)</GameInstallFolder>
+    <GameInstallFolder Condition="'$(GameInstallFolder)' == ''">$(GameFolderDefault)</GameInstallFolder>
+
+    <GameFolder>$(GameInstallFolder)/$(AssemblyFolder)</GameFolder>
+    <GameLibsFolder>$(GameFolder)</GameLibsFolder>
+
+    <DocumentsFolder Condition="'$(USERPROFILE)' != ''">$(USERPROFILE)/Documents</DocumentsFolder>
+    <DocumentsFolder Condition="'$(DocumentsFolder)' == '' and '$(HOMEDRIVE)' != '' and '$(HOMEPATH)' != ''">$(HOMEDRIVE)$(HOMEPATH)/Documents</DocumentsFolder>
+    <DocumentsFolder Condition="'$(DocumentsFolder)' == '' and '$(USERNAME)' != ''">C:/Users/$(USERNAME)/Documents</DocumentsFolder>
+    <ModFolder>$(DocumentsFolder)/$(DevModsFolder)</ModFolder>
+  </PropertyGroup>
+
+  <Target Name="ValidateOniWindowsPath"
+          BeforeTargets="ResolveReferences"
+          Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(DoNotBuildAsMod)' != 'true' and '$(DesignTimeBuild)' != 'true' and '$(SkipOniPathValidation)' != 'true'">
+    <Error Condition="'$(GameFolderRegistryValid)' != 'true' and '$(GameFolderDefaultValid)' != 'true'"
+           Text="Unable to locate a valid Oxygen Not Included installation. Checked registry InstallLocation for Steam App 457140 and fallback '$(GameFolderDefault)'. Set GameInstallFolder/GameFolder/GameLibsFolder in Directory.Build.props.user to OxygenNotIncluded_Data/Managed." />
+  </Target>
 </Project>
