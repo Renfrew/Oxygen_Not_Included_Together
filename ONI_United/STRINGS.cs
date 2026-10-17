@@ -243,7 +243,6 @@ namespace ONI_United
 				{
 					public static LocString LABEL = "Host Game";
 					//e.g:
-					//public static LocString TOOLTIP = "Host your current game as a multiplayer session";
 				}
 				public class INVITE
 				{
