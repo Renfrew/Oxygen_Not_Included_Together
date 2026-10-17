@@ -23,6 +23,7 @@ namespace ONI_United
         private const float PRESENCE_UPDATE_INTERVAL = 5f;
 
         private DiscordRpcClient _client;
+        private bool _isEnabled;
         private System.DateTime _sessionStartTime = System.DateTime.UtcNow;
         private bool _hasRecordedStartTime;
         private float _presenceUpdateTimer;
@@ -31,6 +32,13 @@ namespace ONI_United
         private bool _hasCachedAstroidData;
 
         private void Start()
+        {
+            _isEnabled = Configuration.Instance.UseDiscordRichPresence;
+            if (_isEnabled)
+                InitializeDiscord();
+        }
+
+        private void InitializeDiscord()
         {
             try
             {
@@ -55,7 +63,7 @@ namespace ONI_United
             catch (Exception ex)
             {
                 DebugConsole.LogError($"[DiscordRichPresence] Failed to initialize: {ex.Message}");
-                enabled = false;
+                CleanupDiscord();
                 return;
             }
 
@@ -92,6 +100,16 @@ namespace ONI_United
 
         private void Update()
         {
+            bool shouldBeEnabled = Configuration.Instance.UseDiscordRichPresence;
+            if (shouldBeEnabled != _isEnabled)
+            {
+                _isEnabled = shouldBeEnabled;
+                if (_isEnabled)
+                    InitializeDiscord();
+                else
+                    CleanupDiscord();
+            }
+
             if (_client != null)
                 _client.Invoke();
 
@@ -242,10 +260,18 @@ namespace ONI_United
 
         private void OnDestroy()
         {
+            CleanupDiscord();
+        }
+
+        private void CleanupDiscord()
+        {
             if (_client != null)
             {
                 if (_client.IsInitialized)
                     _client.ClearPresence();
+                _client.OnReady -= OnDiscordReady;
+                _client.OnError -= OnDiscordError;
+                _client.OnJoin -= OnDiscordJoin;
                 _client.Dispose();
                 _client = null;
             }
