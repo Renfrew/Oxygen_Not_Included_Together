@@ -12,7 +12,6 @@ using ONI_United.Networking.Transport.Steamworks;
 using PeterHan.PLib.AVC;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Shared.Profiling;
 using UnityEngine;
 using PeterHan.PLib.Core;
@@ -25,84 +24,56 @@ namespace ONI_United
 	public class MultiplayerMod : UserMod2
 	{
 
-		private static bool _inLogHandler = false;
-
         public override void OnLoad(Harmony harmony)
 		{
 			using var _ = Profiler.Scope();
 
-			try
-			{
-				PUtil.InitLibrary(false);
-				new POptions().RegisterOptions(this, typeof(Configuration));
-				ModAssets.LoadAssetBundles();
-				Configuration.Instance.EnsurePersistentUserId();
-				PacketTracker.Init();
-				DebugConsole.Log("[ONI_Together] Loaded Multiplayer: ONI United.");
-				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-				DebugConsole.Log($"[ONI_Together] Version: {version}");
+			var version = mod?.packagedModInfo?.version ?? "unknown";
+			UnityEngine.Debug.Log($"    - version: {version}");
+
+			PUtil.InitLibrary(false);
+			new POptions().RegisterOptions(this, typeof(Configuration));
+
+			ModAssets.LoadAssetBundles();
+			Configuration.Instance.EnsurePersistentUserId();
+			PacketTracker.Init();
 
 #if DEBUG
-				NetworkStatisticsMenu.Init();
+			NetworkStatisticsMenu.Init();
 #endif
 
-				var go = new GameObject("Multiplayer_Modules");
-				UnityEngine.Object.DontDestroyOnLoad(go);
+			var go = new GameObject("Multiplayer_Modules");
+			UnityEngine.Object.DontDestroyOnLoad(go);
 
-				go.AddComponent<NetworkingComponent>();
-				go.AddComponent<UIVisibilityController>();
-				go.AddComponent<MainThreadExecutor>();
-				go.AddComponent<CursorManager>();
-				go.AddComponent<PingManager>();
-				go.AddComponent<WorldStateSyncer>();
-				var plantLifecycleObject = new GameObject("PlantLifecycleSyncerHost");
-				plantLifecycleObject.transform.SetParent(go.transform);
-				plantLifecycleObject.AddComponent<PlantLifecycleSyncer>();
-				go.AddComponent<ConduitFlowSyncer>();
-				go.AddComponent<BulkPacketMonitor>();
-				go.AddComponent<LogicStateSyncer>();
-				go.AddComponent<OxySyncManager>();
-				go.AddComponent<NetIdActivityTracker>();
-				go.AddComponent<IdCensus>();
-				go.AddComponent<DiscordRichPresence>();
+			go.AddComponent<NetworkingComponent>();
+			go.AddComponent<UIVisibilityController>();
+			go.AddComponent<MainThreadExecutor>();
+			go.AddComponent<CursorManager>();
+			go.AddComponent<PingManager>();
+			go.AddComponent<WorldStateSyncer>();
+			var plantLifecycleObject = new GameObject("PlantLifecycleSyncerHost");
+			plantLifecycleObject.transform.SetParent(go.transform);
+			plantLifecycleObject.AddComponent<PlantLifecycleSyncer>();
+			go.AddComponent<ConduitFlowSyncer>();
+			go.AddComponent<BulkPacketMonitor>();
+			go.AddComponent<LogicStateSyncer>();
+			go.AddComponent<OxySyncManager>();
+			go.AddComponent<NetIdActivityTracker>();
+			go.AddComponent<IdCensus>();
+			go.AddComponent<DiscordRichPresence>();
 
-				ReadyManager.SetupListeners();
+			ReadyManager.SetupListeners();
 
-				ModAssets.LoadEmbeddedBundles();
+			ModAssets.LoadEmbeddedBundles();
 
-				RegisterDevTools();
-				NetworkConfig.ApplyConfiguredTransport();
-				var versionChecker = new PVersionCheck();
-				versionChecker.Register(this, new SteamVersionChecker());
+			RegisterDevTools();
+			NetworkConfig.ApplyConfiguredTransport();
 
-				// Diagnostic hooks for unhandled exceptions
-#if DEBUG
-				Application.logMessageReceived += (condition, stackTrace, type) =>
-				{
-					if (_inLogHandler) return;
-					if (type == LogType.Exception || type == LogType.Error)
-					{
-						_inLogHandler = true;
-						try
-						{
-							DebugConsole.LogError($"[Unity] {type}: {condition}\n{stackTrace}");
-						}
-						finally
-						{
-							_inLogHandler = false;
-						}
-					}
-				};
-#endif
-				base.OnLoad(harmony);
-				SteamLobby.Initialize();
-			}
-			catch (Exception ex)
-			{
-				DebugConsole.LogError($"[ONI_Together] CRITICAL ERROR IN ONLOAD: {ex}");
-				DebugConsole.LogException(ex);
-				throw;
-			}
+			var versionChecker = new PVersionCheck();
+			versionChecker.Register(this, new SteamVersionChecker());
+
+			base.OnLoad(harmony);
+			SteamLobby.Initialize();
         }
 
 		private static void RegisterDevTools()

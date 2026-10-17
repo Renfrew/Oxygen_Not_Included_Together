@@ -11,27 +11,19 @@ namespace ONI_United.DebugTools
     {
         private static DebugConsole _instance;
 
-        public static bool ForceVerboseLogging = false;
-        private static bool VerboseEnabled => Debug.isDebugBuild || ForceVerboseLogging;
-
         private static readonly List<LogEntry> logEntries = new List<LogEntry>();
         private static readonly object _lock = new object();
 
         private Vector2 scrollPos;
         private bool autoScroll = true;
-        private bool collapseDuplicates = false;
         private string filter = "";
 
-        private const int MaxLines = 300;
         private bool showConsole = false;
 
         private class LogEntry
         {
             public string message;
-            public string stack;
             public LogType type;
-            public bool expanded;
-            public int count = 1;
         }
 
         public enum LogType
@@ -60,34 +52,21 @@ namespace ONI_United.DebugTools
         {
             using var _ = Profiler.Scope();
 
-            if (!VerboseEnabled)
-                return;
-
-            Debug.Log($"[ONI_Together] {message}");
-            EnsureInstance();
-            _instance.AddLog(message, "", LogType.Log);
+            ModLog.Info(message);
         }
 
         public static void LogWarning(string message)
         {
             using var _ = Profiler.Scope();
 
-            Debug.LogWarning($"[ONI_Together] {message}");
-            EnsureInstance();
-            _instance.AddLog(message, "", LogType.Warning);
+            ModLog.Warning(message);
         }
 
         public static void LogError(string message, bool trigger_error_screen = false)
         {
             using var _ = Profiler.Scope();
 
-            if (trigger_error_screen)
-                Debug.LogError($"[ONI_Together] {message}");
-			else //put it in the log file but don't trigger the error screen
-				Debug.LogWarning($"-[ERROR] [ONI_Together] {message}");
-
-			EnsureInstance();
-            _instance.AddLog(message, "", LogType.Error);
+            ModLog.Error(message, trigger_error_screen);
         }
 
         public static void LogErrorTriggerInGameScreen(string message)
@@ -99,79 +78,28 @@ namespace ONI_United.DebugTools
         {
             using var _ = Profiler.Scope();
 
-            Debug.LogException(ex);
-            EnsureInstance();
-            _instance.AddLog(ex.Message, ex.StackTrace, LogType.Exception);
+            ModLog.Exception(ex);
         }
 
         public static void LogAssert(string message)
         {
             using var _ = Profiler.Scope();
 
-            Debug.Log($"[ONI_Together/Assert] {message}");
-            EnsureInstance();
-            _instance.AddLog(message, "", LogType.Assert);
+            ModLog.Info(message);
         }
 
         public static void LogSuccess(string message)
         {
             using var _ = Profiler.Scope();
 
-            if (!VerboseEnabled)
-                return;
-
-            Debug.Log($"[ONI_Together] {message}");
-            EnsureInstance();
-            _instance.AddLog(message, "", LogType.Success);
+            ModLog.Info(message);
         }
 
         public static void LogNonImportant(string message)
         {
             using var _ = Profiler.Scope();
 
-            if (!VerboseEnabled)
-                return;
-
-            Debug.Log($"[ONI_Together] {message}");
-            EnsureInstance();
-            _instance.AddLog(message, "", LogType.NonImportant);
-        }
-
-        private static void EnsureInstance()
-        {
-            using var _ = Profiler.Scope();
-
-            if (_instance == null)
-                _instance = new DebugConsole();
-        }
-
-        private void AddLog(string message, string stack, LogType type)
-        {
-            using var _ = Profiler.Scope();
-
-            lock (_lock)
-            {
-                if (collapseDuplicates && logEntries.Count > 0)
-                {
-                    var last = logEntries[logEntries.Count - 1];
-                    if (last.message == message && last.type == type)
-                    {
-                        last.count++;
-                        return;
-                    }
-                }
-
-                logEntries.Add(new LogEntry
-                {
-                    message = message,
-                    stack = stack,
-                    type = type,
-                    expanded = false
-                });
-
-                if (logEntries.Count > MaxLines)
-                    logEntries.RemoveAt(0);
-            }
+            ModLog.Debug(message);
         }
 
         /// <summary>
@@ -277,9 +205,7 @@ namespace ONI_United.DebugTools
                                 break;
                         }
 
-                        string displayMsg = entry.count > 1 ? $"{entry.message} (x{entry.count})" : entry.message;
-
-                        ImGui.TextColored(color, displayMsg);
+                        ImGui.TextColored(color, entry.message);
                     }
                 }
 
