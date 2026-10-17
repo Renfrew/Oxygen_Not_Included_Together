@@ -30,16 +30,12 @@ namespace ONI_United
 
 		public static readonly Dictionary<string, AssetBundle> LoadedBundles = [];
 
-		public static Harmony Harmony;
-
 		public static bool UseSteamOverlay = true; // Will be false for non steam instances
 		private static bool _inLogHandler = false;
 
         public override void OnLoad(Harmony harmony)
 		{
 			using var _ = Profiler.Scope();
-
-			Harmony = harmony;
 
 			try
 			{

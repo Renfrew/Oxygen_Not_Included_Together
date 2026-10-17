@@ -15,9 +15,7 @@ namespace ONI_United.Patches.World.SideScreen
 	/// </summary>
 	///
 
-	///DO NOT PATCH "Door" DIRECTLY !!
-
-	//[HarmonyPatch(typeof(Door), "QueueStateChange")]
+	[HarmonyPatch(typeof(Door), nameof(Door.QueueStateChange), typeof(Door.ControlState))]
 	public static class Door_QueueStateChange_Patch
 	{
 		public static void Postfix(Door __instance, Door.ControlState nextState)
@@ -26,14 +24,6 @@ namespace ONI_United.Patches.World.SideScreen
 
 			if (BuildingConfigPacket.IsApplyingPacket) return;
 			SideScreenSyncHelper.SyncDoorState(__instance.gameObject, nextState);
-		}
-		public static void ExecutePatch()
-		{
-			using var _ = Profiler.Scope();
-
-			var m_TargetMethod = AccessTools.Method("Door, Assembly-CSharp:QueueStateChange");
-			var m_Postfix = AccessTools.Method(typeof(Door_QueueStateChange_Patch), "Postfix");
-			MultiplayerMod.Harmony.Patch(m_TargetMethod, null, new HarmonyMethod(m_Postfix));
 		}
 	}
 
@@ -45,6 +35,7 @@ namespace ONI_United.Patches.World.SideScreen
 	/// the door chore completes (open/close), causing false-positive melt destruction.
 	/// This patch forces do_melt_check to false on clients, preventing the issue.
 	/// </summary>
+	[HarmonyPatch(typeof(Door), nameof(Door.Sim200ms), typeof(float))]
 	public static class Door_Sim200ms_Patch
 	{
 		public static void Prefix(Door __instance)
@@ -56,15 +47,6 @@ namespace ONI_United.Patches.World.SideScreen
 				__instance.do_melt_check = false;
 			}
 		}
-
-		public static void ExecutePatch()
-		{
-			using var _ = Profiler.Scope();
-
-			var m_Target = AccessTools.Method("Door, Assembly-CSharp:Sim200ms");
-			var m_Prefix = AccessTools.Method(typeof(Door_Sim200ms_Patch), "Prefix");
-			MultiplayerMod.Harmony.Patch(m_Target, new HarmonyMethod(m_Prefix));
-		}
 	}
 
 	/// <summary>
@@ -73,6 +55,7 @@ namespace ONI_United.Patches.World.SideScreen
 	/// the ReplaceAndDisplaceElement calls in OnCleanUp that spawn ore debris.
 	/// The host is authoritative for sim state changes.
 	/// </summary>
+	[HarmonyPatch(typeof(Door), "OnCleanUp")]
 	public static class Door_OnCleanUp_Patch
 	{
 		public static bool Prefix(object __instance)
@@ -84,15 +67,6 @@ namespace ONI_United.Patches.World.SideScreen
 				return false;
 			}
 			return true;
-		}
-
-		public static void ExecutePatch()
-		{
-			using var _ = Profiler.Scope();
-
-			var m_Target = AccessTools.Method("Door, Assembly-CSharp:OnCleanUp");
-			var m_Prefix = AccessTools.Method(typeof(Door_OnCleanUp_Patch), "Prefix");
-			MultiplayerMod.Harmony.Patch(m_Target, new HarmonyMethod(m_Prefix));
 		}
 	}
 }
