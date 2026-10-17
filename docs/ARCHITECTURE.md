@@ -1,6 +1,7 @@
 # Multiplayer: ONI United — Architecture
 
-**Last updated:** 2026-10-15  
+**Last updated:** 2026-10-17
+
 **Document status:** Recovered and consolidated reference. This document preserves the existing architecture recorded in the `game mod` ChatGPT Project and the local repository; it is not a redesign.
 
 ## 1. Purpose and source of truth
@@ -90,6 +91,21 @@ Every synchronized domain must record:
 - known unsupported cases.
 
 An unlisted domain is not considered synchronized. The host owns grid simulation, buildings, construction, duplicants, creatures, chores, inventories, equipment, simulation networks, research, priorities, schedules, policies, effective speed, and canonical saves. Each player owns local camera, cursor, hover, menus, and selection.
+
+### Current mod initialization and lifecycle ownership
+
+`MultiplayerMod.OnLoad` is the bootstrap coordinator; subsystem owners retain their configuration, asset, transport, and component behavior:
+
+1. Initialize PLib and register `Configuration` options.
+2. Load the required external UI bundle and prefabs through `ModAssets` before patch activation.
+3. Ensure and persist a nonzero `Configuration.Network.PersistentUserId` only when one is not already present.
+4. Create the persistent `Multiplayer_Modules` root with `DontDestroyOnLoad`, add the networking, presentation, synchronization, identity, and Discord components once, and parent `PlantLifecycleSyncer` beneath that root. `ReadyManager.SetupListeners` is called during this startup.
+5. Load the separately embedded cursor/network-indicator bundles, register Debug developer tools where applicable, apply the configured initial transport, and register the PLib version checker.
+6. Treat `base.OnLoad(harmony)` as the Harmony activation boundary; initialize Steam lobby callbacks afterward.
+
+Harmony patches use normal attribute-based registration; the Door patches are not separately registered by startup code. Default packet discovery/registration occurs later in `OnAllModsLoaded`, after its base callback. `PacketRegistry.TryRegister` logs individual registration failures without rethrowing, so startup continues best-effort and a failed registration can leave the effective registry incomplete. The registered packet-ID fingerprint is derived from registered IDs.
+
+Fatal `OnLoad` exceptions are logged and rethrown. No generic rollback of already-created objects, subscriptions, or loaded assets is implemented; startup rollback remains deferred rather than introducing a second lifecycle framework.
 
 ## 4. Protocol, transport, and identity
 
@@ -462,6 +478,7 @@ The maintained Project references remain `ARCHITECTURE.md`, `DECISIONS.md`, `STA
 
 ## Revision history
 
+- **2026-10-17:** Recorded the completed N14 startup/framework ownership and lifecycle: PLib/configuration and asset prerequisites, persistent identity/components, Harmony activation boundary, attribute-owned patches, and best-effort packet registration. Explicitly separated build evidence from deferred runtime verification and startup rollback.
 - **2026-10-15 (reconciliation):** Reclassified the PR #83 pending-join / intentional disconnect-reconnect flow as historical verified implementation evidence rather than current lifecycle architecture. Updated the current boundary to the later transport-preserving `develop` lifecycle, preserved exact-conformance uncertainty for the October 7 generation/reset proposal, and reconciled the formerly unknown pause mechanism with the accepted one-shot host/client pause entry points while keeping full-interval advancement coverage unverified.
 - **2026-10-15:** Removed lifecycle-specific speed coupling from the accepted architecture. Kept `ReadyManager` speed-agnostic, rejected `IsSimulationLocked` and load-time `GameSpeedSyncer.RequestReSync`/guards, assigned pause initiation to the accepted host/client synchronization entry points, and specified no automatic unpause. Clarified the intended session-centralization boundary while keeping PR #86 implementation and regression status separate from accepted architecture.
 - **2026-10-07:** Approved the transport-preserving normal world-load architecture. Separated transport/session lifetime from per-generation gameplay admission; added centralized world reset, recursive control-packet classification, discard-not-buffer loading behavior, verified reconstruction after `Game.OnSpawnComplete`, `WorldLoadCompleted(loadGeneration)` acknowledgement, and final-`Ready` admission. Recorded host-simulation advancement/catch-up as a blocking implementation prerequisite and retained reconnect for actual transport loss until LiteNetLib and Steam validation.

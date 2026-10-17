@@ -1,9 +1,35 @@
 # Multiplayer: ONI United — Development Roadmap
 
 **Created:** 2026-09-27  
-**Last updated:** 2026-10-16  
+**Last updated:** 2026-10-17
+
 **Status:** Planning and progress guide; verified results retain the evidence limits stated here and in `STATUS.md`  
 **References:** `ARCHITECTURE.md`, `DECISIONS.md`, `STATUS.md`
+
+## N14 closure — startup and lifecycle implementation complete
+
+**Status:** Complete in the current `refactor/mod-lifecycle` history through `810e0fde0e62900e6ecc240d8d335e94e80b66ca`.
+
+**Scope:** Startup ordering and diagnostics; configuration/persistent identity and asset ownership; PLib integration; Harmony patch ownership; packet-registration lifecycle; persistent component and event-subscription checks; Discord Rich Presence enablement.
+
+The N14 implementation commits are `ec2fcc9b`, `e6748619`, `91d664ef`, `955fee1d`, `27cb71df`, `626c2d57`, `5cdcf2f6`, and `810e0fde`. N14-A5 through A9 produced no further source changes where no justified fix was found. The current worktree had no outstanding N14 source changes at closure.
+
+Non-deploying Debug and Release builds succeeded during N14. The final A9 builds each had 0 errors and 4 `MSB3277` assembly-version conflict warnings. No ONI runtime/gameplay testing was performed; these builds and source reviews are not evidence of synchronization or release readiness. Default packet registration remains best-effort and logs individual failures without rethrowing. Generic startup rollback remains deferred.
+
+## Current priority — synchronization integration testing
+
+**Status:** Next development focus; runtime work is deferred until the synchronization phase.
+
+**Objective:** Validate the implemented startup/session/world-load path in game, then exercise multiplayer synchronization and the relevant transport scenarios without reopening completed N14 source investigations.
+
+Begin with a controlled integration run that verifies mod startup, configured transport, session entry, world load, and synchronization completion. Continue with the outstanding synchronization coverage already recorded in `STATUS.md` and the relevant domain milestones in this roadmap. Include the unresolved host-advancement/pause-coverage question and exercise applicable join, reconnect, and cross-transport paths. Record exact build/commit, scenario, result, and limitations; do not infer successful synchronization from connection-only evidence.
+
+**Remaining integration/release gates:**
+
+- Complete the runtime synchronization and transport scenarios applicable to the supported feature set; preserve unsupported/deferred domains such as Sweepy and incomplete special-workable coverage as explicit limits.
+- Resolve remaining legal/compliance and copied-source provenance questions, and complete any approved repository-history remediation before release.
+- Select a clean release commit, build that exact commit, construct and inspect the actual distribution artifact, and verify required notices and excluded files.
+- Run the agreed regression suite on that exact artifact; document platform/scenario coverage and do not claim release readiness before these gates pass.
 
 ## Baseline to preserve
 
@@ -29,9 +55,10 @@ Release-scope outcomes:
 
 The completed release does not imply that all deferred synchronization features are solved.
 
-## Current priority — development-environment and lifecycle walkthrough
+## Deferred — development-environment walkthrough
 
-**Status:** Next session.  
+**Status:** Not part of N14 and not the next development focus. Reassess separately if the tooling/configuration foundation still needs a dedicated walkthrough.
+
 **Objective:** Review the project from its development-environment foundation, then proceed through the mod lifecycle while testing each stage.
 
 Start with project setup and baseline developer experience, including ESLint, default settings, and related tooling/configuration. Record which settings are authoritative, inherited, generated, or local-only before changing them. After the environment baseline is understood, walk through initialization, connection, loading/synchronization, gameplay admission, ordinary runtime behavior, and shutdown/disconnection in order.
@@ -53,9 +80,9 @@ Preserve this evidence for regression history, especially the final-Ready/readin
 
 GitHub verified PR #83 merged into `develop` on 2026-10-07 at merge commit `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f`. That merge remains historical provenance, not the current release baseline.
 
-## Active release-preparation sequence — final upstream-tracking release
+## Historical release-preparation sequence — final upstream-tracking release
 
-**Status:** In progress; PR #63 is open from `develop` `d5a1326d7e5cfc816794644a2d1e597949b84f66` into `experiment` `64a4dd6fa2870877868d13be034a3d8cf13f1f19`. No final release artifact has been established.
+**Status:** Preserved point-in-time plan for PR #63 / 0.8.0.5. Its branch and PR disposition are not current-state evidence; revalidate GitHub and the authoritative repository before using it as an active release plan. No final artifact should be inferred from this historical section.
 **Objective:** Complete the final upstream-tracking release under the verified MIT boundary, resolve the remaining compliance blockers, and verify the exact artifact before release. Future releases form an independent project line.
 
 ### Verified upstream license boundary
@@ -198,6 +225,7 @@ The current lifecycle/speed and session-centralization decisions may also affect
 
 ## Revision history
 
+- **2026-10-17:** Closed N14 implementation with the verified startup/framework commit series and build-only evidence; made synchronization integration testing the next development focus; recorded runtime, compliance, and exact-artifact release gates without claiming runtime verification or release readiness.
 - **2026-10-16:** Recorded the completed N9–N11 identifier-migration cleanup sequence, reported passing audit/build evidence, and the passing connection-only runtime result with strict scope limits. Replaced the immediate next-session release-preparation prompt with a development-environment-first walkthrough beginning with ESLint, default settings, and baseline tooling, followed by lifecycle-stage testing. Exact cleanup hashes and full audit/build output remain to be captured from the authoritative repository.
 - **2026-10-15 (reconciliation):** Reclassified PR #83 lifecycle/readiness as historical verified evidence, recognized the later transport-preserving lifecycle rebuild in current `develop`, converted the old unimplemented transport-preserving milestone into a deferred conformance/runtime audit, and kept PR #86 review plus legal/compliance and exact-artifact verification as the active release path.
 - **2026-10-15:** Replaced the stale next-session transport-preserving-loading priority with the current release sequence: PR #86 regression review, exact baseline selection, legal/licensing/compliance audit, approved remediation, exact-artifact build/runtime verification, then release. Retained the transport-preserving design as deferred and preserved the older `develop`→`experiment` plan as superseded historical context.

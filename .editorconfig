@@ -7,5 +7,14 @@ insert_final_newline = true
 trim_trailing_whitespace = false
 
 [*.{cs,csproj,props,targets,sln,md,json,yml,yaml}]
+indent_style = space
 indent_size = 4
 tab_width = 4
+
+[*.cs]
+
+# Prefer collection expressions when types match exactly
+dotnet_style_prefer_collection_expression = when_types_exactly_match:suggestion
+
+# Prefer target-typed new when the type is already known
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
