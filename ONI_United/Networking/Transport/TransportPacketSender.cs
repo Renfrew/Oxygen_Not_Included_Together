@@ -72,8 +72,8 @@ namespace ONI_United.Networking.Transport
 
         /// <summary>
         /// Payloads larger than MAX_PAYLOAD_BYTES are split into ChunkedPacket fragments before hitting the transport, so backends
-        /// with a hard single-message cap (e.g. LiteNetLib's 1023-byte unreliable limit or Riptides 1024-byte limit)
-        /// never throw. sendRaw is provided by the transport to emit one serialized payload.
+        /// with a hard single-message cap, such as LiteNetLib's 1023-byte unreliable limit, never throw.
+        /// sendRaw is provided by the transport to emit one serialized payload.
         /// </summary>
         protected bool SendChunkedIfNeeded(object conn, byte[] bytes, IPacket packet, PacketSendMode sendType, Func<object, byte[], IPacket, PacketSendMode, bool> sendRaw)
         {

@@ -299,17 +299,6 @@ msgstr ""
 "표시합니다."
 
 msgctxt ""
-"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT"
-msgid ""
-"Which network library is used for LAN games.\n"
-"\n"
-"LiteNetLib is the modern default transport. Riptide is the legacy LAN transport."
-msgstr ""
-"LAN 게임에 사용할 네트워크 라이브러리입니다.\n"
-"\n"
-"LiteNetLib는 최신 기본 전송 방식이고 Riptide는 기존 LAN 전송 방식입니다."
-
-msgctxt ""
 "ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME"
 msgid ""
 "The name shown to other players when they discover or join your LAN game.\n"
@@ -737,74 +726,6 @@ msgid "Disconnected"
 msgstr "연결 해제됨"
 
 msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN_DESC"
-msgid "An unknown network error occurred."
-msgstr "알 수 없는 네트워크 오류가 발생했습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED"
-msgid "Connection failed"
-msgstr "연결 실패"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED_DESC"
-msgid "Could not establish a connection to the server."
-msgstr "서버에 연결할 수 없습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED"
-msgid "Connection rejected"
-msgstr "연결 거부됨"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED_DESC"
-msgid "The server refused the connection."
-msgstr "서버가 연결을 거부했습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR"
-msgid "Network error"
-msgstr "네트워크 오류"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR_DESC"
-msgid "A network error occurred."
-msgstr "네트워크 오류가 발생했습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT"
-msgid "Connection timed out"
-msgstr "연결 시간 초과"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT_DESC"
-msgid "The server did not respond in time."
-msgstr "서버가 제시간에 응답하지 않았습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED"
-msgid "Kicked from server"
-msgstr "서버에서 추방됨"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED_DESC"
-msgid "You were removed from the session."
-msgstr "세션에서 제거되었습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED"
-msgid "Server closed"
-msgstr "서버가 닫힘"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED_DESC"
-msgid "The host has stopped the server."
-msgstr "호스트가 서버를 중지했습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE"
-msgid "Connection unstable"
-msgstr "연결 불안정"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE_DESC"
-msgid "The connection quality was too poor to continue."
-msgstr "연결 품질이 너무 낮아 계속할 수 없습니다."
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN"
-msgid "Disconnected"
-msgstr "연결 해제됨"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN_DESC"
 msgid "An unknown network error occurred."
 msgstr "알 수 없는 네트워크 오류가 발생했습니다."
 

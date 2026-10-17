@@ -24,11 +24,11 @@ namespace ONI_United.Networking.Transfer
 			public byte[] Data;
 		}
 
-		public void Start(int riptidePort)
+		public void Start(int lanPort)
 		{
 			using var _ = Profiler.Scope();
 
-			int tcpPort = riptidePort + 1;
+			int tcpPort = lanPort + 1;
 			_listener = new TcpListener(IPAddress.Any, tcpPort);
 			_listener.Start();
 			_running = true;

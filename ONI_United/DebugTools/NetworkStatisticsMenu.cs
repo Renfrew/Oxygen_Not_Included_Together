@@ -4,7 +4,6 @@ using ONI_United.Networking.Runtime;
 using ONI_United.Networking;
 using ONI_United.Networking.Session.States;
 using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport.Riptide;
 using Steamworks;
 using System;
 using Shared.Profiling;

@@ -5,7 +5,6 @@ using ONI_United.Misc;
 using ONI_United.Networking.Session.States;
 using ONI_United.Networking.Transport;
 using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport.Riptide;
 using ONI_United.Networking.Transport.Steamworks;
 using ONI_United.Patches.ToolPatches;
 using ONI_United.DebugTools;
@@ -34,8 +33,7 @@ namespace ONI_United.Networking
         public enum NetworkTransport
         {
             STEAMWORKS = 0,
-            LITENETLIB = 1,
-            RIPTIDE = 2
+            LITENETLIB = 1
         }
         public static NetworkTransport transport { get; private set; } = NetworkTransport.LITENETLIB;
 
@@ -59,7 +57,6 @@ namespace ONI_United.Networking
                     StartSteamServer();
                     break;
                 case NetworkTransport.LITENETLIB:
-                case NetworkTransport.RIPTIDE:
                     UpdateTransport(transport);
                     CoroutineRunner.RunOne(StartRawDelayed(0.5f));
                     break;
@@ -107,7 +104,6 @@ namespace ONI_United.Networking
                     StopSteamworks();
                     break;
                 case NetworkTransport.LITENETLIB:
-                case NetworkTransport.RIPTIDE:
                     StopRaw();
                     break;
             }
@@ -190,8 +186,6 @@ namespace ONI_United.Networking
                     return SteamUser.GetSteamID().m_SteamID;
                 case NetworkTransport.LITENETLIB:
                     return Configuration.Instance.Network.PersistentUserId;
-                case NetworkTransport.RIPTIDE:
-                    return MultiplayerSession.IsClient ? RiptideClient.CLIENT_ID : RiptideServer.CLIENT_ID;
                 default:
                     return Utils.NilUlong();
             }
@@ -208,7 +202,7 @@ namespace ONI_United.Networking
         {
             using var _ = Profiler.Scope();
 
-            return transport.Equals(NetworkTransport.LITENETLIB) || transport.Equals(NetworkTransport.RIPTIDE);
+            return transport.Equals(NetworkTransport.LITENETLIB);
         }
 
         public static int GetMaxServerCapacity()
@@ -220,7 +214,6 @@ namespace ONI_United.Networking
                         return SteamMatchmaking.GetLobbyMemberLimit(SteamLobby.CurrentLobby);
                     break;
                 case NetworkTransport.LITENETLIB:
-                case NetworkTransport.RIPTIDE:
                     return Configuration.Instance.Host.MaxLobbySize;
             }
             return Configuration.Instance.Host.MaxLobbySize;

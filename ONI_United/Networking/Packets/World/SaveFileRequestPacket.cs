@@ -3,7 +3,6 @@ using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport.Riptide;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -122,8 +121,6 @@ namespace ONI_United.Networking.Packets.World
 			SaveFileTransferManager.CancelClient(requester);
 			if (NetworkConfig.TransportServer is LiteNetLibServer server)
 				server.TcpTransfer?.CancelClient(requester);
-			else if (NetworkConfig.TransportServer is RiptideServer riptide)
-				riptide.TcpTransfer?.CancelClient(requester);
 		}
 
 		internal static void ClearPendingSynchronizationTransfers()
@@ -132,8 +129,6 @@ namespace ONI_United.Networking.Packets.World
 			TransferRuns.Clear();
 			if (NetworkConfig.TransportServer is LiteNetLibServer server)
 				server.TcpTransfer?.ClearPendingTransfers();
-			else if (NetworkConfig.TransportServer is RiptideServer riptide)
-				riptide.TcpTransfer?.ClearPendingTransfers();
 		}
 
 

@@ -297,17 +297,6 @@ msgid ""
 msgstr "启用 Discord Rich Presence 集成，在 Discord 个人资料中显示当前游戏状态（殖民地名称、周期和小行星）。"
 
 msgctxt ""
-"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT"
-msgid ""
-"Which network library is used for LAN games.\n"
-"\n"
-"LiteNetLib is the modern default transport. Riptide is the legacy LAN transport."
-msgstr ""
-"局域网游戏使用的网络库。\n"
-"\n"
-"LiteNetLib 是较新的默认传输方式，Riptide 是旧版局域网传输方式。"
-
-msgctxt ""
 "ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME"
 msgid ""
 "The name shown to other players when they discover or join your LAN game.\n"
@@ -735,74 +724,6 @@ msgid "Disconnected"
 msgstr "已断开"
 
 msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN_DESC"
-msgid "An unknown network error occurred."
-msgstr "发生未知网络错误。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED"
-msgid "Connection failed"
-msgstr "连接失败"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED_DESC"
-msgid "Could not establish a connection to the server."
-msgstr "无法与服务器建立连接。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED"
-msgid "Connection rejected"
-msgstr "连接被拒绝"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED_DESC"
-msgid "The server refused the connection."
-msgstr "服务器拒绝了连接。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR"
-msgid "Network error"
-msgstr "网络错误"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR_DESC"
-msgid "A network error occurred."
-msgstr "发生网络错误。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT"
-msgid "Connection timed out"
-msgstr "连接超时"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT_DESC"
-msgid "The server did not respond in time."
-msgstr "服务器未及时响应。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED"
-msgid "Kicked from server"
-msgstr "已被服务器踢出"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED_DESC"
-msgid "You were removed from the session."
-msgstr "你已被移出会话。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED"
-msgid "Server closed"
-msgstr "服务器已关闭"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED_DESC"
-msgid "The host has stopped the server."
-msgstr "主机已停止服务器。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE"
-msgid "Connection unstable"
-msgstr "连接不稳定"
-
-msgctxt ""
-"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE_DESC"
-msgid "The connection quality was too poor to continue."
-msgstr "连接质量过差，无法继续。"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN"
-msgid "Disconnected"
-msgstr "已断开"
-
-msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN_DESC"
 msgid "An unknown network error occurred."
 msgstr "发生未知网络错误。"
 

@@ -346,8 +346,7 @@ namespace ONI_United
 
     public enum LanTransportType
     {
-        LiteNetLib = 1,
-        Riptide = 2
+        LiteNetLib = 1
     }
 
     [Serializable]

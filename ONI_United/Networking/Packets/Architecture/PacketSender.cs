@@ -323,8 +323,8 @@ namespace ONI_United.Networking.Packets.Architecture
 			}
 			catch (Exception ex)
 			{
-				// A throw from the transport layer (e.g. Riptide pendingMessages key collision)
-				// must not skip remaining connections in the broadcast. Log-and-continue.
+				// A throw from the transport layer must not skip remaining connections in the broadcast.
+				// Log-and-continue.
 				long n = ++_sendErrorCount;
 				if (n <= 5 || n % 100 == 0)
 				{
