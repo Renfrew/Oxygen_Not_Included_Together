@@ -20,7 +20,6 @@ using PeterHan.PLib.Core;
 using PeterHan.PLib.Options;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Plants;
-using System.Threading;
 
 namespace ONI_United
 {
@@ -35,9 +34,6 @@ namespace ONI_United
 
 		public static bool UseSteamOverlay = true; // Will be false for non steam instances
 		private static bool _inLogHandler = false;
-
-        public static int MainThreadId { get; private set; }
-        public static SynchronizationContext MainThread { get; private set; }
 
         public override void OnLoad(Harmony harmony)
 		{
@@ -59,6 +55,7 @@ namespace ONI_United
 
 #if DEBUG
 				DebugMenu.Init();
+				NetworkStatisticsMenu.Init();
 #endif
 
 				var go = new GameObject("Multiplayer_Modules");
@@ -183,10 +180,6 @@ namespace ONI_United
 					DebugConsole.LogAssert($"[ONI_Together] Scene: {name}");
 				}
 
-				foreach (var name in bundle.GetAllAssetNames())
-				{
-					DebugConsole.LogAssert($"[ONI_Together] Asset: {name}");
-				}
 				return bundle;
 			}
 			else
@@ -254,8 +247,6 @@ namespace ONI_United
             UnitTestRegistry.DiscoverTests();
 #endif
 
-            MainThreadId = Thread.CurrentThread.ManagedThreadId;
-            MainThread = SynchronizationContext.Current;
         }
     }
 }

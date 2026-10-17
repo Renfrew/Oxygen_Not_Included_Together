@@ -13,12 +13,6 @@ namespace ONI_United.Networking.Presentation
 		private ToolTip pauseTooltip;
 		private TextStyleSetting tooltipTextStyle;
 
-		private void Start()
-		{
-			// TODO LATER Plug the visibility tweaks to the lobby entered / left events on SteamLobby
-
-		}
-
 		private void Update()
 		{
 			using var _ = Profiler.Scope();

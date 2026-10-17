@@ -23,7 +23,6 @@ namespace ONI_United.DebugTools
 		private Vector2 scrollPosition = Vector2.zero;
 
 
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void Init()
 		{
 			using var _ = Profiler.Scope();

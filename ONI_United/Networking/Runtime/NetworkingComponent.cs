@@ -17,13 +17,6 @@ namespace ONI_United.Networking.Runtime
 		 *
 		 * **/
 
-		private void Start()
-		{
-			//SteamNetworkingUtils.InitRelayNetworkAccess();
-			//GameClient.Init();
-
-		}
-
 		private void Update()
 		{
 			using var _ = Profiler.Scope();

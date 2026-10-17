@@ -34,7 +34,6 @@ namespace ONI_United.DebugTools
 
         private string lanJoinAddress = "127.0.0.1:7777";
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void Init()
 		{
             using var _ = Profiler.Scope();
