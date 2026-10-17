@@ -23,8 +23,6 @@ using ONI_United.Networking.Replication.Components.Plants;
 
 namespace ONI_United
 {
-	//Template: https://github.com/O-n-y/OxygenNotIncludedModTemplate
-
 	public class MultiplayerMod : UserMod2
 	{
 
@@ -50,7 +48,6 @@ namespace ONI_United
 				DebugConsole.Log($"[ONI_Together] Version: {version}");
 
 #if DEBUG
-				DebugMenu.Init();
 				NetworkStatisticsMenu.Init();
 #endif
 
@@ -62,7 +59,6 @@ namespace ONI_United
 				go.AddComponent<MainThreadExecutor>();
 				go.AddComponent<CursorManager>();
 				go.AddComponent<PingManager>();
-				//go.AddComponent<BuildingSyncer>(); // Does thing with bridges (Wire Bridge, WireBridge)
 				go.AddComponent<WorldStateSyncer>();
 				var plantLifecycleObject = new GameObject("PlantLifecycleSyncerHost");
 				plantLifecycleObject.transform.SetParent(go.transform);
@@ -75,14 +71,9 @@ namespace ONI_United
 				go.AddComponent<IdCensus>();
 				go.AddComponent<DiscordRichPresence>();
 
-				SetupListeners();
+				ReadyManager.SetupListeners();
 
 				LoadAssetBundles();
-
-				foreach (var res in Assembly.GetExecutingAssembly().GetManifestResourceNames())
-				{
-					DebugConsole.Log("Embedded Resource: " + res);
-				}
 
 				RegisterDevTools();
 				LoadNetworkRelay();
@@ -141,13 +132,6 @@ namespace ONI_United
             LoadAssetBundle("networkindicators", network_indicators);
         }
 
-		private void SetupListeners()
-		{
-			using var _ = Profiler.Scope();
-
-			ReadyManager.SetupListeners();
-		}
-		
 		public static AssetBundle LoadAssetBundle(string bundleKey, string resourceName)
 		{
 			using var _ = Profiler.Scope();
@@ -236,8 +220,6 @@ namespace ONI_United
 	        using var _ = Profiler.Scope();
 
             base.OnAllModsLoaded(harmony, mods);
-			///does weird force restarts; replaced with plib version checker that doesnt restart the game
-			//ModUpdater.Updater.CheckForUpdate();
 			PacketRegistry.RegisterDefaults();
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
