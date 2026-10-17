@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
+using Shared.Profiling;
 using UnityEngine;
 
 namespace ONI_United
@@ -12,6 +13,23 @@ namespace ONI_United
     [ConfigFile(SharedConfigLocation: true)]
     public class Configuration : SingletonOptions<Configuration>, IOptions
     {
+        public void EnsurePersistentUserId()
+        {
+            using var _ = Profiler.Scope();
+
+            if (Network.PersistentUserId != 0)
+                return;
+
+            ulong persistentUserId;
+            do
+            {
+                persistentUserId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
+            }
+            while (persistentUserId == 0);
+
+            Network.PersistentUserId = persistentUserId;
+            Save();
+        }
  
         [JsonProperty]
         public HostSettings Host { get; set; } = new HostSettings();

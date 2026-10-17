@@ -2,7 +2,6 @@
 using KMod;
 using ONI_United.Networking.Presentation;
 using ONI_United.DebugTools;
-using ONI_United.Misc;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Runtime;
@@ -26,8 +25,6 @@ namespace ONI_United
 	public class MultiplayerMod : UserMod2
 	{
 
-		public static readonly Dictionary<string, AssetBundle> LoadedBundles = [];
-
 		public static bool UseSteamOverlay = true; // Will be false for non steam instances
 		private static bool _inLogHandler = false;
 
@@ -41,7 +38,7 @@ namespace ONI_United
 				PUtil.InitLibrary(false);
 				new POptions().RegisterOptions(this, typeof(Configuration));
 				ModAssets.LoadAssetBundles();
-				EnsurePersistentUserId();
+				Configuration.Instance.EnsurePersistentUserId();
 				PacketTracker.Init();
 				DebugConsole.Log("[ONI_Together] Loaded Multiplayer: ONI United.");
 				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
@@ -73,7 +70,7 @@ namespace ONI_United
 
 				ReadyManager.SetupListeners();
 
-				LoadAssetBundles();
+				ModAssets.LoadEmbeddedBundles();
 
 				RegisterDevTools();
 				LoadNetworkRelay();
@@ -107,81 +104,12 @@ namespace ONI_United
 
         void LoadNetworkRelay()
 		{
-			int relay = Configuration.Instance.Host.NetworkTransport;
-			NetworkConfig.UpdateTransport((NetworkConfig.NetworkTransport)relay);
+			NetworkConfig.ApplyConfiguredTransport();
 
 			///version checker that doesnt restart the game
 			var VersionChecker = new PVersionCheck();
 			VersionChecker.Register(this, new SteamVersionChecker());
 
-		}
-
-		void LoadAssetBundles()
-		{
-			using var _ = Profiler.Scope();
-
-			// Load custom asset bundles
-			string cursor_bundle = GetBundleBasedOnPlatform("ONI_Together.Assets.bundles.playercursor_win.bundle",
-															"ONI_Together.Assets.bundles.playercursor_mac.bundle",
-															"ONI_Together.Assets.bundles.playercursor_lin.bundle");
-			LoadAssetBundle("playercursorbundle", cursor_bundle);
-
-            string network_indicators = GetBundleBasedOnPlatform("ONI_Together.Assets.bundles.networkindicators_win.bundle",
-																 "ONI_Together.Assets.bundles.networkindicators_mac.bundle",
-																 "ONI_Together.Assets.bundles.networkindicators_lin.bundle");
-            LoadAssetBundle("networkindicators", network_indicators);
-        }
-
-		public static AssetBundle LoadAssetBundle(string bundleKey, string resourceName)
-		{
-			using var _ = Profiler.Scope();
-
-			if (LoadedBundles.TryGetValue(bundleKey, out var bundle))
-			{
-				DebugConsole.Log($"LoadAssetBundle: Reusing cached AssetBundle '{bundleKey}'.");
-				return bundle;
-			}
-
-			// load with your existing loader
-			bundle = ResourceLoader.LoadEmbeddedAssetBundle(resourceName);
-
-			if (bundle != null)
-			{
-				LoadedBundles[bundleKey] = bundle;
-				DebugConsole.LogSuccess($"LoadAssetBundle: Successfully loaded AssetBundle '{bundleKey}' from resource '{resourceName}'.");
-
-				foreach (var name in bundle.GetAllAssetNames())
-				{
-					DebugConsole.LogAssert($"[ONI_Together] Bundle Asset: {name}");
-				}
-
-				foreach (var name in bundle.GetAllScenePaths())
-				{
-					DebugConsole.LogAssert($"[ONI_Together] Scene: {name}");
-				}
-
-				return bundle;
-			}
-			else
-			{
-				DebugConsole.LogError($"LoadAssetBundle: Could not load AssetBundle from resource '{resourceName}'");
-				return null;
-			}
-		}
-
-		public string GetBundleBasedOnPlatform(string windows_bundle, string mac_bundle, string linux_bundle)
-		{
-			using var _ = Profiler.Scope();
-
-			switch (Application.platform)
-			{
-				case RuntimePlatform.OSXPlayer:
-					return mac_bundle;
-				case RuntimePlatform.LinuxPlayer:
-					return linux_bundle;
-				default:
-					return windows_bundle;
-			}
 		}
 		
 		private static void RegisterDevTools()
@@ -194,25 +122,6 @@ namespace ONI_United
 			twitchDevToolRegister.Invoke(DevToolManager.Instance, new object[] { "Mods/MultiplayerMod" });
 			DevToolManager.Instance.showImGui = true;
 #endif
-		}
-
-		private void EnsurePersistentUserId()
-		{
-			using var _ = Profiler.Scope();
-
-			var config = Configuration.Instance.Network;
-			if (config.PersistentUserId != 0)
-				return;
-
-			ulong persistentUserId;
-			do
-			{
-				persistentUserId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
-			}
-			while (persistentUserId == 0);
-
-			config.PersistentUserId = persistentUserId;
-			Configuration.Instance.Save();
 		}
 
 		public override void OnAllModsLoaded(Harmony harmony, IReadOnlyList<Mod> mods)
