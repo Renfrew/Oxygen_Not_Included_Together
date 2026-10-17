@@ -46,8 +46,8 @@
 		<EmbeddedResource Include="Assets\mod_mascot.png">
 			<LogicalName>ONI_Together.Assets.mod_mascot.png</LogicalName>
 		</EmbeddedResource>
-		<EmbeddedResource Include="Assets\oni_together_logo.png">
-			<LogicalName>ONI_Together.Assets.oni_together_logo.png</LogicalName>
+		<EmbeddedResource Include="Assets\ONI_United_Logo.png">
+			<LogicalName>ONI_United.Assets.ONI_United_logo.png</LogicalName>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Assets\oni_together_link_chat.png">
 			<LogicalName>ONI_Together.Assets.oni_together_link_chat.png</LogicalName>
@@ -76,8 +76,8 @@
 		<EmbeddedResource Include="Assets\network_overlay_icon.png">
 			<LogicalName>ONI_Together.Assets.network_overlay_icon.png</LogicalName>
 		</EmbeddedResource>
-		<EmbeddedResource Include="Assets\sync_icon.png">
-			<LogicalName>ONI_Together.Assets.sync_icon.png</LogicalName>
+		<EmbeddedResource Include="Assets\syncing.png">
+			<LogicalName>ONI_United.Assets.syncing.png</LogicalName>
 		</EmbeddedResource>
 	</ItemGroup>
 

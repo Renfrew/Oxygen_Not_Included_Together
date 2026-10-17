@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-This file covers third-party software incorporated into or distributed with Oxygen Not Included Together. Build-only tools and game-provided assemblies are not part of the mod distribution.
+This file covers third-party software incorporated into or distributed with Multiplayer: ONI United (historically Oxygen Not Included Together). Build-only tools and game-provided assemblies are not part of the mod distribution.
 
 ## MIT-licensed components incorporated into the mod
 

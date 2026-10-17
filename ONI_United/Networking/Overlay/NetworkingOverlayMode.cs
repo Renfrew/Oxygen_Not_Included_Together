@@ -3,7 +3,6 @@ using ONI_United.Misc;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication;
-using ONI_United.Networking.Replication.Components;
 using Shared.Replication;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using ONI_United.Networking;
 using ONI_United.Networking.Session;
 
 namespace ONI_United.Networking.Overlay
@@ -98,7 +96,7 @@ namespace ONI_United.Networking.Overlay
 			{
 				if (_syncIconSprite == null)
 				{
-					var tex = ONI_United.Misc.ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.sync_icon.png");
+					var tex = ResourceLoader.LoadEmbeddedTexture("ONI_United.Assets.syncing.png");
 					if (tex != null)
 					{
 						tex.filterMode = FilterMode.Bilinear;
