@@ -26,8 +26,6 @@ namespace ONI_United.Patches.MainMenuScreenPatches;
 [HarmonyPatch(typeof(MainMenu), "OnPrefabInit")]
 internal static class MainMenuPatch
 {
-	private static GameObject staticBgGO;
-
 	public static void Postfix(MainMenu __instance)
 	{
 		using var _ = Profiler.Scope();
@@ -45,13 +43,6 @@ internal static class MainMenuPatch
 				new System.Action(() =>
 				{
 					UnityMultiplayerScreen.OpenFromMainMenu();
-					return;
-					// Open the multiplayer screen
-					var canvas = UnityEngine.Object.FindFirstObjectByType<Canvas>();
-					if (canvas != null)
-					{
-						ONI_United.UI.Screens.MultiplayerScreen.Show(canvas.transform);
-					}
 				}),
 				normalFontSize,
 				normalStyle,

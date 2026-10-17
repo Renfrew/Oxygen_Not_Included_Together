@@ -29,7 +29,7 @@ namespace ONI_United
 	public class MultiplayerMod : UserMod2
 	{
 
-		public static readonly Dictionary<string, AssetBundle> LoadedBundles = new Dictionary<string, AssetBundle>();
+		public static readonly Dictionary<string, AssetBundle> LoadedBundles = [];
 
 		public static Harmony Harmony;
 
@@ -44,15 +44,12 @@ namespace ONI_United
 			using var _ = Profiler.Scope();
 
 			Harmony = harmony;
-            PUtil.InitLibrary(false);
-            new POptions().RegisterOptions(this, typeof(Configuration));
-            base.OnLoad(harmony);
-
-            string logPath = System.IO.Path.Combine(Application.dataPath, "../ONI_United_Log.txt");
 
 			try
 			{
 				DebugConsole.Init(); // Init console first to catch logs
+				PUtil.InitLibrary(false);
+				new POptions().RegisterOptions(this, typeof(Configuration));
 				ModAssets.LoadAssetBundles();
 				EnsurePersistentUserId();
 				PacketTracker.Init();
@@ -60,21 +57,13 @@ namespace ONI_United
 				var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
 				DebugConsole.Log($"[ONI_Together] Version: {version}");
 
-                // CHECKPOINT 1
-                System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 1: Pre-DebugMenu\n");
+#if DEBUG
 				DebugMenu.Init();
+#endif
 
-                // CHECKPOINT 2
-                System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 2: Pre-SteamLobby\n");
-				SteamLobby.Initialize();
-
-				// CHECKPOINT 3
-				System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 3: Pre-GameObjects\n");
 				var go = new GameObject("Multiplayer_Modules");
 				UnityEngine.Object.DontDestroyOnLoad(go);
 
-				// CHECKPOINT 4
-				System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 4: Pre-Components\n");
 				go.AddComponent<NetworkingComponent>();
 				go.AddComponent<UIVisibilityController>();
 				go.AddComponent<MainThreadExecutor>();
@@ -93,12 +82,8 @@ namespace ONI_United
 				go.AddComponent<IdCensus>();
 				go.AddComponent<DiscordRichPresence>();
 
-				// CHECKPOINT 5
-				System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 5: Pre-Listeners\n");
 				SetupListeners();
 
-				// CHECKPOINT 6
-				System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 6: Pre-ResLoad\n");
 				LoadAssetBundles();
 
 				foreach (var res in Assembly.GetExecutingAssembly().GetManifestResourceNames())
@@ -106,35 +91,34 @@ namespace ONI_United
 					DebugConsole.Log("Embedded Resource: " + res);
 				}
 
-				System.IO.File.AppendAllText(logPath, "[Trace] Checkpoint 7: Success\n");
+				RegisterDevTools();
+				LoadNetworkRelay();
+
+				// Diagnostic hooks for unhandled exceptions
+				Application.logMessageReceived += (condition, stackTrace, type) =>
+				{
+					if (_inLogHandler) return;
+					if (type == LogType.Exception || type == LogType.Error)
+					{
+						_inLogHandler = true;
+						DebugConsole.LogError($"[Unity] {type}: {condition}\n{stackTrace}");
+						_inLogHandler = false;
+					}
+				};
+
+				AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+				{
+					DebugConsole.LogError($"[AppDomain] Unhandled exception: {args.ExceptionObject}");
+				};
+				base.OnLoad(harmony);
+				SteamLobby.Initialize();
 			}
 			catch (Exception ex)
 			{
 				DebugConsole.LogError($"[ONI_Together] CRITICAL ERROR IN ONLOAD: {ex}");
 				DebugConsole.LogException(ex);
-				return;
+				throw;
 			}
-
-
-			RegisterDevTools();
-			LoadNetworkRelay();
-
-			// Diagnostic hooks for unhandled exceptions
-			Application.logMessageReceived += (condition, stackTrace, type) =>
-			{
-				if (_inLogHandler) return;
-				if (type == LogType.Exception || type == LogType.Error)
-				{
-					_inLogHandler = true;
-					DebugConsole.LogError($"[Unity] {type}: {condition}\n{stackTrace}");
-					_inLogHandler = false;
-				}
-			};
-
-			AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-			{
-				DebugConsole.LogError($"[AppDomain] Unhandled exception: {args.ExceptionObject}");
-			};
         }
 
         void LoadNetworkRelay()
@@ -269,8 +253,6 @@ namespace ONI_United
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
 #endif
-			// For now default to the steam transport
-			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
 
             MainThreadId = Thread.CurrentThread.ManagedThreadId;
             MainThread = SynchronizationContext.Current;
