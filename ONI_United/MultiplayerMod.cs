@@ -25,7 +25,6 @@ namespace ONI_United
 	public class MultiplayerMod : UserMod2
 	{
 
-		public static bool UseSteamOverlay = true; // Will be false for non steam instances
 		private static bool _inLogHandler = false;
 
         public override void OnLoad(Harmony harmony)
@@ -34,7 +33,6 @@ namespace ONI_United
 
 			try
 			{
-				DebugConsole.Init(); // Init console first to catch logs
 				PUtil.InitLibrary(false);
 				new POptions().RegisterOptions(this, typeof(Configuration));
 				ModAssets.LoadAssetBundles();
@@ -73,24 +71,29 @@ namespace ONI_United
 				ModAssets.LoadEmbeddedBundles();
 
 				RegisterDevTools();
-				LoadNetworkRelay();
+				NetworkConfig.ApplyConfiguredTransport();
+				var versionChecker = new PVersionCheck();
+				versionChecker.Register(this, new SteamVersionChecker());
 
 				// Diagnostic hooks for unhandled exceptions
+#if DEBUG
 				Application.logMessageReceived += (condition, stackTrace, type) =>
 				{
 					if (_inLogHandler) return;
 					if (type == LogType.Exception || type == LogType.Error)
 					{
 						_inLogHandler = true;
-						DebugConsole.LogError($"[Unity] {type}: {condition}\n{stackTrace}");
-						_inLogHandler = false;
+						try
+						{
+							DebugConsole.LogError($"[Unity] {type}: {condition}\n{stackTrace}");
+						}
+						finally
+						{
+							_inLogHandler = false;
+						}
 					}
 				};
-
-				AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-				{
-					DebugConsole.LogError($"[AppDomain] Unhandled exception: {args.ExceptionObject}");
-				};
+#endif
 				base.OnLoad(harmony);
 				SteamLobby.Initialize();
 			}
@@ -102,16 +105,6 @@ namespace ONI_United
 			}
         }
 
-        void LoadNetworkRelay()
-		{
-			NetworkConfig.ApplyConfiguredTransport();
-
-			///version checker that doesnt restart the game
-			var VersionChecker = new PVersionCheck();
-			VersionChecker.Register(this, new SteamVersionChecker());
-
-		}
-		
 		private static void RegisterDevTools()
 		{
 			using var _ = Profiler.Scope();

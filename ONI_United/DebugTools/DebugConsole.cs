@@ -141,7 +141,8 @@ namespace ONI_United.DebugTools
         {
             using var _ = Profiler.Scope();
 
-            _instance = new DebugConsole();
+            if (_instance == null)
+                _instance = new DebugConsole();
         }
 
         private void AddLog(string message, string stack, LogType type)
