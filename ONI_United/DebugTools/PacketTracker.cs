@@ -5,7 +5,7 @@ using System.Reflection;
 using ImGuiNET;
 using ONI_United.Misc;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;

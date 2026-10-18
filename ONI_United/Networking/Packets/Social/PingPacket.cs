@@ -4,13 +4,14 @@ using Shared.Profiling;
 using System.IO;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class PingPacket : IPacket, IAllowedWithoutWorldPacket
+	public class PingPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
 	{
 		public ulong PlayerID;
+		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public float WorldX;
 		public float WorldY;
 		public Color PlayerColor;

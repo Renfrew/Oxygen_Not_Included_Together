@@ -5,7 +5,7 @@ using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Shared;
 using Steamworks;
 using UnityEngine;
@@ -13,7 +13,7 @@ using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 
 namespace ONI_United.Networking.Transport.Steamworks
@@ -29,6 +29,13 @@ namespace ONI_United.Networking.Transport.Steamworks
         // Network health
         private const int JITTER_SAMPLE_COUNT = 20;
         private static readonly Queue<int> _pingSamples = new();
+
+        public override object CurrentConnection => Connection.HasValue ? Connection.Value : null;
+
+        public override bool IsCurrentConnection(object connection) =>
+            connection is HSteamNetConnection current
+            && Connection.HasValue
+            && current.m_HSteamNetConnection == Connection.Value.m_HSteamNetConnection;
 
         public override void Prepare()
         {
@@ -166,7 +173,10 @@ namespace ONI_United.Networking.Transport.Steamworks
 
                 try
                 {
-                    PacketHandler.HandleIncoming(data);
+                    ulong? senderId = MultiplayerSession.HostUserID.IsValid()
+                        ? MultiplayerSession.HostUserID
+                        : null;
+                    PacketHandler.HandleIncoming(data, senderId, conn);
                 }
                 catch (Exception ex)
                 {
@@ -209,22 +219,14 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
         }
 
-        private static void OnConnected()
-        {
-            using var _ = Profiler.Scope();
+		private static void OnConnected()
+		{
+		    using var _ = Profiler.Scope();
 
-            MultiplayerSession.OnConnectedToHost(MultiplayerSession.HostUserID, Connection);
-            NetworkConfig.TransportClient.OnClientConnected.Invoke();
+		    if (!Connection.HasValue)
+		        return;
 
-            DebugConsole.Log("[GameClient] Connection to host established!");
-
-            // Skip mod verification if we are the host
-			if (MultiplayerSession.IsHost)
-			{
-				return;
-			}
-
-			NetworkConfig.TransportClient.OnRequestStateOrReturn.Invoke();
+		    SessionHandshakeCoordinator.SendClientHello(Connection.Value);
 		}
 
         private static void OnDisconnected(string reason, CSteamID remote, ESteamNetworkingConnectionState state)

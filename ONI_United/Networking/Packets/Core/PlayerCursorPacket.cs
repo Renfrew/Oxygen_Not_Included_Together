@@ -1,9 +1,9 @@
 ﻿using ONI_United.Misc;
 using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,9 +17,10 @@ using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Core
 {
-	public class PlayerCursorPacket : IPacket
+	public class PlayerCursorPacket : IPacket, IClientIdentityPacket
 	{
 		public ulong PlayerID;
+		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public string PlayerName;
 		public Vector3 Position;
 		public Color Color;

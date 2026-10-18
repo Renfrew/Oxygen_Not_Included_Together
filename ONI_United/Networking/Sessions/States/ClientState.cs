@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ONI_United.Networking.Session.States
+namespace ONI_United.Networking.Sessions.States
 {
 	public enum ClientState
 	{

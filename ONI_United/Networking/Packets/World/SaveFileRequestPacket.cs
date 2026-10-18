@@ -12,16 +12,17 @@ using Shared.Profiling;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transfer;
 using ONI_United;
 using ONI_United.Misc.World;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class SaveFileRequestPacket : IPacket, IAllowedWithoutWorldPacket
+	public class SaveFileRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
 	{
 		public ulong Requester;
+		ulong IClientIdentityPacket.ClaimedSenderId => Requester;
 		public ulong SynchronizationId;
 		private static readonly Dictionary<ulong, object> TransferRuns = new Dictionary<ulong, object>();
 

@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class TrailPointsPacket : IPacket
+	public class TrailPointsPacket : IPacket, IClientIdentityPacket
 	{
 		public ulong PlayerID;
+		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public Color PlayerColor;
 		public bool IsNewStroke;
 		public List<Vector2> Points = new List<Vector2>();

@@ -3,7 +3,7 @@ using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using System;
 using System.Collections.Generic;
 using System.IO;

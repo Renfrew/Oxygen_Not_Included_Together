@@ -4,13 +4,14 @@ using Shared.Profiling;
 using System.IO;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class TrailDeletePacket : IPacket
+	public class TrailDeletePacket : IPacket, IClientIdentityPacket
 	{
 		public ulong PlayerID;
+		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public float WorldX;
 		public float WorldY;
 

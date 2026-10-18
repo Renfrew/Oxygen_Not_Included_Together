@@ -18,6 +18,12 @@ namespace ONI_United.Networking.Transport
 
         public abstract void CloseConnections();
 
+        public abstract bool TryGetRemotePlayerId(object connection, out ulong playerId);
+
+        public abstract void DisconnectConnection(object connection, string reason);
+
+        public virtual void OnSessionPlayerAdmitted(ulong playerId) { }
+
         public abstract void Update();
 
         public abstract void OnMessageRecieved();

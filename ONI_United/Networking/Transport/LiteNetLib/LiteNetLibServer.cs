@@ -4,7 +4,7 @@ using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transfer;
 using Shared.Profiling;
 using System;
@@ -16,7 +16,7 @@ using UnityEngine;
 using ONI_United.Misc.World;
 using ONI_United;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 
 namespace ONI_United.Networking.Transport.LiteNetLib
@@ -24,14 +24,14 @@ namespace ONI_United.Networking.Transport.LiteNetLib
     public class LiteNetLibServer : TransportServer
     {
         private const string ClientIdentityHandshake = "ONI_TOGETHER";
-        private const string HostIdentityHandshake = "ONI_TOGETHER_HOST";
         private static NetManager _server;
         private static EventBasedNetListener _listener;
 
         private TcpFileTransferServer _tcpTransfer;
         private readonly Dictionary<ulong, NetPeer> _peersByClientId = new Dictionary<ulong, NetPeer>();
         private readonly Dictionary<int, ulong> _clientIdByPeerId = new Dictionary<int, ulong>();
-        private readonly ConcurrentQueue<(ulong clientId, byte[] data)> _incomingPackets = new ConcurrentQueue<(ulong, byte[])>();
+        private readonly ConcurrentQueue<(ulong clientId, NetPeer peer, byte[] data)> _incomingPackets =
+            new ConcurrentQueue<(ulong, NetPeer, byte[])>();
 
         public static NetManager ServerInstance => _server;
         public bool IsRunning => _server != null && _server.IsRunning;
@@ -51,6 +51,27 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public override float OutgoingBandwidth => _srvOutBw;
         public override int IncomingPps => _srvInPps;
         public override int OutgoingPps => _srvOutPps;
+
+        public override bool TryGetRemotePlayerId(object connection, out ulong playerId)
+        {
+            if (connection is NetPeer peer)
+                return _clientIdByPeerId.TryGetValue(peer.Id, out playerId);
+
+            playerId = 0;
+            return false;
+        }
+
+        public override void DisconnectConnection(object connection, string reason)
+        {
+            if (connection is NetPeer peer)
+                peer.Disconnect();
+        }
+
+        public override void OnSessionPlayerAdmitted(ulong playerId)
+        {
+            if (!ClientList.Contains(playerId))
+                ClientList.Add(playerId);
+        }
 
         public override void Prepare()
         {
@@ -195,17 +216,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
             }
 
-            var identityWriter = new NetDataWriter();
-            identityWriter.Put(HostIdentityHandshake);
-            identityWriter.Put(NetworkConfig.GetLocalID());
-            peer.Send(identityWriter, DeliveryMethod.ReliableOrdered);
-
-            MultiplayerSession.RegisterClient(clientId, peer);
-
-            if (!ClientList.Contains(clientId))
-                ClientList.Add(clientId);
-
-            DebugConsole.Log("[LiteNetLibServer] Remote client connected: " + clientId + " (" + peer.Address + ":" + peer.Port + ")");
+            DebugConsole.Log("[LiteNetLibServer] Physical connection established from " + clientId + " (" + peer.Address + ":" + peer.Port + ")");
         }
 
         private void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -233,7 +244,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (_clientIdByPeerId.TryGetValue(peer.Id, out ulong clientId))
             {
                 byte[] rawData = reader.GetRemainingBytes();
-                _incomingPackets.Enqueue((clientId, rawData));
+                _incomingPackets.Enqueue((clientId, peer, rawData));
             }
         }
 
@@ -303,7 +314,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 try
                 {
-                    PacketHandler.HandleIncoming(packet.data);
+                    PacketHandler.HandleIncoming(packet.data, packet.clientId, packet.peer);
                 }
                 catch (Exception ex)
                 {

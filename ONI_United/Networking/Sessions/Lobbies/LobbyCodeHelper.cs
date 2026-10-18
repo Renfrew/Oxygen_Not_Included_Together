@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using Shared.Profiling;
 
-namespace ONI_United.Networking.Session.Lobbies
+namespace ONI_United.Networking.Sessions.Lobbies
 {
     /// <summary>
     /// Helper class to convert Steam Lobby IDs to human-readable codes and back.

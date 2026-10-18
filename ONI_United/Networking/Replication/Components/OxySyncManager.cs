@@ -13,7 +13,7 @@ using Shared.Profiling;
 using UnityEngine;
 
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Architecture;
 

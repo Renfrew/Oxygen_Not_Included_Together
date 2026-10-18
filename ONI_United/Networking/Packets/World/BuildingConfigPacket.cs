@@ -12,7 +12,7 @@ using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
@@ -25,9 +25,10 @@ namespace ONI_United.Networking.Packets.World
 		String = 4       // String value (tag names, text fields)
 	}
 
-	public class BuildingConfigPacket : IPacket
+	public class BuildingConfigPacket : IPacket, IClientIdentityPacket
 	{
 		private ulong Sender; // Who triggered this
+		ulong IClientIdentityPacket.ClaimedSenderId => Sender;
 		public int NetId;
 		public int Cell; // Deterministic location-based identification
 		public int ConfigHash; // Hash of the property name (e.g. "Threshold", "Logic")

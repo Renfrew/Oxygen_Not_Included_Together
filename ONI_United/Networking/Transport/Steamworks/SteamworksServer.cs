@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
@@ -6,7 +7,7 @@ using Shared.Profiling;
 using ONI_United.Networking.Replication.Components;
 using Steamworks;
 using ONI_United;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 
 namespace ONI_United.Networking.Transport.Steamworks
@@ -16,6 +17,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         public static HSteamListenSocket ListenSocket { get; private set; }
         public static HSteamNetPollGroup PollGroup { get; private set; }
         private static Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
+        private static readonly Dictionary<uint, ulong> _clientIdsByConnection = new Dictionary<uint, ulong>();
 
         // Bandwidth tracking via per-connection GetConnectionRealTimeStatus
         private float _srvInBw, _srvOutBw;
@@ -89,6 +91,7 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (ListenSocket.m_HSteamListenSocket != 0)
                 SteamNetworkingSockets.CloseListenSocket(ListenSocket);
 
+            _clientIdsByConnection.Clear();
             MultiplayerSession.UnRegisterAsHost(null);
         }
 
@@ -159,7 +162,11 @@ namespace ONI_United.Networking.Transport.Steamworks
 
                 try
                 {
-                    PacketHandler.HandleIncoming(bytes);
+                    HSteamNetConnection connection = msg.m_conn;
+                    if (_clientIdsByConnection.TryGetValue(connection.m_HSteamNetConnection, out ulong senderId))
+                        PacketHandler.HandleIncoming(bytes, senderId, connection);
+                    else
+                        DebugConsole.LogWarning("[GameServer] Received data from an untracked Steam connection.");
                 }
                 catch (Exception ex)
                 {
@@ -252,7 +259,25 @@ namespace ONI_United.Networking.Transport.Steamworks
         {
             using var _ = Profiler.Scope();
 
-            MultiplayerSession.RegisterClient(clientId.m_SteamID, conn);
+            uint connectionId = conn.m_HSteamNetConnection;
+            bool duplicateConnection = false;
+            foreach (var entry in _clientIdsByConnection)
+            {
+                if (entry.Key != connectionId && entry.Value == clientId.m_SteamID)
+                {
+                    duplicateConnection = true;
+                    break;
+                }
+            }
+
+            bool alreadyAdmitted = MultiplayerSession.ConnectedPlayers.ContainsKey(clientId.m_SteamID);
+            if (duplicateConnection || alreadyAdmitted)
+            {
+                SteamNetworkingSockets.CloseConnection(conn, 0, "Duplicate session identity", false);
+                return;
+            }
+
+            _clientIdsByConnection[connectionId] = clientId.m_SteamID;
 
             DebugConsole.Log($"[GameServer] Connection to {clientId} fully established!");
             //SaveFileRequestPacket.SendSaveFile(clientId); // Old method
@@ -264,6 +289,7 @@ namespace ONI_United.Networking.Transport.Steamworks
             using var _ = Profiler.Scope();
 
             SteamNetworkingSockets.CloseConnection(conn, 0, null, false);
+            _clientIdsByConnection.Remove(conn.m_HSteamNetConnection);
 
             MultiplayerSession.UnregisterClient(clientId.m_SteamID, null, conn);
 
@@ -275,6 +301,21 @@ namespace ONI_United.Networking.Transport.Steamworks
             //     SetState(ServerState.Stopped);
             //     Shutdown
             // }
+        }
+
+        public override bool TryGetRemotePlayerId(object connection, out ulong playerId)
+        {
+            if (connection is HSteamNetConnection steamConnection)
+                return _clientIdsByConnection.TryGetValue(steamConnection.m_HSteamNetConnection, out playerId);
+
+            playerId = 0;
+            return false;
+        }
+
+        public override void DisconnectConnection(object connection, string reason)
+        {
+            if (connection is HSteamNetConnection steamConnection)
+                SteamNetworkingSockets.CloseConnection(steamConnection, 0, reason, false);
         }
 
         public override void KickClient(ulong clientId)

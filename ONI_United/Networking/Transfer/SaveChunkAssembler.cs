@@ -1,7 +1,7 @@
 ﻿using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.World;
 using System;

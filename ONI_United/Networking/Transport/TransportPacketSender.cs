@@ -99,7 +99,7 @@ namespace ONI_United.Networking.Transport
                     ChunkData = chunkData
                 };
 
-                byte[] chunkBytes = PacketSender.SerializePacketForSending(chunk);
+                byte[] chunkBytes = PacketSerialization.Serialize(chunk);
                 if (!sendRaw(conn, chunkBytes, chunk, sendType))
                     return false;
             }

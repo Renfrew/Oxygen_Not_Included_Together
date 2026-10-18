@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ONI_United.Misc;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transport;
 using ONI_United.Networking.Transport.LiteNetLib;
 using ONI_United.Networking.Transport.Steamworks;
@@ -15,7 +15,7 @@ using UnityEngine;
 using ONI_United;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using GameServer = ONI_United.Networking.Lifecycle.GameServer;
 using Shared.Networking;
 

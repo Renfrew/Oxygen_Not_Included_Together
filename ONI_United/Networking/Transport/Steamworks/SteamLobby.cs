@@ -2,7 +2,7 @@
 using ONI_United.Misc;
 using ONI_United.Patches.ToolPatches;
 using ONI_United.Networking.Replication.Components;
-using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Sessions.Lobbies;
 using ONI_United.UI.Screens;
 using GameServer = ONI_United.Networking.Lifecycle.GameServer;
 using Steamworks;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using Shared;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
@@ -272,18 +272,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			if ((stateChange & EChatMemberStateChange.k_EChatMemberStateChangeEntered) != 0)
 			{
-				if (MultiplayerSession.IsHost)
-				{
-					if (!MultiplayerSession.ConnectedPlayers.ContainsKey(userId))
-						//MultiplayerSession.ConnectedPlayers[user] = new MultiplayerPlayer(user);
-						MultiplayerSession.ConnectedPlayers.Add(userId, new MultiplayerPlayer(user.m_SteamID));
-				}
-				else if (userId == MultiplayerSession.HostUserID && !MultiplayerSession.ConnectedPlayers.ContainsKey(userId))
-				{
-					//MultiplayerSession.ConnectedPlayers[user] = new MultiplayerPlayer(user);
-                    MultiplayerSession.ConnectedPlayers.Add(userId, new MultiplayerPlayer(user.m_SteamID));
-                }
-
 				DebugConsole.Log($"[SteamLobby] {name} joined the lobby.");
 				OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
                 var boxedId = Boxed<ulong>.Get(userId);
@@ -295,9 +283,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 					(stateChange & EChatMemberStateChange.k_EChatMemberStateChangeDisconnected) != 0 ||
 					(stateChange & EChatMemberStateChange.k_EChatMemberStateChangeKicked) != 0)
 			{
-				if (MultiplayerSession.ConnectedPlayers.TryGetValue(userId, out var p))
-					MultiplayerSession.RemoveConnectedPlayer(userId, p.Connection);
-
 				RefreshLobbyMembers();
 				DebugConsole.Log($"[SteamLobby] {name} left the lobby.");
                 OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
@@ -361,6 +346,10 @@ namespace ONI_United.Networking.Transport.Steamworks
 			{
 				CSteamID member = SteamMatchmaking.GetLobbyMemberByIndex(CurrentLobby, i);
 				LobbyMembers.Add(member);
+				if (Session.Players.ContainsKey(member.m_SteamID))
+					SessionController.UpdatePlayerInformation(
+						member.m_SteamID,
+						SteamFriends.GetFriendPersonaName(member));
 				_OnLobbyMembersRefreshed?.Invoke(member);
 			}
 			ReadyManager.RefreshReadyState();

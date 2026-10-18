@@ -4,13 +4,14 @@ using System.IO;
 using Shared.Profiling;
 using Utils = ONI_United.Misc.Utils;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class WorldDataRequestPacket : IPacket
+	public class WorldDataRequestPacket : IPacket, IClientIdentityPacket
 	{
 		public ulong SenderId;
+		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 
 		public void Serialize(BinaryWriter writer)
 		{

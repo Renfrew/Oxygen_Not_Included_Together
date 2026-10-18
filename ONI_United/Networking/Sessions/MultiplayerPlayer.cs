@@ -1,14 +1,17 @@
 ﻿using ONI_United.Misc;
 using ONI_United.Networking;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 
-namespace ONI_United.Networking.Session;
+namespace ONI_United.Networking.Sessions;
 
-public class MultiplayerPlayer
+public class MultiplayerPlayer : Player
 {
-	public ulong PlayerId { get; private set; }
-	public string PlayerName { get; set; }
+	public string PlayerName
+	{
+		get => UserName;
+		set => UserName = value ?? string.Empty;
+	}
 	public bool IsLocal => PlayerId == NetworkConfig.GetLocalID();
 
 	public int AvatarImageId { get; private set; } = -1;
@@ -19,8 +22,8 @@ public class MultiplayerPlayer
 	public ClientReadyState readyState = ClientReadyState.Unready;
 
     public MultiplayerPlayer(ulong playerId)
+		: base(playerId)
 	{
-		PlayerId = playerId;
 		if (playerId == MultiplayerSession.HostUserID)
 			readyState = ClientReadyState.Ready;
 		ProtocolVerified = IsLocal;
@@ -32,6 +35,12 @@ public class MultiplayerPlayer
 
 		PlayerName = Utils.TrucateName(SteamFriends.GetFriendPersonaName(playerId.AsCSteamID()));
 		AvatarImageId = SteamFriends.GetLargeFriendAvatar(playerId.AsCSteamID());
+	}
+
+	internal MultiplayerPlayer(ulong playerId, string userName)
+		: this(playerId)
+	{
+		UserName = userName ?? string.Empty;
 	}
 
 	public override string ToString()

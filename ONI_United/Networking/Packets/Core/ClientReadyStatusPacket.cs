@@ -1,20 +1,21 @@
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Replication.Components;
 using Shared.Profiling;
 using System.IO;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Core
 {
-	class ClientReadyStatusPacket : IPacket, IAllowedWithoutWorldPacket
+	class ClientReadyStatusPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
 	{
 		public ulong SenderId;
+		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 		public ulong SynchronizationId;
 		public ClientReadyState Status = ClientReadyState.Unready;
 		public string PlayerName = string.Empty;

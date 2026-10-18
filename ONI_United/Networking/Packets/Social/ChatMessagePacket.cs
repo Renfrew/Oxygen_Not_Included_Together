@@ -11,13 +11,14 @@ using Shared.Profiling;
 using UnityEngine;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class ChatMessagePacket : IPacket, IAllowedWithoutWorldPacket
+	public class ChatMessagePacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
 	{
 		public ulong SenderId;
+		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 		public string Message;
 		public Color PlayerColor;
 		public long Timestamp;

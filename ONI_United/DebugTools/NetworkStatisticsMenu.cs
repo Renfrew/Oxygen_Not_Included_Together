@@ -2,7 +2,7 @@ using ONI_United.UI.Screens;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transport.LiteNetLib;
 using Steamworks;
 using System;

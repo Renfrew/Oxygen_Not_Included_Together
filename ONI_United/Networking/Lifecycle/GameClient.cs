@@ -8,7 +8,7 @@ using ONI_United.Networking.Packets.Handshake;
 using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.World;
 using Shared.Profiling;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Patches.ToolPatches;
 using Shared;
 using Shared.Helpers;
@@ -17,7 +17,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
@@ -33,7 +33,7 @@ namespace ONI_United.Networking.Lifecycle
 		private static bool _loadSubmitted;
 
 		internal static bool IsCurrentSynchronization(ulong synchronizationId) =>
-			MultiplayerSession.IsClient && _state == ClientState.LoadingWorld
+			Session.IsClient && _state == ClientState.LoadingWorld
 			&& synchronizationId != 0 && synchronizationId == ActiveSynchronizationId;
 
 		internal static bool CanReceiveSynchronizationSave(ulong synchronizationId) =>
@@ -213,7 +213,7 @@ namespace ONI_United.Networking.Lifecycle
 			};
 			NetworkConfig.TransportClient.OnRequestStateOrReturn = () =>
 			{
-                PacketSender.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
+                GameplayPacketSender.Instance.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
                 MP_Timer.Instance.StartDelayedAction(10, () => CoroutineRunner.RunOne(ShowMessageAndReturnToTitle()));
             };
             NetworkConfig.TransportClient.Prepare();
@@ -298,12 +298,12 @@ namespace ONI_United.Networking.Lifecycle
 
 			switch (State)
 			{
+				case ClientState.Connecting:
 				case ClientState.Connected:
 				case ClientState.LoadingWorld:
 				case ClientState.InGame:
 					NetworkConfig.TransportClient.OnMessageRecieved();
 					break;
-				case ClientState.Connecting:
 				case ClientState.Disconnected:
 				default:
 					break;
@@ -431,7 +431,7 @@ namespace ONI_United.Networking.Lifecycle
 		{
 			using var _ = Profiler.Scope();
 
-			if (MultiplayerSession.IsHost)
+			if (Session.IsHost)
 			{
 				DebugConsole.Log("[GameClient] ContinueConnectionFlow called on host - ignoring");
 				return;

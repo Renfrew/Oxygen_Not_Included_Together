@@ -1,7 +1,7 @@
 using ONI_United.DebugTools;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
-using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Sessions;
+using ONI_United.Networking.Sessions.Lobbies;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;

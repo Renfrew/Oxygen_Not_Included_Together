@@ -1,9 +1,9 @@
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Runtime
 {

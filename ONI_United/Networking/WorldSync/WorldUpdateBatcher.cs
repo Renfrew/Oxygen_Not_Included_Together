@@ -1,6 +1,6 @@
 ﻿using ONI_United.DebugTools;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.World;
 using System;

@@ -4,13 +4,14 @@ using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class TcpFallbackRequestPacket : IPacket, IAllowedWithoutWorldPacket
+	public class TcpFallbackRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
 	{
 		public ulong Requester;
+		ulong IClientIdentityPacket.ClaimedSenderId => Requester;
 		public ulong SynchronizationId;
 
 		public void Serialize(BinaryWriter writer)

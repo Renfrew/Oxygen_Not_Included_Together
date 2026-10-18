@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
@@ -18,7 +18,7 @@ namespace ONI_United.Networking.Packets.World
     /// Client sends sync progress for host to visualize
     /// Host can monitor in real time how the save file download is progressing
     /// </summary>
-    public class SyncProgressPacket : IPacket, IAllowedWithoutWorldPacket
+    public class SyncProgressPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
     {
         // Tracks progress of all clients for host UI
         private static readonly Dictionary<ulong, ClientSyncInfo> ClientProgress = new Dictionary<ulong, ClientSyncInfo>();
@@ -33,6 +33,7 @@ namespace ONI_United.Networking.Packets.World
             public System.DateTime LastUpdate;
         }
         public ulong ClientSteamID;      // Who is sending the progress
+        ulong IClientIdentityPacket.ClaimedSenderId => ClientSteamID;
         public string ClientName;           // Readable player name
         public string FileName;             // Name of file being downloaded
         public int ReceivedChunks;          // How many chunks have been received

@@ -6,13 +6,14 @@ using Shared.Profiling;
 using Steamworks;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Tools.Capture;
 
-public class CaptureToolPacket : IPacket
+public class CaptureToolPacket : IPacket, IClientIdentityPacket
 {
     private ulong        SenderId = MultiplayerSession.LocalUserID;
+    ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
     private Vector2         Min;
     private Vector2         Max;
     private PrioritySetting Priority;

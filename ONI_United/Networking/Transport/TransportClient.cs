@@ -40,6 +40,10 @@ namespace ONI_United.Networking.Transport
 
         public abstract void ConnectToHost(string ip, int port);
 
+        public abstract object CurrentConnection { get; }
+
+        public abstract bool IsCurrentConnection(object connection);
+
         public abstract void Disconnect();
 
         public abstract void ReconnectToSession();
