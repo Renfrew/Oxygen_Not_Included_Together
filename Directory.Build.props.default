@@ -23,15 +23,16 @@
     <GameFolder>$(GameInstallFolder)/$(AssemblyFolder)</GameFolder>
     <GameLibsFolder>$(GameFolder)</GameLibsFolder>
 
-    <DocumentsFolder Condition="'$(USERPROFILE)' != ''">$(USERPROFILE)/Documents</DocumentsFolder>
-    <DocumentsFolder Condition="'$(DocumentsFolder)' == '' and '$(HOMEDRIVE)' != '' and '$(HOMEPATH)' != ''">$(HOMEDRIVE)$(HOMEPATH)/Documents</DocumentsFolder>
-    <DocumentsFolder Condition="'$(DocumentsFolder)' == '' and '$(USERNAME)' != ''">C:/Users/$(USERNAME)/Documents</DocumentsFolder>
-    <ModFolder>$(DocumentsFolder)/$(DevModsFolder)</ModFolder>
+    <!-- Resolve the Windows Known Folder, including redirected Documents; keep explicit overrides. -->
+    <DocumentsFolder Condition="'$(DocumentsFolder)' == ''">$([System.Environment]::GetFolderPath(System.Environment+SpecialFolder.MyDocuments))</DocumentsFolder>
+    <ModFolder Condition="'$(ModFolder)' == '' and '$(DocumentsFolder)' != ''">$(DocumentsFolder)/$(DevModsFolder)</ModFolder>
   </PropertyGroup>
 
   <Target Name="ValidateOniWindowsPath"
           BeforeTargets="ResolveReferences"
           Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(DoNotBuildAsMod)' != 'true' and '$(DesignTimeBuild)' != 'true' and '$(SkipOniPathValidation)' != 'true'">
+    <Error Condition="'$(ModFolder)' == ''"
+           Text="Unable to resolve Windows Documents. Set DocumentsFolder or ModFolder explicitly before building a development mod." />
     <Error Condition="'$(GameFolderRegistryValid)' != 'true' and '$(GameFolderDefaultValid)' != 'true'"
            Text="Unable to locate a valid Oxygen Not Included installation. Checked registry InstallLocation for Steam App 457140 and fallback '$(GameFolderDefault)'. Set GameInstallFolder/GameFolder/GameLibsFolder in Directory.Build.props.user to OxygenNotIncluded_Data/Managed." />
   </Target>

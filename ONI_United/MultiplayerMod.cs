@@ -29,7 +29,7 @@ namespace ONI_United
 			using var _ = Profiler.Scope();
 
 			var version = mod?.packagedModInfo?.version ?? "unknown";
-			UnityEngine.Debug.Log($"    - version: {version}");
+			Debug.Log($"    - version: {version}");
 
 			PUtil.InitLibrary(false);
 			new POptions().RegisterOptions(this, typeof(Configuration));
