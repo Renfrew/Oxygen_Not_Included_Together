@@ -151,7 +151,7 @@ namespace ONI_United.Networking.Overlay
 			var info = cons.Invoke(args) as KIconToggleMenu.ToggleInfo;
 			if (info != null)
 			{
-				info.getSpriteCB = () => NetworkingOverlayMode.OverlayIcon;
+				info.getSpriteCB = () => ModAssets.Images.NetworkOverlayIcon;
 				info.getTooltipText = () =>
 				{
 					var list = new List<Tuple<string, TextStyleSetting>>();
@@ -189,7 +189,7 @@ namespace ONI_United.Networking.Overlay
 			}
 
 			object infoUnit = null;
-			var sprite = NetworkingOverlayMode.OverlayIcon;
+			var sprite = ModAssets.Images.NetworkOverlayIcon;
 			foreach (var cons in infoUnitCons)
 			{
 				var ps = cons.GetParameters();

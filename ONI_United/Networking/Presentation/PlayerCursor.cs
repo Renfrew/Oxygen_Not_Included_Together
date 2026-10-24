@@ -128,7 +128,7 @@ namespace ONI_United.Networking.Presentation
 			SetColor(Color.white);
 			SetVisibility(false);
 
-			playerCursorShader = ResourceLoader.LoadFromBundle<Shader>("playercursorbundle", "assets/playercursoraction/playercursoraction.shader");
+			playerCursorShader = ModAssets.PlayerCursorShader;
 
 			if (playerCursorShader != null)
 			{

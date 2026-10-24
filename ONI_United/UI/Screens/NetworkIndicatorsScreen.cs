@@ -47,18 +47,10 @@ namespace ONI_United.UI.Screens
         {
             using var _ = Profiler.Scope();
 
-			const string bundleKey = "networkindicators";
-			const string prefabPath = "assets/networkindicators/prefabs/network indicators.prefab";
-			if (!ModAssets.LoadedBundles.TryGetValue(bundleKey, out var bundle) || bundle == null)
-			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: embedded AssetBundle '{bundleKey}' is unavailable.");
-				return;
-			}
-
-			var prefab = ResourceLoader.LoadFromBundle<GameObject>(bundleKey, prefabPath);
+			var prefab = ModAssets.NetworkIndicatorsPrefab;
 			if (prefab == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: prefab '{prefabPath}' is missing from embedded AssetBundle '{bundleKey}'.");
+				DebugConsole.LogWarning("Skipping optional network indicators: prefab unavailable; see ModAssets initialization errors.");
 				return;
 			}
 
@@ -76,7 +68,7 @@ namespace ONI_United.UI.Screens
 				parentCanvas.transform);
 			if (indicators == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: instantiation of prefab '{prefabPath}' returned null.");
+				DebugConsole.LogWarning("Skipping optional network indicators: instantiation returned null.");
 				return;
 			}
 			indicators.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
@@ -84,7 +76,7 @@ namespace ONI_United.UI.Screens
             var rect = indicators.GetComponent<RectTransform>();
 			if (rect == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: instantiated prefab '{prefabPath}' has no RectTransform.");
+				DebugConsole.LogWarning("Skipping optional network indicators: instantiated prefab has no RectTransform.");
 				UnityEngine.Object.Destroy(indicators);
 				indicators = null;
 				return;

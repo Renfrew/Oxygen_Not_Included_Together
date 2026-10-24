@@ -100,16 +100,8 @@ internal static class MainMenuPatch
 			var image = logoObj.GetComponent<UnityEngine.UI.Image>();
 			if (image != null)
 			{
-				Texture2D tex = ResourceLoader.LoadEmbeddedTexture("ONI_United.Assets.ONI_United_logo.png");
-				if (tex != null)
-				{
-					Sprite newSprite = Sprite.Create(
-							tex,
-							new Rect(0, 0, tex.width, tex.height),
-							new Vector2(0.5f, 0.5f)
-					);
-					image.sprite = newSprite;
-				}
+				if (ModAssets.Images.Logo != null)
+					image.sprite = ModAssets.Images.Logo;
 			}
 		}
 
@@ -137,8 +129,8 @@ internal static class MainMenuPatch
         layout.childControlHeight = false;
         layout.childControlWidth = false;
 
-        var discordSprite = ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.discord.png");
-        AddSocialButton(socialsContainer.transform, ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO, "https://discord.gg/jpxveK6mmY", discordSprite);
+        AddSocialButton(socialsContainer.transform, ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO,
+            "https://discord.gg/jpxveK6mmY", ModAssets.Images.DiscordNormal, ModAssets.Images.DiscordHighlighted, ModAssets.Images.DiscordPressed);
 
         int buttonCount = socialsContainer.transform.childCount;
         float buttonHeight = 96f;
@@ -146,11 +138,12 @@ internal static class MainMenuPatch
         socialsRect.sizeDelta = new Vector2(100f, totalHeight);
     }
 
-    private static void AddSocialButton(Transform parent, string tooltip, string url, Texture2D spriteSheet)
+    private static void AddSocialButton(Transform parent, string tooltip, string url,
+        Sprite normalSprite, Sprite highlightedSprite, Sprite pressedSprite)
 	{
 		using var _ = Profiler.Scope();
 
-		if (spriteSheet == null)
+		if (normalSprite == null)
 			return;
 
 		GameObject buttonGO = new GameObject($"SocialButton_{tooltip}", typeof(RectTransform));
@@ -162,11 +155,6 @@ internal static class MainMenuPatch
 
 		var rectTransform = button.GetComponent<RectTransform>();
 		rectTransform.sizeDelta = new Vector2(96f, 96f);
-
-		// slice the spritesheet (3 frames horizontally)
-		Sprite normalSprite = Sprite.Create(spriteSheet, new Rect(0, 0, 512, 512), new Vector2(0.5f, 0.5f));
-		Sprite highlightedSprite = Sprite.Create(spriteSheet, new Rect(512, 0, 512, 512), new Vector2(0.5f, 0.5f));
-		Sprite pressedSprite = Sprite.Create(spriteSheet, new Rect(1024, 0, 512, 512), new Vector2(0.5f, 0.5f));
 
 		buttonImage.sprite = normalSprite;
 

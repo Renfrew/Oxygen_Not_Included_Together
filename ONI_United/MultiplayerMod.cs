@@ -34,7 +34,7 @@ namespace ONI_United
 			PUtil.InitLibrary(false);
 			new POptions().RegisterOptions(this, typeof(Configuration));
 
-			ModAssets.LoadAssetBundles();
+			ModAssets.Initialize();
 			Configuration.Instance.EnsurePersistentUserId();
 			PacketTracker.Init();
 
@@ -63,8 +63,6 @@ namespace ONI_United
 			go.AddComponent<DiscordRichPresence>();
 
 			ReadyManager.SetupListeners();
-
-			ModAssets.LoadEmbeddedBundles();
 
 			RegisterDevTools();
 			NetworkConfig.ApplyConfiguredTransport();

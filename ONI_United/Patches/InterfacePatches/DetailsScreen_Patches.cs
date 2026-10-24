@@ -31,7 +31,7 @@ namespace ONI_United.Patches.InterfacePatches
 				UIUtils.AddSimpleTooltipToObject(chatLinkBtn.transform, ONIStrings.UI.MP_CHATBOX.LINK_IN_CHAT.TOOLTIP, true, onBottom: true);
 				if (chatLinkBtn.transform.Find("Image").TryGetComponent<Image>(out var image))
 				{
-					image.sprite = ResourceLoader.LoadEmbeddedSprite("ONI_Together.Assets.oni_together_link_chat.png", out _);
+					image.sprite = ModAssets.Images.ChatLinkIcon;
 				}
 				chatLinkBtn.onClick += () =>
 				{

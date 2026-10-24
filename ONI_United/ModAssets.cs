@@ -1,71 +1,228 @@
 ﻿using ONI_United.DebugTools;
-using ONI_United.Misc;
 using ONI_United.UI.Screens;
-using ONI_United.UI.lib;
 using Shared.Profiling;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UI.lib;
 using UnityEngine;
 
 namespace ONI_United
 {
-	public static class ModAssets
+	public static partial class ModAssets
 	{
+		private static AssetBundle cursorBundle, indicatorsBundle, legacyUiBundle, multiplayerUiBundle;
+		private static string ModPath { get; } = Path.GetDirectoryName(typeof(ModAssets).Assembly.Location);
+		internal static Shader PlayerCursorShader { get; private set; }
+		internal static GameObject NetworkIndicatorsPrefab { get; private set; }
 
-		public static readonly Dictionary<string, AssetBundle> LoadedBundles = [];
 
 		public static GameObject ParentScreen => App.GetCurrentSceneName() == "frontend" ? FrontEndManager.Instance.gameObject : PauseScreen.Instance?.transform?.parent?.gameObject ?? GameScreenManager.Instance.GetParent(GameScreenManager.UIRenderTarget.ScreenSpaceOverlay);
 		public static GameObject MP_ScreenPrefab, MP_PW_Dialogue, MP_LobbyState_Dialogue, MP_Chatbox;
 
-		public static void LoadEmbeddedBundles()
+		public static void Initialize()
 		{
 			using var _ = Profiler.Scope();
 
-			string cursorBundle = GetBundleBasedOnPlatform("ONI_Together.Assets.bundles.playercursor_win.bundle",
-				"ONI_Together.Assets.bundles.playercursor_mac.bundle",
-				"ONI_Together.Assets.bundles.playercursor_lin.bundle");
-			LoadAssetBundle("playercursorbundle", cursorBundle);
-
-			string networkIndicators = GetBundleBasedOnPlatform("ONI_Together.Assets.bundles.networkindicators_win.bundle",
-				"ONI_Together.Assets.bundles.networkindicators_mac.bundle",
-				"ONI_Together.Assets.bundles.networkindicators_lin.bundle");
-			LoadAssetBundle("networkindicators", networkIndicators);
+			Images.Initialize();
+			LoadLegacyUiAssets();
+			ModUI.Initialize();
+			LoadEmbeddedAssets();
 		}
 
-		public static AssetBundle LoadAssetBundle(string bundleKey, string resourceName)
+		internal static class Images
 		{
-			using var _ = Profiler.Scope();
+			internal static Sprite ModMascot { get; private set; }
+			internal static Sprite Logo { get; private set; }
+			internal static Sprite ChatLinkIcon { get; private set; }
+			internal static Sprite NetworkOverlayIcon { get; private set; }
+			internal static Sprite SyncingIcon { get; private set; }
+			internal static Sprite DiscordNormal { get; private set; }
+			internal static Sprite DiscordHighlighted { get; private set; }
+			internal static Sprite DiscordPressed { get; private set; }
 
-			if (LoadedBundles.TryGetValue(bundleKey, out var bundle))
+			internal static void Initialize()
 			{
-				DebugConsole.Log($"LoadAssetBundle: Reusing cached AssetBundle '{bundleKey}'.");
-				return bundle;
-			}
+				ModMascot = LoadEmbeddedSprite("ONI_Together.Assets.mod_mascot.png");
+				Logo = LoadEmbeddedSprite("ONI_United.Assets.ONI_United_logo.png");
+				ChatLinkIcon = LoadEmbeddedSprite("ONI_Together.Assets.oni_together_link_chat.png");
+				SyncingIcon = LoadEmbeddedSprite("ONI_United.Assets.syncing.png", SpriteMeshType.FullRect);
 
-			bundle = ResourceLoader.LoadEmbeddedAssetBundle(resourceName);
-
-			if (bundle != null)
-			{
-				LoadedBundles[bundleKey] = bundle;
-				DebugConsole.LogSuccess($"LoadAssetBundle: Successfully loaded AssetBundle '{bundleKey}' from resource '{resourceName}'.");
-
-				foreach (var name in bundle.GetAllAssetNames())
+				var discord = LoadEmbeddedTexture("ONI_Together.Assets.discord.png");
+				if (discord != null)
 				{
-					DebugConsole.LogAssert($"[ONI_Together] Bundle Asset: {name}");
+					DiscordNormal = Sprite.Create(discord, new Rect(0, 0, 512, 512), new Vector2(0.5f, 0.5f));
+					DiscordHighlighted = Sprite.Create(discord, new Rect(512, 0, 512, 512), new Vector2(0.5f, 0.5f));
+					DiscordPressed = Sprite.Create(discord, new Rect(1024, 0, 512, 512), new Vector2(0.5f, 0.5f));
 				}
 
-				foreach (var name in bundle.GetAllScenePaths())
+				var overlay = LoadEmbeddedTexture("ONI_Together.Assets.network_overlay_icon.png");
+				if (overlay != null)
 				{
-					DebugConsole.LogAssert($"[ONI_Together] Scene: {name}");
+					var small = ResizeTexture(overlay, 36, 36);
+					UnityEngine.Object.Destroy(overlay);
+					small.filterMode = FilterMode.Bilinear;
+					NetworkOverlayIcon = Sprite.Create(small, new Rect(0, 0, 36, 36),
+						new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
 				}
+			}
+		}
 
-				return bundle;
+		internal static class ModUI
+		{
+			internal static GameObject HostView { get; private set; }
+			internal static GameObject HostFooter { get; private set; }
+#if DEBUG
+			internal static GameObject Gallery { get; private set; }
+			internal static GameObject GalleryEntry { get; private set; }
+			internal static GameObject GalleryListEntry { get; private set; }
+			internal static GameObject GalleryContainerEntry { get; private set; }
+#endif
+
+			internal static void Initialize()
+			{
+				try
+				{
+					multiplayerUiBundle = LoadPlatformBundle("oni_united_ui");
+					HostView = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/hostview.prefab");
+					HostFooter = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/hostfooter.prefab");
+#if DEBUG
+					Gallery = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallery.prefab");
+					GalleryEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigalleryentry.prefab");
+					GalleryListEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerylistentry.prefab");
+					GalleryContainerEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerycontainerentry.prefab");
+
+					// Validate the loaded prefabs separately from loading them.
+					foreach (var prefab in new[] { HostView, HostFooter, Gallery, GalleryEntry, GalleryListEntry, GalleryContainerEntry })
+					{
+						if (prefab.activeSelf || prefab.GetComponent<RectTransform>() == null)
+							throw new InvalidOperationException($"Prepared UI prefab '{prefab.name}' must be inactive and have a RectTransform.");
+						ValidateUIComponents(prefab);
+					}
+#endif
+					DebugConsole.Log("[ModAssets] Prepared UI assets initialized.");
+				}
+				catch (Exception error)
+				{
+					DebugConsole.LogError("[ModAssets] Prepared UI initialization failed; other UI remains available: " + error);
+				}
+			}
+		}
+
+		private static void LoadLegacyUiAssets()
+		{
+			legacyUiBundle = LoadPlatformBundle("oni_mp_ui_assets");
+
+			const string screenPath = "Assets/UIs/mp_screen.prefab";
+			const string passwordDialoguePath = "Assets/UIs/mp_password_dialogue.prefab";
+			const string lobbyStateDialoguePath = "Assets/UIs/mp_lobby_state_dialogue.prefab";
+			const string chatboxPath = "Assets/UIs/mp_chatbox.prefab";
+			MP_ScreenPrefab = LoadRequiredPrefab(legacyUiBundle, screenPath);
+			MP_PW_Dialogue = LoadRequiredPrefab(legacyUiBundle, passwordDialoguePath);
+			MP_LobbyState_Dialogue = LoadRequiredPrefab(legacyUiBundle, lobbyStateDialoguePath);
+			MP_Chatbox = LoadRequiredPrefab(legacyUiBundle, chatboxPath);
+			MP_Chatbox.AddComponent<UnityChatBoxUI>();
+
+			var TMPConverter = new TMPConverter();
+			DebugConsole.Log("Loading main screen prefab...");
+			TMPConverter.ReplaceAllText(MP_ScreenPrefab);
+			DebugConsole.Log("Loading password dialogue prefab...");
+			TMPConverter.ReplaceAllText(MP_PW_Dialogue);
+			DebugConsole.Log("Loading lobby state dialogue prefab...");
+			TMPConverter.ReplaceAllText(MP_LobbyState_Dialogue);
+			DebugConsole.Log("Loading chatbox prefab...");
+			TMPConverter.ReplaceAllText(MP_Chatbox);
+		}
+
+		private static void LoadEmbeddedAssets()
+		{
+			try
+			{
+				cursorBundle = LoadEmbeddedBundle(GetBundleBasedOnPlatform(
+					"ONI_Together.Assets.bundles.playercursor_win.bundle",
+					"ONI_Together.Assets.bundles.playercursor_mac.bundle",
+					"ONI_Together.Assets.bundles.playercursor_lin.bundle"));
+				PlayerCursorShader = cursorBundle.LoadAsset<Shader>("assets/playercursoraction/playercursoraction.shader");
+				if (PlayerCursorShader == null)
+					throw new InvalidOperationException("Player cursor shader is missing from its bundle.");
+			}
+			catch (Exception error)
+			{
+				DebugConsole.LogError("[ModAssets] Player cursor shader unavailable: " + error);
 			}
 
-			DebugConsole.LogError($"LoadAssetBundle: Could not load AssetBundle from resource '{resourceName}'");
-			return null;
+			try
+			{
+				indicatorsBundle = LoadEmbeddedBundle(GetBundleBasedOnPlatform(
+					"ONI_Together.Assets.bundles.networkindicators_win.bundle",
+					"ONI_Together.Assets.bundles.networkindicators_mac.bundle",
+					"ONI_Together.Assets.bundles.networkindicators_lin.bundle"));
+				NetworkIndicatorsPrefab = indicatorsBundle.LoadAsset<GameObject>("assets/networkindicators/prefabs/network indicators.prefab");
+				if (NetworkIndicatorsPrefab == null)
+					throw new InvalidOperationException("Network indicators prefab is missing from its bundle.");
+			}
+			catch (Exception error)
+			{
+				DebugConsole.LogError("[ModAssets] Network indicators prefab unavailable: " + error);
+			}
+		}
+
+		private static Texture2D LoadEmbeddedTexture(string resourceName)
+		{
+			using var stream = typeof(ModAssets).Assembly.GetManifestResourceStream(resourceName);
+			if (stream == null)
+			{
+				DebugConsole.LogError("Embedded image resource not found: " + resourceName);
+				return null;
+			}
+
+			using var buffer = new MemoryStream();
+			stream.CopyTo(buffer);
+			var texture = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+			typeof(ImageConversion).GetMethod("LoadImage", new[] { typeof(Texture2D), typeof(byte[]) })
+				.Invoke(null, new object[] { texture, buffer.ToArray() });
+			return texture;
+		}
+
+		private static Sprite LoadEmbeddedSprite(string resourceName, SpriteMeshType meshType = SpriteMeshType.Tight)
+		{
+			var texture = LoadEmbeddedTexture(resourceName);
+			return texture != null
+				? Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+					new Vector2(0.5f, 0.5f), 100f, 0, meshType)
+				: null;
+		}
+
+		private static Texture2D ResizeTexture(Texture2D source, int width, int height)
+		{
+			var target = RenderTexture.GetTemporary(width, height, 0,
+				RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
+			var previous = RenderTexture.active;
+			try
+			{
+				Graphics.Blit(source, target);
+				RenderTexture.active = target;
+				var texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+				texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+				texture.Apply();
+				return texture;
+			}
+			finally
+			{
+				RenderTexture.active = previous;
+				RenderTexture.ReleaseTemporary(target);
+			}
+		}
+
+		private static AssetBundle LoadEmbeddedBundle(string resourceName)
+		{
+			using var stream = typeof(ModAssets).Assembly.GetManifestResourceStream(resourceName)
+				?? throw new InvalidOperationException("Embedded AssetBundle resource not found: " + resourceName);
+			using var buffer = new MemoryStream();
+			stream.CopyTo(buffer);
+			var bundle = AssetBundle.LoadFromMemory(buffer.ToArray());
+			if (bundle == null)
+				throw new InvalidOperationException("Could not load embedded AssetBundle: " + resourceName);
+			return bundle;
 		}
 
 		private static string GetBundleBasedOnPlatform(string windowsBundle, string macBundle, string linuxBundle)
@@ -83,91 +240,37 @@ namespace ONI_United
 			}
 		}
 
-		public static void LoadAssetBundles()
+		private static AssetBundle LoadPlatformBundle(string name)
 		{
-			using var _ = Profiler.Scope();
-
-			var platformFolder = Application.platform switch
+			string platform = Application.platform switch
 			{
 				RuntimePlatform.WindowsPlayer => "windows",
 				RuntimePlatform.OSXPlayer => "mac",
 				RuntimePlatform.LinuxPlayer => "linux",
-				_ => null
+				_ => throw new PlatformNotSupportedException($"Unsupported UI asset platform: {Application.platform}")
 			};
-
-			if (platformFolder == null)
-			{
-				var message = $"Required multiplayer UI assets do not support platform '{Application.platform}'.";
-				DebugConsole.LogError(message);
-				throw new PlatformNotSupportedException(message);
-			}
-
-			var bundlePath = Path.Combine(
-				Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location),
-				"assets",
-				platformFolder,
-				"oni_mp_ui_assets");
-			AssetBundle bundle;
-			try
-			{
-				bundle = AssetUtils.LoadAssetBundle("oni_mp_ui_assets", platformSpecific: true);
-			}
-			catch (Exception ex)
-			{
-				var message = $"Failed to load required multiplayer UI AssetBundle at '{bundlePath}'.";
-				DebugConsole.LogError($"{message} {ex}");
-				throw new InvalidOperationException(message, ex);
-			}
-
+			string path = Path.Combine(ModPath, "assets", platform, name);
+			var bundle = AssetBundle.LoadFromFile(path);
 			if (bundle == null)
-			{
-				var message = $"Required multiplayer UI AssetBundle could not be loaded from '{bundlePath}'.";
-				DebugConsole.LogError(message);
-				throw new InvalidOperationException(message);
-			}
+				throw new InvalidOperationException($"Failed to load AssetBundle '{name}' from '{path}'.");
+			return bundle;
+		}
 
-			const string screenPath = "Assets/UIs/mp_screen.prefab";
-			const string passwordDialoguePath = "Assets/UIs/mp_password_dialogue.prefab";
-			const string lobbyStateDialoguePath = "Assets/UIs/mp_lobby_state_dialogue.prefab";
-			const string chatboxPath = "Assets/UIs/mp_chatbox.prefab";
-			MP_ScreenPrefab = LoadRequiredPrefab(bundle, screenPath);
-			MP_PW_Dialogue = LoadRequiredPrefab(bundle, passwordDialoguePath);
-			MP_LobbyState_Dialogue = LoadRequiredPrefab(bundle, lobbyStateDialoguePath);
-			MP_Chatbox = LoadRequiredPrefab(bundle, chatboxPath);
-			MP_Chatbox.AddComponent<UnityChatBoxUI>();
-
-			var TMPConverter = new TMPConverter();
-			DebugConsole.Log("Loading main screen prefab...");
-			TMPConverter.ReplaceAllText(MP_ScreenPrefab);
-			DebugConsole.Log("Loading password dialogue prefab...");
-			TMPConverter.ReplaceAllText(MP_PW_Dialogue);
-			DebugConsole.Log("Loading lobby state dialogue prefab...");
-			TMPConverter.ReplaceAllText(MP_LobbyState_Dialogue);
-			DebugConsole.Log("Loading chatbox prefab...");
-			TMPConverter.ReplaceAllText(MP_Chatbox);
+		// Detailed hierarchy scans are diagnostics, not part of Release initialization.
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal static void ValidateUIComponents(GameObject root)
+		{
+			foreach (var child in root.GetComponentsInChildren<Transform>(true))
+				foreach (var component in child.GetComponents<Component>())
+					if (component == null)
+						throw new InvalidOperationException("Missing serialized UI component: " + child.name);
 		}
 
 		private static GameObject LoadRequiredPrefab(AssetBundle bundle, string prefabPath)
 		{
-			GameObject prefab;
-			try
-			{
-				prefab = bundle.LoadAsset<GameObject>(prefabPath);
-			}
-			catch (Exception ex)
-			{
-				var message = $"Failed to load required multiplayer UI prefab '{prefabPath}' from AssetBundle 'oni_mp_ui_assets'.";
-				DebugConsole.LogError($"{message} {ex}");
-				throw new InvalidOperationException(message, ex);
-			}
-
+			var prefab = bundle.LoadAsset<GameObject>(prefabPath);
 			if (prefab == null)
-			{
-				var message = $"Required multiplayer UI prefab '{prefabPath}' is missing from AssetBundle 'oni_mp_ui_assets'.";
-				DebugConsole.LogError(message);
-				throw new InvalidOperationException(message);
-			}
-
+				throw new InvalidOperationException($"Required UI prefab '{prefabPath}' is missing from AssetBundle '{bundle.name}'.");
 			return prefab;
 		}
 	}
