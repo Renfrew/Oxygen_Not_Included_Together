@@ -73,6 +73,7 @@ namespace ONI_United
 			internal static GameObject HostFooter { get; private set; }
 #if DEBUG
 			internal static GameObject Gallery { get; private set; }
+			internal static GameObject GalleryContent { get; private set; }
 			internal static GameObject GalleryEntry { get; private set; }
 			internal static GameObject GalleryListEntry { get; private set; }
 			internal static GameObject GalleryContainerEntry { get; private set; }
@@ -87,23 +88,24 @@ namespace ONI_United
 					HostFooter = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/hostfooter.prefab");
 #if DEBUG
 					Gallery = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallery.prefab");
+					GalleryContent = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerycontent.prefab");
 					GalleryEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigalleryentry.prefab");
 					GalleryListEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerylistentry.prefab");
 					GalleryContainerEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerycontainerentry.prefab");
 
 					// Validate the loaded prefabs separately from loading them.
-					foreach (var prefab in new[] { HostView, HostFooter, Gallery, GalleryEntry, GalleryListEntry, GalleryContainerEntry })
+					foreach (var prefab in new[] { HostView, HostFooter, Gallery, GalleryContent, GalleryEntry, GalleryListEntry, GalleryContainerEntry })
 					{
 						if (prefab.activeSelf || prefab.GetComponent<RectTransform>() == null)
 							throw new InvalidOperationException($"Prepared UI prefab '{prefab.name}' must be inactive and have a RectTransform.");
 						ValidateUIComponents(prefab);
 					}
 #endif
-					DebugConsole.Log("[ModAssets] Prepared UI assets initialized.");
+					ModLog.Debug("[ModAssets] Prepared UI assets loaded from '" + multiplayerUiBundle.name + "'.");
 				}
 				catch (Exception error)
 				{
-					DebugConsole.LogError("[ModAssets] Prepared UI initialization failed; other UI remains available: " + error);
+					ModLog.Error("[ModAssets] Prepared UI initialization failed; prepared UI assets may be incomplete: " + error);
 				}
 			}
 		}
@@ -123,14 +125,11 @@ namespace ONI_United
 			MP_Chatbox.AddComponent<UnityChatBoxUI>();
 
 			var TMPConverter = new TMPConverter();
-			DebugConsole.Log("Loading main screen prefab...");
 			TMPConverter.ReplaceAllText(MP_ScreenPrefab);
-			DebugConsole.Log("Loading password dialogue prefab...");
 			TMPConverter.ReplaceAllText(MP_PW_Dialogue);
-			DebugConsole.Log("Loading lobby state dialogue prefab...");
 			TMPConverter.ReplaceAllText(MP_LobbyState_Dialogue);
-			DebugConsole.Log("Loading chatbox prefab...");
 			TMPConverter.ReplaceAllText(MP_Chatbox);
+			ModLog.Debug("[ModAssets] Legacy UI text conversion completed for four prefabs.");
 		}
 
 		private static void LoadEmbeddedAssets()
@@ -147,7 +146,7 @@ namespace ONI_United
 			}
 			catch (Exception error)
 			{
-				DebugConsole.LogError("[ModAssets] Player cursor shader unavailable: " + error);
+				ModLog.Error("[ModAssets] Player cursor shader unavailable: " + error);
 			}
 
 			try
@@ -162,7 +161,7 @@ namespace ONI_United
 			}
 			catch (Exception error)
 			{
-				DebugConsole.LogError("[ModAssets] Network indicators prefab unavailable: " + error);
+				ModLog.Error("[ModAssets] Network indicators prefab unavailable: " + error);
 			}
 		}
 
@@ -171,7 +170,7 @@ namespace ONI_United
 			using var stream = typeof(ModAssets).Assembly.GetManifestResourceStream(resourceName);
 			if (stream == null)
 			{
-				DebugConsole.LogError("Embedded image resource not found: " + resourceName);
+				ModLog.Error("[ModAssets] Embedded image resource not found: " + resourceName);
 				return null;
 			}
 

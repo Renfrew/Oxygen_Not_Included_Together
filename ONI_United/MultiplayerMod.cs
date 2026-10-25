@@ -38,12 +38,14 @@ namespace ONI_United
 			Configuration.Instance.EnsurePersistentUserId();
 			PacketTracker.Init();
 
-#if DEBUG
-			NetworkStatisticsMenu.Init();
-#endif
-
 			var go = new GameObject("Multiplayer_Modules");
 			UnityEngine.Object.DontDestroyOnLoad(go);
+
+#if DEBUG
+			NetworkStatisticsMenu.Init();
+			DevToolMultiplayer.Register();
+			go.AddComponent<NativeUiGallery>();
+#endif
 
 			go.AddComponent<NetworkingComponent>();
 			go.AddComponent<UIVisibilityController>();
@@ -64,7 +66,6 @@ namespace ONI_United
 
 			ReadyManager.SetupListeners();
 
-			RegisterDevTools();
 			NetworkConfig.ApplyConfiguredTransport();
 
 			var versionChecker = new PVersionCheck();
@@ -73,18 +74,6 @@ namespace ONI_United
 			base.OnLoad(harmony);
 			SteamLobby.Initialize();
         }
-
-		private static void RegisterDevTools()
-		{
-			using var _ = Profiler.Scope();
-
-#if DEBUG // DevTool is not accessible on mac.
-			var baseMethod = AccessTools.Method(typeof(DevToolManager), "RegisterDevTool");
-			var twitchDevToolRegister = baseMethod.MakeGenericMethod(typeof(DevToolMultiplayer));
-			twitchDevToolRegister.Invoke(DevToolManager.Instance, new object[] { "Mods/MultiplayerMod" });
-			DevToolManager.Instance.showImGui = true;
-#endif
-		}
 
 		public override void OnAllModsLoaded(Harmony harmony, IReadOnlyList<Mod> mods)
         {

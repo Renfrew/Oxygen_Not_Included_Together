@@ -97,6 +97,11 @@ namespace ONI_United.DebugTools
             "oni_mp.dll"
         );
 
+        internal static void Register()
+        {
+            DevToolManager.Instance.RegisterDevTool<DevToolMultiplayer>("Mods/ONI United");
+        }
+
         public DevToolMultiplayer()
         {
             using var _ = Profiler.Scope();
@@ -110,10 +115,6 @@ namespace ONI_United.DebugTools
             playerColor = new Vector3(loadedColor.R / 255, loadedColor.G / 255, loadedColor.B / 255);
             useRandomColor = Configuration.GetClientProperty<bool>("UseRandomPlayerColor");
 
-            OnInit += () => Init();
-            OnUpdate += () => Update();
-            OnUninit += () => UnInit();
-
             selectedTransportType = Configuration.Instance.Host.NetworkTransport;
             hostIP = Configuration.Instance.Host.LanSettings.Ip;
             hostPort = Configuration.Instance.Host.LanSettings.Port;
@@ -124,21 +125,6 @@ namespace ONI_United.DebugTools
             clientPort = Configuration.Instance.Client.LanSettings.Port;
             settings_client.Ip = clientIP;
             settings_client.Port = clientPort;
-        }
-
-        void Init()
-        {
-
-        }
-
-        void Update()
-        {
-
-        }
-
-        void UnInit()
-        {
-
         }
 
         public override void RenderTo(DevPanel panel)
@@ -295,13 +281,11 @@ namespace ONI_United.DebugTools
                         MultiplayerSession.Clear();
                         try
                         {
-                            DebugConsole.Log("Starting GameServer...");
                             ONI_United.Networking.Lifecycle.GameServer.Start();
-                            DebugConsole.Log("GameServer started successfully.");
                         }
                         catch (Exception ex)
                         {
-                            DebugConsole.LogError($"GameServer.Start() failed: {ex}");
+                            ModLog.Error($"[DevToolMultiplayer] LAN server start failed: {ex}");
                         }
                         SelectToolPatch.UpdateColor();
                     }
@@ -1171,7 +1155,7 @@ namespace ONI_United.DebugTools
                 go.AddComponent<OxySyncTestComponent>();
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 NetworkIdentityRegistry.TryGet(go.GetComponent<ONI_United.Networking.Identity.NetworkIdentity>().NetId, out _);
-                DebugConsole.Log("[OxySync] Spawned test entity at runtime");
+                ModLog.Info("[OxySync] Spawned test entity at runtime");
             }
 
             ImGui.SameLine();
@@ -1185,7 +1169,7 @@ namespace ONI_United.DebugTools
                     {
                         go.AddComponent<ONI_United.Networking.Identity.NetworkIdentity>();
                         go.AddComponent<OxySyncTestComponent>();
-                        DebugConsole.Log($"[OxySync] Attached test component to {go.name}");
+                        ModLog.Info($"[OxySync] Attached test component to {go.name}");
                     }
                 }
             }
