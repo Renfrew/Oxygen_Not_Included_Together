@@ -349,7 +349,7 @@ namespace ONI_United.Networking.Lifecycle
 				// Ignore this if we're in game already
 				if (Utils.IsInMenu())
 				{
-					DialogUtil.CreateConfirmDialogFrontend(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE, text,
+					UiUtil.CreateConfirmDialogFrontend(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE, text,
 		   ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC,
 					() => { SaveHelper.SyncModsAndRestart(notEnabled, notDisabled, missingMods); },
 					ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL,

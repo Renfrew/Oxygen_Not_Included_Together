@@ -23,12 +23,15 @@ namespace ONI_United
 {
 	public class MultiplayerMod : UserMod2
 	{
+        internal static string ModVersion { get; private set; }
 
         public override void OnLoad(Harmony harmony)
 		{
 			using var _ = Profiler.Scope();
 
-			var version = mod?.packagedModInfo?.version ?? "unknown";
+			var version = mod?.packagedModInfo?.version
+                ?? System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(MultiplayerMod).Assembly)?.InformationalVersion;
+            ModVersion = version;
 			Debug.Log($"    - version: {version}");
 
 			PUtil.InitLibrary(false);

@@ -4,6 +4,11 @@ namespace ONI_United
 	{
 		public class UI
 		{
+            public class MULTIPLAYER_BUTTONS
+            {
+                public static LocString TITLE = "Multiplayer";
+            }
+
 			public class CONFIGURATION
 			{
 				public class HEADERS
@@ -231,7 +236,7 @@ namespace ONI_United
 					public static LocString LABEL = "MULTIPLAYER";
 				}
 			}
-			public class PAUSESCREEN
+			public class PAUSE_SCREEN
 			{
 				public class MULTIPLAYER
 				{
@@ -505,8 +510,35 @@ namespace ONI_United
 							public static LocString TEXT = "Join with Code";
 						}
 					}
+                    public class JOINSECTIONS
+                    {
+                        public static LocString PUBLIC_LOBBIES = "Public lobbies";
+                        public static LocString REFRESH = "Refresh";
+                        public static LocString LOBBY_PLACEHOLDER = "No available lobbies.";
+                        public static LocString LOBBY_EMPTY = "No lobby results were returned.";
+                        public static LocString LOBBY_RESULTS = "{0} public lobbies found.";
+                        public static LocString LOBBY_ERROR = "Could not refresh Steam lobbies: {0}";
+                        public static LocString STEAM_SETTINGS = "Steam settings";
+                        public static LocString LAN_SETTINGS = "LAN settings";
+                        public static LocString OPEN_FRIENDS = "Open Friends";
+                        public static LocString CONFIGURE = "Configure";
+                        public static LocString INVALID_CODE = "Enter a valid lobby code.";
+                        public static LocString STEAM_UNAVAILABLE = "Steam is not initialized.";
+                        public static LocString STEAM_JOIN_UNVERIFIED = "Steam joining is unavailable until end-to-end operation is verified.";
+                        public static LocString SEARCHING = "Refreshing public lobbies...";
+                        public static LocString NETWORK_BUSY = "A multiplayer connection or server is already active.";
+                        public static LocString RETURN_TO_FRONTEND = "Return to the frontend before joining another colony.";
+                        public static LocString CONNECTION_ERROR = "Could not start connection: {0}";
+                        public static LocString STEAM_REQUESTING = "Requesting Steam lobby entry; gameplay admission is not yet confirmed.";
+                        public static LocString STEAM_WAITING = "Steam lobby entry returned; waiting for gameplay admission.";
+                        public static LocString STEAM_JOIN_ERROR = "Could not join Steam lobby: {0}";
+                    }
 					public class LANJOIN
 					{
+						public static LocString HOST_ADDRESS = "Host address";
+						public static LocString PORT_LABEL = "Port";
+						public static LocString PLAYER_NAME = "Player name";
+						public static LocString DEFAULT_PLAYER_NAME = "Player {0}";
 						public class INPUTS
 						{
 							public class IPINPUT
@@ -536,6 +568,11 @@ namespace ONI_United
 						public static LocString TEXT = "Cancel";
 					}
 				}
+                    public class HOSTSECTIONS
+                    {
+                        public static LocString SETTINGS = "Settings";
+                    }
+
 				public class HOSTMENU
 				{
 					public static LocString TITLE = "Host Lobby Settings";
@@ -726,6 +763,12 @@ namespace ONI_United
 				public class ENDSESSION
 				{
 					public static LocString TEXT = "End Session";
+					public static LocString STOP_HOSTING = "Stop Hosting";
+				}
+				public class HOSTING
+				{
+					public static LocString LABEL = "Hosting Game";
+					public static LocString PORT = "Listening on port {0}";
 				}
 			}
 			

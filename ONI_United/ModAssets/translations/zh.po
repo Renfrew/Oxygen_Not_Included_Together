@@ -541,6 +541,10 @@ msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOINING"
 msgid "Joining..."
 msgstr "正在加入..."
 
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYER_BUTTONS.TITLE"
+msgid "Multiplayer"
+msgstr "多人游戏"
+
 msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.TITLE"
 msgid "Multiplayer"
 msgstr "多人游戏"
@@ -597,31 +601,31 @@ msgctxt "ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL"
 msgid "MULTIPLAYER"
 msgstr "多人游戏"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.MULTIPLAYER.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.MULTIPLAYER.LABEL"
 msgid "Multiplayer"
 msgstr "多人游戏"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HOSTGAME.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.HOSTGAME.LABEL"
 msgid "Host Game"
 msgstr "创建主机"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.INVITE.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.INVITE.LABEL"
 msgid "Invite Friends"
 msgstr "邀请好友"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.DOHARDSYNC.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.DOHARDSYNC.LABEL"
 msgid "Perform Hard Sync"
 msgstr "执行强制同步"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HARDSYNCNOTAVAILABLE.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.HARDSYNCNOTAVAILABLE.LABEL"
 msgid "Already hard synced this cycle!"
 msgstr "本周期已执行过强制同步！"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.ENDSESSION.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.ENDSESSION.LABEL"
 msgid "End Session"
 msgstr "结束会话"
 
-msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.LEAVESESSION.LABEL"
+msgctxt "ONI_United.STRINGS.UI.PAUSE_SCREEN.LEAVESESSION.LABEL"
 msgid "Leave Session"
 msgstr "离开会话"
 
@@ -1404,3 +1408,143 @@ msgstr "{0} 分钟前"
 msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NEVER"
 msgid "never"
 msgstr "从不"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_LOBBIES"
+msgid "Steam lobbies"
+msgstr "Steam lobbies"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LAN_LOBBIES"
+msgid "LAN lobbies"
+msgstr "LAN lobbies"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.REFRESH"
+msgid "Refresh"
+msgstr "Refresh"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LOBBY_PLACEHOLDER"
+msgid "Refresh to search Steam lobbies. Joining from this list is not available."
+msgstr "Refresh to search Steam lobbies. Joining from this list is not available."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LOBBY_EMPTY"
+msgid "No lobby results were returned."
+msgstr "No lobby results were returned."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LOBBY_RESULTS"
+msgid "Search returned {0} lobby result(s). Joining from this list is not available."
+msgstr "Search returned {0} lobby result(s). Joining from this list is not available."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LOBBY_ERROR"
+msgid "Could not refresh Steam lobbies: {0}"
+msgstr "Could not refresh Steam lobbies: {0}"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LAN_DISCOVERY_UNAVAILABLE"
+msgid "LAN lobby discovery is unavailable. Join using a host address below."
+msgstr "LAN lobby discovery is unavailable. Join using a host address below."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_SETTINGS"
+msgid "Steam settings"
+msgstr "Steam settings"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LAN_SETTINGS"
+msgid "LAN settings"
+msgstr "LAN settings"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.OPEN_FRIENDS"
+msgid "Open Friends"
+msgstr "Open Friends"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.CONFIGURE"
+msgid "Configure"
+msgstr "Configure"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_CONFIGURATION_UNAVAILABLE"
+msgid "Steam configuration is unavailable."
+msgstr "Steam configuration is unavailable."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.LAN_CONFIGURATION_HELP"
+msgid "Additional LAN options are available in this mod's Options from the Mods menu."
+msgstr "Additional LAN options are available in this mod's Options from the Mods menu."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.INVALID_CODE"
+msgid "Enter a valid lobby code."
+msgstr "Enter a valid lobby code."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_UNAVAILABLE"
+msgid "Steam is not initialized."
+msgstr "Steam is not initialized."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_JOIN_UNVERIFIED"
+msgid "Steam joining is unavailable until end-to-end operation is verified."
+msgstr "Steam joining is unavailable until end-to-end operation is verified."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.SEARCHING"
+msgid "Refreshing Steam lobbies..."
+msgstr "Refreshing Steam lobbies..."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.NETWORK_BUSY"
+msgid "A multiplayer connection or server is already active."
+msgstr "A multiplayer connection or server is already active."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.RETURN_TO_FRONTEND"
+msgid "Return to the frontend before joining another colony."
+msgstr "Return to the frontend before joining another colony."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.CONNECTION_ERROR"
+msgid "Could not start connection: {0}"
+msgstr "Could not start connection: {0}"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_REQUESTING"
+msgid "Requesting Steam lobby entry; gameplay admission is not yet confirmed."
+msgstr "Requesting Steam lobby entry; gameplay admission is not yet confirmed."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_WAITING"
+msgid "Steam lobby entry returned; waiting for gameplay admission."
+msgstr "Steam lobby entry returned; waiting for gameplay admission."
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINSECTIONS.STEAM_JOIN_ERROR"
+msgid "Could not join Steam lobby: {0}"
+msgstr "Could not join Steam lobby: {0}"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.HOST_ADDRESS"
+msgid "Host address"
+msgstr "Host address"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.PORT_LABEL"
+msgid "Port"
+msgstr "Port"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.PLAYER_NAME"
+msgid "Player name"
+msgstr "Player name"
+
+#. Source-language fallback for the completed Join UI; translation pending.
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.DEFAULT_PLAYER_NAME"
+msgid "Player {0}"
+msgstr "Player {0}"

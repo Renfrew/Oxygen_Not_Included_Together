@@ -11,7 +11,9 @@ using UnityEngine;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transfer;
+using ONI_United.Networking.Transport.LiteNetLib;
 
 namespace ONI_United.Networking.Lifecycle
 {
@@ -54,9 +56,12 @@ namespace ONI_United.Networking.Lifecycle
 			_ => 60,
 		};
 
-		public static void Start()
+		public static bool Start()
 		{
 			using var _ = Profiler.Scope();
+
+			if (_state == ServerState.Started)
+				return true;
 
 			// A server started - or restarted - inside a loaded world: NetworkConfig.Stop
 			// wiped the identity registry, and the objects of that world never register
@@ -72,6 +77,12 @@ namespace ONI_United.Networking.Lifecycle
 
 			NetworkConfig.TransportServer.OnError = () => SetState(ServerState.Error);
 			NetworkConfig.TransportServer.Prepare();
+			if (_state == ServerState.Error)
+			{
+				NetworkConfig.TransportServer.Stop();
+				return false;
+			}
+
 			CursorManager.Instance.AssignColor();
 
 			RefreshTickRate();
@@ -81,9 +92,19 @@ namespace ONI_United.Networking.Lifecycle
 
 			NetworkConfig.TransportServer.Start();
 
+			if (_state == ServerState.Error
+				|| (NetworkConfig.TransportServer is LiteNetLibServer lanServer
+					&& (!lanServer.IsRunning || !MultiplayerSession.IsHostInSession)))
+			{
+				NetworkConfig.TransportServer.Stop();
+				SetState(ServerState.Error);
+				return false;
+			}
+
 			DebugConsole.Log("[GameServer] Game Server started!");
 
 			SetState(ServerState.Started);
+			return true;
 		}
 
 		public static void Shutdown()

@@ -21,22 +21,24 @@ namespace ONI_United
         {
             // Table templates remain owned by vanilla Assets.UIPrefabs.
             internal Assets.TableScreenAssets TableWidgets => Assets.UIPrefabs.TableScreenWidgets;
-            internal GameObject PrimaryButton { get; }
-            internal GameObject SecondaryButton { get; }
-            internal GameObject PlainText { get; }
-            internal GameObject SubHeader { get; }
-            internal GameObject OptionsButton { get; }
-            internal GameObject MainMenuButton { get; }
-            internal GameObject LineItem { get; }
-            internal GameObject CollapsiblePanel { get; }
-            internal MultiToggle[] MenuTabs { get; }
-            internal KInputTextField SeedInput { get; }
-            internal KInputTextField FileNameInput { get; }
-            internal KInputTextField Input { get; }
-            internal GameObject WindowShell { get; }
-            internal Transform Footer { get; }
-            internal Transform FooterLeft { get; }
-            internal Transform FooterRight { get; }
+            public GameObject PrimaryButton { get; }
+            public GameObject SecondaryButton { get; }
+            public GameObject PlainText { get; }
+            public GameObject SubHeader { get; }
+            public GameObject OptionsButton { get; }
+            public GameObject MainMenuButton { get; }
+            public GameObject LineItem { get; }
+            public GameObject CollapsiblePanel { get; }
+            public MultiToggle[] MenuTabs { get; }
+            public KInputTextField SeedInput { get; }
+            public KInputTextField FileNameInput { get; }
+            public KInputTextField Input { get; }
+            public KButton HeaderCloseButton { get; }
+            public UnityEngine.UI.Image SectionPanel { get; }
+            public LocText SectionHeading { get; }
+            public UnityEngine.UI.Image DialogPanel { get; }
+            public UnityEngine.UI.Image DialogTitleBar { get; }
+            public LocText DialogTitle { get; }
 
             internal NativeUiAssets(ScreenPrefabs provider)
             {
@@ -60,20 +62,13 @@ namespace ONI_United
                 Input = provider.LockerNavigator?.GetComponent<LockerNavigator>()
                     ?.outfitBrowserScreen?.GetComponent<OutfitBrowserScreen>()?.inputFieldPrefab;
                 CollapsiblePanel = provider.CollapsableContentPanel;
-                WindowShell = provider.OptionsScreen?.transform.Find("CenterContent/Content/BG")?.gameObject;
-
-                FooterLeft = dialog?.leftButtonPanel?.transform;
-                FooterRight = dialog?.rightButtonPanel?.transform;
-                var footer = FooterLeft;
-                while (footer != null && FooterRight != null && !FooterRight.IsChildOf(footer))
-                    footer = footer.parent;
-                if (FooterRight != null && footer != null && footer != dialog.transform)
-                    Footer = footer;
-                else
-                    ModLog.Warning(
-                        "[ModAssets] Native InfoDialog footer is unavailable; " +
-                        "footer-dependent UI cannot use this template.");
-
+                var graphics = provider.OptionsScreen.graphicsOptionsScreenPrefab;
+                HeaderCloseButton = graphics.closeButton;
+                DialogPanel = graphics.transform.Find("Content/BG").GetComponent<UnityEngine.UI.Image>();
+                DialogTitleBar = graphics.transform.Find("Content/TitleBar").GetComponent<UnityEngine.UI.Image>();
+                DialogTitle = graphics.transform.Find("Content/TitleBar/Title").GetComponent<LocText>();
+                SectionPanel = graphics.transform.Find("Content/DisplaySettings/BG").GetComponent<UnityEngine.UI.Image>();
+                SectionHeading = graphics.transform.Find("Content/DisplaySettings/Header").GetComponent<LocText>();
             }
         }
     }

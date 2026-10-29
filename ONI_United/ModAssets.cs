@@ -16,8 +16,7 @@ namespace ONI_United
 		internal static GameObject NetworkIndicatorsPrefab { get; private set; }
 
 
-		public static GameObject ParentScreen => App.GetCurrentSceneName() == "frontend" ? FrontEndManager.Instance.gameObject : PauseScreen.Instance?.transform?.parent?.gameObject ?? GameScreenManager.Instance.GetParent(GameScreenManager.UIRenderTarget.ScreenSpaceOverlay);
-		public static GameObject MP_ScreenPrefab, MP_PW_Dialogue, MP_LobbyState_Dialogue, MP_Chatbox;
+		public static GameObject MP_PW_Dialogue, MP_Chatbox;
 
 		public static void Initialize()
 		{
@@ -69,8 +68,10 @@ namespace ONI_United
 
 		internal static class ModUI
 		{
-			internal static GameObject HostView { get; private set; }
-			internal static GameObject HostFooter { get; private set; }
+			internal static Shared.UI.UiTemplateConfig Config { get; private set; }
+			internal static Shared.UI.MultiplayerDialogScreen Dialog { get; private set; }
+			internal static Shared.UI.TabMenu TabMenu { get; private set; }
+			internal static GameObject SessionView { get; private set; }
 #if DEBUG
 			internal static GameObject Gallery { get; private set; }
 			internal static GameObject GalleryContent { get; private set; }
@@ -84,8 +85,14 @@ namespace ONI_United
 				try
 				{
 					multiplayerUiBundle = LoadPlatformBundle("oni_united_ui");
-					HostView = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/hostview.prefab");
-					HostFooter = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/hostfooter.prefab");
+					Config = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/uitemplateconfig.prefab")
+						.GetComponent<Shared.UI.UiTemplateConfig>();
+					if (Config == null) throw new InvalidOperationException("UI template configuration component missing.");
+					Dialog = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/multiplayerdialogscreen.prefab").GetComponent<Shared.UI.MultiplayerDialogScreen>();
+					if (Dialog == null) throw new InvalidOperationException("Multiplayer dialog component missing.");
+					TabMenu = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/tabmenu.prefab").GetComponent<Shared.UI.TabMenu>();
+					if (TabMenu == null) throw new InvalidOperationException("Reusable tab menu component missing.");
+					SessionView = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/sessionview.prefab");
 #if DEBUG
 					Gallery = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallery.prefab");
 					GalleryContent = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerycontent.prefab");
@@ -94,14 +101,14 @@ namespace ONI_United
 					GalleryContainerEntry = LoadRequiredPrefab(multiplayerUiBundle, "assets/prefabs/nativeuigallerycontainerentry.prefab");
 
 					// Validate the loaded prefabs separately from loading them.
-					foreach (var prefab in new[] { HostView, HostFooter, Gallery, GalleryContent, GalleryEntry, GalleryListEntry, GalleryContainerEntry })
+					foreach (var prefab in new[] { Config.gameObject, Dialog.gameObject, TabMenu.gameObject, SessionView, Gallery, GalleryContent, GalleryEntry, GalleryListEntry, GalleryContainerEntry })
 					{
 						if (prefab.activeSelf || prefab.GetComponent<RectTransform>() == null)
 							throw new InvalidOperationException($"Prepared UI prefab '{prefab.name}' must be inactive and have a RectTransform.");
 						ValidateUIComponents(prefab);
 					}
 #endif
-					ModLog.Debug("[ModAssets] Prepared UI assets loaded from '" + multiplayerUiBundle.name + "'.");
+					ModLog.Debug($"[ModAssets] Prepared UI assets loaded from '{multiplayerUiBundle.name}'.");
 				}
 				catch (Exception error)
 				{
@@ -114,22 +121,16 @@ namespace ONI_United
 		{
 			legacyUiBundle = LoadPlatformBundle("oni_mp_ui_assets");
 
-			const string screenPath = "Assets/UIs/mp_screen.prefab";
 			const string passwordDialoguePath = "Assets/UIs/mp_password_dialogue.prefab";
-			const string lobbyStateDialoguePath = "Assets/UIs/mp_lobby_state_dialogue.prefab";
 			const string chatboxPath = "Assets/UIs/mp_chatbox.prefab";
-			MP_ScreenPrefab = LoadRequiredPrefab(legacyUiBundle, screenPath);
 			MP_PW_Dialogue = LoadRequiredPrefab(legacyUiBundle, passwordDialoguePath);
-			MP_LobbyState_Dialogue = LoadRequiredPrefab(legacyUiBundle, lobbyStateDialoguePath);
 			MP_Chatbox = LoadRequiredPrefab(legacyUiBundle, chatboxPath);
 			MP_Chatbox.AddComponent<UnityChatBoxUI>();
 
 			var TMPConverter = new TMPConverter();
-			TMPConverter.ReplaceAllText(MP_ScreenPrefab);
 			TMPConverter.ReplaceAllText(MP_PW_Dialogue);
-			TMPConverter.ReplaceAllText(MP_LobbyState_Dialogue);
 			TMPConverter.ReplaceAllText(MP_Chatbox);
-			ModLog.Debug("[ModAssets] Legacy UI text conversion completed for four prefabs.");
+			ModLog.Debug("[ModAssets] Legacy UI text conversion completed for password and chat prefabs.");
 		}
 
 		private static void LoadEmbeddedAssets()

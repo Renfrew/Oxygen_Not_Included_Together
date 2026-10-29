@@ -1,6 +1,24 @@
 # Multiplayer: ONI United — Architecture
 
-**Last updated:** 2026-10-17
+## Current UI checkpoint — 2026-10-29
+
+The `feature/transport` checkpoint uses `ONI_United.UI.Multiplayer.MultiplayerScreen` with one authored `Shared.UI.MultiplayerDialogScreen : KModalScreen` per dialog layer. Join and Host compose prepared sections/rows through Shared APIs and use the reusable `Shared.UI.TabMenu`; native registration, selection and visibility remain inherited. Each instance exposes its inactive `Layouts/Vertical` KScreen template through `GetContentPrefab()`, outside the live Body. Session retains its existing separate content component; its equivalent composition refactor is pending.
+
+Host has one shared Maximum Players section above the transport menu. Steam Settings has password, then Friends Only plus Settings; LAN Settings has Player Name, then port plus Settings. Both use two existing authored rows, with no `HostSettingsRow` constraint. Host has no status/validation-message area or footer version; Start Hosting is left and Cancel right. Domain validation remains authoritative. Unsupported Steam hosting and Settings actions remain unavailable. The retained legacy Host component/prefab exists for authoring references, not the current Host runtime loading path.
+
+The shell/navigation ownership described below remains: Host overlays cached Join, Session replaces content in the originating layer, and closing UI does not disconnect. Current source selects Session only when `Session.IsActive`; connecting-state progress/cancellation is an implementation gap, not an established working flow. Windows packaging and partial rendering evidence do not verify gameplay or the full lifecycle. This checkpoint adds no new macOS/Linux UI bundle. See STATUS.md and DEVELOPMENT_ROADMAP.md for evidence and gates. Earlier shell/geometry entries retain their historical scope.
+
+## Dedicated Multiplayer presentation shell — 2026-10-26
+
+The current implementation replaces the InfoDialogScreen shell with one Unity-authored Shared.UI.MultiplayerDialogScreen : KModalScreen per layer. The inactive full-canvas root owns a centered content-sized panel, private header/Close/content/footer bindings and authored 10-unit action spacing with 100 x 32 minimum buttons. Native modal code owns the backdrop, stack and ordinary dismissal. The ordinary MultiplayerScreen coordinator retains Join-under-Host logical ownership (Transform siblings), cached content, Session in the layer that connected, polling, base-only Pause ownership, captured camera restoration and explicit scene/failure cleanup. Dismissing supplies early unlinking; native Close supplies final disposal. Shared editing protection runs before native input, and canBackoutWithRightClick is explicitly true. Closing Session does not disconnect. The prior InfoDialog-specific header/escape access and Harmony prefix are removed; shared native control donors remain. This supersedes the shell choice in the historical entry below, not its navigation decision. Build/Editor/package evidence is separate from the outstanding in-game gate.
+
+
+## Historical native Multiplayer dialog presentation — 2026-10-25 (shell superseded)
+
+The staged UI uses an ordinary game-side coordinator and intact native InfoDialogScreen dialogs: Join is the base, Host stacks above Join, and Session replaces the content of the dialog where connection began. Native dismissal destroys that dialog; cached underlying Join and authored content remain until their owning dialog closes. Shared content owns native options, tabs, inputs and rows. There is no custom dialog adapter or footer hierarchy. One Global coroutine polls domain state; a narrowly scoped input prefix guards focused editing before native Escape handling. Only the base dialog owns Pause; native Close and an explicit scene-loading fallback release camera/Pause ownership. UI closure never disconnects a session. See UI_DESIGN_PRINCIPLES.md. Runtime verification remains outstanding.
+
+
+**Last updated:** 2026-10-29
 
 **Document status:** Recovered and consolidated reference. This document preserves the existing architecture recorded in the `game mod` ChatGPT Project and the local repository; it is not a redesign.
 

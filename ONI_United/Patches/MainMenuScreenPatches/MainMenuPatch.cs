@@ -1,25 +1,11 @@
 ﻿using HarmonyLib;
-using ONI_United;
-using ONI_United.DebugTools;
-using ONI_United.Misc;
-using ONI_United.Networking;
-using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Sessions.Lobbies;
-using ONI_United.Networking.Synchronization.Trackers;
-using ONI_United.Networking.Transfer;
-using ONI_United.Networking.WorldSync;
-using Shared.Interfaces.Networking;
-using ONI_United.UI.Screens;
-using Steamworks;
 using System;
 using System.Linq;
 using System.Reflection;
 using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.UI;
+using ONI_United.UI.Multiplayer;
 
 namespace ONI_United.Patches.MainMenuScreenPatches;
 
@@ -39,11 +25,8 @@ internal static class MainMenuPatch
 
 		// Multiplayer - Opens the multiplayer screen with all options
 		var multiplayerInfo = CreateButtonInfo(
-				ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL,
-				new System.Action(() =>
-				{
-					UnityMultiplayerScreen.OpenFromMainMenu();
-				}),
+				ONI_United.STRINGS.UI.MULTIPLAYER_BUTTONS.TITLE,
+				new System.Action(() => MultiplayerScreen.Open(__instance)),
 				normalFontSize,
 				normalStyle,
 				buttonInfoType
@@ -82,7 +65,7 @@ internal static class MainMenuPatch
 			var children = buttonParent.GetComponentsInChildren<KButton>(true);
 
 			// Find Multiplayer button
-			var multiplayerBtn = children.FirstOrDefault(b => b.GetComponentInChildren<LocText>()?.text.ToUpper().Contains(ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL) == true);
+			var multiplayerBtn = children.FirstOrDefault(b => string.Equals(b.GetComponentInChildren<LocText>()?.text, ONI_United.STRINGS.UI.MULTIPLAYER_BUTTONS.TITLE, StringComparison.Ordinal));
 
 			int siblingIndex = children.Length >= 10 ? 4 : 3;
 			multiplayerBtn.transform.SetSiblingIndex(siblingIndex);

@@ -138,7 +138,7 @@ namespace ONI_United.Networking.Sessions
 			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, value ? BoxedBools.True : BoxedBools.False);
 		}
 
-		public static void RegisterAsHost()
+		public static bool RegisterAsHost()
 		{
 			using var _ = Profiler.Scope();
 
@@ -149,11 +149,12 @@ namespace ONI_United.Networking.Sessions
 			if (!SessionController.BeginHosting(hostId, hostPlayer))
 			{
 				DebugConsole.LogError("[MultiplayerSession] Cannot register host with an invalid local player ID.");
-				return;
+				return false;
 			}
 			SessionController.UpdatePlayerInformation(hostId, Utils.GetLocalPlayerName());
 			hostPlayer.readyState = ClientReadyState.Ready;
 			KnownPlayerNames[hostId] = hostPlayer.PlayerName;
+			return true;
 		}
 
 		public static void UnRegisterAsHost(Action<object> close)

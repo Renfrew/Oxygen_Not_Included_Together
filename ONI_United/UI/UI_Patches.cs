@@ -13,7 +13,6 @@ namespace ONI_United.UI
 {
 	internal class UI_Patches
 	{
-		public static System.Action OnLoadScreenExited = null;
 		[HarmonyPatch(typeof(KScreen), nameof(KScreen.OnKeyDown))]
 		public class KScreen_OnKeyDowne_Patch
 		{
@@ -25,10 +24,6 @@ namespace ONI_United.UI
 				{
 					DebugConsole.Log("On LoadScreen deactivate");
 					MultiplayerSession.ShouldHostAfterLoad = false;
-					if (OnLoadScreenExited != null)
-					{
-						OnLoadScreenExited();
-					}
 				}
 			}
 		}

@@ -30,7 +30,7 @@ using static ONI_United.STRINGS.UI;
 using static ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS;
 using static ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU;
 using static ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU;
-using static ONI_United.STRINGS.UI.PAUSESCREEN;
+using static ONI_United.STRINGS.UI.PAUSE_SCREEN;
 using ONI_United;
 
 namespace ONI_United.UI.Screens
@@ -129,7 +129,12 @@ namespace ONI_United.UI.Screens
 			lastScene = currentScene;
 			if (Instance == null)
 			{
-				var screen = Util.KInstantiateUI(ModAssets.MP_PW_Dialogue, ModAssets.ParentScreen, true);
+				var destination = currentScene == "frontend"
+					? FrontEndManager.Instance.gameObject
+					: GameScreenManager.Instance.GetParent(GameScreenManager.UIRenderTarget.ScreenSpaceOverlay);
+				if (destination == null || !destination.activeInHierarchy)
+					throw new InvalidOperationException("The password prompt requires an active UI destination.");
+				var screen = Util.KInstantiateUI(ModAssets.MP_PW_Dialogue, destination, true);
 				Instance = screen.AddOrGet<UnityPasswordInputDialogueUI>();
 				Instance.Init();
 			}

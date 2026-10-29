@@ -1,7 +1,24 @@
 # Multiplayer: ONI United — Development Roadmap
 
+## 2026-10-29 — Windows UI checkpoint and next gates
+
+This is an incomplete development checkpoint on `feature/transport`, not a release. The current shell is the authored `Shared.UI.MultiplayerDialogScreen : KModalScreen`, coordinated by `MultiplayerScreen`; it is not an intact InfoDialogScreen. Join/Host use reusable TabMenu composition. The historical plan below retains its navigation scenarios, but its concrete shell description is superseded.
+
+Before the checkpoint commit, include the reviewed main-menu caption lookup correction and matching catalog keys, and review these documentation changes. The fix and documentation are left unstaged for the user; committing only the existing index would omit them. Preserve the corrected builder/request bridge in the Windows Unity project's intended versioned location; the Mac bundle alone does not capture its packaging implementation.
+
+Next implementation work: make connecting-state progress/Cancel Connection reachable through the existing presentation selection and polling flow, then refactor Session separately under an approved scope. Correct the known Maximum Players 1-4 caption versus 2-16 validation mismatch separately. Do not enable unsupported Steam operations merely for UI parity.
+
+Acceptance gates: build the exact selected source tree; verify and identify the matching DLL/bundle; check localized main-menu startup; test Steam/LAN tab selection and equal page height, inputs and validation, Host start, Join connection/admission, cancellation, stop, repeat open/close, focused Escape, Host Cancel/Close, Session transitions, camera/Pause restoration and scene cleanup. Screenshots and successful asset loading cover only exercised presentation/loading. Keep source compilation, Editor checks, packaging, runtime UI and gameplay evidence separate.
+
+The new UI is packaged only for Windows in this checkpoint. New macOS/Linux bundles and their separate verification are required before claiming support on those platforms. Historical transport/release milestones and tested commits below are not reverified by this UI work.
+
+## Historical 2026-10-25 — Native Multiplayer UI runtime-verification plan (shell superseded)
+
+The staged Join/Host/Session simplification uses native stacked InfoDialogScreen instances and cached authored content. Next verify the exact built artifact in-game: Host Cancel/Escape preserves Join fields and tab state; Host/Join connection switches the existing dialog to Session; closing Session preserves the network session and reveals accurate base content; stopping/cancelling restores appropriate setup actions; focused Escape ends editing without closing; Host dismissal retains Pause ownership and camera lock; overall Close and scene transitions release both. Source/build/compiled checks do not close these runtime gates. No broader roadmap milestone or historical test result is superseded.
+
+
 **Created:** 2026-09-27  
-**Last updated:** 2026-10-17
+**Last updated:** 2026-10-29
 
 **Status:** Planning and progress guide; verified results retain the evidence limits stated here and in `STATUS.md`  
 **References:** `ARCHITECTURE.md`, `DECISIONS.md`, `STATUS.md`

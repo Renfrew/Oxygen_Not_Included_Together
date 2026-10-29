@@ -1,6 +1,32 @@
 # Multiplayer: ONI United — Architecture Decision Log
 
-**Last updated:** 2026-10-17
+## 2026-10-29 — Reusable Host/Join composition and feedback scope
+
+**Decision:** Retain the authored KModalScreen shell and stacked navigation. Join and Host use the existing reusable TabMenu, its instance-local `GetContentPrefab()`, inherited `AddTab`, and explicit initial selection. Unity owns layout; Shared owns insertion/interaction mechanics; mod-side views and focused sections supply feature composition, captions, domain data, validation and callbacks. Do not introduce another page/registration framework.
+
+**Host layout:** Keep one shared Maximum Players section above the tabs. Steam Settings has password on row one and Friends Only plus Settings on row two. LAN Settings has Player Name on row one and port plus Settings on row two. Use existing authored rows; the proposed `HostSettingsRow` dependency was removed. Equal rendered height remains to be verified, not inferred solely from row count. Start Hosting is left, Cancel right, with no version label on Host. Unsupported Steam controls and Settings actions remain disabled.
+
+**Feedback:** Join's below-row notices and validation-feedback space were removed, while public-lobby status remains. Host also has no status/validation-message display or reserved feedback space. Domain validation and authoritative availability rules survive; Host validates fields on Start. This supersedes the fixed feedback-space requirement and concrete Join geometry in the October 26 decision below; historical measurements/tests remain valid only for their original artifacts.
+
+**Status:** Source/design checkpoint, not a verified release. Session composition, connecting-state cancellation, cross-platform bundles and runtime acceptance remain open; see STATUS.md. No host-authority, networking identity or colony-save architecture is redesigned by these presentation decisions.
+
+## 2026-10-26 — Authored KModalScreen shell; stacked navigation retained
+
+**Decision:** Replace only the InfoDialog presentation shell with Shared.UI.MultiplayerDialogScreen : KModalScreen. Direct header/footer ownership removes private-header insertion and the native footer's zero action spacing/128 x 48 minima. Keep the InfoDialog-style SetHeader/AddUI/AddOption API, with a KButton handle/side/accent overload and once-only Dismissing event; do not introduce a builder or navigation framework. Graphics Options supplies frame/title/Close resources; existing neutral/accent button, text and input donors remain unchanged.
+
+**Input/lifecycle:** Enable canBackoutWithRightClick and use native KModal input after focused-input/end-edit-frame protection. Use native drag behavior initially; no PlayerController drag filter is added. Retain camera/Pause capture, native Close, scene fallback, idempotent disposal and existing coordinator/session behavior. Normal dismissal never invokes a network operation.
+
+**Geometry:** Join transport pairs use 496 x 194/120/98 authored sections, 32-high controls and an 18-high bounded feedback line. Panel width is 520 with content-driven height. This supersedes the concrete InfoDialog choice and scoped Harmony exception below, while preserving the approved stacked navigation and historical evidence. Runtime appearance remains unverified.
+
+
+## 2026-10-25 — Native stacked Multiplayer dialogs
+
+**Decision:** Keep Join underneath a separately stacked native Host InfoDialogScreen. Host success replaces Host content with Session; Join connection replaces Join content. Closing a top Session reveals Session on the base dialog if still connected. Use native Cancel and native footer placement, direct AddUI, fixed Shared-owned AddOption actions, and content caching within each dialog. Remove MultiplayerDialogView and MultiplayerFooterView rather than preserving custom navigation/placement infrastructure. No additional KScreen or persistent UI root is introduced.
+
+**Required exceptions:** Native InfoDialog handles Escape before its base editing check, so a dialog-scoped prefix delegates focused-input protection to Shared. Native Close can be suppressed during scene loading; explicit camera/Pause ownership cleanup remains. Networking behavior and Steam operation gates are unchanged. This supersedes the single-dialog adapter arrangement for this staged UI only; prior historical evidence remains intact. Build/compiled checks are recorded separately from pending in-game verification.
+
+
+**Last updated:** 2026-10-29
 
 **Status:** Recovered decisions from the `game mod` Project and local repository. Decision status and implementation status are separate: accepting a decision does not mean its implementation is complete.
 

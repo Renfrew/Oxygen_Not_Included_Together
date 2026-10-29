@@ -35,6 +35,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
         public static NetManager ServerInstance => _server;
         public bool IsRunning => _server != null && _server.IsRunning;
+        public string LastStartFailure { get; private set; }
         public int ConnectedClientCount => _server != null ? _server.ConnectedPeersCount : 0;
         public TcpFileTransferServer TcpTransfer => _tcpTransfer;
 
@@ -82,10 +83,13 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         {
             using var _ = Profiler.Scope();
 
+            LastStartFailure = null;
             if (_server != null)
+            {
+                if (!_server.IsRunning)
+                    LastStartFailure = "A LiteNetLib server instance already exists but is not running.";
                 return;
-
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
+            }
 
             string ip = Configuration.Instance.Host.LanSettings.Ip;
             int port = Configuration.Instance.Host.LanSettings.Port;
@@ -93,7 +97,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             ulong hostId = NetworkConfig.GetLocalID();
             if (hostId == 0)
             {
-                DebugConsole.LogError("[LiteNetLibServer] Cannot start with an empty persistent host ID.");
+                LastStartFailure = "Cannot start with an empty persistent host ID.";
+                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
                 OnError?.Invoke();
                 return;
             }
@@ -120,12 +125,28 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             bool started = _server.Start(port);
             if (!started)
             {
-                DebugConsole.LogError("[LiteNetLibServer] Failed to start server on port " + port);
+                LastStartFailure = "Failed to bind the LiteNetLib listener to port " + port + ".";
+                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
+                _server.Stop();
+                _server = null;
+                _listener = null;
                 OnError?.Invoke();
                 return;
             }
 
-            DebugConsole.Log("[LiteNetLibServer] LiteNetLib server started on port " + port);
+            if (!MultiplayerSession.RegisterAsHost())
+            {
+                LastStartFailure = "The listener started, but the local host session could not be registered.";
+                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
+                _server.Stop();
+                _server = null;
+                _listener = null;
+                OnError?.Invoke();
+                return;
+            }
+
+            DebugConsole.Log("[LiteNetLibServer] Listener started on port " + port);
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
 
             try
             {
@@ -138,13 +159,11 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 _tcpTransfer = null;
             }
 
-            // Register Local Host
-            MultiplayerSession.RegisterAsHost();
-
             ClientList.Clear();
             ClientList.Add(hostId);
 
             OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
+            DebugConsole.Log("[LiteNetLibServer] Host session registered for " + hostId);
         }
 
         private void OnConnectionRequest(ConnectionRequest request)
