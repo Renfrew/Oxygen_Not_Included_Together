@@ -1,5 +1,21 @@
 # Multiplayer: ONI United — Development Status
 
+## 2026-10-30 — Session simplification committed; runtime verification pending
+
+**Verified repository baseline:** `Renfrews-Studio.local` (Darwin arm64), branch `feature/transport`, HEAD `53240ca425768962b345e8eee4a4d140d5be5223` (`refactor(session): consolidate session ownership and remove redundant state`). Initial index, working tree and untracked-file status were clean. The previous LAN checkpoint is committed as `37c7d74adb9475a79f18e6c099e9fc866c0388ec`; the older staged/index reports below are historical checkpoints.
+
+**Committed scope:** Nine files, +300/-194: Session.cs; deleted SessionController.cs; MultiplayerSession.cs; SessionHandshakeCoordinator.cs; Runtime/GameServer.cs; Transport/Steamworks/SteamLobby.cs; the multiplayer-session diagnostic regression tests; SessionMvpTests.cs; and the Shared.Tests project source-link list. Player.cs and MultiplayerPlayer.cs were inspected but are unchanged by this commit.
+
+**Source-inspected result:** Session remains static, with complete host or distinct local/host initialization, valid unique identity checks, host-removal protection, metadata mutation and derived IsActive/IsHost/IsClient properties. SessionController and SessionActiveChanged are absent. GameServer retains the host/capacity admission predicate. Networking operations now explicitly own game activation/deactivation notifications and pending-target cleanup; Steam identity checks still precede Session reset. Handshake authorization remains before admission. This is not the deferred Player redesign, complete client roster replication or common LAN/Steam startup migration. See D-046 and ARCHITECTURE for ownership.
+
+**Validation provenance:** The latest pre-commit implementation report records a successful Debug build with **192 warnings, 0 errors**, **Shared.Tests: 51 passed, 0 failed, 0 skipped**, and passing staged/unstaged whitespace checks. These are historical reported results, not an independently reproduced build/test of the clean commit. The inspected saved `/private/tmp/oni-session-controller-debug.log` and `oni-session-controller-tests.log` instead describe an earlier 225-warning/0-error and 42-test pass; they do not attest the latest counts or final commit inputs. No compiler, tests, deployment or ONI runtime multiplayer execution was performed in this documentation pass.
+
+**Review boundary:** Independent source inspection of the committed scope confirms the consolidation and explicit notification ordering. Shared.Tests cover invalid/complete initialization, identity uniqueness, read-only membership, host-removal protection, reset, derived roles and diagnostic identity invariants; game-dependent notification checks remain diagnostics, not evidence that the standalone suite exercised ONI callbacks. Earlier review of an intermediate unstaged implementation is not a separate endorsement of this final commit. Runtime LAN/Steam admission, callback reentrancy, disconnect and world replacement remain unverified for it.
+
+**Synchronization direction versus implementation:** D-047 records approved global-round/stage-dependent joining and snapshot reuse while relevant state is unchanged. Current GameStateRequestPacket rejects requests during active synchronization, ReadyManager rejects a nonparticipant in an existing round, and GameServerHardSync clears its snapshot on completion/reset. The refinements are not implemented by the Session commit. Player/readiness consolidation and possible ReadyManager removal remain pending; no automatic unpause is authorized.
+
+**Next:** Read-only common LAN/Steam host-start investigation/design, then a separately bounded implementation. Earlier bug reports, exact-artifact runtime/release gates and historical validation below remain in force.
+
 ## 2026-10-29 — Incremental LAN host lifecycle checkpoint
 
 **Review baseline:** Authoritative `Renfrews-Studio.local` (Darwin arm64), `feature/transport`, HEAD `e15e4cdfd34b65b83d2d5ea44332858c6dd60b85`. At documentation-review entry, 51 source paths were staged, with no unstaged changes or untracked files. The source index diff SHA-256 was `a941d42a66df3eae20b05a680c7e7e6e8be66a1dccd7a2ae4dceedfa62536f92`; this identifies the reviewed index, not the reported build inputs. Documentation changes are left unstaged for user review/commit; no source or index edits are part of this documentation pass.
@@ -71,9 +87,9 @@ No ONI runtime tests or deployment occurred. Main/Pause opening, native appearan
 The current feature/transport workspace implements native Join/Host dialog stacking and in-place Session content, fixed native footer options, cached authored content, a scoped text-editing guard, and explicit scene-loading ownership cleanup. The adapter/footer classes have been removed. Steam joining and hosting remain unavailable as before; this task adds no networking functionality. Non-deploying Debug and Release builds passed with zero errors. An isolated harness compiled the actual coordinator/input sources and passed 35 assertions against native-contract test doubles; production assembly inspection passed 13 structural checks. These are not ONI runtime tests. No in-game stacking, focus, camera/Pause restoration or connection scenario is claimed verified. Historical release and transport results below retain their original scope.
 
 
-**Last updated:** 2026-10-29
+**Last updated:** 2026-10-30
 
-**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and point-in-time GitHub/Git evidence through 2026-10-17. Historical runtime/build evidence remains tied to the exact scope in which it was obtained.
+**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and authoritative Studio source/Git inspection through 2026-10-30. Earlier GitHub evidence remains point-in-time; historical runtime/build evidence remains tied to the exact scope in which it was obtained.
 
 ## Executive summary
 
@@ -311,7 +327,7 @@ The later lifecycle/speed simplification rejected and removed `RequestReSync` an
 
 ### Session centralization and PR #86
 
-The intended ownership boundary is shared session state in `MultiplayerSession`/common networking, while `GameClient` retains the current client lifecycle, `ReadyManager`/`GameServerHardSync` retain synchronization ownership, and each transport retains its mechanics and identity rules.
+**Historical PR #86 record:** The then-proposed boundary assigned shared session state to MultiplayerSession/common networking. D-046 and the October 30 checkpoint above now place logical data in static Session, with network integration remaining outside it; client lifecycle, synchronization and transport separation is retained.
 
 At the time checked, PR #86 targeted `develop` `3ddad5ad7fcaace77292c3f4b4a2218c0aa5db1f` from head `a32139b48031202ee41f6bd77bd16701b4b51c35`. GitHub metadata reported mergeable, 2 commits, 12 changed files, and +216/-149. The changed scope was session centralization and transport integration.
 
@@ -444,7 +460,7 @@ This establishes that the later lifecycle replaced the PR #83 normal-load implem
 
 Historical source findings from the earlier transport audits—Riptide duplicate disconnect notification, Steam stale state/handle paths, LiteNet explicit-disconnect callback dependence, and direct reconnect paths that can skip `Connecting`—remain useful bug history, but they must be rechecked against the rebuilt current source before being treated as current defects.
 
-PR #86 session-centralization review remains the active integration gate. Its changes must not reintroduce superseded disconnect/reconnect lifecycle ownership while centralizing shared session state.
+The earlier PR #86 integration gate is historical; the current Session implementation checkpoint is recorded above at commit 53240ca4. Transport-preserving world loading remains the required boundary, and current runtime/release verification is still outstanding. No PR merge status is inferred from this local commit.
 
 ## Recommended next tests
 
@@ -564,6 +580,8 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 - `GameSpeedSyncer` is present in source, but the requested multiplayer matrix has not been run in the evidence available here.
 
 ## Revision history
+
+- **2026-10-30:** Recorded the committed nine-file Session consolidation, derived flags and explicit notification ownership, distinguished reported 192-warning/51-test validation from older saved logs, and retained runtime/protocol/Player/readiness gates. Reconciled historical PR #86 ownership wording.
 
 - **2026-10-29 (LAN lifecycle):** Recorded the source-inspected LAN checkpoint and current paths, corrected Session selection, separated user-reported build success from the saved historical failure log, and retained explicit runtime/Steam/load-continuation limitations. Both source cleanup corrections are now indexed; documentation remains for user staging.
 

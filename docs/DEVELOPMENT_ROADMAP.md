@@ -1,5 +1,22 @@
 # Multiplayer: ONI United — Development Roadmap
 
+## 2026-10-30 — Session consolidation complete; common host startup next
+
+**Implementation checkpoint complete:** Static Session consolidation is committed as `53240ca425768962b345e8eee4a4d140d5be5223` on feature/transport. SessionController, SessionActiveChanged and redundant mutable activity/role state are removed. Source inspection confirms the checkpoint; STATUS records reported pre-commit compilation/unit-test results and their provenance. No runtime gate is closed.
+
+**Immediate next priority:** Read-only investigation and design of common LAN/Steam host startup through GameServer and Lifecycle, followed by a separately bounded implementation. Establish required preparation, asynchronous lobby/listener confirmation, local host membership, cancellation/late-result handling and the StartingHost → Hosting boundary. Preserve Prepare pending that investigation; do not assume current Steam callbacks already follow Lifecycle.
+
+Pending development, in bounded scopes:
+
+1. Common LAN/Steam host startup coordination, retaining Lifecycle permission/transition ownership and action-owned execution/recovery.
+2. Client connection, handshake and host-authorized Session admission; preserve transport/Session across normal world replacement.
+3. Complete host-authorized logical player roster replication to clients.
+4. Player redesign only as required by the agreed protocol; exact fields/ownership remain undecided.
+5. Consolidate synchronization ownership and evaluate ReadyManager removal without losing the collective readiness barrier. Design D-047's stage-dependent joins, stale-ID protection and snapshot-validity rules before implementation; do not mistake current late-join rejection for the final policy. No automatic unpause.
+6. Exact-artifact LAN/Steam runtime testing and release verification, retaining existing compliance and regression gates.
+
+The October 29 staging instructions below describe the earlier LAN checkpoint, now committed as 37c7d74a; they are not current workspace instructions. Older N14/N15, UI and release evidence is preserved. This priority does not claim a completed protocol redesign or authorize a broader refactor.
+
 ## 2026-10-29 — LAN host lifecycle checkpoint and remaining gates
 
 The current incremental slice is `ONI_United.StateMachines.Lifecycle`, with host/client/readiness coordinators in Networking.Runtime. It covers hosting an already-loaded colony over LAN, not a Steam migration or client/world-synchronization redesign. Source review confirms the event/action boundary, repeated Stop in Stopping, explicit retry, component-lifetime release and operation-owned save-load continuation. The current non-deploying Debug pass is user-reported; exact command/output/counts and build-input provenance remain unavailable for that pass. Historical test evidence is not evidence for this snapshot.
@@ -35,7 +52,7 @@ The staged Join/Host/Session simplification uses native stacked InfoDialogScreen
 
 
 **Created:** 2026-09-27  
-**Last updated:** 2026-10-29
+**Last updated:** 2026-10-30
 
 **Status:** Planning and progress guide; verified results retain the evidence limits stated here and in `STATUS.md`  
 **References:** `ARCHITECTURE.md`, `DECISIONS.md`, `STATUS.md`
@@ -276,6 +293,8 @@ The current lifecycle/speed and session-centralization decisions may also affect
 > After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
+
+- **2026-10-30:** Marked static Session consolidation implemented, made common LAN/Steam startup design the immediate next priority, and retained client admission, roster, Player, synchronization and runtime/release work as pending. Earlier staging/test plans remain historical evidence.
 
 - **2026-10-29 (LAN lifecycle):** Added the incremental LAN host checkpoint gates and separately scoped Steam/networking/UI/Session follow-up. Preserved prior N14/N15 and UI evidence, deferred startup cancellation design, and distinguished reported compilation from unverified runtime behavior.
 

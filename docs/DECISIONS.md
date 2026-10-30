@@ -26,7 +26,7 @@
 **Required exceptions:** Native InfoDialog handles Escape before its base editing check, so a dialog-scoped prefix delegates focused-input protection to Shared. Native Close can be suppressed during scene loading; explicit camera/Pause ownership cleanup remains. Networking behavior and Steam operation gates are unchanged. This supersedes the single-dialog adapter arrangement for this staged UI only; prior historical evidence remains intact. Build/compiled checks are recorded separately from pending in-game verification.
 
 
-**Last updated:** 2026-10-29
+**Last updated:** 2026-10-30
 
 **Status:** Recovered decisions from the `game mod` Project and local repository. Decision status and implementation status are separate: accepting a decision does not mean its implementation is complete.
 
@@ -372,6 +372,8 @@ The earlier observation that a client-local Reactable can be stored, enter `Reac
 **Rationale:** Common host/session/player state should have one authority, while lifecycle, synchronization, and transport details have distinct invariants that should not be folded into a broad session object.  
 **Review gate:** PR #86 must be reviewed against current `develop` for lifecycle, identity, cleanup, callback-ordering, and transport regressions before merge.
 
+**2026-10-30 reconciliation:** The PR status and review gate above describe the earlier evidence, not current branch integration status. D-046 supersedes the implementation detail assigning logical Session data ownership to MultiplayerSession: static Session now owns that data; networking operations retain coordination and notifications. The separation from Lifecycle, synchronization and transport remains accepted. Commit `53240ca425768962b345e8eee4a4d140d5be5223` establishes the current local source checkpoint, not a new claim about PR #86 merge or runtime verification.
+
 ## D-038 — Keep startup prerequisites ahead of Harmony activation
 
 **Decision status:** Confirmed
@@ -452,6 +454,32 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 
 **Accepted limitation:** Lifecycle does not universally reject events between quit notification and destruction; no valid operational producer in that interval was established by review. Calls after singleton destruction are lifetime-contract programming errors. Immediate release initiation does not promise that every TCP worker has terminated before process exit. Closing UI does not disconnect; no automatic unpause is introduced.
 
+## D-046 — One static logical Session; networking owns operations and notifications
+
+**Decision status:** Confirmed
+
+**Implementation status:** Committed in `53240ca425768962b345e8eee4a4d140d5be5223`; source-inspected, with reported pre-commit build/unit-test validation and no runtime verification of this commit.
+
+**Decision:** Retain static Session and remove SessionController and SessionActiveChanged. Session owns complete host/client logical initialization, identities, admitted membership, basic invariants and player metadata mutation. Derive activity from nonzero HostPlayerId and host/client role from the local/host identity relationship; keep no redundant mutable role/activity flags. GameServer owns host admission/capacity policy. Handshake/network operations own authorization, subsequent Session mutations, explicit game notifications and pending-target cleanup. Session does not operate transports, synchronization or Lifecycle.
+
+**Rationale:** One logical data authority avoids duplicate coordination/data layers. Explicit operation-owned notifications preserve the point at which complete logical state becomes observable without adding an independent Session event or instance-lifetime migration. Session enforces data validity; network policy remains with the operation that can establish authority and physical identity.
+
+**Alternatives not selected:** Keeping SessionController duplicates a data mutation/coordination layer without a distinct current consumer. Immediate instance-based Session adds lifetime migration without a demonstrated need. Keeping SessionActiveChanged gives logical data mutation an independent notification/cleanup responsibility that existing networking operations can own directly.
+
+**Limits and follow-up:** This does not complete client roster replication, Player redesign or readiness consolidation. Those remain future protocol work; no final Player field layout or removal of ReadyManager is approved by this decision. D-037's responsibility separation survives, with its older named logical-data owner superseded as noted there. Existing transport-preserving world loading (D-029) and no-automatic-unpause rules (D-035/D-036) remain unchanged.
+
+## D-047 — Global synchronization round and stage-dependent joining
+
+**Decision status:** Confirmed behavioral direction; operational details still to design
+
+**Implementation status:** Future protocol refinements, not a claim of complete current support or runtime verification. Current code has a single active round, participant readiness and synchronization-ID checks, but rejects some late requests and releases the snapshot at round completion.
+
+**Decision:** One global host synchronization round runs at a time. Clients may request joining at any time; handling depends on the round's stage. An open round may admit additional eligible participants using its cached authoritative snapshot. Clients finishing local loading early wait for collective completion. When another save load is required, a new round resets required participants to Unready. Synchronization IDs protect against stale messages.
+
+A snapshot must be replaced if relevant authoritative world state has advanced or otherwise changed. While that state remains unchanged, the cached snapshot may remain valid indefinitely; elapsed time alone does not invalidate it. This does not establish that today's pause call proves freshness for the entire interval (D-034). Synchronization completion never automatically unpauses (D-035/D-036).
+
+**Remaining design:** Define the open/closed stage and participant eligibility, the concrete evidence that invalidates a snapshot, and cancellation/failure behavior at those boundaries. This decision refines D-025/D-033's collective completion rule without restoring historical PR #83 reconnect/pending-join machinery or choosing a new readiness class structure.
+
 ## Unresolved decisions
 
 1. Exact TTL and collision handling for Reactable authorization.
@@ -488,6 +516,8 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 | N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | Option 3 / `Shared.Tests` isolation review, five Debug/Release tests, and local-only workflow validation |
 
 ## Revision history
+
+- **2026-10-30:** Added D-046 for static Session, derived role/activity and explicit network-owned notifications; reconciled D-037 without erasing PR #86 history. Added D-047 as accepted future synchronization behavior, separate from implemented mechanics and runtime evidence.
 
 - **2026-10-29 (LAN lifecycle):** Added D-043 through D-045 for operational event/action ownership, repeatable Stop/explicit retry and component lifetime. Kept generic bootstrap rollback (D-040), client synchronization and historical test evidence distinct.
 
