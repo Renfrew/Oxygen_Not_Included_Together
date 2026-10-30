@@ -1,5 +1,21 @@
 # Multiplayer: ONI United — Development Roadmap
 
+## 2026-10-30 — Agreed host architecture: finalize contracts before implementation
+
+The shared Server event-action design is agreed in D-048; it is not implemented. Server is the target coordinator role currently represented by GameServer. Lifecycle owns permission/transitions; backend protocols own asynchronous execution and repeated cancellation. This supersedes the earlier immediate-priority wording below, not its historical evidence or remaining acceptance gates.
+
+Next sequence:
+
+1. Finalize the concrete common transport contract using existing ITransport, TransportServer and TransportClient where appropriate. Decide signatures and inheritance/composition; do not assume a new umbrella abstraction.
+2. Review architecture/ownership against D-048, including Session activation inside Started's action after Hosting, deactivation/shared cleanup in Stop, and protocol-owned pending results/retry. Essential cleanup precedes Stopped.
+3. Implement the agreed common host protocol in a separately authorized bounded change, preserving D-044, optional LAN TCP, existing discovery, identity distinctions and save-load continuation.
+4. Review complete unstaged changes and affected callers; leave staging/commit to the user.
+5. With separate authorization, build and run existing relevant tests. Compilation does not establish runtime behavior.
+6. Perform separately authorized LAN/Steam runtime verification: startup readiness, rejected/duplicate events, Stop while pending, late results, missing-result behavior, cleanup failure/explicit retry, disposal and save replacement. A local timeout cannot authorize Idle for unresolved resources.
+7. Review Client protocol boundaries separately. Its coordinator and event/Lifecycle design are not finalized and need not mirror hosting; do not redesign client synchronization in the host increment.
+
+No new Lifecycle phases/events, Server cleanup state machine, automatic retry/unpause or disconnect on UI close is authorized. Player/roster and synchronization consolidation remain separate pending work. Existing release/compliance gates remain open.
+
 ## 2026-10-30 — Session consolidation complete; common host startup next
 
 **Implementation checkpoint complete:** Static Session consolidation is committed as `53240ca425768962b345e8eee4a4d140d5be5223` on feature/transport. SessionController, SessionActiveChanged and redundant mutable activity/role state are removed. Source inspection confirms the checkpoint; STATUS records reported pre-commit compilation/unit-test results and their provenance. No runtime gate is closed.
@@ -293,6 +309,8 @@ The current lifecycle/speed and session-centralization decisions may also affect
 > After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
+
+- **2026-10-30 (host target agreement):** Set concrete shared-contract design and ownership review ahead of implementation, followed by unstaged review, authorized build/tests, runtime cancellation verification and separate Client design. No implementation or verification gate marked complete.
 
 - **2026-10-30:** Marked static Session consolidation implemented, made common LAN/Steam startup design the immediate next priority, and retained client admission, roster, Player, synchronization and runtime/release work as pending. Earlier staging/test plans remain historical evidence.
 

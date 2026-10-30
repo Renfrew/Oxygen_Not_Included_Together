@@ -432,6 +432,8 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 
 **Scope:** This is the LAN loaded-colony host slice. Hosting means the selected host is ready for remote Session admission, separate from remote-player presence and synchronization/gameplay readiness. Keep one StartingHost phase and the shared Prepare step; do not add a phase per method. Old frame-spread startup windows need not be retained; further startup cancellation design is deferred. GameServer/GameClient/ReadyManager belong to Networking.Runtime without changing ownership. Steam lifecycle integration remains deferred; lobby discovery/membership survives, while pre-game ready-up rooms are out of scope.
 
+**D-048 refinement (2026-10-30; target not implemented):** Event permissions and transition-before-action remain unchanged. Hosting now grants permission for host Session activation inside startedAction, rather than requiring that activation before Started. Read the earlier ready-for-admission wording as the original LAN boundary; actual remote admission still requires successful membership and transport readiness.
+
 **Distinction:** D-040 defers generic mod-bootstrap rollback. This operational multiplayer machine is not a bootstrap rollback framework and does not supersede that decision.
 
 ## D-044 — Repeatable Stop and explicit recovery in Stopping
@@ -443,6 +445,8 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 **Decision:** Stop in Stopping is accepted without a redundant transition. The network owner keeps the original completion while cleanup is running and schedules no extra attempt. Network release/worker observation belongs to LiteNetLibServer/TcpFileTransferServer, pumped by NetworkingComponent; GameServer retains host-operation coordination and outcome interpretation. Session, identity and selection-color cleanup remain with their established owners and ordering. Only confirmed required network/domain cleanup permits Stopped -> Idle. Failure remains Stopping, blocks Start, and requires explicit Stop retry; no StopFailed phase, permission flag, or automatic retry.
 
 **Continuation contract:** A pending save load keeps its original filename across ordinary repeated Stop during in-flight cleanup. Success enters Idle before the continuation resumes the existing load path. Cleanup failure discards that load continuation; ordinary retry stops resources but does not resume the failed load. Disposal discards it as well. TCP sockets close and worker termination is observed without main-thread TCP joins; LiteNetLib's internal UDP Stop thread joins remain a separate dependency limitation, with no established runtime hang.
+
+**D-048 ordering refinement (target not implemented):** The shared Stop action deactivates Session and performs essential shared cleanup before protocol cancellation. This supersedes the committed LAN implementation ordering described in ARCHITECTURE, where domain cleanup follows the network result. Repeated Stop, retained unresolved completion, explicit retry, confirmed cleanup before Idle and the continuation contract above remain accepted.
 
 ## D-045 — Component lifetime ends the machine
 
@@ -480,6 +484,28 @@ A snapshot must be replaced if relevant authoritative world state has advanced o
 
 **Remaining design:** Define the open/closed stage and participant eligibility, the concrete evidence that invalidates a snapshot, and cancellation/failure behavior at those boundaries. This decision refines D-025/D-033's collective completion rule without restoring historical PR #83 reconnect/pending-join machinery or choosing a new readiness class structure.
 
+## D-048 — Shared Server event actions; protocols own execution and cancellation
+
+**Decision status:** Confirmed architectural target
+
+**Implementation status:** Not implemented. Current code remains the LAN slice plus legacy Steam routes. Exact shared-interface signatures and inheritance/composition are not yet approved.
+
+**Decision:** Lifecycle alone owns permission/transitions through Handle(event, action); retain the existing four events and five phases. Server is the shared event-action coordinator (currently GameServer), not a second phase authority. It coordinates shared preparation, Session integration and event outcomes. Backend protocol owners execute network initialization/release and report through Server.Started/Stopped. Server must not require backend-specific startup/cancellation branches.
+
+**Activation order:** Server.StartHost admits Start, entering StartingHost before shared preparation and Protocol.Start. Protocol readiness calls Server.Started, which submits Started. Lifecycle enters Hosting before invoking startedAction; that action activates host Session through the existing networking operation and Session.BeginHosting. Session validation remains defensive. Unexpected activation failure is reported to Server and initiates cancellation. Hosting permission is distinct from successful logical activation, physical readiness, remote admission and client gameplay readiness. Remote admission still requires successful host membership and transport readiness.
+
+**Deactivation order:** Server.Cancel admits Stop, entering/remaining Stopping before stopAction. That shared action deactivates Session, performs shared hosting cleanup and initiates Protocol.Cancel. Essential, potentially failing cleanup is completed before Stopped; stoppedAction must not carry it. Protocol cleanup confirmation reaches Server.Stopped and then Lifecycle.Handle(Stopped, stoppedAction), entering Idle only when required shared and protocol cleanup are finished.
+
+**Repeated cancellation and late results:** Shared Stop actions are repeat-safe. Protocol owners retain pending native work and its unresolved completion, avoid duplicate in-flight cleanup, and retry unfinished resources only on explicit repeated Stop after failure. No automatic retry or Server-side duplicate cleanup state machine is approved. Pending Steam creation stays owned in Stopping; a late result cannot execute Started's action there, must be cleaned by its original owner, and reports through Server.Stopped only after confirmed cleanup. Missing results or failed cleanup leave Stopping unresolved. Native Timeout/terminal failure is distinct from a local timeout, which proves no release. Obsolete callbacks must not affect a later attempt.
+
+**Rationale:** Permission is a central machine concern; execution and native lifetimes differ by backend. Server remains separate because shared host preparation, logical activation/deactivation, failure interpretation and application continuations still need one operation owner. This avoids duplicating them across UI/load/developer callers or backend implementations while keeping Session a logical data owner.
+
+**Alternatives considered:** Moving coordination into Lifecycle would add execution/recovery to its permission role. Removing Server and distributing actions to callers/backends would duplicate shared ordering or recreate a coordinator elsewhere. A new umbrella protocol manager/interface is unnecessary without a consumer that existing abstractions cannot serve. Prefer refining ITransport, TransportServer and TransportClient to express synchronous/asynchronous startup, readiness/failure, cancellation and confirmed cleanup alongside existing connection/data operations; retain backend-specific lobby/discovery and resource mechanics.
+
+**Relationship to prior decisions:** Refines D-043's host-ready boundary by moving activation into Started's action after Hosting. Preserves D-044 permissions/retry/continuation semantics but supersedes the current LAN transport-result-before-domain-cleanup ordering. Preserves D-045 component lifetime and immediate release initiation, D-046 static Session/no controller/no independent Session event, and D-047's separate future synchronization direction. No Player, roster, wire/save, UI or synchronization redesign is included; no automatic unpause or disconnect on UI close.
+
+**Open design:** Concrete interface signatures, inheritance/composition, callback lifetime/completion wiring and reporting of essential shared Stop failures remain to design. No extra phases/events or generic operation framework are authorized. The corresponding Client coordinator and client event/Lifecycle route remain undecided; host/client symmetry is not assumed.
+
 ## Unresolved decisions
 
 1. Exact TTL and collision handling for Reactable authorization.
@@ -516,6 +542,8 @@ A snapshot must be replaced if relevant authoritative world state has advanced o
 | N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | Option 3 / `Shared.Tests` isolation review, five Debug/Release tests, and local-only workflow validation |
 
 ## Revision history
+
+- **2026-10-30 (host target agreement):** Added D-048 for the agreed Server event-action/protocol boundary, post-Hosting activation, Stop-owned deactivation/cleanup and retained pending native cancellation. Annotated D-043/D-044 refinements without erasing history; signatures and client design remain open.
 
 - **2026-10-30:** Added D-046 for static Session, derived role/activity and explicit network-owned notifications; reconciled D-037 without erasing PR #86 history. Added D-047 as accepted future synchronization behavior, separate from implemented mechanics and runtime evidence.
 

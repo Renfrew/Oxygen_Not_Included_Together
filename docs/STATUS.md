@@ -1,5 +1,17 @@
 # Multiplayer: ONI United — Development Status
 
+## 2026-10-30 — Common host architecture agreed; implementation pending
+
+**Documentation baseline:** Studio Renfrews-Studio.local, feature/transport, HEAD `8ecb199fafdc40607eea209d84d7e5ebfed08b7d`; index, working tree and untracked-file status were clean before this update. Source remains unchanged by this documentation task.
+
+**Discussion completed:** D-048 records the agreed Server event-action architecture. Lifecycle retains permission/transitions; Server coordinates shared actions; protocols own native execution, pending operations, cancellation and resource completion; static Session retains logical data/invariants. This agreement is not an implemented common protocol.
+
+**Important ordering differences:** Current LAN registers/confirms host membership before submitting Started; the approved target instead enters Hosting and activates Session inside startedAction. Current LAN performs shared domain cleanup after the networking result; the target Stop action deactivates Session and performs shared cleanup before Protocol.Cancel. Essential cleanup must be finished before Stopped, rather than hidden in stoppedAction. Existing Steam callback startup/Session mutation bypasses, ignored registration/release results and legacy server state still require migration. D-044 repeatable Stop, unresolved completion retention, explicit retry and continuation rules remain in force.
+
+**Pending:** Final concrete contracts for existing transport abstractions, callback/error/completion wiring and inheritance/composition; ownership review; bounded common-host implementation; source review and separately authorized build/existing tests; then LAN/Steam runtime/cancellation verification. Client coordination/event design is separate and not finalized. The Session checkpoint, Player/roster work and D-047 synchronization status below are unchanged.
+
+**Evidence limit:** No new build, tests, deployment or runtime verification was performed. Prior source/binary/API investigations inform design but do not prove the future implementation or deployed-game behavior. Earlier checkpoint results retain their original provenance.
+
 ## 2026-10-30 — Session simplification committed; runtime verification pending
 
 **Verified repository baseline:** `Renfrews-Studio.local` (Darwin arm64), branch `feature/transport`, HEAD `53240ca425768962b345e8eee4a4d140d5be5223` (`refactor(session): consolidate session ownership and remove redundant state`). Initial index, working tree and untracked-file status were clean. The previous LAN checkpoint is committed as `37c7d74adb9475a79f18e6c099e9fc866c0388ec`; the older staged/index reports below are historical checkpoints.
@@ -580,6 +592,8 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 - `GameSpeedSyncer` is present in source, but the requested multiplayer matrix has not been run in the evidence available here.
 
 ## Revision history
+
+- **2026-10-30 (host target agreement):** Recorded architecture discussion complete and D-048 unimplemented, identified current LAN/Steam differences and new Session ordering, and retained interface/client design and all compilation/runtime gates.
 
 - **2026-10-30:** Recorded the committed nine-file Session consolidation, derived flags and explicit notification ownership, distinguished reported 192-warning/51-test validation from older saved logs, and retained runtime/protocol/Player/readiness gates. Reconciled historical PR #86 ownership wording.
 
