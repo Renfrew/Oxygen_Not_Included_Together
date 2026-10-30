@@ -12,6 +12,9 @@ namespace ONI_United.Networking.Sessions;
 
 internal static class SessionHandshakeCoordinator
 {
+    private static bool CanAdmitRemotePlayer(int maxPlayers) =>
+        Session.IsHost && maxPlayers > 0 && Session.Players.Count < maxPlayers;
+
     private const int MaximumHandshakeBytes = 2048;
 
     internal static void SendClientHello(object connection)
@@ -146,7 +149,7 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (!GameServer.CanAdmitRemotePlayer(NetworkConfig.GetMaxServerCapacity()))
+        if (!CanAdmitRemotePlayer(NetworkConfig.GetMaxServerCapacity()))
         {
             RejectHostConnection(physicalConnection, "Session is full.");
             return;

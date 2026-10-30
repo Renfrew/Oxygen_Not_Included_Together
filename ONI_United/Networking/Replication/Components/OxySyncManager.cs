@@ -268,10 +268,10 @@ namespace ONI_United.Networking.Replication.Components
             if (_behaviours.Count == 0) return;
 
             _tickAccumulator += Time.unscaledDeltaTime;
-            _tickAccumulator = Mathf.Min(_tickAccumulator, GameServer.TickInterval * GameServer.MaxMissedTicks);
-            if (_tickAccumulator < GameServer.TickInterval)
+            _tickAccumulator = Mathf.Min(_tickAccumulator, NetworkingComponent.TickInterval * NetworkingComponent.MaxMissedTicks);
+            if (_tickAccumulator < NetworkingComponent.TickInterval)
                 return;
-            _tickAccumulator -= GameServer.TickInterval;
+            _tickAccumulator -= NetworkingComponent.TickInterval;
 
             var sw = Stopwatch.StartNew();
             int totalChanges = 0;

@@ -46,12 +46,6 @@ public static class MultiplayerPopup
 			MultiplayerSession.ShouldHostAfterLoad = true;
 			//MainMenuPatch.Instance.Button_ResumeGame.SignalClick(KKeyCode.Mouse0);
 			//HostLastSave();
-			/*
-			SteamLobby.CreateLobby(onSuccess: () =>
-			{
-
-			});
-			*/
 		});
 
 		AddPopupButton(popup.transform, "Join Game", new Vector2(0, 40), () =>

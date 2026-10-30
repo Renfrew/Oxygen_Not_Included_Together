@@ -85,23 +85,33 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
         }
 
-        public override void Prepare()
+        private void Prepare()
         {
             using var _ = Profiler.Scope();
         }
 
-        public override void Start()
+        protected override void StartProtocol()
         {
             using var _ = Profiler.Scope();
 
+            Prepare();
             LastStartFailure = null;
+            if (!Utils.IsInGame() || Grid.CellCount <= 0)
+            {
+                ReportStartupFailure("Load a colony before starting a LAN host.");
+                return;
+            }
+            if (Configuration.Instance.Host.LanSettings.Port < 1 || Configuration.Instance.Host.LanSettings.Port > 65535)
+            {
+                ReportStartupFailure("The configured LAN port is outside the valid range.");
+                return;
+            }
             if (_tcpTransfer != null && !_tcpTransfer.IsStopped)
                 throw new InvalidOperationException("The previous TCP transfer server has not finished stopping.");
             _tcpTransfer = null;
             if (_server != null)
             {
-                if (!_server.IsRunning)
-                    LastStartFailure = "A LiteNetLib server instance already exists but is not running.";
+                ReportStartupFailure("A LiteNetLib server instance already exists.");
                 return;
             }
 
@@ -112,7 +122,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (hostId == 0)
             {
                 LastStartFailure = "Cannot start with an empty persistent host ID.";
-                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
+                ReportStartupFailure(LastStartFailure);
                 return;
             }
 
@@ -135,14 +145,17 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 EnableStatistics = true
             };
 
-            bool started = _server.Start(port);
+            bool started;
+            try { started = _server.Start(port); }
+            catch (SocketException ex)
+            {
+                ReportStartupFailure(ex.Message);
+                return;
+            }
             if (!started)
             {
                 LastStartFailure = "Failed to bind the LiteNetLib listener to port " + port + ".";
-                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
-                _server?.Stop();
-                _server = null;
-                _listener = null;
+                ReportStartupFailure(LastStartFailure);
                 return;
             }
 
@@ -160,11 +173,17 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 DebugConsole.LogWarning("[LiteNetLibServer] TCP file transfer server failed to start: " + ex.Message);
                 // Preserve the optional TCP fallback, but release partial acquisitions and
-                // retain the owner until its workers have finished. Stop failures propagate.
-                _tcpTransfer?.Stop();
+                // retain the owner until its workers have finished. Cleanup failure cancels startup.
+                try { _tcpTransfer?.Stop(); }
+                catch (Exception cleanupError)
+                {
+                    ReportStartupFailure("Partial TCP startup cleanup failed: " + cleanupError);
+                    return;
+                }
             }
 
             ClientList.Clear();
+            ReportTransportStarted();
         }
 
         private void OnConnectionRequest(ConnectionRequest request)
@@ -273,7 +292,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             DebugConsole.LogWarning("[LiteNetLibServer] Network error from " + endPoint + ": " + socketError);
         }
 
-        internal void BeginShutdown(System.Action<bool, string> finished)
+        protected override void CancelProtocol(System.Action<bool, string> finished)
         {
             if (_shutdownFinished != null)
             {
@@ -282,11 +301,11 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
             _shutdownFinished = finished;
             _shutdownFailure = StopResources();
-            // Deliver from PollShutdown after the action stack has unwound, including
+            // Deliver from PollCancellation after the action stack has unwound, including
             // synchronous failures. No lifecycle state or frame-spread startup work here.
         }
 
-        internal void PollShutdown()
+        public override void PollCancellation()
         {
             var finished = _shutdownFinished;
             if (finished == null) return;
@@ -302,11 +321,12 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _shutdownFailure = null;
         }
 
-        internal string DisposeShutdown()
+        protected override void DisposeProtocol()
         {
             // Discard a pending save-load continuation before terminal resource release.
             CancelShutdownObservation();
-            return StopResources();
+            string failure = StopResources();
+            if (failure != null) DebugConsole.LogError("[LiteNetLibServer] Disposal failed: " + failure);
         }
 
         private string StopResources()
@@ -314,12 +334,12 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             var errors = new List<string>();
             try { CloseConnections(); }
             catch (Exception ex) { errors.Add(ex.Message); }
-            try { Stop(); }
+            try { StopResourcesCore(); }
             catch (Exception ex) { errors.Add(ex.Message); }
             return errors.Count == 0 ? null : string.Join("; ", errors);
         }
 
-        public override void Stop()
+        private void StopResourcesCore()
         {
             using var _ = Profiler.Scope();
 

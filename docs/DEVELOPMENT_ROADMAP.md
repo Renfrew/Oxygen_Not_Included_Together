@@ -1,6 +1,24 @@
 # Multiplayer: ONI United — Development Roadmap
 
-## 2026-10-30 — Agreed host architecture: finalize contracts before implementation
+## 2026-10-30 — Common host source checkpoint; verification before release
+
+The current host integration removes GameServer/ServerState and implements Lifecycle-owned EventActions with common instance-level TransportServer operations for LiteNetLib and Steam. TransportStarted → PrepareSession prepares logical membership before SessionPrepared → Hosting; essential Stop cleanup precedes protocol cancellation and confirmed Stopped. D-049 and the standalone target supersede the earlier D-048 coordinator/order descriptions below. This is a staged source checkpoint at HEAD `f2ca18c1c6b646b169b34a557ccd82ba7c8a29a3`, not a new committed release baseline.
+
+Saved non-deploying Debug evidence is 192 warnings/0 errors; standalone tests are 95 passed/0 failed/0 skipped, including 44 added transition/scenario cases using substitutes. These results close no native runtime, packaging or release gate. STATUS records exact commands and provenance; the LAN live-server Kick correction is already staged.
+
+Next bounded acceptance gates, with separate execution authorization:
+
+1. **LAN runtime:** Identify the exact artifact/source checkpoint; verify listener and logical host readiness before Hosting, UDP plus optional TCP/fallback, remote admission, frontend/pause behavior and actual worker termination. Do not infer synchronization/gameplay readiness from Hosting.
+2. **Steam native results:** Verify correlated creation/local ownership, creator-entry behavior, Stop while creation is pending, late/duplicate results, native terminal failure/Timeout, missing-result unresolved Stopping, local release evidence and explicit retry after failure. A local timeout cannot establish cleanup or Idle.
+3. **Recovery and lifetime:** Exercise repeated pending Stop, original filename retention, successful load only after Idle, failure/disposal discard without retry-resume, normal client world replacement, and duplicate quit/destruction release without another frame. Preserve client shutdown, no automatic retry/unpause and no disconnect on UI close.
+4. **Deferred architecture:** Separately scope NetworkConfig → NetworkRuntime, selected-live-instance ownership/safe replacement, stateless LifecycleEventActions extraction and central host/client/selection permission. Decide exact client phases/events before implementing them; they are not approved by the host table. Address pending-client cancellation and generic Stop's pre-admission LAN gap without redesigning synchronization/UI.
+5. **Session integration:** Migrate direct Session.BeginHosting only after preserving RegisterAsHost activation notifications, host name/readiness and metadata ordering through appropriate existing owners. Keep Player/roster and ReadyManager/synchronization work separately scoped.
+
+Existing compliance, platform, exact-artifact and gameplay regression gates remain. The earlier N14/N15 and release records below retain their original dates/evidence; their next-session/staging instructions are historical, not authorization to execute them now.
+
+## Historical 2026-10-30 — Agreed host architecture: finalize contracts before implementation
+
+This earlier D-048 plan is superseded by the source checkpoint and D-049 above; its named coordinator, activation order and unimplemented status describe that earlier point.
 
 The shared Server event-action design is agreed in D-048; it is not implemented. Server is the target coordinator role currently represented by GameServer. Lifecycle owns permission/transitions; backend protocols own asynchronous execution and repeated cancellation. This supersedes the earlier immediate-priority wording below, not its historical evidence or remaining acceptance gates.
 
@@ -16,7 +34,9 @@ Next sequence:
 
 No new Lifecycle phases/events, Server cleanup state machine, automatic retry/unpause or disconnect on UI close is authorized. Player/roster and synchronization consolidation remain separate pending work. Existing release/compliance gates remain open.
 
-## 2026-10-30 — Session consolidation complete; common host startup next
+## Historical 2026-10-30 — Session consolidation complete; common host startup next
+
+Preserved planning history after the Session commit. Common hosting has since reached the source checkpoint above; client/roster/Player/synchronization work and runtime gates remain pending.
 
 **Implementation checkpoint complete:** Static Session consolidation is committed as `53240ca425768962b345e8eee4a4d140d5be5223` on feature/transport. SessionController, SessionActiveChanged and redundant mutable activity/role state are removed. Source inspection confirms the checkpoint; STATUS records reported pre-commit compilation/unit-test results and their provenance. No runtime gate is closed.
 
@@ -33,7 +53,9 @@ Pending development, in bounded scopes:
 
 The October 29 staging instructions below describe the earlier LAN checkpoint, now committed as 37c7d74a; they are not current workspace instructions. Older N14/N15, UI and release evidence is preserved. This priority does not claim a completed protocol redesign or authorize a broader refactor.
 
-## 2026-10-29 — LAN host lifecycle checkpoint and remaining gates
+## Historical 2026-10-29 — LAN host lifecycle checkpoint and remaining gates
+
+The following implementation/staging instructions describe the earlier LAN slice. Current ownership and verification priority are above; applicable runtime/release gates remain open.
 
 The current incremental slice is `ONI_United.StateMachines.Lifecycle`, with host/client/readiness coordinators in Networking.Runtime. It covers hosting an already-loaded colony over LAN, not a Steam migration or client/world-synchronization redesign. Source review confirms the event/action boundary, repeated Stop in Stopping, explicit retry, component-lifetime release and operation-owned save-load continuation. The current non-deploying Debug pass is user-reported; exact command/output/counts and build-input provenance remain unavailable for that pass. Historical test evidence is not evidence for this snapshot.
 
@@ -309,6 +331,8 @@ The current lifecycle/speed and session-centralization decisions may also affect
 > After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
+
+- **2026-10-30 (common host checkpoint):** Recorded common host source integration and build/standalone evidence without closing runtime gates; prioritized LAN/Steam native, recovery/load/lifetime verification and separately scoped deferred runtime/client/Session refinements. Preserved milestone/release history.
 
 - **2026-10-30 (host target agreement):** Set concrete shared-contract design and ownership review ahead of implementation, followed by unstaged review, authorized build/tests, runtime cancellation verification and separate Client design. No implementation or verification gate marked complete.
 

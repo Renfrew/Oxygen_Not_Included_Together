@@ -1,6 +1,33 @@
 # Multiplayer: ONI United — Development Status
 
-## 2026-10-30 — Common host architecture agreed; implementation pending
+## 2026-10-30 — Common host implementation checkpoint; native runtime gates open
+
+**Verified baseline:** Renfrews-Studio.local, branch `feature/transport`, HEAD `f2ca18c1c6b646b169b34a557ccd82ba7c8a29a3`. The implementation is in **22 staged paths**, not a new committed HEAD or clean release checkpoint. At documentation entry the working tree was clean and no files were untracked. The one-line LAN diagnostic Kick correction in DevToolMultiplayer.cs is now staged: it uses the selected live LiteNetLibServer rather than a factory-created server. Index diff: +1321/-593; SHA-1 `dee1183ea1ed0c5cd25e58783ac7f27da68013ab`. This documentation pass changes only the four maintained references, unstaged; source and index are preserved.
+
+**Implemented and source-reviewed:** GameServer and obsolete ServerState are removed. Lifecycle owns permission/transitions and inline essential EventActions, then caller callback last. Both native server implementations use common instance-level TransportServer host operations. Start → StartingHost → TransportStarted → PrepareSession → SessionPrepared → Hosting prepares logical host membership before Hosting, using existing MultiplayerSession.RegisterAsHost integration. Stop clears Session, identity and selection presentation before protocol cancellation; Stopped requires confirmed essential and protocol cleanup. Repeated Stop retains pending completion/continuation; expected cleanup failure remains Stopping for explicit retry. Unexpected accepted-action exceptions log/rethrow without automatic rollback; an essential cleanup exception skips normal protocol cancellation and invalidates older completion. See ARCHITECTURE and D-049 for ownership, not D-048's superseded coordinator/order wording.
+
+Steam retains correlated pending creation through Stop and owns late-result release/local cleanup evidence; creator LobbyEnter is not a readiness prerequisite. Protocol resources remain independent of Session after logical clear. Host tick ownership is now NetworkingComponent; the original host/capacity admission predicate is in SessionHandshakeCoordinator. Save-load retains its original filename through pending Stop, resumes only after Idle, and is discarded on failure/disposal. Lifetime release initiates without another frame. These are source findings, not native/runtime results.
+
+**Saved verification evidence (not rerun by this documentation task):**
+
+```text
+/usr/local/share/dotnet/dotnet build ONI_United/ONI_United.csproj --no-restore -c Debug -p:DoNotBuildAsMod=true -p:IsPacked=false
+/usr/local/share/dotnet/dotnet test tests/Shared.Tests/Shared.Tests.csproj --no-restore -c Debug -p:DoNotBuildAsMod=true -p:IsPacked=false
+```
+
+The saved `/tmp/oni-checkpoint-verify-build.log` records **192 warnings, 0 errors**; `/tmp/oni-checkpoint-verify-tests.log` records **95 passed, 0 failed, 0 skipped**, with 24 nullable warnings during test compilation. Deployment guards were inspected for that run: DoNotBuildAsMod=true excludes mod metadata/copy/publicization targets; IsPacked=false excludes ILRepack. This is non-deploying Debug compilation/test evidence, not packaging, a release build, deployment or gameplay verification.
+
+**Test scope:** 44 focused cases were added: 30 transition-table cases and 14 scenarios. The project source-links real Lifecycle, common TransportServer and Session with Unity/domain/protocol substitutes. It exercises event rejection/order/nesting, common completion/retry, retained continuation and disposal behavior; it does not execute LiteNetLib/Steam native resources, real Unity callbacks or host/client gameplay. The older 51-test Session checkpoint and five-test N15-B history below retain their own provenance.
+
+**Runtime-unverified:** LAN listener startup, optional TCP/fallback and worker termination; Steam creation, pending cancellation, late callbacks and confirmed local cleanup; actual-game cleanup failure/explicit retry; original-filename save-load continuation; frontend/pause and normal client world replacement; quit/destruction ordering; multiplayer synchronization/gameplay. No exact-artifact or release gate is closed.
+
+**Approved but deferred:** NetworkConfig → NetworkRuntime refinement, stateless LifecycleEventActions extraction, Lifecycle host/client mutual exclusion and selection permission, safe selected-instance replacement/pending-client cancellation, and direct Session.BeginHosting integration preserving RegisterAsHost notification/name/readiness/metadata side effects. Exact client phases/events/transitions remain undecided and unapproved. NetworkConfig still has mutable selected references and factory-style Get methods; existing host/pending-Steam checks do not protect all pending client paths. Generic Stop can miss a pre-admission LAN connection. Current GameClient checks must not be removed before equivalent central permission exists. No Player/ReadyManager/synchronization redesign or new UI support is implied.
+
+**Next gates:** Source checkpoint review, then separately authorized LAN native verification and Steam callback/cancellation verification, including failure/retry, save replacement and lifetime scenarios. Deferred facade/client/Session integration requires its own bounded implementation scope. Existing compliance, exact-artifact and gameplay regression gates remain open.
+
+## Historical 2026-10-30 — Common host architecture agreed; implementation pending
+
+This entry records the earlier D-048 agreement/baseline; its coordinator and startup-order wording is superseded by D-049 and the checkpoint above.
 
 **Documentation baseline:** Studio Renfrews-Studio.local, feature/transport, HEAD `8ecb199fafdc40607eea209d84d7e5ebfed08b7d`; index, working tree and untracked-file status were clean before this update. Source remains unchanged by this documentation task.
 
@@ -14,6 +41,8 @@
 
 ## 2026-10-30 — Session simplification committed; runtime verification pending
 
+This entry records the committed Session change and its original owners/test counts. Subsequent host-owner relocation and common hosting are recorded above; the original GameServer references are historical.
+
 **Verified repository baseline:** `Renfrews-Studio.local` (Darwin arm64), branch `feature/transport`, HEAD `53240ca425768962b345e8eee4a4d140d5be5223` (`refactor(session): consolidate session ownership and remove redundant state`). Initial index, working tree and untracked-file status were clean. The previous LAN checkpoint is committed as `37c7d74adb9475a79f18e6c099e9fc866c0388ec`; the older staged/index reports below are historical checkpoints.
 
 **Committed scope:** Nine files, +300/-194: Session.cs; deleted SessionController.cs; MultiplayerSession.cs; SessionHandshakeCoordinator.cs; Runtime/GameServer.cs; Transport/Steamworks/SteamLobby.cs; the multiplayer-session diagnostic regression tests; SessionMvpTests.cs; and the Shared.Tests project source-link list. Player.cs and MultiplayerPlayer.cs were inspected but are unchanged by this commit.
@@ -26,9 +55,11 @@
 
 **Synchronization direction versus implementation:** D-047 records approved global-round/stage-dependent joining and snapshot reuse while relevant state is unchanged. Current GameStateRequestPacket rejects requests during active synchronization, ReadyManager rejects a nonparticipant in an existing round, and GameServerHardSync clears its snapshot on completion/reset. The refinements are not implemented by the Session commit. Player/readiness consolidation and possible ReadyManager removal remain pending; no automatic unpause is authorized.
 
-**Next:** Read-only common LAN/Steam host-start investigation/design, then a separately bounded implementation. Earlier bug reports, exact-artifact runtime/release gates and historical validation below remain in force.
+**Historical next step at that checkpoint:** Read-only common LAN/Steam host-start investigation/design, then a separately bounded implementation. Earlier bug reports, exact-artifact runtime/release gates and historical validation below remain in force.
 
-## 2026-10-29 — Incremental LAN host lifecycle checkpoint
+## Historical 2026-10-29 — Incremental LAN host lifecycle checkpoint
+
+This is the earlier LAN-only implementation/staging record, superseded by the common host checkpoint above. Its named owners, transition table, validation limits and staging instructions apply only to that baseline.
 
 **Review baseline:** Authoritative `Renfrews-Studio.local` (Darwin arm64), `feature/transport`, HEAD `e15e4cdfd34b65b83d2d5ea44332858c6dd60b85`. At documentation-review entry, 51 source paths were staged, with no unstaged changes or untracked files. The source index diff SHA-256 was `a941d42a66df3eae20b05a680c7e7e6e8be66a1dccd7a2ae4dceedfa62536f92`; this identifies the reviewed index, not the reported build inputs. Documentation changes are left unstaged for user review/commit; no source or index edits are part of this documentation pass.
 
@@ -357,6 +388,7 @@ For the released 0.8.0.4 work, the user reports that their custom Operational/po
 
 | Area | State | Confidence |
 | --- | --- | --- |
+| Common host Lifecycle / TransportServer | Staged common LAN/Steam integration; GameServer removed | Source-reviewed, Debug compiled and standalone-tested; native/runtime gates open |
 | Host authority / client replay | Established core architecture | High |
 | Stable entity identity / registry | Present | High |
 | Save transfer / hard sync | Existing mod feature | Reported/repository status; not retested here |
@@ -404,7 +436,7 @@ For the released 0.8.0.4 work, the user reports that their custom Operational/po
 
 - Current code has not yet been inventoried against the primary architecture’s ownership/coverage ledger.
 - Session ID, baseline epoch, per-stream sequence/version, and old-epoch rejection need an implementation audit.
-- Join/hard-sync lifecycle/readiness behavior was first verified in the PR #83 disconnect/reconnect implementation and was later rebuilt into the current transport-preserving client lifecycle. The active priority is PR #86 regression review, exact release-baseline selection, legal/compliance audit, and exact-artifact verification; broader comparison with the proposed `T/J` consistent-cut and catch-up-journal design remains future architecture work.
+- Join/hard-sync lifecycle/readiness behavior was first verified in the PR #83 disconnect/reconnect implementation and was later rebuilt into the current transport-preserving client lifecycle. The current host runtime priorities are recorded above; earlier PR #86 planning is historical, while exact release-baseline selection, legal/compliance audit and exact-artifact verification remain gates; broader comparison with the proposed `T/J` consistent-cut and catch-up-journal design remains future architecture work.
 - Entity identity persistence/baseline mapping for existing and nested items remains a gating design spike.
 - Command IDs, host deduplication, explicit rejection reasons, and reconnect boundaries need a domain-by-domain audit.
 - Region/entity hashes and targeted refresh behavior are target architecture, not confirmed universal implementation.
@@ -592,6 +624,8 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 - `GameSpeedSyncer` is present in source, but the requested multiplayer matrix has not been run in the evidence available here.
 
 ## Revision history
+
+- **2026-10-30 (common host checkpoint):** Recorded HEAD f2ca18c1 plus 22 staged paths, staged LAN Kick correction, current EventAction/common transport ownership, saved 192-warning/0-error Debug and 95-pass evidence, 44-case scope, deferred refinements and explicit native/runtime limits. Marked superseded host plans as historical.
 
 - **2026-10-30 (host target agreement):** Recorded architecture discussion complete and D-048 unimplemented, identified current LAN/Steam differences and new Session ordering, and retained interface/client design and all compilation/runtime gates.
 

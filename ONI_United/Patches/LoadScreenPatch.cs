@@ -39,7 +39,7 @@ namespace ONI_United.Patches
             {
                 // Resume the existing load only after confirmed cleanup; its normal
                 // OnSaveLoaded hook remains responsible for requesting the new host.
-                if (!Lifecycle.Handle(Lifecycle.Event.Stop, () => GameServer.StopLanHostAndLoad(filename)))
+                if (!NetworkConfig.TransportServer.StopAndLoad(filename))
                     DebugConsole.LogError("[Multiplayer] Load was not admitted: Stop is not permitted in the current lifecycle state.");
                 return false;
             }

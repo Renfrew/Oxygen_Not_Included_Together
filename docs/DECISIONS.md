@@ -422,6 +422,8 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 
 **Verified first increment:** `tests/Shared.Tests` targets `net10.0`, source-links `Shared/Replication/SnapshotTimeline.cs`, has no project references, and removes inherited game/mod build items. Five `SnapshotTimeline` tests passed in Debug and Release. The workflow was locally validated and reviewed for a clean runner but has not run on GitHub. No runtime test was performed. At verification, all N15-B implementation remained uncommitted on `refactor/mod-lifecycle` at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`.
 
+> **Historical decision precedence:** D-043–D-048 below retain their original wording and rationale. D-049 and the standalone network lifecycle target supersede conflicting host-coordinator, activation-order and accepted-action failure semantics; their original implementation labels are point-in-time records.
+
 ## D-043 — Central lifecycle owns permission; actions own execution
 
 **Decision status:** Confirmed
@@ -506,6 +508,26 @@ A snapshot must be replaced if relevant authoritative world state has advanced o
 
 **Open design:** Concrete interface signatures, inheritance/composition, callback lifetime/completion wiring and reporting of essential shared Stop failures remain to design. No extra phases/events or generic operation framework are authorized. The corresponding Client coordinator and client event/Lifecycle route remain undecided; host/client symmetry is not assumed.
 
+## D-049 — Lifecycle EventActions and common transport hosting; deferred runtime ownership refinements
+
+**Decision status:** Confirmed
+
+**Implementation status:** Host checkpoint implemented and source-reviewed in staged changes; native runtime verification outstanding. Facade/extraction/client refinements below are approved but deferred.
+
+**Decision:** Remove GameServer rather than recreate its mixed responsibilities in a replacement coordinator. Lifecycle owns permission, transitions and internal essential EventAction resolution. Accepted execution is transition → EventAction if present → caller Action callback last. Rejection invokes neither action; true reports normal completion of that synchronous dispatch, not asynchronous host success. Unexpected EventAction/callback exceptions are logged and rethrown as fatal integrity failures; later callbacks are skipped, without automatic rollback, reset to Idle or recover-and-continue policy. An outer Unity/native handler may still catch propagation. Expected protocol failures remain normal cancellation outcomes.
+
+**Host boundary:** Preserve Start into StartingHost; TransportStarted enters PrepareSession before its logical Session-preparation action; SessionPrepared enters Hosting only after successful preparation. Stop is repeatable in Stopping; Stopped alone returns to Idle after confirmed essential and protocol cleanup. Uninitialized admits no operational event. No client phases/events are approved by this host table.
+
+**Ownership:** TransportServer provides common instance Start/Stop, readiness/completion, diagnostics and retained application continuations. Concrete implementations own native listeners/lobbies, callbacks, cancellation and release evidence. Session stays the static logical data owner; current preparation still uses MultiplayerSession.RegisterAsHost and its required integration side effects. Host ticking moves to NetworkingComponent and the original host/capacity admission predicate to SessionHandshakeCoordinator. Essential Stop work delegates Session deactivation, identity clearing and selection-color refresh before protocol cancellation. An unexpected shared cleanup exception prevents the normal protocol callback and invalidates pending common completion; native success alone cannot establish Idle afterward. Protocol-reported cleanup failure remains Stopping for explicit retry.
+
+**Preserved contracts:** D-044 retains original unresolved completion/filename, no duplicate in-flight cleanup, confirmed cleanup before Idle, failure/disposal discard and no automatic retry. D-045 retains immediate component-lifetime release without another frame or operational terminal state. Steam's original correlated CreateLobby remains owned through Stop; late resources are released by that owner, and unresolved creation or failed release cannot authorize Stopped. Steam terminal Timeout is a native outcome; a local timeout proves no release.
+
+**Approved, not yet implemented:** Refine/rename existing NetworkConfig to NetworkRuntime as the sole public routing and selected-live-transport owner, without a second facade. TransportRegistry remains catalog/factory; no static TransportServer selection registry. Extract stateless LifecycleEventActions.cs while Lifecycle keeps dispatch authority. Centralize host/client mutual exclusion and selection permission in Lifecycle; exact client phases/events/transitions remain undecided. Migrate direct host activation through Session.BeginHosting(host), preserving necessary notifications, host name/readiness and metadata through existing owners before removing the legacy RegisterAsHost integration. Protect selection/replacement and pending-client cancellation; existing checks are not the completed target.
+
+**Supersession:** This replaces D-043's permission-only/caller-owned essential execution description and D-048's required Server/GameServer coordinator, activation-after-Hosting ordering and conflicting recovery semantics. It refines D-044/D-045's named owners and Stop ordering without discarding their completion/continuation/lifetime guarantees. D-046's static logical Session and notification separation remain; direct host integration is a future migration. D-047 synchronization/Player/readiness policy is unchanged. Historical D-043–D-048 text remains intact. Detailed target: ONI_United_Network_Lifecycle_Protocol_Design.md.
+
+**Evidence:** Source inspection and the saved non-deploying Debug build (192 warnings/0 errors) plus 95 standalone passes support this checkpoint only. The 44 added Lifecycle/common-transport cases use substitutes; they establish no native LAN/Steam, Unity lifetime or gameplay runtime result. NetworkRuntime/extraction/client refinements are not inferred from those results.
+
 ## Unresolved decisions
 
 1. Exact TTL and collision handling for Reactable authorization.
@@ -542,6 +564,8 @@ A snapshot must be replaced if relevant authoritative world state has advanced o
 | N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | Option 3 / `Shared.Tests` isolation review, five Debug/Release tests, and local-only workflow validation |
 
 ## Revision history
+
+- **2026-10-30 (common host checkpoint):** Added D-049 for approved EventAction/Action ordering, GameServer removal, common instance-level transport hosting and deferred NetworkRuntime/extraction/client/Session refinements. Preserved D-043–D-048 verbatim with explicit precedence.
 
 - **2026-10-30 (host target agreement):** Added D-048 for the agreed Server event-action/protocol boundary, post-Hosting activation, Stop-owned deactivation/cleanup and retained pending native cancellation. Annotated D-043/D-044 refinements without erasing history; signatures and client design remain open.
 

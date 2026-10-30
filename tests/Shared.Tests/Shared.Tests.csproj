@@ -28,6 +28,9 @@
   <ItemGroup>
     <Compile Include="../../Shared/Replication/SnapshotTimeline.cs" Link="Replication/SnapshotTimeline.cs" />
     <Compile Include="../../Shared/Networking/TransportConfigurationMigration.cs" Link="Networking/TransportConfigurationMigration.cs" />
+    <Compile Include="../../ONI_United/StateMachines/Lifecycle.cs" Link="Networking/Lifecycle.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/TransportServer.cs" Link="Networking/TransportServer.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/States/ClientState.cs" Link="Networking/ClientState.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Player.cs" Link="Networking/Sessions/Player.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Session.cs" Link="Networking/Sessions/Session.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakeRules.cs" Link="Networking/Sessions/SessionHandshakeRules.cs" />

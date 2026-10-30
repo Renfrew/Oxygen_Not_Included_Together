@@ -56,7 +56,7 @@ namespace ONI_United.UI.Multiplayer.Views
 
         private bool CanStart => !disposed && IsLan && Utils.IsInGame() && Grid.CellCount > 0
             && !Session.IsActive && GameClient.State == ClientState.Disconnected
-            && GameServer.State == ServerState.Stopped && Lifecycle.Current == Lifecycle.Phase.Idle;
+            && Lifecycle.Current == Lifecycle.Phase.Idle;
 
         internal void RefreshAvailability() => startButton.isInteractable = CanStart;
 
@@ -76,23 +76,18 @@ namespace ONI_United.UI.Multiplayer.Views
 
             try
             {
-                if (!Lifecycle.Handle(Lifecycle.Event.Start, () =>
+                NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.LITENETLIB);
+                if (!NetworkConfig.TransportServer.Start(configure: () =>
                 {
-                    try
-                    {
-                        var config = Configuration.Instance;
-                        config.Host.LanSettings.Port = port;
-                        config.Host.LanSettings.DisplayName = name;
-                        config.Host.MaxLobbySize = maxPlayers;
-                        config.Host.NetworkTransport = (int)NetworkConfig.NetworkTransport.LITENETLIB;
-                        config.Save();
-                        GameServer.StartLanHost();
-                    }
-                    catch (Exception ex) { GameServer.FailLanStartup(ex.Message); }
+                    var config = Configuration.Instance;
+                    config.Host.LanSettings.Port = port;
+                    config.Host.LanSettings.DisplayName = name;
+                    config.Host.MaxLobbySize = maxPlayers;
+                    config.Host.NetworkTransport = (int)NetworkConfig.NetworkTransport.LITENETLIB;
+                    config.Save();
                 })) ModLog.Warning("Host start is not permitted in the current lifecycle state.");
                 if (!disposed) screen.RefreshActiveView();
             }
-            catch (Exception ex) { ModLog.Warning($"LAN hosting action failed: {ex.Message}"); }
             finally { if (!disposed && view != null && view.isActiveAndEnabled) RefreshAvailability(); }
         }
 

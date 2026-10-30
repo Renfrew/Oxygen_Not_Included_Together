@@ -9,6 +9,8 @@ using Steamworks;
 using ONI_United;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
+using ONI_United.StateMachines;
+using ONI_United.Patches.ToolPatches;
 
 namespace ONI_United.Networking.Transport.Steamworks
 {
@@ -16,30 +18,25 @@ namespace ONI_United.Networking.Transport.Steamworks
     {
         public static HSteamListenSocket ListenSocket { get; private set; }
         public static HSteamNetPollGroup PollGroup { get; private set; }
-        private static Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
+        private Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
         private static readonly Dictionary<uint, ulong> _clientIdsByConnection = new Dictionary<uint, ulong>();
+
+        private Action<bool, string> cancellation;
 
         // Bandwidth tracking via per-connection GetConnectionRealTimeStatus
         private float _srvInBw, _srvOutBw;
         private int _srvInPps, _srvOutPps;
 
-        public override void Prepare()
+        private bool Prepare()
         {
-            using var _ = Profiler.Scope();
-
-            if (!SteamManager.Initialized)
-            {
-                OnError.Invoke();
-                DebugConsole.LogError("[GameServer] SteamManager not initialized! Cannot start listen server.");
-                return;
-            }
+            if (SteamManager.Initialized && !SteamLobby.InLobby && !SteamLobby.HasPendingJoin) return true;
+            ReportStartupFailure("Steam must be initialized and outside a lobby before hosting.");
+            return false;
         }
 
-        public override void Start()
+        protected override void StartProtocol()
         {
-            using var _ = Profiler.Scope();
-
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Steam"));
+            if (!Prepare()) return;
 
             // Create listen socket for P2P
             var options = new SteamNetworkingConfigValue_t[2];
@@ -59,8 +56,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (ListenSocket.m_HSteamListenSocket == 0)
             {
-                OnError.Invoke();
-                DebugConsole.LogError("[GameServer] Failed to create ListenSocket!");
+                ReportStartupFailure("Steam failed to create its listen socket.");
                 return;
             }
 
@@ -68,36 +64,95 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (PollGroup.m_HSteamNetPollGroup == 0)
             {
-                OnError.Invoke();
-                DebugConsole.LogError("[GameServer] Failed to create PollGroup!");
-                SteamNetworkingSockets.CloseListenSocket(ListenSocket);
+                ReportStartupFailure("Steam failed to create its poll group.");
                 return;
             }
 
             _connectionStatusChangedCallback = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
 
-            MultiplayerSession.RegisterAsHost();
+            SteamLobby.CreateHostLobby(error =>
+            {
+                if (error != null) ReportStartupFailure(error);
+                else
+                {
+                    OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Steam"));
+                    ReportTransportStarted();
+                }
+            });
         }
 
-        public override void Stop()
+        public override void OnSessionPlayerAdmitted(ulong playerId)
         {
-            using var _ = Profiler.Scope();
+            if (playerId != Session.LocalPlayerId) return;
+            SteamLobby.UpdateGameInfo();
+            SelectToolPatch.UpdateColor();
+        }
 
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "Steam"));
+        protected override void CancelProtocol(Action<bool, string> completed)
+        {
+            if (cancellation != null) return;
+            cancellation = completed;
+            string resourceFailure = ReleaseSockets();
+            SteamLobby.CancelHostLobby((success, error) =>
+            {
+                var finished = cancellation;
+                cancellation = null;
+                if (finished != null && success && resourceFailure == null)
+                    OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED, "Steam"));
+                finished?.Invoke(success && resourceFailure == null, resourceFailure ?? error);
+            });
+        }
 
-            if (PollGroup.m_HSteamNetPollGroup != 0)
-                SteamNetworkingSockets.DestroyPollGroup(PollGroup);
+        protected override void DisposeProtocol()
+        {
+            cancellation = null;
+            string failure = ReleaseSockets();
+            // A pending native lobby result remains registered, but can only release
+            // its original lobby and cannot call the destroyed Lifecycle singleton.
+            SteamLobby.CancelHostLobby(null);
+            if (failure != null) DebugConsole.LogError("[SteamworksServer] Disposal failed: " + failure);
+        }
 
+        private string ReleaseSockets()
+        {
+            var errors = new List<string>();
+            try { CloseConnections(); }
+            catch (Exception ex) { errors.Add(ex.ToString()); }
             if (ListenSocket.m_HSteamListenSocket != 0)
-                SteamNetworkingSockets.CloseListenSocket(ListenSocket);
-
-            _clientIdsByConnection.Clear();
-            MultiplayerSession.UnRegisterAsHost(null);
+            {
+                if (SteamNetworkingSockets.CloseListenSocket(ListenSocket))
+                {
+                    ListenSocket = default;
+                    _clientIdsByConnection.Clear(); // Closing a listener closes its accepted connections.
+                }
+                else errors.Add("Steam did not confirm listener release.");
+            }
+            if (PollGroup.m_HSteamNetPollGroup != 0)
+            {
+                if (SteamNetworkingSockets.DestroyPollGroup(PollGroup)) PollGroup = default;
+                else errors.Add("Steam did not confirm poll-group release.");
+            }
+            if (ListenSocket.m_HSteamListenSocket == 0 && PollGroup.m_HSteamNetPollGroup == 0
+                && _clientIdsByConnection.Count == 0)
+            {
+                _connectionStatusChangedCallback?.Dispose();
+                _connectionStatusChangedCallback = null;
+            }
+            return errors.Count == 0 ? null : string.Join("; ", errors);
         }
 
         public override void CloseConnections()
         {
-            MultiplayerSession.UnRegisterAsHost(CreateCloseFunc("Shutdown"));
+            // Logical membership has already been deactivated by Stop's EventAction.
+            // Physical handles, including connections not yet admitted, remain here.
+            foreach (var id in new List<uint>(_clientIdsByConnection.Keys))
+            {
+                var connection = new HSteamNetConnection(id);
+                if (SteamNetworkingSockets.CloseConnection(connection, 0, "Shutdown", false)
+                    || !SteamNetworkingSockets.GetConnectionInfo(connection, out var _))
+                    _clientIdsByConnection.Remove(id);
+                else throw new InvalidOperationException("Steam did not confirm connection release: " + id);
+            }
         }
 
         public override void Update()
@@ -166,11 +221,11 @@ namespace ONI_United.Networking.Transport.Steamworks
                     if (_clientIdsByConnection.TryGetValue(connection.m_HSteamNetConnection, out ulong senderId))
                         PacketHandler.HandleIncoming(bytes, senderId, connection);
                     else
-                        DebugConsole.LogWarning("[GameServer] Received data from an untracked Steam connection.");
+                        DebugConsole.LogWarning("[SteamworksServer] Received data from an untracked Steam connection.");
                 }
                 catch (Exception ex)
                 {
-                    DebugConsole.LogWarning($"[GameServer] Rejected invalid incoming packet: {ex}");
+                    DebugConsole.LogWarning($"[SteamworksServer] Rejected invalid incoming packet: {ex}");
                 }
 
                 SteamNetworkingMessage_t.Release(messages[i]);
@@ -178,19 +233,27 @@ namespace ONI_United.Networking.Transport.Steamworks
             scope.End(msgCount, totalBytes);
         }
 
-        private static void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t data)
+        private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t data)
         {
             using var _ = Profiler.Scope();
 
             var conn = data.m_hConn;
+            if (data.m_info.m_hListenSocket != ListenSocket || ListenSocket.m_HSteamListenSocket == 0)
+                return;
             var clientId = data.m_info.m_identityRemote.GetSteamID();
             var state = data.m_info.m_eState;
 
-            DebugConsole.Log($"[GameServer] OnConnectionStatusChanged: state={state} from {clientId}");
+            DebugConsole.Log($"[SteamworksServer] OnConnectionStatusChanged: state={state} from {clientId}");
 
             switch (state)
             {
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting:
+                    if (!Session.IsHost || Lifecycle.Current != Lifecycle.Phase.Hosting)
+                    {
+                        SteamNetworkingSockets.CloseConnection(conn, 0, "Host is not admitting players", false);
+                        break;
+                    }
+                    _clientIdsByConnection[conn.m_HSteamNetConnection] = clientId.m_SteamID;
                     TryAcceptConnection(conn, clientId);
                     break;
 
@@ -213,17 +276,17 @@ namespace ONI_United.Networking.Transport.Steamworks
             SteamNetConnectionInfo_t info = default;
             if (!SteamNetworkingSockets.GetConnectionInfo(conn, out info))
             {
-                DebugConsole.LogWarning($"[GameServer] TryAcceptConnection: Could not get connection info for {clientId}");
+                DebugConsole.LogWarning($"[SteamworksServer] TryAcceptConnection: Could not get connection info for {clientId}");
             }
             else
             {
-                DebugConsole.Log($"[GameServer] TryAcceptConnection: Connection state for {clientId} is {info.m_eState}");
+                DebugConsole.Log($"[SteamworksServer] TryAcceptConnection: Connection state for {clientId} is {info.m_eState}");
             }
 
             // Only accept if in Connecting state
             if (info.m_eState != ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting)
             {
-                DebugConsole.LogWarning($"[GameServer] TryAcceptConnection: Connection {clientId} is not in Connecting state (actual: {info.m_eState}), skipping accept");
+                DebugConsole.LogWarning($"[SteamworksServer] TryAcceptConnection: Connection {clientId} is not in Connecting state (actual: {info.m_eState}), skipping accept");
                 return;
             }
 
@@ -231,14 +294,14 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (result == EResult.k_EResultOK)
             {
                 SteamNetworkingSockets.SetConnectionPollGroup(conn, PollGroup);
-                DebugConsole.Log($"[GameServer] Connection accepted from {clientId}");
+                DebugConsole.Log($"[SteamworksServer] Connection accepted from {clientId}");
             }
             else
             {
                 // k_EResultInvalidState means the connection has already transitioned away
                 if (result == EResult.k_EResultInvalidState)
                 {
-                    DebugConsole.LogWarning($"[GameServer] AcceptConnection returned InvalidState for {clientId} - connection may have already been handled or closed");
+                    DebugConsole.LogWarning($"[SteamworksServer] AcceptConnection returned InvalidState for {clientId} - connection may have already been handled or closed");
                 }
                 else
                 {
@@ -251,7 +314,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         {
             using var _ = Profiler.Scope();
 
-            DebugConsole.LogError($"[GameServer] Rejecting connection from {clientId}: {reason}", false);
+            DebugConsole.LogError($"[SteamworksServer] Rejecting connection from {clientId}: {reason}", false);
             SteamNetworkingSockets.CloseConnection(conn, 0, reason, false);
         }
 
@@ -279,7 +342,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             _clientIdsByConnection[connectionId] = clientId.m_SteamID;
 
-            DebugConsole.Log($"[GameServer] Connection to {clientId} fully established!");
+            DebugConsole.Log($"[SteamworksServer] Connection to {clientId} fully established!");
             //SaveFileRequestPacket.SendSaveFile(clientId); // Old method
             //GoogleDriveUtils.UploadAndSendToClient(clientId); // Upload to googledrive and send to the client
         }
@@ -293,14 +356,8 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             MultiplayerSession.UnregisterClient(clientId.m_SteamID, null, conn);
 
-            DebugConsole.Log($"[GameServer] Connection closed for {clientId}");
+            DebugConsole.Log($"[SteamworksServer] Connection closed for {clientId}");
 
-            // Do I wanna auto shutdown here? I don't think so
-            // if (MultiplayerSession.ConnectedPlayers.Count == 0)
-            // {
-            //     SetState(ServerState.Stopped);
-            //     Shutdown
-            // }
         }
 
         public override bool TryGetRemotePlayerId(object connection, out ulong playerId)
@@ -322,25 +379,25 @@ namespace ONI_United.Networking.Transport.Steamworks
         {
             if (!MultiplayerSession.ConnectedPlayers.TryGetValue(clientId, out var player))
             {
-                DebugConsole.LogWarning($"[GameServer] KickClient: Client {clientId} not found.");
+                DebugConsole.LogWarning($"[SteamworksServer] KickClient: Client {clientId} not found.");
                 return;
             }
 
             if (player.Connection == null)
             {
-                DebugConsole.LogWarning($"[GameServer] KickClient: Client {clientId} has no active connection.");
+                DebugConsole.LogWarning($"[SteamworksServer] KickClient: Client {clientId} has no active connection.");
                 return;
             }
 
             if (player.Connection is HSteamNetConnection conn)
             {
-                DebugConsole.Log($"[GameServer] Kicking client {clientId}");
+                DebugConsole.Log($"[SteamworksServer] Kicking client {clientId}");
 
                 MultiplayerSession.UnregisterClient(clientId, CreateCloseFunc("Kicked by host"), conn);
             }
             else
             {
-                DebugConsole.LogError($"[GameServer] KickClient: Invalid connection type for {clientId}");
+                DebugConsole.LogError($"[SteamworksServer] KickClient: Invalid connection type for {clientId}");
             }
         }
 

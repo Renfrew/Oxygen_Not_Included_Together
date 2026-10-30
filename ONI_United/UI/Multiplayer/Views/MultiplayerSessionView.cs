@@ -29,16 +29,14 @@ namespace ONI_United.UI.Multiplayer.Views
             string status, role;
             if (Lifecycle.HasHostOperation)
             {
-                status = GameServer.LanError ?? (Lifecycle.Current == Lifecycle.Phase.Hosting
-                    ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.Stopping ? "Stopping LAN host" : "Starting LAN host");
+                status = NetworkConfig.TransportServer.OperationError ?? (Lifecycle.Current == Lifecycle.Phase.Hosting
+                    ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.Stopping ? "Stopping host" : "Starting host");
                 role = "Role: host";
             }
             else if (Session.IsActive)
             { status = Session.IsHost ? "Hosting Game" : "Connected to a multiplayer session"; role = $"Role: {(Session.IsHost ? "Host" : "Client")}"; }
             else if (GameClient.State != ClientState.Disconnected)
             { status = $"Connection in progress: {GameClient.State}"; role = "Role: awaiting session admission"; }
-            else if (GameServer.State != ServerState.Stopped)
-            { status = $"Server state: {GameServer.State}"; role = "Role: host startup/shutdown"; }
             else if (SteamLobby.InLobby)
             { status = "In a Steam lobby; gameplay connection is not confirmed."; role = "Role: lobby member"; }
             else { status = "No active multiplayer session."; role = "Role: none"; }
@@ -62,7 +60,7 @@ namespace ONI_United.UI.Multiplayer.Views
         }
         private void StopHosting()
         {
-            if (!Lifecycle.Handle(Lifecycle.Event.Stop, GameServer.StopLanHost))
+            if (!NetworkConfig.TransportServer.Stop())
                 ModLog.Warning("Stop is not permitted in the current lifecycle state.");
             screen.RefreshActiveView();
         }

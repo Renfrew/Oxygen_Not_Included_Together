@@ -2,6 +2,12 @@ using System;
 using ONI_United.DebugTools;
 using UnityEngine;
 using ONI_United.Networking.Runtime;
+using ONI_United.Networking;
+using ONI_United.Networking.Identity;
+using ONI_United.Networking.Sessions;
+using ONI_United.Patches.ToolPatches;
+using ONI_United.Misc;
+using ONI_United.Networking.Presentation;
 
 namespace ONI_United.StateMachines
 {
@@ -13,17 +19,18 @@ namespace ONI_United.StateMachines
             Uninitialized,
             Idle,
             StartingHost,
+            PrepareSession,
             Hosting,
             Stopping
         }
-        internal enum Event { Start, Started, Stop, Stopped }
+        internal enum Event { Start, TransportStarted, SessionPrepared, Stop, Stopped }
 
         private static Lifecycle instance;
         private Phase current = Phase.Uninitialized;
 
         internal static Phase Current => instance.current;
         internal static bool HasHostOperation => Current == Phase.StartingHost
-            || Current == Phase.Hosting || Current == Phase.Stopping;
+            || Current == Phase.PrepareSession || Current == Phase.Hosting || Current == Phase.Stopping;
 
         private void Awake()
         {
@@ -44,9 +51,8 @@ namespace ONI_United.StateMachines
             instance.Transition(Phase.Idle);
         }
 
-        internal static bool Handle(Event evt, System.Action action)
+        internal static bool Handle(Event evt, System.Action callback = null)
         {
-            if (action == null) throw new ArgumentNullException(nameof(action));
             var owner = instance;
 
             switch (evt)
@@ -55,12 +61,16 @@ namespace ONI_United.StateMachines
                     if (owner.current != Phase.Idle) return false;
                     owner.Transition(Phase.StartingHost);
                     break;
-                case Event.Started:
+                case Event.TransportStarted:
                     if (owner.current != Phase.StartingHost) return false;
+                    owner.Transition(Phase.PrepareSession);
+                    break;
+                case Event.SessionPrepared:
+                    if (owner.current != Phase.PrepareSession) return false;
                     owner.Transition(Phase.Hosting);
                     break;
                 case Event.Stop:
-                    if (owner.current != Phase.StartingHost && owner.current != Phase.Hosting
+                    if (owner.current != Phase.StartingHost && owner.current != Phase.PrepareSession && owner.current != Phase.Hosting
                         && owner.current != Phase.Stopping) return false;
                     if (owner.current != Phase.Stopping) owner.Transition(Phase.Stopping);
                     break;
@@ -72,10 +82,43 @@ namespace ONI_United.StateMachines
                     return false;
             }
 
-            // Permissions/state are established before execution. Owners handle failures
-            // and continuations; true reports invocation, never operation completion.
-            action();
-            return true;
+            try
+            {
+                EventAction(evt);
+                callback?.Invoke();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.LogError($"[Lifecycle] Event {evt} failed in phase {Current}: {ex}");
+                throw;
+            }
+        }
+
+        private static void EventAction(Event evt)
+        {
+            switch (evt)
+            {
+                case Event.Start:
+                    if (Session.IsActive || Session.Players.Count != 0
+                        || GameClient.State != Networking.Sessions.States.ClientState.Disconnected)
+                        throw new InvalidOperationException("A multiplayer session or connection is already active.");
+                    if (Utils.IsInGame()) NetworkIdentityRegistry.RebuildFromScene();
+                    CursorManager.Instance.AssignColor();
+                    NetworkingComponent.InitializeHostTick();
+                    break;
+                case Event.TransportStarted:
+                    if (!MultiplayerSession.RegisterAsHost())
+                        throw new InvalidOperationException("The local host Session could not be registered.");
+                    break;
+                case Event.Stop:
+                    MultiplayerSession.Clear();
+                    NetworkIdentityRegistry.Clear();
+                    SelectToolPatch.UpdateColor();
+                    if (Session.IsActive || Session.Players.Count != 0)
+                        throw new InvalidOperationException("Host membership was not fully cleared.");
+                    break;
+            }
         }
 
         private void Transition(Phase next)
@@ -84,15 +127,25 @@ namespace ONI_United.StateMachines
             DebugConsole.Log("[Lifecycle] " + next);
         }
 
+        private static void DisposeHost()
+        {
+            if (!HasHostOperation) return;
+            // Lifetime release is immediate and repeat-safe, independent of another Update.
+            // Drop application continuations even if essential cleanup throws.
+            var server = NetworkConfig.TransportServer;
+            try { EventAction(Event.Stop); }
+            finally { server.DisposeHost(); }
+        }
+
         private void OnApplicationQuit()
         {
-            if (ReferenceEquals(instance, this)) GameServer.DisposeLanHost();
+            if (ReferenceEquals(instance, this)) DisposeHost();
         }
 
         private void OnDestroy()
         {
             if (!ReferenceEquals(instance, this)) return;
-            try { GameServer.DisposeLanHost(); }
+            try { DisposeHost(); }
             finally { instance = null; }
         }
     }

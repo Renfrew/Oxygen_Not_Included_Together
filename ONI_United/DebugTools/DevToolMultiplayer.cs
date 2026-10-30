@@ -9,7 +9,6 @@ using ImGuiNET;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Runtime;
-using GameServer = ONI_United.Networking.Runtime.GameServer;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Packets.World;
@@ -270,7 +269,7 @@ namespace ONI_United.DebugTools
             {
                 case NetworkConfig.NetworkTransport.STEAMWORKS:
                     if (ImGui.Button("Create Lobby"))
-                        SteamLobby.CreateLobby();
+                        NetworkConfig.TransportServer.Start();
 
                     ImGui.SameLine();
                     if (ImGui.Button("Leave Lobby"))
@@ -279,7 +278,7 @@ namespace ONI_United.DebugTools
                 case NetworkConfig.NetworkTransport.LITENETLIB:
                     if (ImGui.Button("Start Lan"))
                     {
-                        if (!Lifecycle.Handle(Lifecycle.Event.Start, GameServer.StartLanHost))
+                        if (!NetworkConfig.TransportServer.Start())
                             ModLog.Error("Host start is not permitted in the current lifecycle state.");
                     }
 
@@ -356,19 +355,14 @@ namespace ONI_United.DebugTools
 
             if (ImGui.Button("Start Current Config Server"))
             {
-                if (NetworkConfig.IsLanConfig())
-                {
-                    if (!Lifecycle.Handle(Lifecycle.Event.Start, GameServer.StartLanHost))
-                        ModLog.Error("Host start is not permitted in the current lifecycle state.");
-                }
-                else NetworkConfig.TransportServer.Start();
+                if (!NetworkConfig.TransportServer.Start())
+                    ModLog.Error("Host start is not permitted in the current lifecycle state.");
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Stop Current Config Server"))
             {
-                if (NetworkConfig.IsLanConfig()) NetworkConfig.Stop();
-                else NetworkConfig.TransportServer.Stop();
+                NetworkConfig.TransportServer.Stop();
             }
             ImGui.Separator();
             DisplayUnitTests();
@@ -617,7 +611,7 @@ namespace ONI_United.DebugTools
             if(MultiplayerSession.IsHost)
             {
                 var players = MultiplayerSession.ConnectedPlayers;
-                var server = NetworkConfig.GetTransportServer() as LiteNetLibServer;
+                var server = NetworkConfig.TransportServer as LiteNetLibServer;
 
                 foreach (var player in players)
                 {

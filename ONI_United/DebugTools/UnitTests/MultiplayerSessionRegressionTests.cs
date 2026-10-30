@@ -1,3 +1,4 @@
+using ONI_United.StateMachines;
 using System;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
@@ -16,7 +17,7 @@ namespace ONI_United.DebugTools.UnitTests
 			!MultiplayerSession.InActiveSession
 			&& MultiplayerSession.ConnectedPlayers.Count == 0
 			&& GameClient.State == ClientState.Disconnected
-			&& GameServer.State == ServerState.Stopped;
+			&& Lifecycle.Current == Lifecycle.Phase.Idle;
 
 		[UnitTest(name: "Networking: replacement connection resets protocol verification", category: "Networking")]
 		public static UnitTestResult ReplacementConnectionResetsProtocolVerification()

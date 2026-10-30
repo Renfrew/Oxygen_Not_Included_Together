@@ -14,7 +14,6 @@ using UnityEngine;
 using ONI_United;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Runtime;
-using GameServer = ONI_United.Networking.Runtime.GameServer;
 using ONI_United.StateMachines;
 using ONI_United.Networking.Sessions;
 using Shared.Networking;
@@ -45,42 +44,13 @@ namespace ONI_United.Networking
         public static readonly int LOBBY_SIZE_DEFAULT = 4;
         public static readonly int LOBBY_SIZE_MAX = 16;
 
-        /// <summary>
-        /// Starts a GameServer on the current transport
-        /// </summary>
         public static void StartServer()
         {
-            switch(transport)
+            if (!TransportServer.Start(() =>
             {
-                case NetworkTransport.STEAMWORKS:
-                    UpdateTransport(NetworkTransport.STEAMWORKS);
-                    StartSteamServer();
-                    break;
-                case NetworkTransport.LITENETLIB:
-                    if (!Lifecycle.Handle(Lifecycle.Event.Start, () =>
-                    {
-                        GameServer.StartLanHost();
-                        if (Lifecycle.Current == Lifecycle.Phase.Hosting)
-                        {
-                            try
-                            {
-                                SelectToolPatch.UpdateColor();
-                                SpeedControlScreen.Instance?.Pause(true);
-                            }
-                            catch (Exception ex) { DebugConsole.LogError("[NetworkConfig] Host presentation update failed: " + ex); }
-                        }
-                    })) DebugConsole.LogError("[NetworkConfig] Host start is not permitted in the current lifecycle state.");
-                    break;
-            }
-        }
-
-        private static void StartSteamServer()
-        {
-            SteamLobby.CreateLobby(onSuccess: () =>
-            {
-                //SpeedControlScreen.Instance?.Unpause(false);
-                SpeedControlScreen.Instance.Pause(true);
-            });
+                SelectToolPatch.UpdateColor();
+                SpeedControlScreen.Instance?.Pause(true);
+            })) DebugConsole.LogError("[NetworkConfig] Host start is not permitted in the current lifecycle state.");
         }
 
         /// <summary>
@@ -90,7 +60,7 @@ namespace ONI_United.Networking
         {
             if (Lifecycle.HasHostOperation)
             {
-                if (!Lifecycle.Handle(Lifecycle.Event.Stop, GameServer.StopLanHost))
+                if (!TransportServer.Stop())
                     DebugConsole.LogError("[NetworkConfig] Stop is not permitted in the current lifecycle state.");
                 return;
             }
@@ -127,10 +97,11 @@ namespace ONI_United.Networking
         {
             newTransport = (NetworkTransport)TransportConfigurationMigration.NormalizeNetworkTransport((int)newTransport);
 
-            if (Lifecycle.HasHostOperation && !transport.Equals(newTransport)
-                && !(Lifecycle.Current == Lifecycle.Phase.StartingHost
-                    && newTransport == NetworkTransport.LITENETLIB))
-                throw new InvalidOperationException("Stop the owned LAN host before changing transport.");
+            // A lobby join owns its native result before GameClient becomes Connecting.
+            if (SteamLobby.HasPendingJoin && !transport.Equals(newTransport))
+                throw new InvalidOperationException("Wait for the pending Steam lobby join before changing transport.");
+            if (Lifecycle.HasHostOperation && !transport.Equals(newTransport))
+                throw new InvalidOperationException("Stop the owned host before changing transport.");
 
             if (transport.Equals(newTransport))
                 return;
