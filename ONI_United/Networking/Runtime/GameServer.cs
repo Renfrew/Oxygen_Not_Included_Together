@@ -75,6 +75,9 @@ namespace ONI_United.Networking.Runtime
         private static LiteNetLibServer lanServer;
         internal static string LanError { get; private set; }
 
+        internal static bool CanAdmitRemotePlayer(int maxPlayers) =>
+            Session.IsHost && maxPlayers > 0 && Session.Players.Count < maxPlayers;
+
         internal static void StartLanHost()
         {
             LanError = null;

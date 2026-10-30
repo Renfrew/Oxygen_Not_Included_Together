@@ -30,7 +30,6 @@
     <Compile Include="../../Shared/Networking/TransportConfigurationMigration.cs" Link="Networking/TransportConfigurationMigration.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Player.cs" Link="Networking/Sessions/Player.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Session.cs" Link="Networking/Sessions/Session.cs" />
-    <Compile Include="../../ONI_United/Networking/Sessions/SessionController.cs" Link="Networking/Sessions/SessionController.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakeRules.cs" Link="Networking/Sessions/SessionHandshakeRules.cs" />
   </ItemGroup>
 

@@ -3,8 +3,10 @@ using System.Linq;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Transport;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Transport.Steamworks;
 using Shared.Interfaces.Networking;
+using Shared;
 
 namespace ONI_United.Networking.Sessions;
 
@@ -144,7 +146,7 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (!SessionController.CanAdmitRemotePlayer(NetworkConfig.GetMaxServerCapacity()))
+        if (!GameServer.CanAdmitRemotePlayer(NetworkConfig.GetMaxServerCapacity()))
         {
             RejectHostConnection(physicalConnection, "Session is full.");
             return;
@@ -159,7 +161,7 @@ internal static class SessionHandshakeCoordinator
         }
 
         var player = new MultiplayerPlayer(transportPlayerId, name);
-        if (!SessionController.AdmitRemotePlayer(player))
+        if (!Session.TryAddPlayer(player))
         {
             RejectHostConnection(physicalConnection, "Host could not register the admitted player.");
             return;
@@ -217,12 +219,13 @@ internal static class SessionHandshakeCoordinator
         MultiplayerSession.SetHost(packet.HostPlayerId);
         var localPlayer = new MultiplayerPlayer(localPlayerId, Utils.GetLocalPlayerName());
         var hostPlayer = new MultiplayerPlayer(packet.HostPlayerId, hostName);
-        if (!SessionController.AdmitClientSession(localPlayerId, packet.HostPlayerId, localPlayer, hostPlayer))
+        if (!Session.AdmitClient(localPlayer, hostPlayer))
         {
             RejectLocalConnection("Session role could not be established.");
             return;
         }
 
+        Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
         MultiplayerSession.OnConnectedToHost(packet.HostPlayerId, physicalConnection);
         if (!Session.IsClient)
         {

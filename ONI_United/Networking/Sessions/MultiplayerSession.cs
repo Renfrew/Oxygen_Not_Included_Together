@@ -22,11 +22,6 @@ namespace ONI_United.Networking.Sessions
 	{
 		private static ulong? _targetHostId;
 
-		static MultiplayerSession()
-		{
-			SessionController.SessionActiveChanged += OnSessionActiveChanged;
-		}
-
 		private sealed class MultiplayerPlayerView : IReadOnlyDictionary<ulong, MultiplayerPlayer>
 		{
 			public int Count
@@ -131,13 +126,6 @@ namespace ONI_United.Networking.Sessions
 
 		public static event Action<ulong> OnClientDisconnected;
 
-		private static void OnSessionActiveChanged(bool value)
-		{
-			if (!value)
-				_targetHostId = null;
-			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, value ? BoxedBools.True : BoxedBools.False);
-		}
-
 		public static bool RegisterAsHost()
 		{
 			using var _ = Profiler.Scope();
@@ -146,12 +134,13 @@ namespace ONI_United.Networking.Sessions
 			var hostPlayer = ConnectedPlayers.TryGetValue(hostId, out var existingHost)
 				? existingHost
 				: new MultiplayerPlayer(hostId);
-			if (!SessionController.BeginHosting(hostId, hostPlayer))
+			if (!Session.BeginHosting(hostPlayer))
 			{
 				DebugConsole.LogError("[MultiplayerSession] Cannot register host with an invalid local player ID.");
 				return false;
 			}
-			SessionController.UpdatePlayerInformation(hostId, Utils.GetLocalPlayerName());
+			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
+			Session.UpdatePlayerName(hostId, Utils.GetLocalPlayerName());
 			hostPlayer.readyState = ClientReadyState.Ready;
 			KnownPlayerNames[hostId] = hostPlayer.PlayerName;
 			return true;
@@ -169,7 +158,7 @@ namespace ONI_United.Networking.Sessions
 			using var _ = Profiler.Scope();
 
 			var player = new MultiplayerPlayer(clientId);
-			if (!SessionController.AdmitRemotePlayer(player))
+			if (!Session.IsHost || !Session.TryAddPlayer(player))
 				return false;
 			InitializeAdmittedClient(player, connection);
 			return true;
@@ -193,7 +182,7 @@ namespace ONI_United.Networking.Sessions
 
 			close?.Invoke(player.Connection);
 			player.Connection = null;
-			SessionController.RemovePlayer(clientId);
+			Session.RemovePlayer(clientId);
 			KnownPlayerNames.Remove(clientId);
 			ReadyManager.RemoveParticipant(clientId);
 			OnClientDisconnected?.Invoke(clientId);
@@ -284,9 +273,12 @@ namespace ONI_United.Networking.Sessions
 		{
 			using var _ = Profiler.Scope();
 
+			bool wasActive = Session.IsActive;
 			var players = new List<MultiplayerPlayer>(ConnectedPlayers.Values);
-			SessionController.Leave();
+			Session.Reset();
 			_targetHostId = null;
+			if (wasActive)
+				Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.False);
 			foreach (var player in players)
 			{
 				OnClientDisconnected?.Invoke(player.PlayerId);
@@ -422,7 +414,15 @@ namespace ONI_United.Networking.Sessions
 
 		internal static void UnitTestOverrideConn(bool isHost, bool inActiveSession)
 		{
-			SessionController.SetForTests(isHost, inActiveSession, LocalUserID, HostUserID);
+			bool wasActive = Session.IsActive;
+			Session.SetForTests(isHost, inActiveSession, LocalUserID, HostUserID);
+			if (wasActive != Session.IsActive)
+			{
+				if (!Session.IsActive)
+					_targetHostId = null;
+				Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged,
+					Session.IsActive ? BoxedBools.True : BoxedBools.False);
+			}
 		}
 
 

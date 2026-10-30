@@ -347,7 +347,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 				CSteamID member = SteamMatchmaking.GetLobbyMemberByIndex(CurrentLobby, i);
 				LobbyMembers.Add(member);
 				if (Session.Players.ContainsKey(member.m_SteamID))
-					SessionController.UpdatePlayerInformation(
+					Session.UpdatePlayerName(
 						member.m_SteamID,
 						SteamFriends.GetFriendPersonaName(member));
 				_OnLobbyMembersRefreshed?.Invoke(member);

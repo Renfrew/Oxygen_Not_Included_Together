@@ -60,6 +60,8 @@ namespace ONI_United.DebugTools.UnitTests
 		[UnitTest(name: "Networking: host registration establishes Ready state", category: "Networking")]
 		public static UnitTestResult HostRegistrationEstablishesReadyState()
 		{
+			if (Game.Instance == null)
+				return UnitTestResult.InProgress("Requires an initialized game event bus");
 			if (!SessionIsIdle)
 				return UnitTestResult.InProgress("Run only while client and server are stopped");
 
@@ -67,9 +69,26 @@ namespace ONI_United.DebugTools.UnitTests
 			if (!hostId.IsValid())
 				return UnitTestResult.InProgress("The current transport has not assigned a valid local host ID");
 
+			int activeNotifications = 0;
+			bool hostIdentityCommittedAtNotification = false;
+			Action<object> onSessionChanged = _ =>
+			{
+				if (!MultiplayerSession.InActiveSession)
+					return;
+
+				activeNotifications++;
+				hostIdentityCommittedAtNotification =
+					Session.IsHost
+					&& Session.LocalPlayerId == hostId
+					&& Session.Players.ContainsKey(hostId);
+			};
+			Game.Instance.Subscribe(MP_HASHES.OnInSessionChanged, onSessionChanged);
 			try
 			{
-				MultiplayerSession.RegisterAsHost();
+				if (!MultiplayerSession.RegisterAsHost())
+					return UnitTestResult.Fail("Host registration failed");
+				if (activeNotifications != 1 || !hostIdentityCommittedAtNotification)
+					return UnitTestResult.Fail("Host registration did not publish one active notification after committing its identity");
 				if (MultiplayerSession.HostUserID != hostId || !MultiplayerSession.IsHost || !MultiplayerSession.InActiveSession)
 					return UnitTestResult.Fail("Host registration did not establish the active host identity");
 				if (!MultiplayerSession.ConnectedPlayers.TryGetValue(hostId, out var host)
@@ -84,6 +103,7 @@ namespace ONI_United.DebugTools.UnitTests
 			finally
 			{
 				MultiplayerSession.Clear();
+				Game.Instance?.Unsubscribe(MP_HASHES.OnInSessionChanged, onSessionChanged);
 			}
 		}
 
@@ -97,10 +117,19 @@ namespace ONI_United.DebugTools.UnitTests
 
 			int disconnectEvents = 0;
 			int inactiveTransitions = 0;
+			int activeTransitions = 0;
+			bool activeDataCommittedAtNotification = true;
 			Action<object> onDisconnected = _ => disconnectEvents++;
 			Action<object> onSessionChanged = _ =>
 			{
-				if (!MultiplayerSession.InActiveSession)
+				if (MultiplayerSession.InActiveSession)
+				{
+					activeTransitions++;
+					activeDataCommittedAtNotification &= Session.IsActive
+						&& Session.Players.ContainsKey(Session.LocalPlayerId)
+						&& Session.Players.ContainsKey(Session.HostPlayerId);
+				}
+				else
 					inactiveTransitions++;
 			};
 			Game.Instance.Subscribe(MP_HASHES.OnDisconnected, onDisconnected);
@@ -119,8 +148,9 @@ namespace ONI_United.DebugTools.UnitTests
 				MultiplayerSession.UnRegisterAsHost(null);
 				MultiplayerSession.Clear();
 
-				if (disconnectEvents != 2 || inactiveTransitions != 2)
-					return UnitTestResult.Fail($"Expected one disconnect and inactive transition per session, got {disconnectEvents} and {inactiveTransitions}");
+				if (disconnectEvents != 2 || activeTransitions != 2 || inactiveTransitions != 2
+					|| !activeDataCommittedAtNotification)
+					return UnitTestResult.Fail($"Expected two committed active notifications and one inactive notification per session, got {activeTransitions}, {inactiveTransitions} and {disconnectEvents}");
 				if (MultiplayerSession.IsHost || MultiplayerSession.InActiveSession
 					|| MultiplayerSession.HostUserID != Utils.NilUlong()
 					|| MultiplayerSession.ConnectedPlayers.Count != 0
