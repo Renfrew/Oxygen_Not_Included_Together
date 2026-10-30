@@ -96,6 +96,6 @@ namespace ONI_United.Networking
 }
 public static class LoadScreen
 {
-    internal static readonly List<(string Filename, ONI_United.StateMachines.Lifecycle.Phase Phase)> Loaded = new();
-    public static void DoLoad(string filename) => Loaded.Add((filename, ONI_United.StateMachines.Lifecycle.Current));
+    internal static readonly List<(string Filename, ONI_United.Core.Lifecycle.Phase Phase)> Loaded = new();
+    public static void DoLoad(string filename) => Loaded.Add((filename, ONI_United.Core.Lifecycle.Current));
 }

@@ -9,7 +9,7 @@ using Steamworks;
 using ONI_United;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
-using ONI_United.StateMachines;
+using ONI_United.Core;
 using ONI_United.Patches.ToolPatches;
 
 namespace ONI_United.Networking.Transport.Steamworks

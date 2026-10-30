@@ -3,7 +3,7 @@ using System.Reflection;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
-using ONI_United.StateMachines;
+using ONI_United.Core;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
 

@@ -7,7 +7,7 @@ using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transport.Steamworks;
 using Shared.UI;
-using ONI_United.StateMachines;
+using ONI_United.Core;
 
 namespace ONI_United.UI.Multiplayer.Views
 {

@@ -1,15 +1,9 @@
 using System;
 using ONI_United.DebugTools;
 using UnityEngine;
-using ONI_United.Networking.Runtime;
 using ONI_United.Networking;
-using ONI_United.Networking.Identity;
-using ONI_United.Networking.Sessions;
-using ONI_United.Patches.ToolPatches;
-using ONI_United.Misc;
-using ONI_United.Networking.Presentation;
 
-namespace ONI_United.StateMachines
+namespace ONI_United.Core
 {
     // Persistent component on Multiplayer_Modules.
     internal sealed class Lifecycle : MonoBehaviour
@@ -100,23 +94,13 @@ namespace ONI_United.StateMachines
             switch (evt)
             {
                 case Event.Start:
-                    if (Session.IsActive || Session.Players.Count != 0
-                        || GameClient.State != Networking.Sessions.States.ClientState.Disconnected)
-                        throw new InvalidOperationException("A multiplayer session or connection is already active.");
-                    if (Utils.IsInGame()) NetworkIdentityRegistry.RebuildFromScene();
-                    CursorManager.Instance.AssignColor();
-                    NetworkingComponent.InitializeHostTick();
+                    LifecycleEventActions.Start();
                     break;
                 case Event.TransportStarted:
-                    if (!MultiplayerSession.RegisterAsHost())
-                        throw new InvalidOperationException("The local host Session could not be registered.");
+                    LifecycleEventActions.PrepareSession();
                     break;
                 case Event.Stop:
-                    MultiplayerSession.Clear();
-                    NetworkIdentityRegistry.Clear();
-                    SelectToolPatch.UpdateColor();
-                    if (Session.IsActive || Session.Players.Count != 0)
-                        throw new InvalidOperationException("Host membership was not fully cleared.");
+                    LifecycleEventActions.Stop();
                     break;
             }
         }

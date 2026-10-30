@@ -6,7 +6,7 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.Events;
-using ONI_United.StateMachines;
+using ONI_United.Core;
 
 namespace ONI_United.Patches
 {
