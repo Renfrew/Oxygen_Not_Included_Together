@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using Shared.UI;
 using UnityEngine;
+using ONI_United.StateMachines;
 
 namespace ONI_United.UI.Multiplayer
 {
@@ -111,7 +112,7 @@ namespace ONI_United.UI.Multiplayer
         internal void RefreshActiveView()
         {
             if (closed) return;
-            sessionShown = Session.IsActive;
+            sessionShown = Session.IsActive || Lifecycle.HasHostOperation;
             KScreen next;
             if (sessionShown)
             {
@@ -153,7 +154,7 @@ namespace ONI_United.UI.Multiplayer
             while (!closed && dialog != null)
             {
                 var visible = child ?? this;
-                if (visible.sessionShown != Session.IsActive || Time.unscaledTime >= visible.nextRefresh)
+                if (visible.sessionShown != (Session.IsActive || Lifecycle.HasHostOperation) || Time.unscaledTime >= visible.nextRefresh)
                     visible.RefreshActiveView();
                 yield return null;
             }

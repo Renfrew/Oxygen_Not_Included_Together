@@ -4,7 +4,7 @@ using ONI_United.Patches.ToolPatches;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Sessions.Lobbies;
 using ONI_United.UI.Screens;
-using GameServer = ONI_United.Networking.Lifecycle.GameServer;
+using GameServer = ONI_United.Networking.Runtime.GameServer;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using ONI_United.Networking.Sessions;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 
 namespace ONI_United.Networking.Transport.Steamworks
 {

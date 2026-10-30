@@ -11,7 +11,6 @@ using System.IO;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transfer;
 using ONI_United;

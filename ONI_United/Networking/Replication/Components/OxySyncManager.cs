@@ -12,7 +12,7 @@ using Shared.Replication.Attributes;
 using Shared.Profiling;
 using UnityEngine;
 
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Architecture;

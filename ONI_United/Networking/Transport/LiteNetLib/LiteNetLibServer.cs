@@ -28,6 +28,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         private static EventBasedNetListener _listener;
 
         private TcpFileTransferServer _tcpTransfer;
+        private System.Action<bool, string> _shutdownFinished;
+        private string _shutdownFailure;
         private readonly Dictionary<ulong, NetPeer> _peersByClientId = new Dictionary<ulong, NetPeer>();
         private readonly Dictionary<int, ulong> _clientIdByPeerId = new Dictionary<int, ulong>();
         private readonly ConcurrentQueue<(ulong clientId, NetPeer peer, byte[] data)> _incomingPackets =
@@ -36,8 +38,10 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public static NetManager ServerInstance => _server;
         public bool IsRunning => _server != null && _server.IsRunning;
         public string LastStartFailure { get; private set; }
+        private string CleanupFailure => _tcpTransfer?.CleanupFailure;
+        private bool IsStopped => _server == null && (_tcpTransfer == null || _tcpTransfer.IsStopped);
         public int ConnectedClientCount => _server != null ? _server.ConnectedPeersCount : 0;
-        public TcpFileTransferServer TcpTransfer => _tcpTransfer;
+        public TcpFileTransferServer TcpTransfer => _tcpTransfer?.IsRunning == true ? _tcpTransfer : null;
 
         public List<ulong> ClientList { get; internal set; } = new List<ulong>();
 
@@ -71,7 +75,14 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public override void OnSessionPlayerAdmitted(ulong playerId)
         {
             if (!ClientList.Contains(playerId))
+            {
                 ClientList.Add(playerId);
+                if (playerId == NetworkConfig.GetLocalID())
+                {
+                    OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
+                    DebugConsole.Log("[LiteNetLibServer] Host session registered for " + playerId);
+                }
+            }
         }
 
         public override void Prepare()
@@ -84,6 +95,9 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             using var _ = Profiler.Scope();
 
             LastStartFailure = null;
+            if (_tcpTransfer != null && !_tcpTransfer.IsStopped)
+                throw new InvalidOperationException("The previous TCP transfer server has not finished stopping.");
+            _tcpTransfer = null;
             if (_server != null)
             {
                 if (!_server.IsRunning)
@@ -99,7 +113,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 LastStartFailure = "Cannot start with an empty persistent host ID.";
                 DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
-                OnError?.Invoke();
                 return;
             }
 
@@ -127,26 +140,16 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 LastStartFailure = "Failed to bind the LiteNetLib listener to port " + port + ".";
                 DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
-                _server.Stop();
+                _server?.Stop();
                 _server = null;
                 _listener = null;
-                OnError?.Invoke();
-                return;
-            }
-
-            if (!MultiplayerSession.RegisterAsHost())
-            {
-                LastStartFailure = "The listener started, but the local host session could not be registered.";
-                DebugConsole.LogError("[LiteNetLibServer] " + LastStartFailure);
-                _server.Stop();
-                _server = null;
-                _listener = null;
-                OnError?.Invoke();
                 return;
             }
 
             DebugConsole.Log("[LiteNetLibServer] Listener started on port " + port);
             OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
+
+            if (_server == null || !_server.IsRunning) return;
 
             try
             {
@@ -156,14 +159,12 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             catch (Exception ex)
             {
                 DebugConsole.LogWarning("[LiteNetLibServer] TCP file transfer server failed to start: " + ex.Message);
-                _tcpTransfer = null;
+                // Preserve the optional TCP fallback, but release partial acquisitions and
+                // retain the owner until its workers have finished. Stop failures propagate.
+                _tcpTransfer?.Stop();
             }
 
             ClientList.Clear();
-            ClientList.Add(hostId);
-
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
-            DebugConsole.Log("[LiteNetLibServer] Host session registered for " + hostId);
         }
 
         private void OnConnectionRequest(ConnectionRequest request)
@@ -272,29 +273,72 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             DebugConsole.LogWarning("[LiteNetLibServer] Network error from " + endPoint + ": " + socketError);
         }
 
+        internal void BeginShutdown(System.Action<bool, string> finished)
+        {
+            if (_shutdownFinished != null)
+            {
+                DebugConsole.Log("[LiteNetLibServer] Shutdown is already in progress; keeping its original completion. No additional request was scheduled.");
+                return;
+            }
+            _shutdownFinished = finished;
+            _shutdownFailure = StopResources();
+            // Deliver from PollShutdown after the action stack has unwound, including
+            // synchronous failures. No lifecycle state or frame-spread startup work here.
+        }
+
+        internal void PollShutdown()
+        {
+            var finished = _shutdownFinished;
+            if (finished == null) return;
+            string failure = _shutdownFailure ?? CleanupFailure;
+            if (failure == null && !IsStopped) return;
+            CancelShutdownObservation();
+            finished(failure == null, failure);
+        }
+
+        private void CancelShutdownObservation()
+        {
+            _shutdownFinished = null;
+            _shutdownFailure = null;
+        }
+
+        internal string DisposeShutdown()
+        {
+            // Discard a pending save-load continuation before terminal resource release.
+            CancelShutdownObservation();
+            return StopResources();
+        }
+
+        private string StopResources()
+        {
+            var errors = new List<string>();
+            try { CloseConnections(); }
+            catch (Exception ex) { errors.Add(ex.Message); }
+            try { Stop(); }
+            catch (Exception ex) { errors.Add(ex.Message); }
+            return errors.Count == 0 ? null : string.Join("; ", errors);
+        }
+
         public override void Stop()
         {
             using var _ = Profiler.Scope();
 
-            if (_server == null)
-                return;
-
-            _server.Stop();
-            _server = null;
-            _listener = null;
-
-            _tcpTransfer?.Stop();
-            _tcpTransfer = null;
+            var errors = new List<Exception>();
+            try
+            {
+                _server?.Stop();
+                _server = null;
+                _listener = null;
+            }
+            catch (Exception ex) { errors.Add(ex); }
+            try { _tcpTransfer?.Stop(); }
+            catch (Exception ex) { errors.Add(ex); }
 
             _peersByClientId.Clear();
             _clientIdByPeerId.Clear();
             ClientList.Clear();
-
             while (_incomingPackets.TryDequeue(out var _)) { }
-
-            MultiplayerSession.UnRegisterAsHost(null);
-
-            DebugConsole.Log("[LiteNetLibServer] Server stopped.");
+            if (errors.Count != 0) throw new AggregateException("LAN transport cleanup failed.", errors);
         }
 
         public override void CloseConnections()
@@ -308,9 +352,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _peersByClientId.Clear();
             _clientIdByPeerId.Clear();
             ClientList.Clear();
-            ClientList.Add(NetworkConfig.GetLocalID());
-
-            MultiplayerSession.UnRegisterAsHost(null);
         }
 
         public override void Update()

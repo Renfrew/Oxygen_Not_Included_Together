@@ -7,7 +7,7 @@ using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Sessions.States;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Architecture

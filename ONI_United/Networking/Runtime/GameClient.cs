@@ -22,7 +22,7 @@ using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
 
-namespace ONI_United.Networking.Lifecycle
+namespace ONI_United.Networking.Runtime
 {
 	public static class GameClient
 	{

@@ -1,10 +1,27 @@
 # Multiplayer: ONI United — Development Roadmap
 
-## 2026-10-29 — Windows UI checkpoint and next gates
+## 2026-10-29 — LAN host lifecycle checkpoint and remaining gates
+
+The current incremental slice is `ONI_United.StateMachines.Lifecycle`, with host/client/readiness coordinators in Networking.Runtime. It covers hosting an already-loaded colony over LAN, not a Steam migration or client/world-synchronization redesign. Source review confirms the event/action boundary, repeated Stop in Stopping, explicit retry, component-lifetime release and operation-owned save-load continuation. The current non-deploying Debug pass is user-reported; exact command/output/counts and build-input provenance remain unavailable for that pass. Historical test evidence is not evidence for this snapshot.
+
+Before the user commits, review the existing 51 staged source paths together with these four maintained documentation updates and run both staged/unstaged whitespace checks. The two source cleanup corrections are already staged in the reviewed baseline. Do not stage or commit automatically. Keep this checkpoint explicitly incremental; no runtime gate is closed by this documentation pass.
+
+Next bounded decisions/work, each requiring its own scope:
+
+1. Review the shared LAN/Steam host sequence while retaining Prepare and one StartingHost phase. Define how Steam asynchronous lobby/listener callbacks, cancellation/late results, callback ownership and confirmed local host membership submit events; do not enable unsupported Steam UI or infer parity from existing bypasses. Preserve lobby discovery/membership; pre-game ready-up rooms remain deferred.
+2. Design startup cancellation later, as agreed; do not recreate the removed frame-spread UI windows solely to match old implementation. Continue reviewing networking ownership without turning Lifecycle into a transport/error owner or introducing a generic operation framework.
+3. Rework UI/Session separately: preserve Host layout, use existing Session presentation for unfinished LAN work, address unreachable connecting-client progress/cancel, and handle the separate startup-error presentation issue under its own scope. Preserve no disconnect on UI close and no automatic unpause. Keep client synchronization/readiness independent of host Hosting.
+4. Resolve or explicitly retain the dependency limitations before release: LiteNetLib's internal UDP Stop joins may block, and TCP termination timing/deadlines are not runtime verified. No observed hang is claimed and no cleanup redesign is authorized here.
+
+**Runtime verification gate:** On an identified build/DLL/bundle, exercise loaded-colony LAN start with listener/local membership confirmation; frontend/pause processing; normal client world replacement; rejected/nested Start/Started/Stop events; repeated Stop during in-flight cleanup; cleanup failure and explicit retry while Start remains blocked; TCP accept/handler shutdown without a TCP join; save-load success, original filename retention and failure-discard/no-retry-resume; duplicate quit/destruction; and retained client/Steam shutdown. Observe rather than assume worker termination and callback ordering. Steam creation/entry/cancel/late-result and membership/admission flows require their own evidence after migration. Do not infer gameplay readiness from Hosting or a successful connection.
+
+The older UI acceptance matrix and existing N15/test-infrastructure plan remain outstanding in their own scope. This checkpoint changes neither their historical evidence nor the independent release/legal gates.
+
+## Earlier 2026-10-29 — Windows UI checkpoint and remaining gates
 
 This is an incomplete development checkpoint on `feature/transport`, not a release. The current shell is the authored `Shared.UI.MultiplayerDialogScreen : KModalScreen`, coordinated by `MultiplayerScreen`; it is not an intact InfoDialogScreen. Join/Host use reusable TabMenu composition. The historical plan below retains its navigation scenarios, but its concrete shell description is superseded.
 
-Before the checkpoint commit, include the reviewed main-menu caption lookup correction and matching catalog keys, and review these documentation changes. The fix and documentation are left unstaged for the user; committing only the existing index would omit them. Preserve the corrected builder/request bridge in the Windows Unity project's intended versioned location; the Mac bundle alone does not capture its packaging implementation.
+The earlier UI checkpoint required the reviewed main-menu caption lookup correction and matching catalog keys before its commit. Those staging instructions apply to that historical baseline; use the LAN checkpoint above for current review/staging requirements. Preserve the corrected builder/request bridge in the Windows Unity project's intended versioned location; the Mac bundle alone does not capture its packaging implementation.
 
 Next implementation work: make connecting-state progress/Cancel Connection reachable through the existing presentation selection and polling flow, then refactor Session separately under an approved scope. Correct the known Maximum Players 1-4 caption versus 2-16 validation mismatch separately. Do not enable unsupported Steam operations merely for UI parity.
 
@@ -259,6 +276,8 @@ The current lifecycle/speed and session-centralization decisions may also affect
 > After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
+
+- **2026-10-29 (LAN lifecycle):** Added the incremental LAN host checkpoint gates and separately scoped Steam/networking/UI/Session follow-up. Preserved prior N14/N15 and UI evidence, deferred startup cancellation design, and distinguished reported compilation from unverified runtime behavior.
 
 - **2026-10-17:** Added the independently verified but uncommitted N15-B Option 3 foundation, its five Debug/Release `SnapshotTimeline` passes and local-only workflow validation, and changed the post-merge next priority to N15-C. Preserved synchronization integration as required Level 3 work rather than claiming it complete.
 - **2026-10-17:** Closed N14 implementation with the verified startup/framework commit series and build-only evidence; made synchronization integration testing the next development focus; recorded runtime, compliance, and exact-artifact release gates without claiming runtime verification or release readiness.

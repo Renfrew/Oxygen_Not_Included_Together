@@ -12,7 +12,7 @@ using UnityEngine;
 using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 using ONI_United;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 

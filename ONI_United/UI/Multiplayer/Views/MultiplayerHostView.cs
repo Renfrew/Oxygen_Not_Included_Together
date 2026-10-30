@@ -2,13 +2,14 @@ using System;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Sessions.States;
 using Shared.Helpers;
 using Shared.UI;
 using static ONI_United.STRINGS.UI.MP_SCREEN;
 using static ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU;
+using ONI_United.StateMachines;
 
 namespace ONI_United.UI.Multiplayer.Views
 {
@@ -22,7 +23,7 @@ namespace ONI_United.UI.Multiplayer.Views
         private readonly LanHostSettingsSection lanSettings;
         private KButton startButton;
         private readonly int lanIndex;
-        private bool starting, disposed;
+        private bool disposed;
 
         internal KTabMenu Content => view;
         private bool IsLan => view.PreviousActiveTab == lanIndex;
@@ -55,7 +56,7 @@ namespace ONI_United.UI.Multiplayer.Views
 
         private bool CanStart => !disposed && IsLan && Utils.IsInGame() && Grid.CellCount > 0
             && !Session.IsActive && GameClient.State == ClientState.Disconnected
-            && GameServer.State == ServerState.Stopped && !starting;
+            && GameServer.State == ServerState.Stopped && Lifecycle.Current == Lifecycle.Phase.Idle;
 
         internal void RefreshAvailability() => startButton.isInteractable = CanStart;
 
@@ -73,24 +74,26 @@ namespace ONI_United.UI.Multiplayer.Views
             foreach (char character in name)
                 if (char.IsControl(character)) return;
 
-            starting = true;
-            RefreshAvailability();
             try
             {
-                var config = Configuration.Instance;
-                config.Host.LanSettings.Port = port;
-                config.Host.LanSettings.DisplayName = name;
-                config.Host.MaxLobbySize = maxPlayers;
-                config.Host.NetworkTransport = (int)NetworkConfig.NetworkTransport.LITENETLIB;
-                config.Save();
-                if (!NetworkConfig.TryStartLanHostFromLoadedGame(out string failureReason))
-                { ModLog.Warning(string.IsNullOrWhiteSpace(failureReason) ? "LAN hosting could not be started." : failureReason); return; }
-                if (!Session.IsActive || !Session.IsHost || GameServer.State != ServerState.Started)
-                { ModLog.Warning("Listener startup returned without a confirmed host session."); return; }
-                screen.RefreshActiveView();
+                if (!Lifecycle.Handle(Lifecycle.Event.Start, () =>
+                {
+                    try
+                    {
+                        var config = Configuration.Instance;
+                        config.Host.LanSettings.Port = port;
+                        config.Host.LanSettings.DisplayName = name;
+                        config.Host.MaxLobbySize = maxPlayers;
+                        config.Host.NetworkTransport = (int)NetworkConfig.NetworkTransport.LITENETLIB;
+                        config.Save();
+                        GameServer.StartLanHost();
+                    }
+                    catch (Exception ex) { GameServer.FailLanStartup(ex.Message); }
+                })) ModLog.Warning("Host start is not permitted in the current lifecycle state.");
+                if (!disposed) screen.RefreshActiveView();
             }
-            catch (Exception ex) { ModLog.Warning($"LAN hosting failed: {ex.Message}"); }
-            finally { starting = false; if (!disposed && view != null && view.isActiveAndEnabled) RefreshAvailability(); }
+            catch (Exception ex) { ModLog.Warning($"LAN hosting action failed: {ex.Message}"); }
+            finally { if (!disposed && view != null && view.isActiveAndEnabled) RefreshAvailability(); }
         }
 
         private void StopEditing()

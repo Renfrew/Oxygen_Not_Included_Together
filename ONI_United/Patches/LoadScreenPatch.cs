@@ -1,9 +1,11 @@
+using ONI_United.Networking.Runtime;
 using HarmonyLib;
 using ONI_United.DebugTools;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
 using System.Reflection;
 using Shared.Profiling;
+using ONI_United.StateMachines;
 
 namespace ONI_United.Patches
 {
@@ -27,27 +29,34 @@ namespace ONI_United.Patches
 
 		// Updating this bool here doesn't affect SP
 		[HarmonyPrefix]
-		public static void Prefix_DoLoad(string filename)
+		public static bool Prefix_DoLoad(string filename)
 		{
 			using var _ = Profiler.Scope();
 
 			DebugConsole.Log($"Loading {filename}");
 
-			// A live server still references the scene that LoadScreen is about to
-			// destroy. Stop it first and recreate it after the save has loaded.
-			if (MultiplayerSession.IsHostInSession)
-			{
-				MultiplayerSession.ShouldHostAfterLoad = true;
-				NetworkConfig.Stop();
-			}
-		}
+            if (Lifecycle.HasHostOperation)
+            {
+                // Resume the existing load only after confirmed cleanup; its normal
+                // OnSaveLoaded hook remains responsible for requesting the new host.
+                if (!Lifecycle.Handle(Lifecycle.Event.Stop, () => GameServer.StopLanHostAndLoad(filename)))
+                    DebugConsole.LogError("[Multiplayer] Load was not admitted: Stop is not permitted in the current lifecycle state.");
+                return false;
+            }
+            if (MultiplayerSession.IsHostInSession)
+            {
+                MultiplayerSession.ShouldHostAfterLoad = true;
+                NetworkConfig.Stop();
+            }
+            return true;
+        }
 
 		[HarmonyPostfix]
-		public static void Postfix_DoLoad(string filename)
+		public static void Postfix_DoLoad(string filename, bool __runOriginal)
 		{
 			using var _ = Profiler.Scope();
 
-			DebugConsole.Log($"Loaded {filename}");
+            if (__runOriginal) DebugConsole.Log($"Loaded {filename}");
 		}
 	}
 }

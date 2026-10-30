@@ -13,7 +13,7 @@ using YamlDotNet.Core;
 using Object = UnityEngine.Object;
 using ONI_United;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Synchronization.Trackers;
 
 namespace ONI_United.Networking.Sessions

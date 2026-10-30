@@ -3,8 +3,8 @@ using KMod;
 using ONI_United.Networking.Presentation;
 using ONI_United.DebugTools;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Runtime;
+using ONI_United.StateMachines;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Packets.Architecture;
@@ -50,6 +50,7 @@ namespace ONI_United
 			go.AddComponent<NativeUiGallery>();
 #endif
 
+			go.AddComponent<Lifecycle>();
 			go.AddComponent<NetworkingComponent>();
 			go.AddComponent<UIVisibilityController>();
 			go.AddComponent<MainThreadExecutor>();
@@ -84,6 +85,7 @@ namespace ONI_United
 
             base.OnAllModsLoaded(harmony, mods);
 			PacketRegistry.RegisterDefaults();
+            Lifecycle.Initialize();
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
 #endif

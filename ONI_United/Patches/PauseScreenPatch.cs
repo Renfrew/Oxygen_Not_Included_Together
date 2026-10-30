@@ -6,6 +6,7 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.Events;
+using ONI_United.StateMachines;
 
 namespace ONI_United.Patches
 {
@@ -18,13 +19,13 @@ namespace ONI_United.Patches
 			{
 				using var _ = Profiler.Scope();
 
-				if (!Session.IsActive)
+				if (!Session.IsActive && !Lifecycle.HasHostOperation)
 					return;
 
 				MultiplayerSession.IsQuitting = true;
 
-				NetworkConfig.Stop();
-				MultiplayerSession.Clear();
+                // The host owner clears membership only as part of its cleanup attempt.
+                NetworkConfig.Stop();
 			}
 		}
 

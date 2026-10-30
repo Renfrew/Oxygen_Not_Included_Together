@@ -420,6 +420,38 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 
 **Verified first increment:** `tests/Shared.Tests` targets `net10.0`, source-links `Shared/Replication/SnapshotTimeline.cs`, has no project references, and removes inherited game/mod build items. Five `SnapshotTimeline` tests passed in Debug and Release. The workflow was locally validated and reviewed for a clean runner but has not run on GitHub. No runtime test was performed. At verification, all N15-B implementation remained uncommitted on `refactor/mod-lifecycle` at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`.
 
+## D-043 — Central lifecycle owns permission; actions own execution
+
+**Decision status:** Confirmed
+
+**Implementation status:** Implemented but further testing required
+
+**Decision:** Keep one persistent `ONI_United.StateMachines.Lifecycle` component on Multiplayer_Modules, initialized once after packet registration. Explicit phases are Uninitialized, Idle, StartingHost, Hosting, Stopping; events are Start, Started, Stop, Stopped. Start admits only Idle and enters StartingHost; Started admits only StartingHost and enters Hosting; Stop admits StartingHost, Hosting or Stopping; Stopped admits only Stopping and enters Idle. Uninitialized admits no operational event. Handle rejects with no action invocation, or establishes permission/state before invoking the supplied action synchronously. Its boolean is admission/invocation, never success/completion. Actions own work, failures, recovery and subsequent events; Lifecycle owns no networking operations, polling, error interpretation, callback queue or operation framework.
+
+**Scope:** This is the LAN loaded-colony host slice. Hosting means the selected host is ready for remote Session admission, separate from remote-player presence and synchronization/gameplay readiness. Keep one StartingHost phase and the shared Prepare step; do not add a phase per method. Old frame-spread startup windows need not be retained; further startup cancellation design is deferred. GameServer/GameClient/ReadyManager belong to Networking.Runtime without changing ownership. Steam lifecycle integration remains deferred; lobby discovery/membership survives, while pre-game ready-up rooms are out of scope.
+
+**Distinction:** D-040 defers generic mod-bootstrap rollback. This operational multiplayer machine is not a bootstrap rollback framework and does not supersede that decision.
+
+## D-044 — Repeatable Stop and explicit recovery in Stopping
+
+**Decision status:** Confirmed
+
+**Implementation status:** Implemented but further testing required
+
+**Decision:** Stop in Stopping is accepted without a redundant transition. The network owner keeps the original completion while cleanup is running and schedules no extra attempt. Network release/worker observation belongs to LiteNetLibServer/TcpFileTransferServer, pumped by NetworkingComponent; GameServer retains host-operation coordination and outcome interpretation. Session, identity and selection-color cleanup remain with their established owners and ordering. Only confirmed required network/domain cleanup permits Stopped -> Idle. Failure remains Stopping, blocks Start, and requires explicit Stop retry; no StopFailed phase, permission flag, or automatic retry.
+
+**Continuation contract:** A pending save load keeps its original filename across ordinary repeated Stop during in-flight cleanup. Success enters Idle before the continuation resumes the existing load path. Cleanup failure discards that load continuation; ordinary retry stops resources but does not resume the failed load. Disposal discards it as well. TCP sockets close and worker termination is observed without main-thread TCP joins; LiteNetLib's internal UDP Stop thread joins remain a separate dependency limitation, with no established runtime hang.
+
+## D-045 — Component lifetime ends the machine
+
+**Decision status:** Confirmed
+
+**Implementation status:** Implemented but further testing required
+
+**Decision:** Application termination is not an operational phase/event. Keep no Disposed phase, Dispose event, replacement shutdown flag or terminal forwarding layer. Owning OnApplicationQuit and OnDestroy directly initiate existing repeat-safe GameServer.DisposeLanHost cleanup without another-frame dependency. The cleanup owner detaches its resource owner before release; the owning OnDestroy clears the singleton in finally. Duplicate components cannot replace or dispose the live owner. Legacy client/Steam quit cleanup remains with NetworkingComponent.
+
+**Accepted limitation:** Lifecycle does not universally reject events between quit notification and destruction; no valid operational producer in that interval was established by review. Calls after singleton destruction are lifetime-contract programming errors. Immediate release initiation does not promise that every TCP worker has terminated before process exit. Closing UI does not disconnect; no automatic unpause is introduced.
+
 ## Unresolved decisions
 
 1. Exact TTL and collision handling for Reactable authorization.
@@ -456,6 +488,8 @@ Migrate the existing 92 in-game diagnostics incrementally. Move a diagnostic onl
 | N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | Option 3 / `Shared.Tests` isolation review, five Debug/Release tests, and local-only workflow validation |
 
 ## Revision history
+
+- **2026-10-29 (LAN lifecycle):** Added D-043 through D-045 for operational event/action ownership, repeatable Stop/explicit retry and component lifetime. Kept generic bootstrap rollback (D-040), client synchronization and historical test evidence distinct.
 
 - **2026-10-17:** Added D-042 for the agreed Level 1/2/3 verification model, Option 3 separate test projects, incremental migration of 92 existing diagnostics, and the bounded N15-B `Shared.Tests` evidence. No commit, merge, GitHub Actions success, or runtime test is claimed.
 - **2026-10-17:** Added D-038–D-041 for startup prerequisites before Harmony activation, best-effort packet registration, deferred generic startup rollback, and the N14 runtime-verification boundary.

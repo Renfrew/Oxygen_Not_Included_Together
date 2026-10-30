@@ -8,7 +8,8 @@ using System.IO;
 using ImGuiNET;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
+using GameServer = ONI_United.Networking.Runtime.GameServer;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Packets.World;
@@ -17,7 +18,6 @@ using UnityEngine;
 using static ONI_United.STRINGS.UI;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
-using ONI_United.Networking.Runtime;
 using Shared.Profiling;
 using System.Text;
 using ONI_United.Patches.ToolPatches;
@@ -34,6 +34,7 @@ using Shared.Replication;
 using System.Linq;
 using Shared;
 using ONI_United;
+using ONI_United.StateMachines;
 
 namespace ONI_United.DebugTools
 {
@@ -278,33 +279,13 @@ namespace ONI_United.DebugTools
                 case NetworkConfig.NetworkTransport.LITENETLIB:
                     if (ImGui.Button("Start Lan"))
                     {
-                        MultiplayerSession.Clear();
-                        try
-                        {
-                            ONI_United.Networking.Lifecycle.GameServer.Start();
-                        }
-                        catch (Exception ex)
-                        {
-                            ModLog.Error($"[DevToolMultiplayer] LAN server start failed: {ex}");
-                        }
-                        SelectToolPatch.UpdateColor();
+                        if (!Lifecycle.Handle(Lifecycle.Event.Start, GameServer.StartLanHost))
+                            ModLog.Error("Host start is not permitted in the current lifecycle state.");
                     }
 
                     ImGui.SameLine();
                     if (ImGui.Button("Stop Lan"))
-                    {
-                        if (MultiplayerSession.IsHost)
-                            ONI_United.Networking.Lifecycle.GameServer.Shutdown();
-
-                        if (MultiplayerSession.IsClient)
-                            GameClient.Disconnect();
-
-                        NetworkIdentityRegistry.Clear();
-                        MultiplayerSession.Clear();
-
-                        SelectToolPatch.UpdateColor();
-                        Game.Instance.Trigger(MP_HASHES.OnDisconnected);
-                    }
+                        NetworkConfig.Stop();
                     break;
                 default:
                     break;
@@ -375,13 +356,19 @@ namespace ONI_United.DebugTools
 
             if (ImGui.Button("Start Current Config Server"))
             {
-                NetworkConfig.TransportServer.Start();
+                if (NetworkConfig.IsLanConfig())
+                {
+                    if (!Lifecycle.Handle(Lifecycle.Event.Start, GameServer.StartLanHost))
+                        ModLog.Error("Host start is not permitted in the current lifecycle state.");
+                }
+                else NetworkConfig.TransportServer.Start();
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Stop Current Config Server"))
             {
-                NetworkConfig.TransportServer.Stop();
+                if (NetworkConfig.IsLanConfig()) NetworkConfig.Stop();
+                else NetworkConfig.TransportServer.Stop();
             }
             ImGui.Separator();
             DisplayUnitTests();

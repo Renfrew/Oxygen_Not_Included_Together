@@ -1,11 +1,13 @@
+using ONI_United.DebugTools;
 using System;
 using System.Collections.Generic;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transport.Steamworks;
 using Shared.UI;
+using ONI_United.StateMachines;
 
 namespace ONI_United.UI.Multiplayer.Views
 {
@@ -14,8 +16,6 @@ namespace ONI_United.UI.Multiplayer.Views
         private readonly MultiplayerScreen screen;
         private MultiplayerSessionContent view;
         private readonly List<string> players = new();
-        private string actionError;
-        private bool stopping;
         internal MultiplayerSessionContent Content => view;
         internal MultiplayerSessionView(MultiplayerScreen owner, MultiplayerDialogScreen dialog)
         {
@@ -27,7 +27,13 @@ namespace ONI_United.UI.Multiplayer.Views
         internal void Refresh()
         {
             string status, role;
-            if (Session.IsActive)
+            if (Lifecycle.HasHostOperation)
+            {
+                status = GameServer.LanError ?? (Lifecycle.Current == Lifecycle.Phase.Hosting
+                    ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.Stopping ? "Stopping LAN host" : "Starting LAN host");
+                role = "Role: host";
+            }
+            else if (Session.IsActive)
             { status = Session.IsHost ? "Hosting Game" : "Connected to a multiplayer session"; role = $"Role: {(Session.IsHost ? "Host" : "Client")}"; }
             else if (GameClient.State != ClientState.Disconnected)
             { status = $"Connection in progress: {GameClient.State}"; role = "Role: awaiting session admission"; }
@@ -36,9 +42,9 @@ namespace ONI_United.UI.Multiplayer.Views
             else if (SteamLobby.InLobby)
             { status = "In a Steam lobby; gameplay connection is not confirmed."; role = "Role: lobby member"; }
             else { status = "No active multiplayer session."; role = "Role: none"; }
-            view.SetState(actionError ?? status, role, $"Transport: {NetworkConfig.transport}",
-                NetworkConfig.IsLanConfig() && (Session.IsHost || GameServer.State != ServerState.Stopped),
-                GameClient.State == ClientState.Connecting, stopping);
+            view.SetState(status, role, $"Transport: {NetworkConfig.transport}",
+                Lifecycle.HasHostOperation,
+                GameClient.State == ClientState.Connecting);
             players.Clear();
             foreach (var pair in Session.Players)
             {
@@ -52,20 +58,13 @@ namespace ONI_United.UI.Multiplayer.Views
         private void CancelConnection()
         {
             if (GameClient.State != ClientState.Connecting) return;
-            actionError = null; GameClient.CancelConnectionAttempt(); screen.RefreshActiveView();
+            GameClient.CancelConnectionAttempt(); screen.RefreshActiveView();
         }
         private void StopHosting()
         {
-            if (stopping) return;
-            stopping = true; actionError = null; Refresh();
-            try
-            {
-                if (NetworkConfig.StopLanHost() && !Session.IsActive && GameServer.State == ServerState.Stopped)
-                { screen.RefreshActiveView(); return; }
-                actionError = "Hosting could not be fully stopped. Check the listener and session state.";
-            }
-            catch (Exception ex) { actionError = $"Stop Hosting failed: {ex.Message}"; }
-            finally { stopping = false; if (view != null && view.isActiveAndEnabled) Refresh(); }
+            if (!Lifecycle.Handle(Lifecycle.Event.Stop, GameServer.StopLanHost))
+                ModLog.Warning("Stop is not permitted in the current lifecycle state.");
+            screen.RefreshActiveView();
         }
     }
 }

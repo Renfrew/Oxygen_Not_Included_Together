@@ -7,7 +7,7 @@ using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Transfer;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United;
 

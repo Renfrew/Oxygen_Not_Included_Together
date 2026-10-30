@@ -2,8 +2,9 @@ using ONI_United.Networking.Sessions.States;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
+using ONI_United.Networking.Transport.LiteNetLib;
 
 namespace ONI_United.Networking.Runtime
 {
@@ -20,6 +21,10 @@ namespace ONI_United.Networking.Runtime
 		private void Update()
 		{
 			using var _ = Profiler.Scope();
+
+            // Shutdown observation must continue outside Started, including frontend/pause.
+            if (NetworkConfig.TransportServer is LiteNetLibServer lanServer)
+                lanServer.PollShutdown();
 
 			scheduler.Tick();
 
@@ -50,10 +55,12 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-			if (!MultiplayerSession.InActiveSession)
-				return;
-
-			NetworkConfig.Stop();
+            // Lifecycle owns LAN host disposal, regardless of which quit callback runs first.
+            // Retain the existing client and Steam shutdown path here.
+            if (!MultiplayerSession.InActiveSession
+                || (NetworkConfig.IsLanConfig() && MultiplayerSession.IsHost))
+                return;
+            NetworkConfig.Stop();
 		}
 	}
 }

@@ -26,10 +26,10 @@ namespace Shared.UI
             dialog.AddOption("STOP HOSTING", _ => onStop(), out stopButton, rightSide: false, accent: true);
             dialog.AddOption("CANCEL CONNECTION", _ => onCancel(), out cancelButton);
         }
-        public void SetState(string status, string role, string transport, bool canStop, bool canCancel, bool stopping)
+        public void SetState(string status, string role, string transport, bool canStop, bool canCancel)
         {
             statusText.SetText(status); roleText.SetText(role); transportText.SetText(transport);
-            stopButton.gameObject.SetActive(canStop); stopButton.isInteractable = !stopping;
+            stopButton.gameObject.SetActive(canStop); stopButton.isInteractable = canStop;
             cancelButton.gameObject.SetActive(canCancel);
         }
         public override void OnShow(bool show)
