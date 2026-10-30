@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
@@ -196,7 +197,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetJitterState();
+            return NetworkRuntime.TransportClient.GetJitterState();
         }
 
         public static NetworkState GetLatencyState()
@@ -209,7 +210,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetLatencyState();
+            return NetworkRuntime.TransportClient.GetLatencyState();
         }
 
         public static NetworkState GetPacketlossState()
@@ -222,7 +223,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetPacketlossState();
+            return NetworkRuntime.TransportClient.GetPacketlossState();
         }
 
         public static NetworkState GetServerPerformanceState()
@@ -235,7 +236,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetServerPerformanceState();
+            return NetworkRuntime.TransportClient.GetServerPerformanceState();
         }
 
     }

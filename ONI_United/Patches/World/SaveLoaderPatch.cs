@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using System;
 using HarmonyLib;
 using ONI_United.DebugTools;
@@ -59,7 +60,7 @@ namespace ONI_United.Patches.World
 			{
 				MultiplayerSession.ShouldHostAfterLoad = false;
 
-				NetworkConfig.StartServer();
+				NetworkRuntime.StartServer();
 			}
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using ONI_United.Misc;
+﻿using ONI_United.Core;
+using ONI_United.Misc;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions.States;
 using Steamworks;
@@ -12,7 +13,7 @@ public class MultiplayerPlayer : Player
 		get => UserName;
 		set => UserName = value ?? string.Empty;
 	}
-	public bool IsLocal => PlayerId == NetworkConfig.GetLocalID();
+	public bool IsLocal => PlayerId == NetworkRuntime.GetLocalID();
 
 	public int AvatarImageId { get; private set; } = -1;
 	public object Connection { get; set; } = null;
@@ -27,7 +28,7 @@ public class MultiplayerPlayer : Player
 		if (playerId == MultiplayerSession.HostUserID)
 			readyState = ClientReadyState.Ready;
 		ProtocolVerified = IsLocal;
-		if(NetworkConfig.IsLanConfig())
+		if(NetworkRuntime.IsLanConfig())
 		{
             PlayerName = $"Player {playerId}";
             return;

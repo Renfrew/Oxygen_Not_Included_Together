@@ -2,9 +2,9 @@
 using KMod;
 using ONI_United.Networking.Presentation;
 using ONI_United.DebugTools;
+using ONI_United.Core;
 using ONI_United.Networking;
 using ONI_United.Networking.Runtime;
-using ONI_United.Core;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Packets.Architecture;
@@ -51,7 +51,7 @@ namespace ONI_United
 #endif
 
 			go.AddComponent<Lifecycle>();
-			go.AddComponent<NetworkingComponent>();
+			go.AddComponent<NetworkRuntime>();
 			go.AddComponent<UIVisibilityController>();
 			go.AddComponent<MainThreadExecutor>();
 			go.AddComponent<CursorManager>();
@@ -70,7 +70,7 @@ namespace ONI_United
 
 			ReadyManager.SetupListeners();
 
-			NetworkConfig.ApplyConfiguredTransport();
+			NetworkRuntime.ApplyConfiguredTransport();
 
 			var versionChecker = new PVersionCheck();
 			versionChecker.Register(this, new SteamVersionChecker());

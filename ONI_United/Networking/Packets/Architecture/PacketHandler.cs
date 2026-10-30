@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using System;
 using System.IO;
 using ONI_United.DebugTools;
@@ -117,7 +118,7 @@ namespace ONI_United.Networking.Packets.Architecture
 
 			if (Session.IsHost)
 			{
-				if (!NetworkConfig.TransportServer.TryGetRemotePlayerId(physicalConnection, out ulong physicalPlayerId)
+				if (!NetworkRuntime.TransportServer.TryGetRemotePlayerId(physicalConnection, out ulong physicalPlayerId)
 					|| physicalPlayerId != senderPlayerId.Value
 					|| !MultiplayerSession.ConnectedPlayers.TryGetValue(physicalPlayerId, out var player))
 					return false;
@@ -127,7 +128,7 @@ namespace ONI_United.Networking.Packets.Architecture
 
 			return Session.IsClient
 				&& senderPlayerId.Value == Session.HostPlayerId
-				&& NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection);
+				&& NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection);
 		}
 
 		public static bool ShouldDispatchPacket(IPacket packet)

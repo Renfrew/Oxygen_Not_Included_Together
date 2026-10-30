@@ -25,7 +25,7 @@ namespace ONI_United.Patches
 				MultiplayerSession.IsQuitting = true;
 
                 // The host owner clears membership only as part of its cleanup attempt.
-                NetworkConfig.Stop();
+                NetworkRuntime.Stop();
 			}
 		}
 

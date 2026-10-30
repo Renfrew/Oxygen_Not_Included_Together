@@ -17,7 +17,7 @@ namespace ONI_United.Core
                 throw new InvalidOperationException("A multiplayer session or connection is already active.");
             if (Utils.IsInGame()) NetworkIdentityRegistry.RebuildFromScene();
             CursorManager.Instance.AssignColor();
-            NetworkingComponent.InitializeHostTick();
+            NetworkRuntime.InitializeHostTick();
         }
 
         internal static void PrepareSession()

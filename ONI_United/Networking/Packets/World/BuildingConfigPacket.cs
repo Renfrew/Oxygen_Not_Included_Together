@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.World.Handlers;
@@ -47,7 +48,7 @@ namespace ONI_United.Networking.Packets.World
 		{
 			using var _ = Profiler.Scope();
 
-			Sender = NetworkConfig.GetLocalID();
+			Sender = NetworkRuntime.GetLocalID();
 			writer.Write(Sender);
 			writer.Write(NetId);
 			writer.Write(Cell);
@@ -77,7 +78,7 @@ namespace ONI_United.Networking.Packets.World
 			using var _ = Profiler.Scope();
 
 			// We sent this ignore
-			if (Sender == NetworkConfig.GetLocalID())
+			if (Sender == NetworkRuntime.GetLocalID())
 				return;
 
 			//DebugConsole.Log($"[BuildingConfigPacket] Received a config update packet. NetId={NetId}, Cell={Cell}");

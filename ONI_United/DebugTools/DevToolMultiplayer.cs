@@ -265,26 +265,26 @@ namespace ONI_United.DebugTools
                 ImGui.TextColored(new Vector4(1f, 0.3f, 0.3f, 1f), "Multiplayer Not Active");
             ImGui.Separator();
 
-            switch (NetworkConfig.transport)
+            switch (NetworkRuntime.transport)
             {
-                case NetworkConfig.NetworkTransport.STEAMWORKS:
+                case NetworkRuntime.NetworkTransport.STEAMWORKS:
                     if (ImGui.Button("Create Lobby"))
-                        NetworkConfig.TransportServer.Start();
+                        NetworkRuntime.TransportServer.Start();
 
                     ImGui.SameLine();
                     if (ImGui.Button("Leave Lobby"))
                         SteamLobby.LeaveLobby();
                     break;
-                case NetworkConfig.NetworkTransport.LITENETLIB:
+                case NetworkRuntime.NetworkTransport.LITENETLIB:
                     if (ImGui.Button("Start Lan"))
                     {
-                        if (!NetworkConfig.TransportServer.Start())
+                        if (!NetworkRuntime.TransportServer.Start())
                             ModLog.Error("Host start is not permitted in the current lifecycle state.");
                     }
 
                     ImGui.SameLine();
                     if (ImGui.Button("Stop Lan"))
-                        NetworkConfig.Stop();
+                        NetworkRuntime.Stop();
                     break;
                 default:
                     break;
@@ -355,14 +355,14 @@ namespace ONI_United.DebugTools
 
             if (ImGui.Button("Start Current Config Server"))
             {
-                if (!NetworkConfig.TransportServer.Start())
+                if (!NetworkRuntime.TransportServer.Start())
                     ModLog.Error("Host start is not permitted in the current lifecycle state.");
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Stop Current Config Server"))
             {
-                NetworkConfig.TransportServer.Stop();
+                NetworkRuntime.TransportServer.Stop();
             }
             ImGui.Separator();
             DisplayUnitTests();
@@ -542,12 +542,12 @@ namespace ONI_United.DebugTools
             ImGui.Separator();
             ImGui.Text("Players in Lobby:");
 
-            switch (NetworkConfig.transport)
+            switch (NetworkRuntime.transport)
             {
-                case NetworkConfig.NetworkTransport.STEAMWORKS:
+                case NetworkRuntime.NetworkTransport.STEAMWORKS:
                     SteamworksPlayerList();
                     break;
-                case NetworkConfig.NetworkTransport.LITENETLIB:
+                case NetworkRuntime.NetworkTransport.LITENETLIB:
                     LiteNetLibPlayerList();
                     break;
             }
@@ -597,7 +597,7 @@ namespace ONI_United.DebugTools
                     ImGui.SameLine();
                     if (ImGui.Button($"Kick##{player.m_SteamID}")) // ensure unique ID
                     {
-                        server = NetworkConfig.GetTransportServer();
+                        server = NetworkRuntime.GetTransportServer();
                         server?.KickClient(player.m_SteamID);
                     }
                 }
@@ -611,7 +611,7 @@ namespace ONI_United.DebugTools
             if(MultiplayerSession.IsHost)
             {
                 var players = MultiplayerSession.ConnectedPlayers;
-                var server = NetworkConfig.TransportServer as LiteNetLibServer;
+                var server = NetworkRuntime.TransportServer as LiteNetLibServer;
 
                 foreach (var player in players)
                 {
@@ -672,7 +672,7 @@ namespace ONI_United.DebugTools
             int ping = 0;
             if (MultiplayerSession.IsClient)
             {
-                ping = NetworkConfig.GetTransportClient().GetPing();
+                ping = NetworkRuntime.GetTransportClient().GetPing();
             }
             ImGui.Text($"Ping: {ping}");
             ImGui.Text($"Latency: {Utils.NetworkStateToString(NetworkIndicatorsScreen.latencyState)}");
@@ -772,7 +772,7 @@ namespace ONI_United.DebugTools
             ImGui.Text("Network Transport Settings");
 
             string[] display_options = new string[] { "Steam", "LAN (LiteNetLib)" };
-            int currentTransportIndex = Mathf.Clamp((int)NetworkConfig.transport, 0, display_options.Length - 1);
+            int currentTransportIndex = Mathf.Clamp((int)NetworkRuntime.transport, 0, display_options.Length - 1);
             ImGui.Text($"Currently used transport: {display_options[currentTransportIndex]}");
 
             string[] options = new string[] { "Steam", "LAN" };
@@ -810,16 +810,16 @@ namespace ONI_United.DebugTools
                 Configuration.Instance.Client.LanSettings.Ip = clientIP;
                 Configuration.Instance.Client.LanSettings.Port = clientPort;
 
-                NetworkConfig.NetworkTransport selected_transport = selectedTransportType == 0
-                    ? NetworkConfig.NetworkTransport.STEAMWORKS
-                    : NetworkConfig.NetworkTransport.LITENETLIB;
+                NetworkRuntime.NetworkTransport selected_transport = selectedTransportType == 0
+                    ? NetworkRuntime.NetworkTransport.STEAMWORKS
+                    : NetworkRuntime.NetworkTransport.LITENETLIB;
 
                 Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
                 Configuration.Instance.Host.LanSettings.Transport = LanTransportType.LiteNetLib;
                 if (selectedTransportType == 1)
-                    NetworkConfig.UpdateLanTransport();
+                    NetworkRuntime.UpdateLanTransport();
                 else
-                    NetworkConfig.UpdateTransport(selected_transport);
+                    NetworkRuntime.UpdateTransport(selected_transport);
                 Configuration.Instance.Save();
             }
         }

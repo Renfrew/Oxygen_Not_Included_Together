@@ -1,4 +1,5 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Core;
@@ -50,7 +51,7 @@ namespace ONI_United.Networking.Runtime
 				if (Participants.Contains(requester))
 					return;
 				DebugConsole.LogWarning($"[Synchronization] Rejecting late join from {requester}.");
-				NetworkConfig.TransportServer?.KickClient(requester);
+				NetworkRuntime.TransportServer?.KickClient(requester);
 				return;
 			}
 			GameServerHardSync.PerformHardSync();
@@ -201,7 +202,7 @@ namespace ONI_United.Networking.Runtime
 
 			var packet = new ClientReadyStatusPacket
 			{
-				SenderId = NetworkConfig.GetLocalID(),
+				SenderId = NetworkRuntime.GetLocalID(),
 				SynchronizationId = state == ClientReadyState.Ready ? GameClient.ActiveSynchronizationId : 0,
 				Status = state,
 				PlayerName = Utils.GetLocalPlayerName()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ONI_United.Core;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ONI_United.DebugTools;
@@ -235,9 +236,9 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             DebugConsole.LogWarning($"[GameClient] Connection closed or failed ({state}) for {remote}. Reason: {reason}");
 			if (GameClient.State == ClientState.Connecting)
-                NetworkConfig.TransportClient.OnConnectionFailed?.Invoke();
+                NetworkRuntime.TransportClient.OnConnectionFailed?.Invoke();
 			else
-				NetworkConfig.TransportClient.OnClientDisconnected?.Invoke();
+				NetworkRuntime.TransportClient.OnClientDisconnected?.Invoke();
 
             switch (state)
             {
@@ -246,12 +247,12 @@ namespace ONI_United.Networking.Transport.Steamworks
                     if (remote.m_SteamID == MultiplayerSession.HostUserID)
                     {
                         // Invoke(reason, message)
-                        NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
+                        NetworkRuntime.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC);
                     }
                     break;
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
                     // Something went wrong locally
-                    NetworkConfig.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
+                    NetworkRuntime.TransportClient.OnReturnToMenu.Invoke(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM, ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC);
                     break;
             }
 
@@ -436,10 +437,10 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (ping <= 0)
                 return NetworkState.BAD;
 
-            if (ping <= NetworkConfig.PingRanges.DEGRADED)
+            if (ping <= NetworkRuntime.PingRanges.DEGRADED)
                 return NetworkState.GOOD;
 
-            if (ping <= NetworkConfig.PingRanges.BAD)
+            if (ping <= NetworkRuntime.PingRanges.BAD)
                 return NetworkState.DEGRADED;
 
             return NetworkState.BAD;

@@ -1,7 +1,5 @@
-﻿using ONI_United.DebugTools;
-using ONI_United.Misc;
-using ONI_United.Networking.Packets;
-using ONI_United.Networking.Packets.Architecture;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Core;
 using Shared.Interfaces.Networking;
 using System;
@@ -10,12 +8,9 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Synchronization;
-using ONI_United.Networking;
-using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Replication;
 using ONI_United.Networking.Overlay;
-using States = ONI_United.Networking.Sessions.States;
 
 namespace ONI_United.Networking.Packets.Architecture
 {
@@ -173,7 +168,7 @@ namespace ONI_United.Networking.Packets.Architecture
 			byteTotals[packetId] = runningTotal;
 
 			bool atCapacity = false;
-			if (NetworkConfig.IsLanConfig())
+			if (NetworkRuntime.IsLanConfig())
 			{
 				float maxSize = MAX_PACKET_SIZE_LAN * 1024f;
 				if (runningTotal >= maxSize)

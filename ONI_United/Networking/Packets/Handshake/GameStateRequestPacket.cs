@@ -1,4 +1,5 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +8,8 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
-using ONI_United;
 
 namespace ONI_United.Networking.Packets.Handshake
 {
@@ -251,7 +250,7 @@ namespace ONI_United.Networking.Packets.Handshake
 				return;
 			}
 
-			NetworkConfig.TransportServer?.KickClient(ClientId);
+			NetworkRuntime.TransportServer?.KickClient(ClientId);
 		}
 
 		private static IEnumerator DelayedKick(ulong clientId, float delay)
@@ -261,7 +260,7 @@ namespace ONI_United.Networking.Packets.Handshake
 				yield return new WaitForSecondsRealtime(delay);
 			}
 
-			NetworkConfig.TransportServer?.KickClient(clientId);
+			NetworkRuntime.TransportServer?.KickClient(clientId);
 		}
 	}
 }

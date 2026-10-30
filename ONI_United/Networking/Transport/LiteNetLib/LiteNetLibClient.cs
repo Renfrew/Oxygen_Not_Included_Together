@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using ONI_United.Core;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
@@ -168,7 +169,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
 
             int timeout = Configuration.Instance.Client.TimeoutSeconds;
-            ulong clientId = NetworkConfig.GetLocalID();
+            ulong clientId = NetworkRuntime.GetLocalID();
 
             MultiplayerSession.ServerIp = ip;
             MultiplayerSession.ServerPort = port;
@@ -443,8 +444,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         {
             int ping = GetPing();
             if (ping < 0) return NetworkState.BAD;
-            if (ping > NetworkConfig.PingRanges.BAD) return NetworkState.BAD;
-            if (ping > NetworkConfig.PingRanges.DEGRADED) return NetworkState.DEGRADED;
+            if (ping > NetworkRuntime.PingRanges.BAD) return NetworkState.BAD;
+            if (ping > NetworkRuntime.PingRanges.DEGRADED) return NetworkState.DEGRADED;
             return NetworkState.GOOD;
         }
 

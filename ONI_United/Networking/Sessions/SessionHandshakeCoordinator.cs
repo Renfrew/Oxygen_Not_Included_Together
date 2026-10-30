@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using System;
 using System.Linq;
 using ONI_United.DebugTools;
@@ -19,19 +20,19 @@ internal static class SessionHandshakeCoordinator
 
     internal static void SendClientHello(object connection)
     {
-        ulong localPlayerId = NetworkConfig.GetLocalID();
+        ulong localPlayerId = NetworkRuntime.GetLocalID();
         if (connection == null || localPlayerId == 0)
         {
             DebugConsole.LogError("[SessionHandshake] Cannot send hello without a physical connection and valid local player ID.");
-            NetworkConfig.TransportClient.Disconnect();
+            NetworkRuntime.TransportClient.Disconnect();
             return;
         }
 
         var hello = SessionHandshakePacket.CreateClientHello(localPlayerId, Utils.GetLocalPlayerName());
-        if (!NetworkConfig.TransportPacketSender.SendPacket(connection, hello, PacketSendMode.ReliableImmediate))
+        if (!NetworkRuntime.TransportPacketSender.SendPacket(connection, hello, PacketSendMode.ReliableImmediate))
         {
             DebugConsole.LogError("[SessionHandshake] Failed to queue client hello.");
-            NetworkConfig.TransportClient.Disconnect();
+            NetworkRuntime.TransportClient.Disconnect();
         }
     }
 
@@ -43,7 +44,7 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection))
+        if (NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection))
             RejectLocalConnection("Session handshake exceeds the allowed size.");
     }
 
@@ -55,7 +56,7 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection))
+        if (NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection))
             RejectLocalConnection("Malformed session handshake.");
     }
 
@@ -78,7 +79,7 @@ internal static class SessionHandshakeCoordinator
 
         if (packet.Message == SessionHandshakeMessage.Rejected)
         {
-            if (NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection))
+            if (NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection))
                 RejectLocalConnection(packet.RejectionReason.Length <= 256 && packet.RejectionReason.Length > 0
                     ? packet.RejectionReason
                     : "The host rejected the session connection.");
@@ -87,7 +88,7 @@ internal static class SessionHandshakeCoordinator
 
         if (Session.IsHost)
             RejectHostConnection(physicalConnection, "Unknown session handshake message.");
-        else if (NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection))
+        else if (NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection))
             RejectLocalConnection("Unknown session handshake message.");
     }
 
@@ -98,7 +99,7 @@ internal static class SessionHandshakeCoordinator
     {
         if (!Session.IsHost
             || !senderPlayerId.HasValue
-            || !NetworkConfig.TransportServer.TryGetRemotePlayerId(physicalConnection, out ulong transportPlayerId)
+            || !NetworkRuntime.TransportServer.TryGetRemotePlayerId(physicalConnection, out ulong transportPlayerId)
             || transportPlayerId != senderPlayerId.Value)
         {
             RejectHostConnection(physicalConnection, "Client hello did not match an active physical connection.");
@@ -149,13 +150,13 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (!CanAdmitRemotePlayer(NetworkConfig.GetMaxServerCapacity()))
+        if (!CanAdmitRemotePlayer(NetworkRuntime.GetMaxServerCapacity()))
         {
             RejectHostConnection(physicalConnection, "Session is full.");
             return;
         }
 
-        if (NetworkConfig.IsSteamConfig()
+        if (NetworkRuntime.IsSteamConfig()
             && (!SteamLobby.InLobby
                 || !SteamLobby.GetAllLobbyMembers().Any(member => member.m_SteamID == transportPlayerId)))
         {
@@ -171,7 +172,7 @@ internal static class SessionHandshakeCoordinator
         }
 
         MultiplayerSession.InitializeAdmittedClient(player, physicalConnection);
-        NetworkConfig.TransportServer.OnSessionPlayerAdmitted(transportPlayerId);
+        NetworkRuntime.TransportServer.OnSessionPlayerAdmitted(transportPlayerId);
         SendWelcome(transportPlayerId, physicalConnection);
     }
 
@@ -180,12 +181,12 @@ internal static class SessionHandshakeCoordinator
         ulong? senderPlayerId,
         object physicalConnection)
     {
-        if (!NetworkConfig.TransportClient.IsCurrentConnection(physicalConnection)
+        if (!NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection)
             || Session.IsHost
             || Session.IsActive)
             return;
 
-        ulong localPlayerId = NetworkConfig.GetLocalID();
+        ulong localPlayerId = NetworkRuntime.GetLocalID();
         ulong transportHostId = senderPlayerId ?? packet.HostPlayerId;
         bool protocolCompatible = Configuration.Instance.Network.BypassProtocolCompatibilityChecks
             || ProtocolCompatibility.Matches(packet.ProtocolVersion, packet.PacketRegistryFingerprint, packet.ModVersion);
@@ -236,17 +237,17 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        NetworkConfig.TransportClient.OnClientConnected?.Invoke();
-        NetworkConfig.TransportClient.OnRequestStateOrReturn?.Invoke();
+        NetworkRuntime.TransportClient.OnClientConnected?.Invoke();
+        NetworkRuntime.TransportClient.OnRequestStateOrReturn?.Invoke();
     }
 
     private static void SendWelcome(ulong playerId, object physicalConnection)
     {
         var welcome = SessionHandshakePacket.CreateWelcome(
             playerId,
-            NetworkConfig.GetLocalID(),
+            NetworkRuntime.GetLocalID(),
             Utils.GetLocalPlayerName());
-        if (!NetworkConfig.TransportPacketSender.SendPacket(
+        if (!NetworkRuntime.TransportPacketSender.SendPacket(
                 physicalConnection,
                 welcome,
                 PacketSendMode.ReliableImmediate))
@@ -260,18 +261,18 @@ internal static class SessionHandshakeCoordinator
         if (physicalConnection == null)
             return;
 
-        NetworkConfig.TransportPacketSender.SendPacket(
+        NetworkRuntime.TransportPacketSender.SendPacket(
             physicalConnection,
             SessionHandshakePacket.CreateRejected(reason),
             PacketSendMode.ReliableImmediate);
-        NetworkConfig.TransportServer.DisconnectConnection(physicalConnection, reason);
+        NetworkRuntime.TransportServer.DisconnectConnection(physicalConnection, reason);
     }
 
     private static void RejectLocalConnection(string reason)
     {
         DebugConsole.LogWarning("[SessionHandshake] Session join rejected: " + reason);
-        NetworkConfig.TransportClient.OnConnectionFailed?.Invoke();
-        NetworkConfig.TransportClient.OnReturnToMenu?.Invoke(reason, reason);
-        NetworkConfig.TransportClient.Disconnect();
+        NetworkRuntime.TransportClient.OnConnectionFailed?.Invoke();
+        NetworkRuntime.TransportClient.OnReturnToMenu?.Invoke(reason, reason);
+        NetworkRuntime.TransportClient.Disconnect();
     }
 }

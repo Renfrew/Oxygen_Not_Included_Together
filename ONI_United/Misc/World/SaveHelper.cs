@@ -1,10 +1,9 @@
+using ONI_United.Core;
 using HarmonyLib;
 using Klei;
-using ONI_United;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
-using ONI_United.Misc;
-using ONI_United.Networking;
+
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
@@ -28,7 +27,7 @@ public static class SaveHelper
 	{
 		get
 		{
-			int minChunkKB = NetworkConfig.IsLanConfig() ? 1 : 64;
+			int minChunkKB = NetworkRuntime.IsLanConfig() ? 1 : 64;
 			return Math.Max(minChunkKB, Configuration.GetHostProperty<int>("SaveFileTransferChunkKB"));
 		}
 	}
@@ -36,7 +35,7 @@ public static class SaveHelper
 	{
 		using var _ = Profiler.Scope();
 
-		NetworkingComponent.scheduler.Run(() =>
+		NetworkRuntime.scheduler.Run(() =>
 		{
 			if (isCurrent != null && !isCurrent())
 			{
@@ -161,7 +160,7 @@ public static class SaveHelper
 		{
 			MultiplayerOverlay.Close();
 			NetworkIdentityRegistry.Clear();
-			NetworkConfig.Stop();
+			NetworkRuntime.Stop();
 
 			App.LoadScene("frontend");
 		}

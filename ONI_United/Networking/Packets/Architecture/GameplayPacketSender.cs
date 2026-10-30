@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using System.Collections.Generic;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Runtime;
@@ -78,7 +79,7 @@ namespace ONI_United.Networking.Packets.Architecture
 			if (connection == null || packet == null || !CanSendPacket(packet))
 				return false;
 
-			return NetworkConfig.TransportPacketSender.SendToConnection(connection, packet, sendType);
+			return NetworkRuntime.TransportPacketSender.SendToConnection(connection, packet, sendType);
 		}
 
 		internal static bool CanSendPacket(IPacket packet)

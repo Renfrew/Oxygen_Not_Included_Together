@@ -23,7 +23,7 @@ public sealed class LifecycleTests : IDisposable
     public LifecycleTests()
     {
         Reset();
-        NetworkConfig.TransportServer = server;
+        NetworkRuntime.TransportServer = server;
         Invoke(machine, "Awake");
     }
     public void Dispose()

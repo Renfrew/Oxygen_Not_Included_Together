@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
@@ -64,17 +65,17 @@ namespace ONI_United.DebugTools
 
 			scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, true, GUILayout.Width(windowRect.width - 20), GUILayout.Height(windowRect.height - 40));
 
-			int ping = NetworkConfig.GetTransportClient().GetPing();
+			int ping = NetworkRuntime.GetTransportClient().GetPing();
 			float qualityL = -1;
             float qualityR = -1;
 
-			switch (NetworkConfig.transport)
+			switch (NetworkRuntime.transport)
 			{
-				case NetworkConfig.NetworkTransport.STEAMWORKS:
+				case NetworkRuntime.NetworkTransport.STEAMWORKS:
 					qualityL = SteamworksClient.GetLocalPacketQuality();
 					qualityR = SteamworksClient.GetRemotePacketQuality();
 					break;
-				case NetworkConfig.NetworkTransport.LITENETLIB:
+				case NetworkRuntime.NetworkTransport.LITENETLIB:
 					qualityL = 1.0f;
 					qualityR = 1.0f;
 					break;

@@ -152,12 +152,12 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if(!NetworkConfig.IsSteamConfig())
+			if(!NetworkRuntime.IsSteamConfig())
 				return;
 
             if (Lifecycle.HasHostOperation)
             {
-                NetworkConfig.TransportServer.Stop();
+                NetworkRuntime.TransportServer.Stop();
                 return;
             }
 			if (InLobby)
@@ -207,11 +207,11 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
             CurrentLobby = _hostLobby;
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "name", SteamFriends.GetPersonaName() + "'s Lobby");
-				SteamMatchmaking.SetLobbyData(CurrentLobby, "host", NetworkConfig.GetLocalID().ToString());
+				SteamMatchmaking.SetLobbyData(CurrentLobby, "host", NetworkRuntime.GetLocalID().ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "hostname", SteamFriends.GetPersonaName());
 
-				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", ((int)NetworkConfig.transport).ToString());
-				if (NetworkConfig.IsLanConfig())
+				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", ((int)NetworkRuntime.transport).ToString());
+				if (NetworkRuntime.IsLanConfig())
 				{
 					string address = Configuration.Instance.Host.LanSettings.GetHashedAddress();
 					DebugConsole.Log($"[SteamLobby] Detected Lan config! Hashed address: {address}");
@@ -243,7 +243,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 			using var _ = Profiler.Scope();
 
 			DebugConsole.Log($"[SteamLobby] Joining lobby invited by {callback.m_steamIDFriend}");
-			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS); // We're joining through the steam invite system so force steam transport
+			NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.STEAMWORKS); // We're joining through the steam invite system so force steam transport
 
             CSteamID lobbyId = callback.m_steamIDLobby;
 
@@ -358,7 +358,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			List<CSteamID> members = new List<CSteamID>();
 
-			if (!NetworkConfig.IsSteamConfig()) return members;
+			if (!NetworkRuntime.IsSteamConfig()) return members;
 
 			if (!InLobby) return members;
 
@@ -455,7 +455,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkConfig.IsSteamConfig())
+			if (!NetworkRuntime.IsSteamConfig())
 				return false; // Default to invalid as these don't have passwords yet
 
 			string storedHash = SteamMatchmaking.GetLobbyData(lobbyId.AsCSteamID(), "password_hash");
@@ -538,7 +538,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkConfig.IsSteamConfig())
+			if (!NetworkRuntime.IsSteamConfig())
 				return;
 
 			if (!InLobby || !MultiplayerSession.IsHost)
@@ -560,7 +560,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_alive", aliveCount.ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_count", totalCount.ToString());
 
-				if (!NetworkConfig.transport.Equals(NetworkConfig.NetworkTransport.STEAMWORKS))
+				if (!NetworkRuntime.transport.Equals(NetworkRuntime.NetworkTransport.STEAMWORKS))
 				{
                     SteamMatchmaking.SetLobbyData(CurrentLobby, "host_ping_location", "???");
                     return;

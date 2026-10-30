@@ -116,7 +116,7 @@ namespace ONI_United.Core
             if (!HasHostOperation) return;
             // Lifetime release is immediate and repeat-safe, independent of another Update.
             // Drop application continuations even if essential cleanup throws.
-            var server = NetworkConfig.TransportServer;
+            var server = NetworkRuntime.TransportServer;
             try { EventAction(Event.Stop); }
             finally { server.DisposeHost(); }
         }

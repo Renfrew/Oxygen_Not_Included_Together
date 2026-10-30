@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using ONI_United.DebugTools;
@@ -77,7 +78,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (!ClientList.Contains(playerId))
             {
                 ClientList.Add(playerId);
-                if (playerId == NetworkConfig.GetLocalID())
+                if (playerId == NetworkRuntime.GetLocalID())
                 {
                     OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
                     DebugConsole.Log("[LiteNetLibServer] Host session registered for " + playerId);
@@ -118,7 +119,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             string ip = Configuration.Instance.Host.LanSettings.Ip;
             int port = Configuration.Instance.Host.LanSettings.Port;
             int maxClients = Configuration.Instance.Host.MaxLobbySize;
-            ulong hostId = NetworkConfig.GetLocalID();
+            ulong hostId = NetworkRuntime.GetLocalID();
             if (hostId == 0)
             {
                 LastStartFailure = "Cannot start with an empty persistent host ID.";
@@ -205,7 +206,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
             }
 
-            if (clientId == NetworkConfig.GetLocalID() || _peersByClientId.ContainsKey(clientId))
+            if (clientId == NetworkRuntime.GetLocalID() || _peersByClientId.ContainsKey(clientId))
             {
                 DebugConsole.LogWarning($"[LiteNetLibServer] Rejected duplicate persistent client ID {clientId} from {request.RemoteEndPoint}.");
                 request.Reject();

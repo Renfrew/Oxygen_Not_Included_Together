@@ -1,4 +1,5 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
@@ -59,8 +60,8 @@ namespace ONI_United.Networking.WorldSync
                 return 0;
             }
 
-            bool isLan = NetworkConfig.IsLanConfig();
-            bool isSteam = NetworkConfig.IsSteamConfig();
+            bool isLan = NetworkRuntime.IsLanConfig();
+            bool isSteam = NetworkRuntime.IsSteamConfig();
 
             // Max packet sizes (bytes)
             float maxPacketSize =

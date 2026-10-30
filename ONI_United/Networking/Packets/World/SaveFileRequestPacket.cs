@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
@@ -10,7 +11,6 @@ using System.Globalization;
 using System.IO;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transfer;
 using ONI_United;
@@ -88,7 +88,7 @@ namespace ONI_United.Networking.Packets.World
 			TransferRuns[requester] = run;
 			try
 			{
-				if (!forceGeneric && NetworkConfig.IsLanConfig() && NetworkConfig.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
+				if (!forceGeneric && NetworkRuntime.IsLanConfig() && NetworkRuntime.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
 				{
 					int tcpPort = Configuration.Instance.Host.LanSettings.Port + 1;
 					lnlServer.TcpTransfer.QueueTransfer(requester, synchronizationId, fileName, snapshot);
@@ -119,7 +119,7 @@ namespace ONI_United.Networking.Packets.World
 		{
 			TransferRuns.Remove(requester);
 			SaveFileTransferManager.CancelClient(requester);
-			if (NetworkConfig.TransportServer is LiteNetLibServer server)
+			if (NetworkRuntime.TransportServer is LiteNetLibServer server)
 				server.TcpTransfer?.CancelClient(requester);
 		}
 
@@ -127,7 +127,7 @@ namespace ONI_United.Networking.Packets.World
 		{
 			SaveFileTransferManager.ClearTransfers();
 			TransferRuns.Clear();
-			if (NetworkConfig.TransportServer is LiteNetLibServer server)
+			if (NetworkRuntime.TransportServer is LiteNetLibServer server)
 				server.TcpTransfer?.ClearPendingTransfers();
 		}
 

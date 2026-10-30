@@ -1,4 +1,5 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
 using ONI_United.Misc.World;
@@ -188,7 +189,7 @@ namespace ONI_United.Networking.Runtime
 			using var _ = Profiler.Scope();
 
 			// I fucking hate this, maybe replace this with hashes?
-			NetworkConfig.TransportClient.OnClientDisconnected = () =>
+			NetworkRuntime.TransportClient.OnClientDisconnected = () =>
 			{
 				if (_cancellingConnectionAttempt)
 					return;
@@ -196,27 +197,27 @@ namespace ONI_United.Networking.Runtime
 				ClientState previousState = _state;
 				Handle(previousState == ClientState.Connecting ? ClientEvent.ConnectionFailed : ClientEvent.TransportDisconnected);
 			};
-			NetworkConfig.TransportClient.OnConnectionFailed = () =>
+			NetworkRuntime.TransportClient.OnConnectionFailed = () =>
 			{
 				if (!_cancellingConnectionAttempt)
 					Handle(ClientEvent.ConnectionFailed);
 			};
-			NetworkConfig.TransportClient.OnClientConnected = () =>
+			NetworkRuntime.TransportClient.OnClientConnected = () =>
 			{
 				if (!_cancellingConnectionAttempt)
 					Handle(ClientEvent.TransportConnected);
 			};
-			NetworkConfig.TransportClient.OnContinueConnectionFlow = () => ContinueConnectionFlow();
-			NetworkConfig.TransportClient.OnReturnToMenu = (reason, message) =>
+			NetworkRuntime.TransportClient.OnContinueConnectionFlow = () => ContinueConnectionFlow();
+			NetworkRuntime.TransportClient.OnReturnToMenu = (reason, message) =>
 			{
 				CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message, skipIfReconnected: true));
 			};
-			NetworkConfig.TransportClient.OnRequestStateOrReturn = () =>
+			NetworkRuntime.TransportClient.OnRequestStateOrReturn = () =>
 			{
                 GameplayPacketSender.Instance.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
                 MP_Timer.Instance.StartDelayedAction(10, () => CoroutineRunner.RunOne(ShowMessageAndReturnToTitle()));
             };
-            NetworkConfig.TransportClient.Prepare();
+            NetworkRuntime.TransportClient.Prepare();
             CursorManager.Instance.AssignColor();
         }
 
@@ -229,11 +230,11 @@ namespace ONI_United.Networking.Runtime
 			if (showLoadingScreen)
 			{
 				string hostName = "uknown host";
-				if (NetworkConfig.IsSteamConfig())
+				if (NetworkRuntime.IsSteamConfig())
 				{
 					hostName = SteamFriends.GetFriendPersonaName(MultiplayerSession.HostUserID.AsCSteamID());
                 }
-				else if (NetworkConfig.IsLanConfig())
+				else if (NetworkRuntime.IsLanConfig())
 				{
 					hostName = $"{ip}:{port}";
                 }
@@ -245,7 +246,7 @@ namespace ONI_United.Networking.Runtime
 
 			try
 			{
-				NetworkConfig.TransportClient.ConnectToHost(ip, port);
+				NetworkRuntime.TransportClient.ConnectToHost(ip, port);
 			}
 			catch
 			{
@@ -258,7 +259,7 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-			NetworkConfig.TransportClient.Disconnect();
+			NetworkRuntime.TransportClient.Disconnect();
 		}
 
 		public static void CancelConnectionAttempt()
@@ -271,7 +272,7 @@ namespace ONI_United.Networking.Runtime
 			_cancellingConnectionAttempt = true;
 			try
 			{
-				NetworkConfig.TransportClient.Disconnect();
+				NetworkRuntime.TransportClient.Disconnect();
 			}
 			finally
 			{
@@ -287,14 +288,14 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-			NetworkConfig.TransportClient.ReconnectToSession();
+			NetworkRuntime.TransportClient.ReconnectToSession();
 		}
 
 		public static void Poll()
 		{
 			using var _ = Profiler.Scope();
 
-			NetworkConfig.TransportClient.Update();
+			NetworkRuntime.TransportClient.Update();
 
 			switch (State)
 			{
@@ -302,7 +303,7 @@ namespace ONI_United.Networking.Runtime
 				case ClientState.Connected:
 				case ClientState.LoadingWorld:
 				case ClientState.InGame:
-					NetworkConfig.TransportClient.OnMessageRecieved();
+					NetworkRuntime.TransportClient.OnMessageRecieved();
 					break;
 				case ClientState.Disconnected:
 				default:
@@ -423,7 +424,7 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Close();
 			NetworkIdentityRegistry.Clear();
-			NetworkConfig.Stop();
+			NetworkRuntime.Stop();
 			App.LoadScene("frontend");
 		}
 
@@ -544,7 +545,7 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Close();
             NetworkIdentityRegistry.Clear();
-            NetworkConfig.Stop();
+            NetworkRuntime.Stop();
 		}
 	}
 }

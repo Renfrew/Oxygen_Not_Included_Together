@@ -1,8 +1,7 @@
-using ONI_United.Core;
 using System;
+using ONI_United.Core;
 using ONI_United.Misc;
 using ONI_United.DebugTools;
-using ONI_United.Networking;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Sessions.Lobbies;
@@ -111,7 +110,7 @@ namespace ONI_United.UI.Multiplayer.Views
             { return; }
             try
             {
-                NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
+                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.STEAMWORKS);
                 SteamLobby.JoinLobbyByCode(code, onJoined: lobby =>
                 {
                     if (disposed) return;
@@ -143,7 +142,7 @@ namespace ONI_United.UI.Multiplayer.Views
                 config.Client.LanSettings.Ip = address;
                 config.Client.LanSettings.Port = port;
                 config.Save();
-                NetworkConfig.UpdateLanTransport();
+                NetworkRuntime.UpdateLanTransport();
                 GameClient.ConnectToHost(ip: address, port: port);
                 screen.RefreshActiveView();
             }

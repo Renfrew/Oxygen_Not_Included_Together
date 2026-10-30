@@ -63,10 +63,6 @@ namespace ONI_United.Patches.ToolPatches
 namespace ONI_United.Networking.Runtime
 {
     public static class GameClient { public static Sessions.States.ClientState State; }
-    public static class NetworkingComponent
-    {
-        public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
-    }
 }
 namespace ONI_United.Networking.Sessions
 {
@@ -90,9 +86,13 @@ namespace ONI_United.Networking.Sessions
         }
     }
 }
-namespace ONI_United.Networking
+namespace ONI_United.Core
 {
-    public static class NetworkConfig { public static Transport.TransportServer TransportServer; }
+    public static class NetworkRuntime
+    {
+        public static Networking.Transport.TransportServer TransportServer;
+        public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
+    }
 }
 public static class LoadScreen
 {

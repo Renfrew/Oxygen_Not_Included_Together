@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ONI_United.Core;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Sessions;
@@ -20,7 +21,7 @@ namespace ONI_United.DebugTools.UnitTests
         [UnitTest(name: "Server is running", category: "Networking")]
         public static UnitTestResult ServerStarts()
         {
-            if (NetworkConfig.TransportServer == null)
+            if (NetworkRuntime.TransportServer == null)
                 return UnitTestResult.Fail("TransportServer is null");
 
             if (!MultiplayerSession.IsHost && !MultiplayerSession.IsClient)
@@ -32,7 +33,7 @@ namespace ONI_United.DebugTools.UnitTests
         [UnitTest(name: "Using Steamworks Transport", category: "Networking")]
         public static UnitTestResult IsSteamTransport()
         {
-            if (NetworkConfig.transport != NetworkConfig.NetworkTransport.STEAMWORKS)
+            if (NetworkRuntime.transport != NetworkRuntime.NetworkTransport.STEAMWORKS)
                 return UnitTestResult.Fail("Transport is not Steamworks");
             return UnitTestResult.Pass("Transport is Steamworks");
         }
@@ -40,7 +41,7 @@ namespace ONI_United.DebugTools.UnitTests
         [UnitTest(name: "Using LiteNetLib Transport", category: "Networking")]
         public static UnitTestResult IsLiteNetLibTransport()
         {
-            if (NetworkConfig.transport != NetworkConfig.NetworkTransport.LITENETLIB)
+            if (NetworkRuntime.transport != NetworkRuntime.NetworkTransport.LITENETLIB)
                 return UnitTestResult.Fail("Transport is not LiteNetLib");
             return UnitTestResult.Pass("Transport is LiteNetLib");
         }
@@ -65,10 +66,10 @@ namespace ONI_United.DebugTools.UnitTests
             if (!MultiplayerSession.IsHost)
                 return UnitTestResult.Fail("Not host, TCP transfer server only runs on the host");
 
-            if (!NetworkConfig.IsLanConfig())
+            if (!NetworkRuntime.IsLanConfig())
                 return UnitTestResult.Fail("Not on LiteNetLib/LAN transport");
 
-            if (NetworkConfig.TransportServer is not LiteNetLibServer server)
+            if (NetworkRuntime.TransportServer is not LiteNetLibServer server)
                 return UnitTestResult.Fail("TransportServer is not a LiteNetLibServer");
 
             if (server.TcpTransfer == null)
@@ -162,7 +163,7 @@ namespace ONI_United.DebugTools.UnitTests
             if (!MultiplayerSession.InActiveSession)
                 return UnitTestResult.Fail("Not in a multiplayer session");
 
-            var transportClients = NetworkConfig.GetConnectedClients();
+            var transportClients = NetworkRuntime.GetConnectedClients();
             if (transportClients.Count == 0)
                 return UnitTestResult.Fail("Transport reports zero connected clients");
 

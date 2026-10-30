@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using KSerialization;
 using ONI_United;
 using ONI_United.Misc;
@@ -13,8 +14,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
 using ONI_United.DebugTools;
 using Shared;
 using UnityEngine;
@@ -124,7 +123,7 @@ public class OxySyncChat : NetworkBehaviour
             return;
 
         string senderName = playerName;
-        if (NetworkConfig.IsSteamConfig())
+        if (NetworkRuntime.IsSteamConfig())
         {
             CSteamID cSteamId = playerId.AsCSteamID();
             if (SteamFriends.HasFriend(cSteamId, EFriendFlags.k_EFriendFlagImmediate))

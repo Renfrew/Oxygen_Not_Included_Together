@@ -66,7 +66,7 @@ namespace ONI_United.UI.Multiplayer.Views
             if (!int.TryParse(lanSettings.Port.Trim(), out int port) || port < 1 || port > 65535)
             { return; }
             if (!int.TryParse(players.PlayerLimit.Trim(), out int maxPlayers)
-                || maxPlayers < NetworkConfig.LOBBY_SIZE_MIN || maxPlayers > NetworkConfig.LOBBY_SIZE_MAX)
+                || maxPlayers < NetworkRuntime.LOBBY_SIZE_MIN || maxPlayers > NetworkRuntime.LOBBY_SIZE_MAX)
             { return; }
             string name = lanSettings.PlayerName.Trim();
             // Match the existing LAN form name rules and local identity limit, only on Start.
@@ -76,14 +76,14 @@ namespace ONI_United.UI.Multiplayer.Views
 
             try
             {
-                NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.LITENETLIB);
-                if (!NetworkConfig.TransportServer.Start(configure: () =>
+                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
+                if (!NetworkRuntime.TransportServer.Start(configure: () =>
                 {
                     var config = Configuration.Instance;
                     config.Host.LanSettings.Port = port;
                     config.Host.LanSettings.DisplayName = name;
                     config.Host.MaxLobbySize = maxPlayers;
-                    config.Host.NetworkTransport = (int)NetworkConfig.NetworkTransport.LITENETLIB;
+                    config.Host.NetworkTransport = (int)NetworkRuntime.NetworkTransport.LITENETLIB;
                     config.Save();
                 })) ModLog.Warning("Host start is not permitted in the current lifecycle state.");
                 if (!disposed) screen.RefreshActiveView();

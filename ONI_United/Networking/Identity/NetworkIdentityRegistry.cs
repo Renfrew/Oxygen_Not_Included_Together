@@ -73,7 +73,7 @@ namespace ONI_United.Networking.Identity
 
 		/// <summary>
 		/// Re-index every live NetworkIdentity in the scene under the NetId it carries.
-		/// NetworkConfig.Stop clears this registry, but the objects of a loaded world stay,
+		/// NetworkRuntime.Stop clears this registry, but the objects of a loaded world stay,
 		/// and RegisterIdentity is guarded by IsRegistered, so after a server restart in the
 		/// same world the host resolved nothing: Count went from 5318 to 0 in the log and
 		/// crept back only with newly spawned objects until the save was reloaded.

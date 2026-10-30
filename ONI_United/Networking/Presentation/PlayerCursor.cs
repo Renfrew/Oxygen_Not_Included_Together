@@ -1,4 +1,5 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Sessions.States;
 using Steamworks;
@@ -118,7 +119,7 @@ namespace ONI_United.Networking.Presentation
 			cursor.transform.SetParent(transform, false);
 			gameObject.SetLayerRecursively(LayerMask.NameToLayer("UI"));
 
-			string defaultName = NetworkConfig.IsLanConfig() ? (MultiplayerSession.GetPlayer(assignedPlayer)?.PlayerName ?? $"Player {assignedPlayer}") : SteamFriends.GetFriendPersonaName(assignedPlayer.AsCSteamID());
+			string defaultName = NetworkRuntime.IsLanConfig() ? (MultiplayerSession.GetPlayer(assignedPlayer)?.PlayerName ?? $"Player {assignedPlayer}") : SteamFriends.GetFriendPersonaName(assignedPlayer.AsCSteamID());
 			SetPlayerName(defaultName);
 			
 			OnCursorStateChanged += () => UpdateActionImage();

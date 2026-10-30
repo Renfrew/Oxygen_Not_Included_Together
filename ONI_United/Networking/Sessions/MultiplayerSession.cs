@@ -1,4 +1,5 @@
 ﻿using System;
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Presentation;
@@ -89,11 +90,11 @@ namespace ONI_United.Networking.Sessions
 
         /// <summary>
         /// HOST ONLY - Returns a list of connected players
-		/// <para>For clients use NetworkConfig.GetConnectedClients() instead</para>
+		/// <para>For clients use NetworkRuntime.GetConnectedClients() instead</para>
         /// </summary>
         public static IReadOnlyDictionary<ulong, MultiplayerPlayer> ConnectedPlayers { get; } = new MultiplayerPlayerView();
 
-		public static ulong LocalUserID => Session.IsActive ? Session.LocalPlayerId : NetworkConfig.GetLocalID();
+		public static ulong LocalUserID => Session.IsActive ? Session.LocalPlayerId : NetworkRuntime.GetLocalID();
 
 		public static ulong HostUserID
 		{
@@ -338,7 +339,7 @@ namespace ONI_United.Networking.Sessions
 		{
 			//using var _ = Profiler.Scope();
 
-			//var members = NetworkConfig.GetConnectedClients();
+			//var members = NetworkRuntime.GetConnectedClients();
 			//foreach (var playerId in members)
 			//{
 			//	if (playerId == LocalUserID)

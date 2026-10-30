@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Identity;
@@ -367,16 +368,16 @@ namespace ONI_United.Networking.Overlay
 					Color.white, null, null, displaySprite: false),
 			};
 
-			if (MultiplayerSession.IsClient && NetworkConfig.TransportClient != null)
+			if (MultiplayerSession.IsClient && NetworkRuntime.TransportClient != null)
 			{
-				int ping = NetworkConfig.TransportClient.GetPing();
+				int ping = NetworkRuntime.TransportClient.GetPing();
 				entries.Add(new LegendEntry(ping >= 0 ? string.Format("Ping: {0}ms", ping) : "Ping: --",
 					null, Color.white, null, null, displaySprite: false));
 			}
 
             if (MultiplayerSession.IsHost)
             {
-                var server = NetworkConfig.TransportServer;
+                var server = NetworkRuntime.TransportServer;
                 if (server != null)
                 {
                     int inPps = server.IncomingPps;
@@ -394,7 +395,7 @@ namespace ONI_United.Networking.Overlay
             }
             else
             {
-                var client = NetworkConfig.TransportClient;
+                var client = NetworkRuntime.TransportClient;
                 if (client != null)
                 {
                     int inPps = client.IncomingPps;
