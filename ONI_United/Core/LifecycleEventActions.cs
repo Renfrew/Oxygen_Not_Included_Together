@@ -26,6 +26,11 @@ namespace ONI_United.Core
                 throw new InvalidOperationException("The local host Session could not be registered.");
         }
 
+        internal static void SessionPrepared()
+        {
+            SelectToolPatch.UpdateColor();
+        }
+
         internal static void Stop()
         {
             MultiplayerSession.Clear();

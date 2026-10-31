@@ -38,7 +38,6 @@ namespace ONI_United
 			new POptions().RegisterOptions(this, typeof(Configuration));
 
 			ModAssets.Initialize();
-			Configuration.Instance.EnsurePersistentUserId();
 			PacketTracker.Init();
 
 			var go = new GameObject("Multiplayer_Modules");

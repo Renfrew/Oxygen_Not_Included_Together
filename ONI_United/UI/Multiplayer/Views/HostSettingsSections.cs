@@ -78,16 +78,16 @@ namespace ONI_United.UI.Multiplayer.Views
         internal string PlayerName => playerName.text;
         internal string Port => port.text;
 
-        internal LanHostSettingsSection(MultiplayerSection section, LanSettings defaults)
+        internal LanHostSettingsSection(MultiplayerSection section)
         {
             section.SetHeader(HOSTSECTIONS.SETTINGS);
             section.AddRow(out var nameRow);
             nameRow.AddUI(ModAssets.UiTemplates.PlainTextPrefab, out var nameLabel);
             UiUtil.ConfigureText(nameLabel, LANJOIN.PLAYER_NAME);
             nameRow.AddUI(ModAssets.UiTemplates.InputFieldPrefab, out playerName);
-            string initialName = string.IsNullOrWhiteSpace(defaults.DisplayName)
+            string initialName = string.IsNullOrWhiteSpace(Configuration.Instance.Network.DisplayName)
                 ? Utils.TruncateLocalPlayerName(string.Format(LANJOIN.DEFAULT_PLAYER_NAME, Configuration.Instance.Network.PersistentUserId))
-                : defaults.DisplayName;
+                : Configuration.Instance.Network.DisplayName;
             UiUtil.ConfigureInputField(playerName, text: initialName, placeholder: LANJOIN.PLAYER_NAME,
                 characterLimit: Utils.MaxLocalPlayerNameLength);
 
@@ -95,7 +95,7 @@ namespace ONI_United.UI.Multiplayer.Views
             portRow.AddUI(ModAssets.UiTemplates.PlainTextPrefab, out var portLabel);
             UiUtil.ConfigureText(portLabel, HOSTMENU.LANHOSTING.PORT.LABEL);
             portRow.AddUI(ModAssets.UiTemplates.InputFieldPrefab, out port);
-            UiUtil.ConfigureInputField(port, text: defaults.Port.ToString(CultureInfo.InvariantCulture),
+            UiUtil.ConfigureInputField(port, text: Configuration.Instance.Host.LanPort.ToString(CultureInfo.InvariantCulture),
                 placeholder: "Port", contentType: TMP_InputField.ContentType.IntegerNumber, characterLimit: 5);
             portRow.AddUI(ModAssets.UiTemplates.primaryBtnPrefab, out var settings, useLeft: false);
             UiUtil.ConfigureButton(settings, HOSTSECTIONS.SETTINGS);

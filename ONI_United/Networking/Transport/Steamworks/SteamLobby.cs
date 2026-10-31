@@ -211,12 +211,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "hostname", SteamFriends.GetPersonaName());
 
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", NetworkRuntime.IsSteam ? "0" : "1");
-				if (NetworkRuntime.IsLan)
-				{
-					string address = Configuration.Instance.Host.LanSettings.GetHashedAddress();
-					DebugConsole.Log($"[SteamLobby] Detected Lan config! Hashed address: {address}");
-					SteamMatchmaking.SetLobbyData(CurrentLobby, "lan_address", address);
-				}
 
 				bool isPrivate = Configuration.Instance.Host.Lobby.IsPrivate;
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "visibility", isPrivate ? "private" : "public");

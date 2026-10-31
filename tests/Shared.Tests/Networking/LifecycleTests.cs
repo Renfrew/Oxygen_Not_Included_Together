@@ -34,6 +34,9 @@ public sealed class LifecycleTests : IDisposable
     }
     private void Initialize() => Lifecycle.Initialize();
 
+    // Exercises the production dispatcher/transport contract, not NetworkRuntime routing.
+    private bool Start() => Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
+
     public static IEnumerable<object[]> Permissions()
     {
         foreach (var phase in Enum.GetValues<Lifecycle.Phase>())
@@ -76,9 +79,12 @@ public sealed class LifecycleTests : IDisposable
     public void ImmediateReadinessCanCompleteInsideStart()
     {
         Initialize(); server.SynchronousReady = true;
-        bool ready = false;
-        Assert.True(server.Start(() => ready = true));
-        Assert.True(ready);
+        Assert.True(Start());
+        server.Ready(); // Duplicate readiness must not repeat successful-host actions.
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () => throw new Exception("duplicate completion")));
+        Assert.Single(Trace, line => line == "color:Hosting");
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
+        Assert.Single(Trace, line => line == "protocol:admitted");
         Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
         Assert.True(Session.IsHost);
     }
@@ -96,32 +102,32 @@ public sealed class LifecycleTests : IDisposable
     public void SharedActionsPrecedeCallbacksAndReadinessIsNotStartAcceptance()
     {
         Initialize();
-        Assert.True(server.Start(() =>
-        {
-            Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
-            Assert.True(Session.IsHost);
-            Trace.Add("ready");
-        }));
+        Assert.True(Start());
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
         Assert.False(Session.IsActive);
-        Assert.False(server.Start());
+        Assert.False(Start());
+        Assert.Single(Trace, line => line == "protocol:start");
+        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         server.Ready();
         Assert.Equal(new[] { "[Lifecycle] Idle", "[Lifecycle] StartingHost", "identity:start", "color:start",
             "tick:start", "protocol:start", "[Lifecycle] PrepareSession", "session:start",
-            "[Lifecycle] Hosting", "ready" }, Trace);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted));
+            "[Lifecycle] Hosting", "color:Hosting", "protocol:admitted" }, Trace);
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted, () => throw new Exception("rejected readiness callback")));
     }
 
     [Fact]
     public void NestedStopDuringRegistrationRejectsLaterSessionPrepared()
     {
-        Initialize(); server.Start();
+        Initialize(); Start();
         Registered = () => server.Stop();
         server.Ready();
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.False(Session.IsActive);
         Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () => throw new Exception()));
         Assert.Equal(1, server.Cancellations);
+        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
     }
 
     [Fact]
@@ -129,32 +135,34 @@ public sealed class LifecycleTests : IDisposable
     {
         Initialize();
         ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Connecting;
-        Assert.Throws<InvalidOperationException>(() => server.Start());
+        Assert.Throws<InvalidOperationException>(() => Start());
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
         Assert.DoesNotContain("protocol:start", Trace);
+        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
     }
 
     [Fact]
     public void DuplicateComponentCannotDisposeLiveOwner()
     {
-        Initialize(); server.Start();
-        NetworkRuntime.Instance = new NetworkRuntime();
+        Initialize(); Start();
         var duplicate = new Lifecycle();
         Invoke(duplicate, "Awake");
         Invoke(duplicate, "OnDestroy");
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
         Assert.Equal(0, server.Disposals);
-        Assert.DoesNotContain("runtime:lifetime", Trace);
     }
 
     [Fact]
     public void FailedEssentialActionSkipsCallbackLogsAndDoesNotRollback()
     {
-        Initialize(); server.Start(); RegistrationSucceeds = false;
+        Initialize(); Start(); RegistrationSucceeds = false;
         Assert.Throws<InvalidOperationException>(() => server.Ready());
         Assert.Equal(Lifecycle.Phase.PrepareSession, Lifecycle.Current);
         Assert.Contains(Trace, line => line.Contains("Event TransportStarted failed in phase PrepareSession"));
         Assert.DoesNotContain("[Lifecycle] Hosting", Trace);
+        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
     }
 
     [Fact]
@@ -169,14 +177,14 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void RepeatedStopRetainsOriginalLoadAndWaitsForConfirmedCleanup()
     {
-        Initialize(); server.Start(); server.Ready();
+        Initialize(); Start(); server.Ready();
         Assert.True(server.StopAndLoad("first.sav"));
         Assert.False(Session.IsActive);
         Assert.True(Trace.IndexOf("session:stop") < Trace.IndexOf("protocol:cancel"));
         Assert.True(server.StopAndLoad("second.sav"));
         Assert.Equal(1, server.Cancellations);
         Assert.Empty(LoadScreen.Loaded);
-        Assert.False(server.Start());
+        Assert.False(Start());
         server.Complete(true, null);
         Assert.Equal(("first.sav", Lifecycle.Phase.Idle), Assert.Single(LoadScreen.Loaded));
         Assert.Single(Trace, line => line == "[Lifecycle] Stopping");
@@ -185,10 +193,10 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void CleanupFailureWithEmptyDiagnosticDiscardsLoadAndRequiresExplicitRetry()
     {
-        Initialize(); server.Start(); server.StopAndLoad("discard.sav");
+        Initialize(); Start(); server.StopAndLoad("discard.sav");
         server.Complete(false, "");
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
-        Assert.False(server.Start());
+        Assert.False(Start());
         Assert.False(string.IsNullOrEmpty(server.OperationError));
         Assert.Empty(LoadScreen.Loaded);
         Assert.Equal(1, server.Cancellations);
@@ -200,7 +208,7 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void EssentialCleanupExceptionCannotBeOverriddenByEarlierNativeSuccess()
     {
-        Initialize(); server.Start(); server.StopAndLoad("discard.sav");
+        Initialize(); Start(); server.StopAndLoad("discard.sav");
         Clearing = () => throw new Exception("shared cleanup failure");
         Assert.Throws<Exception>(() => server.Stop());
         server.Complete(true, null);
@@ -211,8 +219,10 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void StartupFailureUsesStopAndNeverHosts()
     {
-        Initialize(); server.Start(); server.FailStart();
+        Initialize(); Start(); server.FailStart();
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         server.Ready(); // A late protocol readiness event has no registration side effects.
         Assert.False(Session.IsActive);
         Assert.DoesNotContain("session:start", Trace);
@@ -223,28 +233,25 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void DuplicateCompletionCannotStopLaterAttempt()
     {
-        Initialize(); server.Start(); server.Stop();
+        Initialize(); Start(); server.Stop();
         var oldCompletion = server.Completion;
         server.Complete(true, null);
-        server.Start(); server.Ready();
+        Start(); server.Ready();
         oldCompletion(true, null);
         Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
     }
 
     [Fact]
-    public void EssentialLifetimeCleanupAndTransportDisposalRemainRepeatSafe()
+    public void TransportDisposalDiscardsLoadAndIgnoresLateCompletion()
     {
-        Initialize(); server.Start(); server.StopAndLoad("discard.sav");
+        Initialize(); Start(); server.StopAndLoad("discard.sav");
         var lateCompletion = server.Completion;
         var phase = Lifecycle.Current;
         int idleEntries = Trace.Count(line => line == "[Lifecycle] Idle");
-        // Exercise the real cleanup/disposal boundaries; not the substituted runtime's hooks.
-        Lifecycle.CleanupHostForLifetime();
         server.DisposeHost();
         Assert.Equal(1, server.Disposals);
         lateCompletion(true, null);
         Assert.Empty(LoadScreen.Loaded);
-        Lifecycle.CleanupHostForLifetime();
         server.DisposeHost();
         Assert.Equal(2, server.Disposals);
         Assert.Equal(phase, Lifecycle.Current);
@@ -252,52 +259,29 @@ public sealed class LifecycleTests : IDisposable
     }
 
     [Fact]
-    public void OwningDestructionHandsOffBeforeClearingLifecycle()
+    public void OwningDestructionOnlyClearsSingleton()
     {
-        Initialize(); server.Start();
-        NetworkRuntime.Instance = new NetworkRuntime();
-        int handoffs = 0;
-        RuntimeLifetimeRequested = () =>
-        {
-            handoffs++;
-            Assert.True(Lifecycle.RequiresHostLifetimeCleanup);
-            Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
-        };
+        Initialize(); Start(); server.Ready();
+        Clearing = () => throw new Exception("Lifecycle destruction must not clear Session");
+        var trace = Trace.ToArray();
         Invoke(machine, "OnDestroy");
-        Assert.Equal(1, handoffs);
-        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
+        Assert.Null(typeof(Lifecycle).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null));
+        Assert.True(Session.IsHost);
+        Assert.Equal(0, server.Disposals);
+        Assert.Equal(trace, Trace);
     }
 
     [Fact]
-    public void DestructionClearsLifecycleWhenRuntimeHandoffThrows()
+    public void EssentialStopFailureSkipsProtocolCancellation()
     {
-        Initialize(); server.Start();
-        NetworkRuntime.Instance = new NetworkRuntime();
-        var error = new Exception("lifetime handoff failure");
-        RuntimeLifetimeRequested = () => throw error;
-        var thrown = Assert.Throws<TargetInvocationException>(() => Invoke(machine, "OnDestroy"));
-        Assert.Same(error, thrown.InnerException);
-        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
-    }
-
-    [Fact]
-    public void DestructionAfterRuntimeOwnerClearedDoesNotRequireRuntime()
-    {
-        Initialize(); server.Start();
-        NetworkRuntime.Instance = null;
-        Invoke(machine, "OnDestroy");
-        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
-        Assert.DoesNotContain("runtime:lifetime", Trace);
-    }
-
-    [Fact]
-    public void EssentialLifetimeCleanupFailureDoesNotChangePhase()
-    {
-        Initialize(); server.Start(); server.Ready();
-        var error = new Exception("essential lifetime cleanup failure");
+        Initialize(); Start(); server.Ready();
+        var error = new Exception("essential cleanup failure");
         Clearing = () => throw error;
-        Assert.Same(error, Assert.Throws<Exception>(() => Lifecycle.CleanupHostForLifetime()));
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Same(error, Assert.Throws<Exception>(() => server.Stop()));
+        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(0, server.Cancellations);
+        Assert.Null(server.Completion);
+        Assert.Contains(Trace, line => line.Contains("Event Stop failed in phase Stopping"));
     }
 
     private sealed class TestTransport : TransportServer
@@ -310,6 +294,14 @@ public sealed class LifecycleTests : IDisposable
             Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
             Trace.Add("protocol:start");
             if (SynchronousReady) Ready();
+        }
+        public override void OnSessionPlayerAdmitted(ulong playerId)
+        {
+            Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+            Assert.True(Session.IsHost);
+            Assert.Single(Trace, line => line == "color:Hosting");
+            Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
+            Trace.Add("protocol:admitted");
         }
         public void Ready() => ReportTransportStarted();
         public void FailStart() => ReportStartupFailure("native startup failure");

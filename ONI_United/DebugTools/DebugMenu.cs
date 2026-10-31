@@ -24,7 +24,6 @@ namespace ONI_United.DebugTools
 		private Vector2 scrollPosition = Vector2.zero;
 
 		// LAN
-        private string lanHostIP = "127.0.0.1";
         private string lanHostPort = "7777";
         private string[] hostTransportOptions = new string[]
         {
@@ -45,8 +44,7 @@ namespace ONI_United.DebugTools
 			DontDestroyOnLoad(go);
 			_instance = go.AddComponent<DebugMenu>();
 
-            _instance.lanHostIP = Configuration.Instance.Host.LanSettings.Ip;
-            _instance.lanHostPort = Configuration.Instance.Host.LanSettings.Port.ToString();
+            _instance.lanHostPort = Configuration.Instance.Host.LanPort.ToString();
 
             _instance.lanJoinAddress = $"{Configuration.Instance.Client.LanSettings.Ip}:{Configuration.Instance.Client.LanSettings.Port}";
 
@@ -99,9 +97,6 @@ namespace ONI_United.DebugTools
 
             GUILayout.Space(5);
 
-            GUILayout.Label("Host IP:");
-            lanHostIP = GUILayout.TextField(lanHostIP);
-
             GUILayout.Label("Port:");
             lanHostPort = GUILayout.TextField(lanHostPort);
 
@@ -120,10 +115,9 @@ namespace ONI_United.DebugTools
 
                 if (int.TryParse(lanHostPort, out int port))
                 {
-                    DebugConsole.Log($"[LAN] Hosting on {lanHostIP}:{port}");
+                    DebugConsole.Log($"[LAN] Hosting on port {port}");
 
-                    Configuration.Instance.Host.LanSettings.Ip = lanHostIP;
-                    Configuration.Instance.Host.LanSettings.Port = port;
+                    Configuration.Instance.Host.LanPort = port;
 
                     NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.LITENETLIB;
                     Configuration.Instance.Network.Transport = (int)selected_transport;

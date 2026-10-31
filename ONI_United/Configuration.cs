@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
-using Shared.Profiling;
 using UnityEngine;
 
 namespace ONI_United
@@ -13,24 +12,6 @@ namespace ONI_United
     [ConfigFile(SharedConfigLocation: true)]
     public class Configuration : SingletonOptions<Configuration>, IOptions
     {
-        public void EnsurePersistentUserId()
-        {
-            using var _ = Profiler.Scope();
-
-            if (Network.PersistentUserId != 0)
-                return;
-
-            ulong persistentUserId;
-            do
-            {
-                persistentUserId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
-            }
-            while (persistentUserId == 0);
-
-            Network.PersistentUserId = persistentUserId;
-            Save();
-        }
- 
         [JsonProperty]
         public HostSettings Host { get; set; } = new HostSettings();
 
@@ -108,8 +89,8 @@ namespace ONI_United
         [JsonIgnore]
         public string LanDisplayName
         {
-            get => Host.LanSettings.DisplayName;
-            set => Host.LanSettings.DisplayName = value;
+            get => Network.DisplayName;
+            set => Network.DisplayName = value;
         }
 
         [Option("STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE", "STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
@@ -248,7 +229,8 @@ namespace ONI_United
         [JsonProperty] public int SaveFileTransferChunkKB { get; set; } = 256;
         [JsonProperty] public int TimeoutSeconds { get; set; } = 30;
 
-        [JsonProperty] public LanSettings LanSettings { get; set; } = new LanSettings();
+        [JsonProperty] public int LanPort { get; set; } = 8080;
+
         [JsonProperty] public LobbySettings Lobby { get; set; } = new LobbySettings();
         [JsonProperty] public ServerSettings Server { get; set; } = new ServerSettings();
 
@@ -304,6 +286,7 @@ namespace ONI_United
     {
         [JsonProperty] public int Transport { get; set; } = 0;
         [JsonProperty] public ulong PersistentUserId { get; set; } = 0;
+        [JsonProperty] public string DisplayName { get; set; } = "";
         [JsonProperty] public bool EnablePacketQueue { get; set; } = false;
         [JsonProperty] public int MaxPacketsPerSecond { get; set; } = 500;
         [JsonProperty] public bool BypassProtocolCompatibilityChecks { get; set; } = false;
@@ -324,7 +307,6 @@ namespace ONI_United
     {
         [JsonProperty] public string Ip { get; set; } = "127.0.0.1";
         [JsonProperty] public int Port { get; set; } = 8080;
-        [JsonProperty] public string DisplayName { get; set; } = "";
 
         public string GetHashedAddress()
         {

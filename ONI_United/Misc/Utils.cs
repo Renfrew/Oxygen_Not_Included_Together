@@ -388,10 +388,7 @@ namespace ONI_United.Misc
             string name;
             if (NetworkRuntime.IsLan)
             {
-                LanSettings settings = Session.IsHost
-                    ? Configuration.Instance.Host.LanSettings
-                    : Configuration.Instance.Client.LanSettings;
-                string displayName = settings.DisplayName;
+                string displayName = Configuration.Instance.Network.DisplayName;
                 name = !string.IsNullOrWhiteSpace(displayName) ? displayName : $"Player {NetworkRuntime.GetLocalID()}";
             }
             else if (SteamManager.Initialized)

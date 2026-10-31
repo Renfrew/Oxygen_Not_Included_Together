@@ -25,16 +25,16 @@ namespace ONI_United.UI.Multiplayer.Views
 
     internal sealed class LanSettingsSection
     {
-        internal LanSettingsSection(MultiplayerSection section, LanSettings defaults, out KInputTextField playerName)
+        internal LanSettingsSection(MultiplayerSection section, out KInputTextField playerName)
         {
             section.SetHeader(JOINSECTIONS.LAN_SETTINGS);
             section.AddRow(out var row);
             row.AddUI(ModAssets.UiTemplates.PlainTextPrefab, out var label);
             UiUtil.ConfigureText(label, LANJOIN.PLAYER_NAME);
             row.AddUI(ModAssets.UiTemplates.InputFieldPrefab, out playerName);
-            string initialName = string.IsNullOrWhiteSpace(defaults.DisplayName)
+            string initialName = string.IsNullOrWhiteSpace(Configuration.Instance.Network.DisplayName)
                 ? Utils.TruncateLocalPlayerName(string.Format(LANJOIN.DEFAULT_PLAYER_NAME, Configuration.Instance.Network.PersistentUserId))
-                : defaults.DisplayName;
+                : Configuration.Instance.Network.DisplayName;
             UiUtil.ConfigureInputField(playerName, text: initialName, placeholder: LANJOIN.PLAYER_NAME,
                 characterLimit: Utils.MaxLocalPlayerNameLength);
             row.AddUI(ModAssets.UiTemplates.primaryBtnPrefab, out var configure, useLeft: false);

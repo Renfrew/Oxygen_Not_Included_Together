@@ -103,6 +103,9 @@ namespace ONI_United.Core
                 case Event.TransportStarted:
                     LifecycleEventActions.PrepareSession();
                     break;
+                case Event.SessionPrepared:
+                    LifecycleEventActions.SessionPrepared();
+                    break;
                 case Event.Stop:
                     LifecycleEventActions.Stop();
                     break;

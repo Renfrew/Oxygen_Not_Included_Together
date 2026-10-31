@@ -102,7 +102,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 ReportStartupFailure("Load a colony before starting a LAN host.");
                 return;
             }
-            if (Configuration.Instance.Host.LanSettings.Port < 1 || Configuration.Instance.Host.LanSettings.Port > 65535)
+            if (Configuration.Instance.Host.LanPort < 1 || Configuration.Instance.Host.LanPort > 65535)
             {
                 ReportStartupFailure("The configured LAN port is outside the valid range.");
                 return;
@@ -116,8 +116,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
             }
 
-            string ip = Configuration.Instance.Host.LanSettings.Ip;
-            int port = Configuration.Instance.Host.LanSettings.Port;
+            int port = Configuration.Instance.Host.LanPort;
             int maxClients = Configuration.Instance.Host.MaxLobbySize;
             ulong hostId = NetworkRuntime.GetLocalID();
             if (hostId == 0)
@@ -235,7 +234,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                     writer.Put(GameClock.Instance != null ? GameClock.Instance.GetCycle() + 1 : 1);
                     writer.Put(MultiplayerSession.ConnectedPlayers.Count);
                     writer.Put(Configuration.Instance.Host.MaxLobbySize);
-                    writer.Put(Configuration.Instance.Host.LanSettings.Port);
+                    writer.Put(Configuration.Instance.Host.LanPort);
                     _server.SendUnconnectedMessage(writer, remoteEndPoint);
                 }
             }

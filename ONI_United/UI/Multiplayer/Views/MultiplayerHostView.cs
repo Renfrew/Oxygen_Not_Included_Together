@@ -41,9 +41,9 @@ namespace ONI_United.UI.Multiplayer.Views
             steam.AddUI(ModAssets.UiTemplates.SectionPrefab, out var steamSection);
             steamSettings = new SteamHostSettingsSection(steamSection, host.Lobby);
             lan.AddUI(ModAssets.UiTemplates.SectionPrefab, out var lanSection);
-            lanSettings = new LanHostSettingsSection(lanSection, host.LanSettings);
+            lanSettings = new LanHostSettingsSection(lanSection);
 
-            dialog.AddOption(HOSTMENU.BUTTONS.STARTHOSTING.TEXT, _ => StartLanHosting(),
+            dialog.AddOption(HOSTMENU.BUTTONS.STARTHOSTING.TEXT, _ => OnClickHost(),
                 out startButton, rightSide: false, accent: true);
             steamIndex = view.AddTab(JOINVIABUTTONS.STEAM.TEXT, steam);
             lanIndex = view.AddTab(JOINVIABUTTONS.LAN.TEXT, lan);
@@ -52,11 +52,9 @@ namespace ONI_United.UI.Multiplayer.Views
             Show(false);
         }
 
-        private bool CanStart => !disposed && NetworkRuntime.IsLan && Utils.IsInGame() && Grid.CellCount > 0
-            && !Session.IsActive && GameClient.State == ClientState.Disconnected
-            && Lifecycle.Current == Lifecycle.Phase.Idle;
-
-        internal void RefreshAvailability() => startButton.isInteractable = CanStart;
+        internal void RefreshAvailability() => startButton.isInteractable = Lifecycle.Current == Lifecycle.Phase.Idle
+            && !disposed && NetworkRuntime.IsLan && Utils.IsInGame() && Grid.CellCount > 0
+            && !Session.IsActive && GameClient.State == ClientState.Disconnected;
 
         internal void RefreshTransport()
         {
@@ -66,9 +64,10 @@ namespace ONI_United.UI.Multiplayer.Views
             RefreshAvailability();
         }
 
-        private void StartLanHosting()
+        private void OnClickHost()
         {
-            if (!CanStart) return;
+            if (disposed || !NetworkRuntime.IsLan || !Utils.IsInGame() || Grid.CellCount <= 0
+                || Session.IsActive || GameClient.State != ClientState.Disconnected) return;
             if (!int.TryParse(lanSettings.Port.Trim(), out int port) || port < 1 || port > 65535)
             { return; }
             if (!int.TryParse(players.PlayerLimit.Trim(), out int maxPlayers)
@@ -82,14 +81,12 @@ namespace ONI_United.UI.Multiplayer.Views
 
             try
             {
-                if (!NetworkRuntime.TransportServer.Start(configure: () =>
-                {
-                    var config = Configuration.Instance;
-                    config.Host.LanSettings.Port = port;
-                    config.Host.LanSettings.DisplayName = name;
-                    config.Host.MaxLobbySize = maxPlayers;
-                    NetworkRuntime.SaveTransport();
-                })) ModLog.Warning("Host start is not permitted in the current lifecycle state.");
+                var config = Configuration.Instance;
+                config.Host.LanPort = port;
+                config.Network.DisplayName = name;
+                config.Host.MaxLobbySize = maxPlayers;
+                NetworkRuntime.SaveTransport();
+                NetworkRuntime.StartServer();
                 if (!disposed) screen.RefreshActiveView();
             }
             finally { if (!disposed && view != null && view.isActiveAndEnabled) RefreshAvailability(); }

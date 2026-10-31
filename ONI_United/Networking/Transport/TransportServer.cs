@@ -7,20 +7,14 @@ namespace ONI_United.Networking.Transport
 {
     public abstract class TransportServer
     {
-        private System.Action hostReady;
         private System.Action afterStop;
         private Action<bool, string> stopCompletion;
         public string OperationError { get; private set; }
 
-        public bool Start(System.Action onStarted = null, System.Action configure = null)
+        internal void Start()
         {
-            return Lifecycle.Handle(Lifecycle.Event.Start, () =>
-            {
-                OperationError = null;
-                hostReady = onStarted;
-                configure?.Invoke();
-                StartProtocol();
-            });
+            OperationError = null;
+            StartProtocol();
         }
 
         protected abstract void StartProtocol();
@@ -37,9 +31,6 @@ namespace ONI_United.Networking.Transport
                 Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () =>
                 {
                     OnSessionPlayerAdmitted(Session.LocalPlayerId);
-                    var ready = hostReady;
-                    hostReady = null;
-                    ready?.Invoke();
                 });
             });
         }
@@ -57,7 +48,6 @@ namespace ONI_United.Networking.Transport
             {
                 return Lifecycle.Handle(Lifecycle.Event.Stop, () =>
                 {
-                    hostReady = null;
                     if (stopCompletion == null)
                     {
                         afterStop = onStopped;
@@ -76,7 +66,6 @@ namespace ONI_United.Networking.Transport
                 // completion: its later native success cannot establish complete cleanup.
                 stopCompletion = null;
                 afterStop = null;
-                hostReady = null;
                 throw;
             }
         }
@@ -108,7 +97,6 @@ namespace ONI_United.Networking.Transport
 
         internal void DisposeHost()
         {
-            hostReady = null;
             afterStop = null;
             stopCompletion = null;
             DisposeProtocol();

@@ -55,11 +55,9 @@ namespace ONI_United.DebugTools
 
         // Network transport
         private int selectedTransportType = 0; // 0 = Steam, 1 = LAN
-        private string hostIP = "";
         private int hostPort = 7777;
         private string clientIP = "";
         private int clientPort = 7777;
-        LanSettings settings_host = new LanSettings();
         LanSettings settings_client = new LanSettings();
 
         // Unit testing
@@ -116,10 +114,7 @@ namespace ONI_United.DebugTools
             useRandomColor = Configuration.GetClientProperty<bool>("UseRandomPlayerColor");
 
             selectedTransportType = Configuration.Instance.Network.Transport;
-            hostIP = Configuration.Instance.Host.LanSettings.Ip;
-            hostPort = Configuration.Instance.Host.LanSettings.Port;
-            settings_host.Ip = hostIP;
-            settings_host.Port = hostPort;
+            hostPort = Configuration.Instance.Host.LanPort;
 
             clientIP = Configuration.Instance.Client.LanSettings.Ip;
             clientPort = Configuration.Instance.Client.LanSettings.Port;
@@ -268,7 +263,7 @@ namespace ONI_United.DebugTools
             if (NetworkRuntime.IsSteam)
             {
                 if (ImGui.Button("Create Lobby"))
-                    NetworkRuntime.TransportServer.Start();
+                    NetworkRuntime.StartServer();
                 
                 ImGui.SameLine();
                 if (ImGui.Button("Leave Lobby"))
@@ -279,8 +274,7 @@ namespace ONI_United.DebugTools
             {
                 if (ImGui.Button("Start Lan"))
                 {
-                    if (!NetworkRuntime.TransportServer.Start())
-                        ModLog.Error("Host start is not permitted in the current lifecycle state.") ;
+                    NetworkRuntime.StartServer();
                 }
 
                 ImGui.SameLine();
@@ -353,8 +347,7 @@ namespace ONI_United.DebugTools
 
             if (ImGui.Button("Start Current Config Server"))
             {
-                if (!NetworkRuntime.TransportServer.Start())
-                    ModLog.Error("Host start is not permitted in the current lifecycle state.");
+                NetworkRuntime.StartServer();
             }
 
             ImGui.SameLine();
@@ -781,10 +774,7 @@ namespace ONI_United.DebugTools
 
                 // Host section
                 ImGui.Text("Host Settings (Used for hosting a server)");
-                ImGui.InputText("Host IP", ref hostIP, 64);
                 ImGui.InputInt("Host Port", ref hostPort);
-                settings_host.Ip = hostIP;
-                settings_host.Port = hostPort;
 
                 ImGui.Separator();
 
@@ -792,15 +782,13 @@ namespace ONI_United.DebugTools
                 ImGui.Text("Client Settings (The server you are connecting too)");
                 ImGui.InputText("Client IP", ref clientIP, 64);
                 ImGui.InputInt("Client Port", ref clientPort);
-                settings_client.Ip = hostIP;
                 settings_client.Port = hostPort;
                 ImGui.Unindent();
             }
 
             if (ImGui.Button("Save & Apply"))
             {
-                Configuration.Instance.Host.LanSettings.Ip = hostIP;
-                Configuration.Instance.Host.LanSettings.Port = hostPort;
+                Configuration.Instance.Host.LanPort = hostPort;
                 Configuration.Instance.Client.LanSettings.Ip = clientIP;
                 Configuration.Instance.Client.LanSettings.Port = clientPort;
 

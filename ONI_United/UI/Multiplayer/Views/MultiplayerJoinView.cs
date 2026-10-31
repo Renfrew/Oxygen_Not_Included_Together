@@ -60,7 +60,7 @@ namespace ONI_United.UI.Multiplayer.Views
             lan.AddUI(ModAssets.UiTemplates.SectionPrefab, out var lanJoinSection);
             lan.AddUI(ModAssets.UiTemplates.SectionPrefab, out var lanSettingsSection);
             var lanDefaults = Configuration.Instance.Client.LanSettings;
-            new LanSettingsSection(lanSettingsSection, lanDefaults, out var playerName);
+            new LanSettingsSection(lanSettingsSection, out var playerName);
             lanJoin = new LanJoinSection(lanJoinSection, lanDefaults, playerName, Connect, OnLanEdited);
 
             dialog.AddOption(HOSTGAMEBUTTON.TEXT, _ => owner.OpenHostSetup(), out hostButton, accent: false);
@@ -140,7 +140,7 @@ namespace ONI_United.UI.Multiplayer.Views
             try
             {
                 var config = Configuration.Instance;
-                config.Client.LanSettings.DisplayName = name;
+                config.Network.DisplayName = name;
                 config.Client.LanSettings.Ip = address;
                 config.Client.LanSettings.Port = port;
                 NetworkRuntime.SaveTransport();

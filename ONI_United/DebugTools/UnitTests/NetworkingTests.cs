@@ -75,7 +75,7 @@ namespace ONI_United.DebugTools.UnitTests
             if (server.TcpTransfer == null)
                 return UnitTestResult.Fail("TcpFileTransfer is null (listener failed to start, UDP fallback in use)");
 
-            int lanPort = Configuration.Instance.Host.LanSettings.Port;
+            int lanPort = Configuration.Instance.Host.LanPort;
             return UnitTestResult.Pass($"TcpFileTransferServer running on port {lanPort + 1}");
         }
 

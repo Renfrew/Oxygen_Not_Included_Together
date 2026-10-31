@@ -90,7 +90,7 @@ namespace ONI_United.Networking.Packets.World
 			{
 				if (!forceGeneric && NetworkRuntime.IsLan && NetworkRuntime.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
 				{
-					int tcpPort = Configuration.Instance.Host.LanSettings.Port + 1;
+					int tcpPort = Configuration.Instance.Host.LanPort + 1;
 					lnlServer.TcpTransfer.QueueTransfer(requester, synchronizationId, fileName, snapshot);
 
 					var startPacket = new TcpTransferStartPacket

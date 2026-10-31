@@ -10,12 +10,10 @@ namespace Shared.Tests.Networking
         internal static readonly List<string> Trace = new();
         internal static Action Registered;
         internal static Action Clearing;
-        internal static Action RuntimeLifetimeRequested;
         internal static bool RegistrationSucceeds = true;
         internal static void Reset()
         {
-            Trace.Clear(); Registered = null; Clearing = null; RuntimeLifetimeRequested = null;
-            ONI_United.Core.NetworkRuntime.Instance = null;
+            Trace.Clear(); Registered = null; Clearing = null;
             RegistrationSucceeds = true; Session.Reset();
             LoadScreen.Loaded.Clear();
             ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Disconnected;
@@ -59,7 +57,7 @@ namespace ONI_United.Patches.ToolPatches
 {
     public static class SelectToolPatch
     {
-        public static void UpdateColor() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("color:stop");
+        public static void UpdateColor() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("color:" + ONI_United.Core.Lifecycle.Current);
     }
 }
 namespace ONI_United.Networking.Runtime
@@ -92,19 +90,19 @@ namespace ONI_United.Core
 {
     public sealed class NetworkRuntime
     {
-        public static NetworkRuntime Instance;
         public static Networking.Transport.TransportServer TransportServer;
         public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
-        // A handoff spy only: production NetworkRuntime coordination is not copied here.
-        internal void DisposeHostForLifetime()
-        {
-            Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("runtime:lifetime");
-            Shared.Tests.Networking.LifecycleTestEnvironment.RuntimeLifetimeRequested?.Invoke();
-        }
     }
 }
 public static class LoadScreen
 {
     internal static readonly List<(string Filename, ONI_United.Core.Lifecycle.Phase Phase)> Loaded = new();
     public static void DoLoad(string filename) => Loaded.Add((filename, ONI_United.Core.Lifecycle.Current));
+}
+
+public sealed class SpeedControlScreen
+{
+    public static readonly SpeedControlScreen Instance = new();
+    public void Pause(bool pause) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(
+        $"pause:{ONI_United.Core.Lifecycle.Current}:{pause}");
 }

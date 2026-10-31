@@ -63,7 +63,27 @@ namespace ONI_United.Core
 
         public static void Initialize()
         {
+            EnsurePersistentUserId();
             UpdateTransport((NetworkTransport)Configuration.Instance.Network.Transport);
+        }
+
+        internal static void EnsurePersistentUserId()
+        {
+            using var _ = Profiler.Scope();
+
+            var config = Configuration.Instance;
+            if (config.Network.PersistentUserId != 0)
+                return;
+
+            ulong persistentUserId;
+            do
+            {
+                persistentUserId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
+            }
+            while (persistentUserId == 0);
+
+            config.Network.PersistentUserId = persistentUserId;
+            config.Save();
         }
 
         public static TransportServer TransportServer { get; private set; } = new LiteNetLibServer();
@@ -76,11 +96,8 @@ namespace ONI_United.Core
 
         public static void StartServer()
         {
-            if (!TransportServer.Start(() =>
-            {
-                SelectToolPatch.UpdateColor();
-                SpeedControlScreen.Instance?.Pause(true);
-            })) DebugConsole.LogError("[NetworkRuntime] Host start is not permitted in the current lifecycle state.");
+            if (!Lifecycle.Handle(Lifecycle.Event.Start, TransportServer.Start))
+                DebugConsole.LogError("[NetworkRuntime] Host start is not permitted in the current lifecycle state.");
         }
 
         /// <summary>
