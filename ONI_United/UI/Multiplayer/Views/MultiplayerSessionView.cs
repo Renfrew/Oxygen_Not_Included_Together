@@ -60,8 +60,7 @@ namespace ONI_United.UI.Multiplayer.Views
         }
         private void StopHosting()
         {
-            if (!NetworkRuntime.TransportServer.Stop())
-                ModLog.Warning("Stop is not permitted in the current lifecycle state.");
+            NetworkRuntime.Stop();
             screen.RefreshActiveView();
         }
     }

@@ -7,7 +7,6 @@ namespace ONI_United.Networking.Transport
 {
     public abstract class TransportServer
     {
-        private System.Action afterStop;
         private Action<bool, string> stopCompletion;
         public string OperationError { get; private set; }
 
@@ -39,49 +38,26 @@ namespace ONI_United.Networking.Transport
         {
             OperationError = string.IsNullOrEmpty(reason) ? "Host startup failed." : reason;
             DebugConsole.LogError("[TransportServer] " + OperationError);
-            Stop();
+            NetworkRuntime.Stop();
         }
 
-        public bool Stop(System.Action onStopped = null)
+        internal void Stop()
         {
-            try
+            if (stopCompletion == null)
             {
-                return Lifecycle.Handle(Lifecycle.Event.Stop, () =>
-                {
-                    if (stopCompletion == null)
-                    {
-                        afterStop = onStopped;
-                        Action<bool, string> completion = null;
-                        completion = (success, error) => CompleteStop(completion, success, error);
-                        stopCompletion = completion;
-                    }
-                    // The protocol keeps the first unresolved completion and coalesces
-                    // repeated cancellation. A reported failure allows explicit retry.
-                    CancelProtocol(stopCompletion);
-                });
+                Action<bool, string> completion = null;
+                completion = (success, error) => CompleteStop(completion, success, error);
+                stopCompletion = completion;
             }
-            catch
-            {
-                // An essential cleanup failure invalidates even an older in-flight
-                // completion: its later native success cannot establish complete cleanup.
-                stopCompletion = null;
-                afterStop = null;
-                throw;
-            }
+            // The protocol keeps the first unresolved completion and coalesces
+            // repeated cancellation. A reported failure allows explicit retry.
+            CancelProtocol(stopCompletion);
         }
-
-        public bool StopAndLoad(string filename) => Stop(() =>
-        {
-            MultiplayerSession.ShouldHostAfterLoad = true;
-            LoadScreen.DoLoad(filename);
-        });
 
         private void CompleteStop(Action<bool, string> completion, bool success, string error)
         {
             if (!ReferenceEquals(stopCompletion, completion)) return;
             stopCompletion = null;
-            var continuation = afterStop;
-            afterStop = null;
             if (!success)
             {
                 OperationError = string.IsNullOrEmpty(error) ? "Host cleanup failed." : error;
@@ -91,13 +67,11 @@ namespace ONI_United.Networking.Transport
             Lifecycle.Handle(Lifecycle.Event.Stopped, () =>
             {
                 OperationError = null;
-                continuation?.Invoke();
             });
         }
 
         internal void DisposeHost()
         {
-            afterStop = null;
             stopCompletion = null;
             DisposeProtocol();
         }

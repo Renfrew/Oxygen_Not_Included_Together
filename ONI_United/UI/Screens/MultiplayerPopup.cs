@@ -41,13 +41,6 @@ public static class MultiplayerPopup
 		canvasGroup.blocksRaycasts = true;
 
 		// Create buttons
-		AddPopupButton(popup.transform, "Host Game", new Vector2(0, 100), () =>
-		{
-			MultiplayerSession.ShouldHostAfterLoad = true;
-			//MainMenuPatch.Instance.Button_ResumeGame.SignalClick(KKeyCode.Mouse0);
-			//HostLastSave();
-		});
-
 		AddPopupButton(popup.transform, "Join Game", new Vector2(0, 40), () =>
 		{
 			//SteamFriends.ActivateGameOverlay("friends");
@@ -72,31 +65,6 @@ public static class MultiplayerPopup
 		{
 			Object.Destroy(currentPopup);
 			currentPopup = null;
-		}
-	}
-
-	private static void HostLastSave()
-	{
-		using var _ = Profiler.Scope();
-
-		MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.HOST.STARTINGHOSTING);
-		string text;
-		if (!KPlayerPrefs.HasKey("AutoResumeSaveFile"))
-		{
-			text = SaveLoader.GetLatestSaveForCurrentDLC();
-		}
-		else
-		{
-			text = KPlayerPrefs.GetString("AutoResumeSaveFile");
-			KPlayerPrefs.DeleteKey("AutoResumeSaveFile");
-		}
-
-		if (!string.IsNullOrEmpty(text))
-		{
-			KCrashReporter.MOST_RECENT_SAVEFILE = text;
-			SaveLoader.SetActiveSaveFilePath(text);
-
-			App.LoadScene("backend");
 		}
 	}
 

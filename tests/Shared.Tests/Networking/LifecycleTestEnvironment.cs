@@ -15,7 +15,6 @@ namespace Shared.Tests.Networking
         {
             Trace.Clear(); Registered = null; Clearing = null;
             RegistrationSucceeds = true; Session.Reset();
-            LoadScreen.Loaded.Clear();
             ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Disconnected;
         }
     }
@@ -68,7 +67,6 @@ namespace ONI_United.Networking.Sessions
 {
     public static class MultiplayerSession
     {
-        public static bool ShouldHostAfterLoad;
         public static bool RegisterAsHost()
         {
             var env = Shared.Tests.Networking.LifecycleTestEnvironment.Trace;
@@ -92,14 +90,15 @@ namespace ONI_United.Core
     {
         public static Networking.Transport.TransportServer TransportServer;
         public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
+        // Host admission substitute only; production NetworkRuntime is not source-linked.
+        public static void Stop()
+        {
+            var server = TransportServer;
+            if (!Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop))
+                DebugTools.DebugConsole.LogError("[NetworkRuntime] Stop is not permitted in the current lifecycle state.");
+        }
     }
 }
-public static class LoadScreen
-{
-    internal static readonly List<(string Filename, ONI_United.Core.Lifecycle.Phase Phase)> Loaded = new();
-    public static void DoLoad(string filename) => Loaded.Add((filename, ONI_United.Core.Lifecycle.Current));
-}
-
 public sealed class SpeedControlScreen
 {
     public static readonly SpeedControlScreen Instance = new();

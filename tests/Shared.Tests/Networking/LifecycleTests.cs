@@ -36,6 +36,8 @@ public sealed class LifecycleTests : IDisposable
 
     // Exercises the production dispatcher/transport contract, not NetworkRuntime routing.
     private bool Start() => Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
+    // Stop admission uses the runtime substitute; transport completion remains production code.
+    private void Stop() => NetworkRuntime.Stop();
 
     public static IEnumerable<object[]> Permissions()
     {
@@ -120,7 +122,7 @@ public sealed class LifecycleTests : IDisposable
     public void NestedStopDuringRegistrationRejectsLaterSessionPrepared()
     {
         Initialize(); Start();
-        Registered = () => server.Stop();
+        Registered = () => Stop();
         server.Ready();
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.False(Session.IsActive);
@@ -175,51 +177,69 @@ public sealed class LifecycleTests : IDisposable
     }
 
     [Fact]
-    public void RepeatedStopRetainsOriginalLoadAndWaitsForConfirmedCleanup()
+    public void RepeatedStopRetainsCompletionAndWaitsForConfirmedCleanup()
     {
         Initialize(); Start(); server.Ready();
-        Assert.True(server.StopAndLoad("first.sav"));
+        Stop();
         Assert.False(Session.IsActive);
         Assert.True(Trace.IndexOf("session:stop") < Trace.IndexOf("protocol:cancel"));
-        Assert.True(server.StopAndLoad("second.sav"));
+        var completion = server.Completion;
+        Stop();
+        Assert.Same(completion, server.Completion);
         Assert.Equal(1, server.Cancellations);
-        Assert.Empty(LoadScreen.Loaded);
+        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.False(Start());
         server.Complete(true, null);
-        Assert.Equal(("first.sav", Lifecycle.Phase.Idle), Assert.Single(LoadScreen.Loaded));
+        completion(true, null); // Duplicate completion must not enter Idle again.
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
         Assert.Single(Trace, line => line == "[Lifecycle] Stopping");
+        Assert.Equal(2, Trace.Count(line => line == "[Lifecycle] Idle"));
     }
 
     [Fact]
-    public void CleanupFailureWithEmptyDiagnosticDiscardsLoadAndRequiresExplicitRetry()
+    public void RejectedStopEventDoesNotRunTransport()
     {
-        Initialize(); Start(); server.StopAndLoad("discard.sav");
+        Initialize();
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop));
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.Equal(0, server.Cancellations);
+        Assert.Null(server.Completion);
+        Assert.Equal(new[] { "[Lifecycle] Idle" }, Trace);
+    }
+
+    [Fact]
+    public void SynchronousCancellationEntersIdleOnlyAfterConfirmation()
+    {
+        Initialize(); Start(); server.Ready(); server.SynchronousCancellation = true;
+        Stop();
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.False(Session.IsActive);
+        Assert.Equal(1, server.Cancellations);
+        Assert.True(Trace.IndexOf("protocol:cancel") < Trace.LastIndexOf("[Lifecycle] Idle"));
+    }
+
+    [Fact]
+    public void CleanupFailureWithEmptyDiagnosticRequiresExplicitRetry()
+    {
+        Initialize(); Start(); Stop();
         server.Complete(false, "");
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.False(Start());
         Assert.False(string.IsNullOrEmpty(server.OperationError));
-        Assert.Empty(LoadScreen.Loaded);
         Assert.Equal(1, server.Cancellations);
-        server.Stop(); server.Complete(true, null);
-        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
-        Assert.Empty(LoadScreen.Loaded);
-    }
-
-    [Fact]
-    public void EssentialCleanupExceptionCannotBeOverriddenByEarlierNativeSuccess()
-    {
-        Initialize(); Start(); server.StopAndLoad("discard.sav");
-        Clearing = () => throw new Exception("shared cleanup failure");
-        Assert.Throws<Exception>(() => server.Stop());
+        Stop();
+        Assert.Equal(2, server.Cancellations);
         server.Complete(true, null);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
-        Assert.Empty(LoadScreen.Loaded);
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.Null(server.OperationError);
     }
 
     [Fact]
     public void StartupFailureUsesStopAndNeverHosts()
     {
         Initialize(); Start(); server.FailStart();
+        Assert.Equal("native startup failure", server.OperationError);
+        Assert.Equal(1, server.Cancellations);
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.DoesNotContain("color:Hosting", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
@@ -233,7 +253,7 @@ public sealed class LifecycleTests : IDisposable
     [Fact]
     public void DuplicateCompletionCannotStopLaterAttempt()
     {
-        Initialize(); Start(); server.Stop();
+        Initialize(); Start(); Stop();
         var oldCompletion = server.Completion;
         server.Complete(true, null);
         Start(); server.Ready();
@@ -242,16 +262,15 @@ public sealed class LifecycleTests : IDisposable
     }
 
     [Fact]
-    public void TransportDisposalDiscardsLoadAndIgnoresLateCompletion()
+    public void TransportDisposalInvalidatesLateCompletion()
     {
-        Initialize(); Start(); server.StopAndLoad("discard.sav");
+        Initialize(); Start(); Stop();
         var lateCompletion = server.Completion;
         var phase = Lifecycle.Current;
         int idleEntries = Trace.Count(line => line == "[Lifecycle] Idle");
         server.DisposeHost();
         Assert.Equal(1, server.Disposals);
         lateCompletion(true, null);
-        Assert.Empty(LoadScreen.Loaded);
         server.DisposeHost();
         Assert.Equal(2, server.Disposals);
         Assert.Equal(phase, Lifecycle.Current);
@@ -277,7 +296,7 @@ public sealed class LifecycleTests : IDisposable
         Initialize(); Start(); server.Ready();
         var error = new Exception("essential cleanup failure");
         Clearing = () => throw error;
-        Assert.Same(error, Assert.Throws<Exception>(() => server.Stop()));
+        Assert.Same(error, Assert.Throws<Exception>(() => Stop()));
         Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
         Assert.Equal(0, server.Cancellations);
         Assert.Null(server.Completion);
@@ -288,7 +307,7 @@ public sealed class LifecycleTests : IDisposable
     {
         public Action<bool, string> Completion;
         public int Cancellations, Disposals;
-        public bool SynchronousReady;
+        public bool SynchronousReady, SynchronousCancellation;
         protected override void StartProtocol()
         {
             Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
@@ -310,6 +329,7 @@ public sealed class LifecycleTests : IDisposable
             if (Completion != null) return;
             Assert.False(Session.IsActive);
             Trace.Add("protocol:cancel"); Cancellations++; Completion = completed;
+            if (SynchronousCancellation) Complete(true, null);
         }
         public void Complete(bool success, string error)
         {

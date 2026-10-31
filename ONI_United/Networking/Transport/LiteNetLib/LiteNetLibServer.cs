@@ -323,7 +323,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
         protected override void DisposeProtocol()
         {
-            // Discard a pending save-load continuation before terminal resource release.
+            // Stop observing completion before terminal resource release.
             CancelShutdownObservation();
             string failure = StopResources();
             if (failure != null) DebugConsole.LogError("[LiteNetLibServer] Disposal failed: " + failure);

@@ -86,7 +86,6 @@ namespace ONI_United.Networking.Sessions
 			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
-		public static bool ShouldHostAfterLoad = false;
 
         /// <summary>
         /// HOST ONLY - Returns a list of connected players

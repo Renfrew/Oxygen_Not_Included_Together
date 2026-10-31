@@ -107,7 +107,7 @@ namespace ONI_United.Core
         {
             if (Lifecycle.HasHostOperation)
             {
-                if (!TransportServer.Stop())
+                if (!Lifecycle.Handle(Lifecycle.Event.Stop, TransportServer.Stop))
                     DebugConsole.LogError("[NetworkRuntime] Stop is not permitted in the current lifecycle state.");
                 return;
             }

@@ -157,7 +157,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (Lifecycle.HasHostOperation)
             {
-                NetworkRuntime.TransportServer.Stop();
+                NetworkRuntime.Stop();
                 return;
             }
 			if (InLobby)

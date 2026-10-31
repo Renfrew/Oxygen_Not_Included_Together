@@ -353,7 +353,7 @@ namespace ONI_United.DebugTools
             ImGui.SameLine();
             if (ImGui.Button("Stop Current Config Server"))
             {
-                NetworkRuntime.TransportServer.Stop();
+                NetworkRuntime.Stop();
             }
             ImGui.Separator();
             DisplayUnitTests();
