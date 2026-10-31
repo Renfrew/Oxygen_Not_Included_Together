@@ -110,7 +110,7 @@ namespace ONI_United.DebugTools
                 if(selectedHostTransport == 0)
                 {
                     NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.STEAMWORKS;
-                    Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
                     NetworkRuntime.UpdateTransport(selected_transport);
                     Configuration.Instance.Save();
 
@@ -126,8 +126,8 @@ namespace ONI_United.DebugTools
                     Configuration.Instance.Host.LanSettings.Port = port;
 
                     NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.LITENETLIB;
-                    Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
-                    NetworkRuntime.UpdateLanTransport();
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
+                    NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
 
                     Configuration.Instance.Save();
 
@@ -153,7 +153,7 @@ namespace ONI_United.DebugTools
 
             if (GUILayout.Button("Join Server"))
             {
-                NetworkRuntime.UpdateLanTransport();
+                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
                 DebugConsole.Log($"[LAN] Joining {lanJoinAddress}");
 
                 string[] address = lanJoinAddress.Split(':');

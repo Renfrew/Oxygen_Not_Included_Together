@@ -138,11 +138,13 @@ public sealed class LifecycleTests : IDisposable
     public void DuplicateComponentCannotDisposeLiveOwner()
     {
         Initialize(); server.Start();
+        NetworkRuntime.Instance = new NetworkRuntime();
         var duplicate = new Lifecycle();
         Invoke(duplicate, "Awake");
         Invoke(duplicate, "OnDestroy");
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
         Assert.Equal(0, server.Disposals);
+        Assert.DoesNotContain("runtime:lifetime", Trace);
     }
 
     [Fact]
@@ -230,16 +232,72 @@ public sealed class LifecycleTests : IDisposable
     }
 
     [Fact]
-    public void QuitAndDestroyInitiateImmediateReleaseAndDiscardContinuation()
+    public void EssentialLifetimeCleanupAndTransportDisposalRemainRepeatSafe()
     {
         Initialize(); server.Start(); server.StopAndLoad("discard.sav");
         var lateCompletion = server.Completion;
-        Invoke(machine, "OnApplicationQuit");
+        var phase = Lifecycle.Current;
+        int idleEntries = Trace.Count(line => line == "[Lifecycle] Idle");
+        // Exercise the real cleanup/disposal boundaries; not the substituted runtime's hooks.
+        Lifecycle.CleanupHostForLifetime();
+        server.DisposeHost();
         Assert.Equal(1, server.Disposals);
         lateCompletion(true, null);
         Assert.Empty(LoadScreen.Loaded);
+        Lifecycle.CleanupHostForLifetime();
+        server.DisposeHost();
+        Assert.Equal(2, server.Disposals);
+        Assert.Equal(phase, Lifecycle.Current);
+        Assert.Equal(idleEntries, Trace.Count(line => line == "[Lifecycle] Idle"));
+    }
+
+    [Fact]
+    public void OwningDestructionHandsOffBeforeClearingLifecycle()
+    {
+        Initialize(); server.Start();
+        NetworkRuntime.Instance = new NetworkRuntime();
+        int handoffs = 0;
+        RuntimeLifetimeRequested = () =>
+        {
+            handoffs++;
+            Assert.True(Lifecycle.RequiresHostLifetimeCleanup);
+            Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
+        };
         Invoke(machine, "OnDestroy");
-        Assert.Equal(2, server.Disposals); // Protocol disposal is repeat-safe; no frame or terminal phase.
+        Assert.Equal(1, handoffs);
+        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
+    }
+
+    [Fact]
+    public void DestructionClearsLifecycleWhenRuntimeHandoffThrows()
+    {
+        Initialize(); server.Start();
+        NetworkRuntime.Instance = new NetworkRuntime();
+        var error = new Exception("lifetime handoff failure");
+        RuntimeLifetimeRequested = () => throw error;
+        var thrown = Assert.Throws<TargetInvocationException>(() => Invoke(machine, "OnDestroy"));
+        Assert.Same(error, thrown.InnerException);
+        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
+    }
+
+    [Fact]
+    public void DestructionAfterRuntimeOwnerClearedDoesNotRequireRuntime()
+    {
+        Initialize(); server.Start();
+        NetworkRuntime.Instance = null;
+        Invoke(machine, "OnDestroy");
+        Assert.False(Lifecycle.RequiresHostLifetimeCleanup);
+        Assert.DoesNotContain("runtime:lifetime", Trace);
+    }
+
+    [Fact]
+    public void EssentialLifetimeCleanupFailureDoesNotChangePhase()
+    {
+        Initialize(); server.Start(); server.Ready();
+        var error = new Exception("essential lifetime cleanup failure");
+        Clearing = () => throw error;
+        Assert.Same(error, Assert.Throws<Exception>(() => Lifecycle.CleanupHostForLifetime()));
+        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
     }
 
     private sealed class TestTransport : TransportServer

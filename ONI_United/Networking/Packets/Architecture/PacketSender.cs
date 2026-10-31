@@ -168,7 +168,7 @@ namespace ONI_United.Networking.Packets.Architecture
 			byteTotals[packetId] = runningTotal;
 
 			bool atCapacity = false;
-			if (NetworkRuntime.IsLanConfig())
+			if (NetworkRuntime.IsLan)
 			{
 				float maxSize = MAX_PACKET_SIZE_LAN * 1024f;
 				if (runningTotal >= maxSize)

@@ -40,7 +40,7 @@ namespace ONI_United.UI.Multiplayer.Views
             else if (SteamLobby.InLobby)
             { status = "In a Steam lobby; gameplay connection is not confirmed."; role = "Role: lobby member"; }
             else { status = "No active multiplayer session."; role = "Role: none"; }
-            view.SetState(status, role, $"Transport: {NetworkRuntime.transport}",
+            view.SetState(status, role, $"Transport: {(NetworkRuntime.IsSteam ? "STEAMWORKS" : "LITENETLIB")}",
                 Lifecycle.HasHostOperation,
                 GameClient.State == ClientState.Connecting);
             players.Clear();

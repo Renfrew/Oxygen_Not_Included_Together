@@ -152,7 +152,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if(!NetworkRuntime.IsSteamConfig())
+			if(!NetworkRuntime.IsSteam)
 				return;
 
             if (Lifecycle.HasHostOperation)
@@ -210,8 +210,8 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "host", NetworkRuntime.GetLocalID().ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "hostname", SteamFriends.GetPersonaName());
 
-				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", ((int)NetworkRuntime.transport).ToString());
-				if (NetworkRuntime.IsLanConfig())
+				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", NetworkRuntime.IsSteam ? "0" : "1");
+				if (NetworkRuntime.IsLan)
 				{
 					string address = Configuration.Instance.Host.LanSettings.GetHashedAddress();
 					DebugConsole.Log($"[SteamLobby] Detected Lan config! Hashed address: {address}");
@@ -358,7 +358,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			List<CSteamID> members = new List<CSteamID>();
 
-			if (!NetworkRuntime.IsSteamConfig()) return members;
+			if (!NetworkRuntime.IsSteam) return members;
 
 			if (!InLobby) return members;
 
@@ -455,7 +455,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkRuntime.IsSteamConfig())
+			if (!NetworkRuntime.IsSteam)
 				return false; // Default to invalid as these don't have passwords yet
 
 			string storedHash = SteamMatchmaking.GetLobbyData(lobbyId.AsCSteamID(), "password_hash");
@@ -538,7 +538,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkRuntime.IsSteamConfig())
+			if (!NetworkRuntime.IsSteam)
 				return;
 
 			if (!InLobby || !MultiplayerSession.IsHost)
@@ -560,7 +560,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_alive", aliveCount.ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_count", totalCount.ToString());
 
-				if (!NetworkRuntime.transport.Equals(NetworkRuntime.NetworkTransport.STEAMWORKS))
+				if (!NetworkRuntime.IsSteam)
 				{
                     SteamMatchmaking.SetLobbyData(CurrentLobby, "host_ping_location", "???");
                     return;

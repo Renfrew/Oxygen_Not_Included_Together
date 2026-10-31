@@ -70,8 +70,6 @@ namespace ONI_United
 
 			ReadyManager.SetupListeners();
 
-			NetworkRuntime.ApplyConfiguredTransport();
-
 			var versionChecker = new PVersionCheck();
 			versionChecker.Register(this, new SteamVersionChecker());
 
@@ -86,6 +84,7 @@ namespace ONI_United
             base.OnAllModsLoaded(harmony, mods);
 			PacketRegistry.RegisterDefaults();
             Lifecycle.Initialize();
+			NetworkRuntime.Initialize();
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
 #endif

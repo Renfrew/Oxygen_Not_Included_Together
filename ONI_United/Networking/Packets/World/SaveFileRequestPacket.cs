@@ -88,7 +88,7 @@ namespace ONI_United.Networking.Packets.World
 			TransferRuns[requester] = run;
 			try
 			{
-				if (!forceGeneric && NetworkRuntime.IsLanConfig() && NetworkRuntime.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
+				if (!forceGeneric && NetworkRuntime.IsLan && NetworkRuntime.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
 				{
 					int tcpPort = Configuration.Instance.Host.LanSettings.Port + 1;
 					lnlServer.TcpTransfer.QueueTransfer(requester, synchronizationId, fileName, snapshot);

@@ -386,7 +386,7 @@ namespace ONI_United.Misc
 	        using var _ = Profiler.Scope();
 
             string name;
-            if (NetworkRuntime.IsLanConfig())
+            if (NetworkRuntime.IsLan)
             {
                 LanSettings settings = Session.IsHost
                     ? Configuration.Instance.Host.LanSettings

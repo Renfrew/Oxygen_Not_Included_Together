@@ -10,10 +10,12 @@ namespace Shared.Tests.Networking
         internal static readonly List<string> Trace = new();
         internal static Action Registered;
         internal static Action Clearing;
+        internal static Action RuntimeLifetimeRequested;
         internal static bool RegistrationSucceeds = true;
         internal static void Reset()
         {
-            Trace.Clear(); Registered = null; Clearing = null;
+            Trace.Clear(); Registered = null; Clearing = null; RuntimeLifetimeRequested = null;
+            ONI_United.Core.NetworkRuntime.Instance = null;
             RegistrationSucceeds = true; Session.Reset();
             LoadScreen.Loaded.Clear();
             ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Disconnected;
@@ -88,10 +90,17 @@ namespace ONI_United.Networking.Sessions
 }
 namespace ONI_United.Core
 {
-    public static class NetworkRuntime
+    public sealed class NetworkRuntime
     {
+        public static NetworkRuntime Instance;
         public static Networking.Transport.TransportServer TransportServer;
         public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
+        // A handoff spy only: production NetworkRuntime coordination is not copied here.
+        internal void DisposeHostForLifetime()
+        {
+            Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("runtime:lifetime");
+            Shared.Tests.Networking.LifecycleTestEnvironment.RuntimeLifetimeRequested?.Invoke();
+        }
     }
 }
 public static class LoadScreen

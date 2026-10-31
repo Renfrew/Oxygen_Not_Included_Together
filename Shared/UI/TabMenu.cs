@@ -7,7 +7,18 @@ namespace Shared.UI
     {
         [SerializeField] private KScreen verticalLayout = null!;
 
+        public event System.Action<int, int> AfterTabActivated = null!;
+
         public KScreen GetContentPrefab() => verticalLayout;
+
+        public override void ActivateTab(int index)
+        {
+            int previous = PreviousActiveTab;
+            base.ActivateTab(index);
+            // Native onTabActivated runs before PreviousActiveTab is updated.
+            // Notify consumers afterward so synchronous synchronization/rollback is safe.
+            AfterTabActivated?.Invoke(index, previous);
+        }
 
         public void Initialize(KButton buttonPrefab)
         {

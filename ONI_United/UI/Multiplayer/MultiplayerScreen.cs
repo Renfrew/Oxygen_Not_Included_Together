@@ -5,6 +5,7 @@ using System.Collections;
 using Shared.UI;
 using UnityEngine;
 using ONI_United.Core;
+using ONI_United.DebugTools;
 
 namespace ONI_United.UI.Multiplayer
 {
@@ -106,6 +107,18 @@ namespace ONI_United.UI.Multiplayer
                 child = null;
                 UnityEngine.Object.Destroy(next.gameObject);
                 throw;
+            }
+        }
+
+        internal void SelectTransport(NetworkRuntime.NetworkTransport protocol)
+        {
+            try { NetworkRuntime.UpdateTransport(protocol); }
+            catch (Exception ex) { ModLog.Warning(ex.Message); }
+            finally
+            {
+                var root = parent ?? this;
+                root.join?.RefreshTransport();
+                root.child?.host?.RefreshTransport();
             }
         }
 

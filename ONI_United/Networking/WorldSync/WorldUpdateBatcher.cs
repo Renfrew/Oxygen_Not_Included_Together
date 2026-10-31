@@ -60,8 +60,8 @@ namespace ONI_United.Networking.WorldSync
                 return 0;
             }
 
-            bool isLan = NetworkRuntime.IsLanConfig();
-            bool isSteam = NetworkRuntime.IsSteamConfig();
+            bool isLan = NetworkRuntime.IsLan;
+            bool isSteam = NetworkRuntime.IsSteam;
 
             // Max packet sizes (bytes)
             float maxPacketSize =

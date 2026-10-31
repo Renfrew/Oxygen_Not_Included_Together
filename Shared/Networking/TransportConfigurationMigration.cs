@@ -12,18 +12,5 @@ namespace Shared.Networking
             _ => LiteNetLibTransport
         };
 
-        public static int NormalizeLanTransport(int transport) =>
-            transport == LiteNetLibTransport ? transport : LiteNetLibTransport;
-
-        public static bool NormalizeTransportSettings(ref int networkTransport, ref int lanTransport)
-        {
-            int normalizedNetworkTransport = NormalizeNetworkTransport(networkTransport);
-            int normalizedLanTransport = NormalizeLanTransport(lanTransport);
-            bool changed = normalizedNetworkTransport != networkTransport || normalizedLanTransport != lanTransport;
-
-            networkTransport = normalizedNetworkTransport;
-            lanTransport = normalizedLanTransport;
-            return changed;
-        }
     }
 }

@@ -28,7 +28,7 @@ public class MultiplayerPlayer : Player
 		if (playerId == MultiplayerSession.HostUserID)
 			readyState = ClientReadyState.Ready;
 		ProtocolVerified = IsLocal;
-		if(NetworkRuntime.IsLanConfig())
+		if(NetworkRuntime.IsLan)
 		{
             PlayerName = $"Player {playerId}";
             return;

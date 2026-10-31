@@ -1,7 +1,5 @@
-using System;
 using ONI_United.DebugTools;
 using UnityEngine;
-using ONI_United.Networking;
 
 namespace ONI_United.Core
 {
@@ -19,7 +17,7 @@ namespace ONI_United.Core
         }
         internal enum Event { Start, TransportStarted, SessionPrepared, Stop, Stopped }
 
-        private static Lifecycle instance;
+        private static Lifecycle instance = null!;
         private Phase current = Phase.Uninitialized;
 
         internal static Phase Current => instance.current;
@@ -37,15 +35,21 @@ namespace ONI_United.Core
             instance = this;
         }
 
+        private void OnDestroy()
+        {
+            if (ReferenceEquals(instance, this))
+                instance = null!;
+        }
+
         internal static void Initialize()
         {
             if (instance == null)
-                throw new InvalidOperationException("The Lifecycle component has not been attached.");
+                throw new System.InvalidOperationException("The Lifecycle component has not been attached.");
 
             instance.Transition(Phase.Idle);
         }
 
-        internal static bool Handle(Event evt, System.Action callback = null)
+        internal static bool Handle(Event evt, System.Action callback)
         {
             var owner = instance;
 
@@ -82,7 +86,7 @@ namespace ONI_United.Core
                 callback?.Invoke();
                 return true;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 DebugConsole.LogError($"[Lifecycle] Event {evt} failed in phase {Current}: {ex}");
                 throw;
@@ -109,28 +113,6 @@ namespace ONI_United.Core
         {
             current = next;
             DebugConsole.Log("[Lifecycle] " + next);
-        }
-
-        private static void DisposeHost()
-        {
-            if (!HasHostOperation) return;
-            // Lifetime release is immediate and repeat-safe, independent of another Update.
-            // Drop application continuations even if essential cleanup throws.
-            var server = NetworkRuntime.TransportServer;
-            try { EventAction(Event.Stop); }
-            finally { server.DisposeHost(); }
-        }
-
-        private void OnApplicationQuit()
-        {
-            if (ReferenceEquals(instance, this)) DisposeHost();
-        }
-
-        private void OnDestroy()
-        {
-            if (!ReferenceEquals(instance, this)) return;
-            try { DisposeHost(); }
-            finally { instance = null; }
         }
     }
 }

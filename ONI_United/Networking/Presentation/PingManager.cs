@@ -285,7 +285,7 @@ namespace ONI_United.Networking.Presentation
 		{
 			using var _ = Profiler.Scope();
 
-			if (NetworkRuntime.IsSteamConfig() && SteamFriends.HasFriend(playerID.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
+			if (NetworkRuntime.IsSteam && SteamFriends.HasFriend(playerID.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
 				return SteamFriends.GetFriendPersonaName(playerID.AsCSteamID());
 
 			var player = MultiplayerSession.GetPlayer(playerID);

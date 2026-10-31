@@ -1,7 +1,6 @@
 using System;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
-using ONI_United.Networking;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Sessions.States;
@@ -22,11 +21,10 @@ namespace ONI_United.UI.Multiplayer.Views
         private readonly SteamHostSettingsSection steamSettings;
         private readonly LanHostSettingsSection lanSettings;
         private KButton startButton;
-        private readonly int lanIndex;
+        private readonly int steamIndex, lanIndex;
         private bool disposed;
 
         internal KTabMenu Content => view;
-        private bool IsLan => view.PreviousActiveTab == lanIndex;
 
         internal MultiplayerHostView(MultiplayerScreen owner, MultiplayerDialogScreen dialog)
         {
@@ -47,18 +45,26 @@ namespace ONI_United.UI.Multiplayer.Views
 
             dialog.AddOption(HOSTMENU.BUTTONS.STARTHOSTING.TEXT, _ => StartLanHosting(),
                 out startButton, rightSide: false, accent: true);
-            int steamIndex = view.AddTab(JOINVIABUTTONS.STEAM.TEXT, steam);
+            steamIndex = view.AddTab(JOINVIABUTTONS.STEAM.TEXT, steam);
             lanIndex = view.AddTab(JOINVIABUTTONS.LAN.TEXT, lan);
-            view.onTabActivated += OnTabActivated;
-            view.ActivateTab(steamIndex);
+            view.ActivateTab(NetworkRuntime.IsLan ? lanIndex : steamIndex);
+            view.AfterTabActivated += OnTabActivated;
             Show(false);
         }
 
-        private bool CanStart => !disposed && IsLan && Utils.IsInGame() && Grid.CellCount > 0
+        private bool CanStart => !disposed && NetworkRuntime.IsLan && Utils.IsInGame() && Grid.CellCount > 0
             && !Session.IsActive && GameClient.State == ClientState.Disconnected
             && Lifecycle.Current == Lifecycle.Phase.Idle;
 
         internal void RefreshAvailability() => startButton.isInteractable = CanStart;
+
+        internal void RefreshTransport()
+        {
+            if (disposed) return;
+            int index = NetworkRuntime.IsLan ? lanIndex : steamIndex;
+            if (view.PreviousActiveTab != index) view.ActivateTab(index);
+            RefreshAvailability();
+        }
 
         private void StartLanHosting()
         {
@@ -76,15 +82,13 @@ namespace ONI_United.UI.Multiplayer.Views
 
             try
             {
-                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
                 if (!NetworkRuntime.TransportServer.Start(configure: () =>
                 {
                     var config = Configuration.Instance;
                     config.Host.LanSettings.Port = port;
                     config.Host.LanSettings.DisplayName = name;
                     config.Host.MaxLobbySize = maxPlayers;
-                    config.Host.NetworkTransport = (int)NetworkRuntime.NetworkTransport.LITENETLIB;
-                    config.Save();
+                    NetworkRuntime.SaveTransport();
                 })) ModLog.Warning("Host start is not permitted in the current lifecycle state.");
                 if (!disposed) screen.RefreshActiveView();
             }
@@ -103,7 +107,7 @@ namespace ONI_United.UI.Multiplayer.Views
             if (!show) StopEditing();
             playerSettings.gameObject.SetActive(show);
             view.Show(show);
-            if (show && view.PreviousActiveTab >= 0) view.ActivateTab(view.PreviousActiveTab);
+            if (show) view.ActivateTab(NetworkRuntime.IsLan ? lanIndex : steamIndex);
             startButton.gameObject.SetActive(show);
         }
 
@@ -111,6 +115,8 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             if (current == previous) return;
             StopEditing();
+            screen.SelectTransport(current == lanIndex
+                ? NetworkRuntime.NetworkTransport.LITENETLIB : NetworkRuntime.NetworkTransport.STEAMWORKS);
             RefreshAvailability();
         }
 
@@ -118,7 +124,7 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             if (disposed) return;
             disposed = true;
-            view.onTabActivated -= OnTabActivated;
+            view.AfterTabActivated -= OnTabActivated;
             players.Release();
             steamSettings.Release();
             lanSettings.Release();

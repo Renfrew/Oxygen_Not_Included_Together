@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
-using Shared.Networking;
 using Shared.Profiling;
 using UnityEngine;
 
@@ -103,14 +102,6 @@ namespace ONI_United
         {
             get => Client.TimeoutSeconds;
             set => Client.TimeoutSeconds = Mathf.Max(value, 30);
-        }
-
-        [Option("STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT", "STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
-        [JsonIgnore]
-        public LanTransportType LanTransport
-        {
-            get => Host.LanSettings.Transport;
-            set => Host.LanSettings.Transport = value;
         }
 
         [Option("STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME", "STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
@@ -235,19 +226,7 @@ namespace ONI_United
 
         public void Save()
         {
-            NormalizeTransportSettings();
             POptions.WriteSettings(this);
-        }
-
-        internal bool NormalizeTransportSettings()
-        {
-            int networkTransport = Host.NetworkTransport;
-            int lanTransport = (int)Host.LanSettings.Transport;
-            bool changed = TransportConfigurationMigration.NormalizeTransportSettings(ref networkTransport, ref lanTransport);
-
-            Host.NetworkTransport = networkTransport;
-            Host.LanSettings.Transport = (LanTransportType)lanTransport;
-            return changed;
         }
 
         public IEnumerable<IOptionsEntry> CreateOptions()
@@ -257,18 +236,13 @@ namespace ONI_United
 
         public void OnOptionsChanged()
         {
-            bool changed = NormalizeTransportSettings();
             Instance = this;
-
-            if (changed)
-                Save();
         }
     }
 
     [Serializable]
     public class HostSettings
     {
-        [JsonProperty] public int NetworkTransport { get; set; } = 0;
         [JsonProperty] public int MaxLobbySize { get; set; } = 4;
         [JsonProperty] public int MaxMessagesPerPoll { get; set; } = 128;
         [JsonProperty] public int SaveFileTransferChunkKB { get; set; } = 256;
@@ -328,6 +302,7 @@ namespace ONI_United
     [Serializable]
     public class NetworkSettings
     {
+        [JsonProperty] public int Transport { get; set; } = 0;
         [JsonProperty] public ulong PersistentUserId { get; set; } = 0;
         [JsonProperty] public bool EnablePacketQueue { get; set; } = false;
         [JsonProperty] public int MaxPacketsPerSecond { get; set; } = 500;
@@ -344,17 +319,11 @@ namespace ONI_United
         [JsonProperty] public string Region { get; set; } = "";
     }
 
-    public enum LanTransportType
-    {
-        LiteNetLib = 1
-    }
-
     [Serializable]
     public class LanSettings
     {
         [JsonProperty] public string Ip { get; set; } = "127.0.0.1";
         [JsonProperty] public int Port { get; set; } = 8080;
-        [JsonProperty] public LanTransportType Transport { get; set; } = LanTransportType.LiteNetLib;
         [JsonProperty] public string DisplayName { get; set; } = "";
 
         public string GetHashedAddress()

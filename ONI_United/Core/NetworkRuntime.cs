@@ -21,25 +21,6 @@ namespace ONI_United.Core
 {
     public class NetworkRuntime : MonoBehaviour
     {
-        public static NetworkRuntime Instance { get; private set; }
-
-        private void Awake()
-        {
-            if (Instance != null && !ReferenceEquals(Instance, this))
-            {
-                enabled = false;
-                Destroy(this);
-                return;
-            }
-            Instance = this;
-        }
-
-        private void OnDestroy()
-        {
-            if (ReferenceEquals(Instance, this))
-                Instance = null;
-        }
-
         public class PingRanges
         {
             // Anything less then degraded is considered good
@@ -52,11 +33,42 @@ namespace ONI_United.Core
             STEAMWORKS = 0,
             LITENETLIB = 1
         }
-        public static NetworkTransport transport { get; private set; } = NetworkTransport.LITENETLIB;
 
-        public static TransportServer TransportServer { get; set; } = new LiteNetLibServer();
-        public static TransportClient TransportClient { get; set; } = new LiteNetLibClient();
-        public static TransportPacketSender TransportPacketSender { get; set; } = new LiteNetLibPacketSender();
+        private static NetworkRuntime instance = null!;
+
+        public static NetworkRuntime Instance => instance;
+
+        private static NetworkTransport transport = NetworkTransport.LITENETLIB;
+
+        public static bool IsSteam => transport == NetworkTransport.STEAMWORKS;
+        public static bool IsLan => transport == NetworkTransport.LITENETLIB;
+
+        private void Awake()
+        {
+            if (instance != null && !ReferenceEquals(instance, this))
+            {
+                enabled = false;
+                Destroy(this);
+                return;
+            }
+            instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (!ReferenceEquals(instance, this)) return;
+            try { TransportServer.DisposeHost(); }
+            finally { instance = null!; }
+        }
+
+        public static void Initialize()
+        {
+            UpdateTransport((NetworkTransport)Configuration.Instance.Network.Transport);
+        }
+
+        public static TransportServer TransportServer { get; private set; } = new LiteNetLibServer();
+        public static TransportClient TransportClient { get; private set; } = new LiteNetLibClient();
+        public static TransportPacketSender TransportPacketSender { get; private set; } = new LiteNetLibPacketSender();
 
         public static readonly int LOBBY_SIZE_MIN = 2;
         public static readonly int LOBBY_SIZE_DEFAULT = 4;
@@ -131,33 +143,25 @@ namespace ONI_United.Core
             DebugConsole.Log($"Updated network transport to: {newTransport.ToString()}");
         }
 
-        public static void ApplyConfiguredTransport()
+        public static void SaveTransport()
         {
-            Configuration config = Configuration.Instance;
-            config.NormalizeTransportSettings();
-            UpdateTransport((NetworkTransport)config.Host.NetworkTransport);
+            Configuration.Instance.Network.Transport = (int)transport;
+            Configuration.Instance.Save();
         }
 
-        public static void UpdateLanTransport()
-        {
-            Configuration config = Configuration.Instance;
-            config.NormalizeTransportSettings();
-            UpdateTransport((NetworkTransport)config.Host.LanSettings.Transport);
-        }
-
-        public static TransportServer GetTransportServer()
+        private static TransportServer GetTransportServer()
         {
             using var _ = Profiler.Scope();
             return TransportRegistry.GetTransport((TransportProtocol)transport).CreateServer();
         }
 
-        public static TransportClient GetTransportClient()
+        private static TransportClient GetTransportClient()
         {
             using var _ = Profiler.Scope();
             return TransportRegistry.GetTransport((TransportProtocol)transport).CreateClient();
         }
 
-        public static TransportPacketSender GetTransportPacketSender()
+        private static TransportPacketSender GetTransportPacketSender()
         {
             using var _ = Profiler.Scope();
             return TransportRegistry.GetTransport((TransportProtocol)transport).CreatePacketSender();
@@ -176,20 +180,6 @@ namespace ONI_United.Core
                 default:
                     return Utils.NilUlong();
             }
-        }
-
-        public static bool IsSteamConfig()
-        {
-            using var _ = Profiler.Scope();
-
-            return transport.Equals(NetworkTransport.STEAMWORKS);
-        }
-
-        public static bool IsLanConfig()
-        {
-            using var _ = Profiler.Scope();
-
-            return transport.Equals(NetworkTransport.LITENETLIB);
         }
 
         public static int GetMaxServerCapacity()
@@ -267,7 +257,7 @@ namespace ONI_United.Core
 
         private void Update()
         {
-            if (!ReferenceEquals(Instance, this)) return;
+            if (!ReferenceEquals(instance, this)) return;
 
             using var _ = Profiler.Scope();
 
@@ -304,19 +294,6 @@ namespace ONI_United.Core
                 }
             }
             TransportPacketSender.Flush();
-        }
-
-        private void OnApplicationQuit()
-        {
-            if (!ReferenceEquals(Instance, this)) return;
-
-            using var _ = Profiler.Scope();
-
-            // Lifecycle owns host disposal for both protocols; retain client shutdown.
-            if (!MultiplayerSession.InActiveSession
-                || Lifecycle.HasHostOperation)
-                return;
-            Stop();
         }
     }
 }

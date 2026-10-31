@@ -27,7 +27,7 @@ public static class SaveHelper
 	{
 		get
 		{
-			int minChunkKB = NetworkRuntime.IsLanConfig() ? 1 : 64;
+			int minChunkKB = NetworkRuntime.IsLan ? 1 : 64;
 			return Math.Max(minChunkKB, Configuration.GetHostProperty<int>("SaveFileTransferChunkKB"));
 		}
 	}

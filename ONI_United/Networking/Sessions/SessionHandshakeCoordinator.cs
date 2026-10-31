@@ -156,7 +156,7 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        if (NetworkRuntime.IsSteamConfig()
+        if (NetworkRuntime.IsSteam
             && (!SteamLobby.InLobby
                 || !SteamLobby.GetAllLobbyMembers().Any(member => member.m_SteamID == transportPlayerId)))
         {

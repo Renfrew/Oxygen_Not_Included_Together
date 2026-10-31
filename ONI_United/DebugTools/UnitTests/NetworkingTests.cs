@@ -33,7 +33,7 @@ namespace ONI_United.DebugTools.UnitTests
         [UnitTest(name: "Using Steamworks Transport", category: "Networking")]
         public static UnitTestResult IsSteamTransport()
         {
-            if (NetworkRuntime.transport != NetworkRuntime.NetworkTransport.STEAMWORKS)
+            if (!NetworkRuntime.IsSteam)
                 return UnitTestResult.Fail("Transport is not Steamworks");
             return UnitTestResult.Pass("Transport is Steamworks");
         }
@@ -41,7 +41,7 @@ namespace ONI_United.DebugTools.UnitTests
         [UnitTest(name: "Using LiteNetLib Transport", category: "Networking")]
         public static UnitTestResult IsLiteNetLibTransport()
         {
-            if (NetworkRuntime.transport != NetworkRuntime.NetworkTransport.LITENETLIB)
+            if (!NetworkRuntime.IsLan)
                 return UnitTestResult.Fail("Transport is not LiteNetLib");
             return UnitTestResult.Pass("Transport is LiteNetLib");
         }
@@ -66,7 +66,7 @@ namespace ONI_United.DebugTools.UnitTests
             if (!MultiplayerSession.IsHost)
                 return UnitTestResult.Fail("Not host, TCP transfer server only runs on the host");
 
-            if (!NetworkRuntime.IsLanConfig())
+            if (!NetworkRuntime.IsLan)
                 return UnitTestResult.Fail("Not on LiteNetLib/LAN transport");
 
             if (NetworkRuntime.TransportServer is not LiteNetLibServer server)

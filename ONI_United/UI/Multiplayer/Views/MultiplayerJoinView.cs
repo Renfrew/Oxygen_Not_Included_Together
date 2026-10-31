@@ -17,6 +17,7 @@ namespace ONI_United.UI.Multiplayer.Views
     {
         private readonly MultiplayerScreen screen;
         private TabMenu view;
+        private readonly int steamIndex, lanIndex;
 
         private LobbySection steamLobby;
         private SteamJoinSection steamJoin;
@@ -65,10 +66,10 @@ namespace ONI_United.UI.Multiplayer.Views
             dialog.AddOption(HOSTGAMEBUTTON.TEXT, _ => owner.OpenHostSetup(), out hostButton, accent: false);
             hostButton.gameObject.SetActive(true);
 
-            view.AddTab(JOINVIABUTTONS.STEAM.TEXT, steam);
-            view.AddTab(JOINVIABUTTONS.LAN.TEXT, lan);
-            view.onTabActivated += OnTabActivated;
-            view.ActivateTab(0);
+            steamIndex = view.AddTab(JOINVIABUTTONS.STEAM.TEXT, steam);
+            lanIndex = view.AddTab(JOINVIABUTTONS.LAN.TEXT, lan);
+            view.ActivateTab(NetworkRuntime.IsLan ? lanIndex : steamIndex);
+            view.AfterTabActivated += OnTabActivated;
             Show(false);
         }
 
@@ -106,11 +107,12 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             if (!SteamJoiningVerified)
             { return; }
-            if (!CanJoinFromFrontend() || !global::SteamManager.Initialized)
+            if (!NetworkRuntime.IsSteam || !CanJoinFromFrontend()
+                || !global::SteamManager.Initialized || !IsValidLobbyCode(code))
             { return; }
             try
             {
-                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.STEAMWORKS);
+                NetworkRuntime.SaveTransport();
                 SteamLobby.JoinLobbyByCode(code, onJoined: lobby =>
                 {
                     if (disposed) return;
@@ -128,7 +130,7 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             string address = lanJoin.Address.Trim();
             string name = lanJoin.PlayerName.Trim();
-            if (Utils.IsInGame() || Grid.CellCount > 0)
+            if (!NetworkRuntime.IsLan || Utils.IsInGame() || Grid.CellCount > 0)
             { return; }
             if (Session.IsActive || GameClient.State != ClientState.Disconnected || Lifecycle.Current != Lifecycle.Phase.Idle)
             { return; }
@@ -141,13 +143,20 @@ namespace ONI_United.UI.Multiplayer.Views
                 config.Client.LanSettings.DisplayName = name;
                 config.Client.LanSettings.Ip = address;
                 config.Client.LanSettings.Port = port;
-                config.Save();
-                NetworkRuntime.UpdateLanTransport();
+                NetworkRuntime.SaveTransport();
                 GameClient.ConnectToHost(ip: address, port: port);
                 screen.RefreshActiveView();
             }
             catch (Exception ex) { ModLog.Warning(string.Format(JOINSECTIONS.CONNECTION_ERROR, ex.Message)); RefreshStatus(); }
         }
+        internal void RefreshTransport()
+        {
+            if (disposed) return;
+            int index = NetworkRuntime.IsLan ? lanIndex : steamIndex;
+            if (view.PreviousActiveTab != index) view.ActivateTab(index);
+            RefreshStatus();
+        }
+
         internal void RefreshStatus()
         {
             bool idle = CanJoinFromFrontend();
@@ -169,13 +178,15 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             if (!show) StopEditing();
             view.Show(show);
-            if (show && view.PreviousActiveTab >= 0) view.ActivateTab(view.PreviousActiveTab);
+            if (show) view.ActivateTab(NetworkRuntime.IsLan ? lanIndex : steamIndex);
             hostButton.gameObject.SetActive(show);
         }
         private void OnTabActivated(int current, int previous)
         {
             if (current == previous) return;
             StopEditing();
+            screen.SelectTransport(current == lanIndex
+                ? NetworkRuntime.NetworkTransport.LITENETLIB : NetworkRuntime.NetworkTransport.STEAMWORKS);
             RefreshStatus();
         }
         private void OnSteamEdited() { if (!disposed) RefreshStatus(); }
@@ -188,7 +199,7 @@ namespace ONI_United.UI.Multiplayer.Views
         {
             if (disposed) return;
             disposed = true;
-            view.onTabActivated -= OnTabActivated;
+            view.AfterTabActivated -= OnTabActivated;
             lanJoin.Release();
             steamJoin.Release();
             steamLobby.Release();

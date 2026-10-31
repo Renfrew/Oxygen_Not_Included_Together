@@ -108,7 +108,7 @@ namespace ONI_United.Networking.Packets.Core
 
 			DebugConsole.Log($"[ClientReadyStatusPacket] {SenderId} marked as {Status}");
 
-			if (NetworkRuntime.IsLanConfig() && nameChanged)
+			if (NetworkRuntime.IsLan && nameChanged)
 			{
 				OxySyncChat.AddSystemMessage(
 					string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));

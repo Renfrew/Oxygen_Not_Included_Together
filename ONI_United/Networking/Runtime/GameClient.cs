@@ -230,11 +230,11 @@ namespace ONI_United.Networking.Runtime
 			if (showLoadingScreen)
 			{
 				string hostName = "uknown host";
-				if (NetworkRuntime.IsSteamConfig())
+				if (NetworkRuntime.IsSteam)
 				{
 					hostName = SteamFriends.GetFriendPersonaName(MultiplayerSession.HostUserID.AsCSteamID());
                 }
-				else if (NetworkRuntime.IsLanConfig())
+				else if (NetworkRuntime.IsLan)
 				{
 					hostName = $"{ip}:{port}";
                 }

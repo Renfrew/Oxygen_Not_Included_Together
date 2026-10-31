@@ -168,13 +168,13 @@ namespace ONI_United
                     : $"{baseName} — Cycle {cycle} with {dupeCount} dupes";
 
                 string role = MultiplayerSession.IsHost ? "Hosting" : "Playing";
-                string transport = NetworkRuntime.IsSteamConfig() ? "Steam" : "LAN";
+                string transport = NetworkRuntime.IsSteam ? "Steam" : "LAN";
                 presence.State = $"{role} over {transport}";
 
                 string party_id = "oni_together_session";
                 bool isPublic = false;
                 
-                if (_client.HasRegisteredUriScheme && NetworkRuntime.IsSteamConfig() && SteamLobby.InLobby)
+                if (_client.HasRegisteredUriScheme && NetworkRuntime.IsSteam && SteamLobby.InLobby)
                 {
                     party_id = $"{SteamLobby.CurrentLobby.m_SteamID}";
                     string visibility = SteamMatchmaking.GetLobbyData(SteamLobby.CurrentLobby, "visibility");

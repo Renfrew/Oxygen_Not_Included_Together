@@ -75,7 +75,7 @@ namespace ONI_United.Networking.Packets.Social
 				return;
 
             string senderName = SenderName;
-            if (NetworkRuntime.IsSteamConfig() && SteamFriends.HasFriend(SenderId.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
+            if (NetworkRuntime.IsSteam && SteamFriends.HasFriend(SenderId.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
 			{
 				// Update the sender name to what we have them named as on our friends list
                 senderName = SteamFriends.GetFriendPersonaName(SenderId.AsCSteamID());

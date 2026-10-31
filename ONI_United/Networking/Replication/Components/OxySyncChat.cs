@@ -123,7 +123,7 @@ public class OxySyncChat : NetworkBehaviour
             return;
 
         string senderName = playerName;
-        if (NetworkRuntime.IsSteamConfig())
+        if (NetworkRuntime.IsSteam)
         {
             CSteamID cSteamId = playerId.AsCSteamID();
             if (SteamFriends.HasFriend(cSteamId, EFriendFlags.k_EFriendFlagImmediate))
