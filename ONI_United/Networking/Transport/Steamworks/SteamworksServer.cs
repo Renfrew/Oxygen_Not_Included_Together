@@ -6,9 +6,7 @@ using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using ONI_United.Networking.Replication.Components;
 using Steamworks;
-using ONI_United;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport;
 using ONI_United.Core;
 
 namespace ONI_United.Networking.Transport.Steamworks
@@ -146,10 +144,8 @@ namespace ONI_United.Networking.Transport.Steamworks
             foreach (var id in new List<uint>(_clientIdsByConnection.Keys))
             {
                 var connection = new HSteamNetConnection(id);
-                if (SteamNetworkingSockets.CloseConnection(connection, 0, "Shutdown", false)
-                    || !SteamNetworkingSockets.GetConnectionInfo(connection, out var _))
-                    _clientIdsByConnection.Remove(id);
-                else throw new InvalidOperationException("Steam did not confirm connection release: " + id);
+                if (!CloseConnection(connection, "Shutdown"))
+                    throw new InvalidOperationException("Steam did not confirm connection release: " + id);
             }
         }
 
@@ -206,27 +202,36 @@ namespace ONI_United.Networking.Transport.Steamworks
             var messages = new IntPtr[maxMessagesPerPoll];
             int msgCount = SteamNetworkingSockets.ReceiveMessagesOnPollGroup(PollGroup, messages, maxMessagesPerPoll);
 
-            for (int i = 0; i < msgCount; i++)
+            try
             {
-                var msg = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messages[i]);
-                totalBytes += msg.m_cbSize;
-                byte[] bytes = new byte[msg.m_cbSize];
-                Marshal.Copy(msg.m_pData, bytes, 0, msg.m_cbSize);
-
-                try
+                for (int i = 0; i < msgCount; i++)
                 {
-                    HSteamNetConnection connection = msg.m_conn;
-                    if (_clientIdsByConnection.TryGetValue(connection.m_HSteamNetConnection, out ulong senderId))
-                        PacketHandler.HandleIncoming(bytes, senderId, connection);
-                    else
-                        DebugConsole.LogWarning("[SteamworksServer] Received data from an untracked Steam connection.");
-                }
-                catch (Exception ex)
-                {
-                    DebugConsole.LogWarning($"[SteamworksServer] Rejected invalid incoming packet: {ex}");
-                }
+                    var msg = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messages[i]);
+                    totalBytes += msg.m_cbSize;
+                    byte[] bytes = new byte[msg.m_cbSize];
+                    Marshal.Copy(msg.m_pData, bytes, 0, msg.m_cbSize);
 
-                SteamNetworkingMessage_t.Release(messages[i]);
+                    try
+                    {
+                        HSteamNetConnection connection = msg.m_conn;
+                        if (_clientIdsByConnection.TryGetValue(connection.m_HSteamNetConnection, out ulong senderId))
+                            PacketHandler.HandleIncoming(bytes, senderId, connection);
+                        else
+                            DebugConsole.LogWarning("[SteamworksServer] Received data from an untracked Steam connection.");
+                    }
+                    catch (Exception ex)
+                    {
+                        DebugConsole.LogWarning($"[SteamworksServer] Rejected invalid incoming packet: {ex}");
+                    }
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < msgCount; i++)
+                {
+                    if (messages[i] != IntPtr.Zero)
+                        SteamNetworkingMessage_t.Release(messages[i]);
+                }
             }
             scope.End(msgCount, totalBytes);
         }
@@ -246,17 +251,19 @@ namespace ONI_United.Networking.Transport.Steamworks
             switch (state)
             {
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting:
+                    _clientIdsByConnection[conn.m_HSteamNetConnection] = clientId.m_SteamID;
                     if (!Session.IsHost || Lifecycle.Current != Lifecycle.Phase.Hosting)
                     {
-                        SteamNetworkingSockets.CloseConnection(conn, 0, "Host is not admitting players", false);
+                        CloseConnection(conn, "Host is not admitting players");
                         break;
                     }
-                    _clientIdsByConnection[conn.m_HSteamNetConnection] = clientId.m_SteamID;
                     TryAcceptConnection(conn, clientId);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected:
-                    OnClientConnected(conn, clientId);
+                    // A queued Connected notification must not restore a locally retired handle.
+                    if (_clientIdsByConnection.ContainsKey(conn.m_HSteamNetConnection))
+                        OnClientConnected(conn, clientId);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer:
@@ -275,6 +282,8 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (!SteamNetworkingSockets.GetConnectionInfo(conn, out info))
             {
                 DebugConsole.LogWarning($"[SteamworksServer] TryAcceptConnection: Could not get connection info for {clientId}");
+                CloseConnection(conn, "Connection info is unavailable");
+                return;
             }
             else
             {
@@ -291,7 +300,12 @@ namespace ONI_United.Networking.Transport.Steamworks
             var result = SteamNetworkingSockets.AcceptConnection(conn);
             if (result == EResult.k_EResultOK)
             {
-                SteamNetworkingSockets.SetConnectionPollGroup(conn, PollGroup);
+                if (!SteamNetworkingSockets.SetConnectionPollGroup(conn, PollGroup))
+                {
+                    RejectConnection(conn, clientId,
+                        $"Poll-group assignment failed (connection {conn.m_HSteamNetConnection}, poll group {PollGroup.m_HSteamNetPollGroup})");
+                    return;
+                }
                 DebugConsole.Log($"[SteamworksServer] Connection accepted from {clientId}");
             }
             else
@@ -313,7 +327,24 @@ namespace ONI_United.Networking.Transport.Steamworks
             using var _ = Profiler.Scope();
 
             DebugConsole.LogError($"[SteamworksServer] Rejecting connection from {clientId}: {reason}", false);
-            SteamNetworkingSockets.CloseConnection(conn, 0, reason, false);
+            CloseConnection(conn, reason);
+        }
+
+        private static bool CloseConnection(HSteamNetConnection connection, string reason)
+        {
+            if (!SteamNetworkingSockets.CloseConnection(connection, 0, reason, false)
+                && SteamNetworkingSockets.GetConnectionInfo(connection, out var _))
+            {
+                DebugConsole.LogWarning($"[SteamworksServer] Steam did not confirm connection release: {connection.m_HSteamNetConnection}");
+                return false;
+            }
+
+            if (_clientIdsByConnection.TryGetValue(connection.m_HSteamNetConnection, out ulong playerId))
+            {
+                _clientIdsByConnection.Remove(connection.m_HSteamNetConnection);
+                MultiplayerSession.UnregisterClient(playerId, null, connection);
+            }
+            return true;
         }
 
         private static void OnClientConnected(HSteamNetConnection conn, CSteamID clientId)
@@ -331,10 +362,9 @@ namespace ONI_United.Networking.Transport.Steamworks
                 }
             }
 
-            bool alreadyAdmitted = MultiplayerSession.ConnectedPlayers.ContainsKey(clientId.m_SteamID);
-            if (duplicateConnection || alreadyAdmitted)
+            if (duplicateConnection)
             {
-                SteamNetworkingSockets.CloseConnection(conn, 0, "Duplicate session identity", false);
+                CloseConnection(conn, "Duplicate session identity");
                 return;
             }
 
@@ -349,10 +379,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         {
             using var _ = Profiler.Scope();
 
-            SteamNetworkingSockets.CloseConnection(conn, 0, null, false);
-            _clientIdsByConnection.Remove(conn.m_HSteamNetConnection);
-
-            MultiplayerSession.UnregisterClient(clientId.m_SteamID, null, conn);
+            if (!CloseConnection(conn, null)) return;
 
             DebugConsole.Log($"[SteamworksServer] Connection closed for {clientId}");
 
@@ -370,7 +397,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         public override void DisconnectConnection(object connection, string reason)
         {
             if (connection is HSteamNetConnection steamConnection)
-                SteamNetworkingSockets.CloseConnection(steamConnection, 0, reason, false);
+                CloseConnection(steamConnection, reason);
         }
 
         public override void KickClient(ulong clientId)
@@ -391,7 +418,7 @@ namespace ONI_United.Networking.Transport.Steamworks
             {
                 DebugConsole.Log($"[SteamworksServer] Kicking client {clientId}");
 
-                MultiplayerSession.UnregisterClient(clientId, CreateCloseFunc("Kicked by host"), conn);
+                CloseConnection(conn, "Kicked by host");
             }
             else
             {
@@ -399,13 +426,5 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
         }
 
-        private static Action<object> CreateCloseFunc(string reason)
-        {
-            return connection =>
-            {
-                if (connection is HSteamNetConnection conn)
-                    SteamNetworkingSockets.CloseConnection(conn, 0, reason, false);
-            };
-        }
     }
 }

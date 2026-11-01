@@ -63,8 +63,17 @@ namespace ONI_United.Core
 
         public static void Initialize()
         {
+            if (instance == null)
+                throw new System.InvalidOperationException("The NetworkRuntime component has not been attached.");
+
             EnsurePersistentUserId();
             UpdateTransport((NetworkTransport)Configuration.Instance.Network.Transport);
+
+            if (SteamManager.Initialized)
+            {
+                SteamLobby.Initialize();
+                SteamNetworkingUtils.InitRelayNetworkAccess();
+            }
         }
 
         internal static void EnsurePersistentUserId()

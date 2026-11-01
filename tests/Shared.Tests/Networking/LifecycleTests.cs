@@ -47,7 +47,7 @@ public sealed class LifecycleTests : IDisposable
             Lifecycle.Phase? destination = (phase, evt) switch
             {
                 (Lifecycle.Phase.Idle, Lifecycle.Event.Start) => Lifecycle.Phase.StartingHost,
-                (Lifecycle.Phase.StartingHost, Lifecycle.Event.TransportStarted) => Lifecycle.Phase.PrepareSession,
+                (Lifecycle.Phase.StartingHost, Lifecycle.Event.TransportStarted) => Lifecycle.Phase.Hosting,
                 (Lifecycle.Phase.PrepareSession, Lifecycle.Event.SessionPrepared) => Lifecycle.Phase.Hosting,
                 (Lifecycle.Phase.StartingHost or Lifecycle.Phase.PrepareSession or Lifecycle.Phase.Hosting or Lifecycle.Phase.Stopping,
                     Lifecycle.Event.Stop) => Lifecycle.Phase.Stopping,
@@ -116,6 +116,21 @@ public sealed class LifecycleTests : IDisposable
             "tick:start", "protocol:start", "[Lifecycle] PrepareSession", "session:start",
             "[Lifecycle] Hosting", "color:Hosting", "protocol:admitted" }, Trace);
         Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted, () => throw new Exception("rejected readiness callback")));
+    }
+
+    [Fact]
+    public void TransportStartedActionPreparesSessionAndCompletesWithoutTransportCallback()
+    {
+        Initialize(); Start();
+        Registered = () => Assert.Equal(Lifecycle.Phase.PrepareSession, Lifecycle.Current);
+
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.TransportStarted, null));
+
+        Assert.True(Session.IsHost);
+        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted, null));
+        Assert.Single(Trace, line => line == "session:start");
+        Assert.Single(Trace, line => line == "color:Hosting");
     }
 
     [Fact]

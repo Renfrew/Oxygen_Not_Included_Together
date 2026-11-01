@@ -95,6 +95,6 @@ internal sealed class SessionHandshakePacket : IPacket, IAllowedWithoutWorldPack
     internal bool HasValidMetadata =>
         !string.IsNullOrWhiteSpace(ModVersion)
         && !string.IsNullOrWhiteSpace(PlayerName)
-        && PlayerName.Length <= SessionHandshakeRules.MaximumPlayerNameLength
+        && PlayerName.Length <= Session.MaximumPlayerNameLength
         && RejectionReason.Length <= 256;
 }

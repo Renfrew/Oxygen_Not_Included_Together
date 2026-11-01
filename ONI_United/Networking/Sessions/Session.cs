@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using ONI_United.Core;
 
 namespace ONI_United.Networking.Sessions;
 
 internal static class Session
 {
+    internal const int MaximumPlayerNameLength = 64;
+
     private static readonly Dictionary<ulong, Player> players = [];
     private static readonly ReadOnlyDictionary<ulong, Player> readOnlyPlayers = new(players);
 
@@ -37,6 +40,22 @@ internal static class Session
         LocalPlayerId = local.PlayerId;
         HostPlayerId = host.PlayerId;
         return true;
+    }
+
+    // Admission creates logical membership only, without gameplay readiness.
+    internal static bool TryAdmitPlayer(ulong clientId, string playerName)
+    {
+        if (!IsHost || clientId == 0 || clientId == HostPlayerId
+            || players.ContainsKey(clientId)
+            || players.Count >= NetworkRuntime.GetMaxServerCapacity()
+            || string.IsNullOrWhiteSpace(playerName)
+            || playerName.Length > MaximumPlayerNameLength)
+            return false;
+
+        foreach (char character in playerName)
+            if (char.IsControl(character)) return false;
+
+        return TryAddPlayer(new Player(clientId, playerName.Trim()));
     }
 
     internal static bool TryAddPlayer(Player player)

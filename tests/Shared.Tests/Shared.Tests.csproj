@@ -31,6 +31,15 @@
     <Compile Include="../../ONI_United/Core/Lifecycle.cs" Link="Core/Lifecycle.cs" />
     <Compile Include="../../ONI_United/Core/LifecycleEventActions.cs" Link="Core/LifecycleEventActions.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/TransportServer.cs" Link="Networking/TransportServer.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/ServerTransport.cs" Link="Networking/ServerTransport.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/ClientTransport.cs" Link="Networking/ClientTransport.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksClientDraft.cs" Link="Networking/SteamworksClientDraft.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksServerDraft.cs" Link="Networking/SteamworksServerDraft.cs" />
+    <Compile Include="../../ONI_United/Networking/Transport/LiteNetLib/LiteNetLibServerDraft.cs" Link="LAN/LiteNetLibServerDraft.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakePacket.cs" Link="LAN/SessionHandshakePacket.cs" />
+    <Compile Include="../../ONI_United/Networking/Packets/Architecture/PacketSerialization.cs" Link="LAN/PacketSerialization.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/IPacket.cs" Link="LAN/IPacket.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/IAllowedWithoutWorldPacket.cs" Link="LAN/IAllowedWithoutWorldPacket.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/States/ClientState.cs" Link="Networking/ClientState.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Player.cs" Link="Networking/Sessions/Player.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Session.cs" Link="Networking/Sessions/Session.cs" />

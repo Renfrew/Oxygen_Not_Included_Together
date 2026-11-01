@@ -8,7 +8,6 @@ using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Transport.Steamworks;
 using PeterHan.PLib.AVC;
 using System;
 using System.Collections.Generic;
@@ -73,7 +72,6 @@ namespace ONI_United
 			versionChecker.Register(this, new SteamVersionChecker());
 
 			base.OnLoad(harmony);
-			SteamLobby.Initialize();
         }
 
 		public override void OnAllModsLoaded(Harmony harmony, IReadOnlyList<Mod> mods)

@@ -24,6 +24,10 @@ namespace ONI_United.Core
         {
             if (!MultiplayerSession.RegisterAsHost())
                 throw new InvalidOperationException("The local host Session could not be registered.");
+
+            // Registration can synchronously Stop; the transition guard decides
+            // whether preparation may still complete.
+            Lifecycle.Handle(Lifecycle.Event.SessionPrepared, null);
         }
 
         internal static void SessionPrepared()

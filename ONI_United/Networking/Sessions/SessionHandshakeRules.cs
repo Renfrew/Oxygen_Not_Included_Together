@@ -4,8 +4,6 @@ namespace ONI_United.Networking.Sessions;
 
 internal static class SessionHandshakeRules
 {
-    internal const int MaximumPlayerNameLength = 64;
-
     internal static bool TryValidateClient(
         ulong claimedPlayerId,
         ulong transportPlayerId,
@@ -29,7 +27,7 @@ internal static class SessionHandshakeRules
             rejectionReason = "Player identity is already in this session.";
         else if (string.IsNullOrWhiteSpace(playerName))
             rejectionReason = "A player name is required.";
-        else if (playerName.Length > MaximumPlayerNameLength)
+        else if (playerName.Length > Session.MaximumPlayerNameLength)
             rejectionReason = "Player name is too long.";
         else
         {

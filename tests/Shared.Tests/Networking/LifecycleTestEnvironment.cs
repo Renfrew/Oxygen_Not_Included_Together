@@ -15,6 +15,7 @@ namespace Shared.Tests.Networking
         {
             Trace.Clear(); Registered = null; Clearing = null;
             RegistrationSucceeds = true; Session.Reset();
+            ONI_United.Core.NetworkRuntime.ServerCapacity = 16;
             ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Disconnected;
         }
     }
@@ -32,6 +33,7 @@ namespace ONI_United.DebugTools
     public static class DebugConsole
     {
         public static void Log(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
+        public static void LogWarning(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
         public static void LogError(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
     }
 }
@@ -67,6 +69,7 @@ namespace ONI_United.Networking.Sessions
 {
     public static class MultiplayerSession
     {
+        public static ulong HostUserID { get; set; }
         public static bool RegisterAsHost()
         {
             var env = Shared.Tests.Networking.LifecycleTestEnvironment.Trace;
@@ -89,6 +92,8 @@ namespace ONI_United.Core
     public sealed class NetworkRuntime
     {
         public static Networking.Transport.TransportServer TransportServer;
+        internal static int ServerCapacity = 16;
+        public static int GetMaxServerCapacity() => ServerCapacity;
         public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
         // Host admission substitute only; production NetworkRuntime is not source-linked.
         public static void Stop()

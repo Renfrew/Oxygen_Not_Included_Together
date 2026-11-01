@@ -25,12 +25,9 @@ namespace ONI_United.Networking.Transport
         {
             Lifecycle.Handle(Lifecycle.Event.TransportStarted, () =>
             {
-                // Registration notifications may synchronously Stop. Admission of the
-                // following event, rather than a duplicate phase check, decides completion.
-                Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () =>
-                {
+                // Preparation owns SessionPrepared. Registration may synchronously Stop.
+                if (Lifecycle.Current == Lifecycle.Phase.Hosting)
                     OnSessionPlayerAdmitted(Session.LocalPlayerId);
-                });
             });
         }
 
