@@ -12,7 +12,7 @@ namespace ONI_United.Core
         internal static object? OperationTransport { get; private set; }
         internal static bool HasActiveOperation => ActiveOperation != null;
         internal static bool HasHostOperation => HasActiveOperation && OperationTransport is TransportServer;
-        internal static bool HasClientOperation => HasActiveOperation && OperationTransport is ClientTransport;
+        internal static bool HasClientOperation => HasActiveOperation && OperationTransport is TransportClient;
 
         internal static bool IsCurrentOperation(object? owner, object? operation) =>
             operation != null && ReferenceEquals(operation, ActiveOperation)
@@ -51,44 +51,6 @@ namespace ONI_United.Core
             if (IsCurrentOperation(owner, operation) && Lifecycle.Current == Lifecycle.Phase.StartingHost)
                 owner.Start();
         }
-
-        internal static bool ConnectClient(ClientTransport owner, System.Action connect) =>
-            ReferenceEquals(owner, TransportClient)
-            && Lifecycle.Handle(Lifecycle.Event.Join, connect);
-
-        internal static bool DisconnectClient(ClientTransport owner, System.Action disconnect)
-        {
-            var operation = ActiveOperation;
-            if (!IsCurrentOperation(owner, operation)) return false;
-            return Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () =>
-            {
-                if (IsCurrentOperation(owner, operation)) disconnect();
-            });
-        }
-
-        internal static bool PollClient(ClientTransport owner, System.Action poll)
-        {
-            var operation = ActiveOperation;
-            if (!IsCurrentOperation(owner, operation)) return false;
-            return Lifecycle.Handle(Lifecycle.Event.PollClient, () =>
-            {
-                if (IsCurrentOperation(owner, operation)) poll();
-            });
-        }
-
-        internal static bool ClientTransportConnected(ClientTransport owner, System.Action notify)
-        {
-            var operation = ActiveOperation;
-            if (!IsCurrentOperation(owner, operation)) return false;
-            return Lifecycle.Handle(Lifecycle.Event.PrepareClientSession, () =>
-            {
-                if (IsCurrentOperation(owner, operation)) notify();
-            });
-        }
-
-        internal static bool ClientTransportDisconnected(ClientTransport owner, object? operation, System.Action notify) =>
-            IsCurrentOperation(owner, operation)
-            && Lifecycle.Handle(Lifecycle.Event.SessionCleared, notify);
 
         internal static bool HostSessionReady(TransportServer owner, object? operation) =>
             IsCurrentOperation(owner, operation) && Lifecycle.Handle(Lifecycle.Event.HostSessionReady);
@@ -129,31 +91,33 @@ namespace ONI_United.Core
                 if (IsCurrentOperation(owner, operation)) owner.OnRequestStateOrReturn?.Invoke();
             });
 
-        public static void DisconnectClient() => TransportClient.Disconnect();
-
-        internal static void CleanupClientTransport(TransportClient owner, object? operation, System.Action completed)
+        public static void DisconnectClient()
         {
-            if (!IsCurrentOperation(owner, operation))
-                throw new InvalidOperationException("Client cleanup was requested without owning the active operation.");
-
-            if (!owner.TryStop(out string error))
+            var owner = TransportClient;
+            var operation = ActiveOperation;
+            Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () =>
             {
-                DebugConsole.LogError("[NetworkRuntime] Client cleanup remains unresolved: " + error);
-                return;
-            }
-            if (!IsCurrentOperation(owner, operation)) return;
-            if (IsSteam && !SteamLobby.TryReleaseClientLobby(out error, (success, failure) =>
-            {
-                if (!success)
-                    DebugConsole.LogError("[NetworkRuntime] Client lobby cleanup remains unresolved: " + failure);
-                else if (IsCurrentOperation(owner, operation))
-                    completed();
-            }))
-            {
-                if (error != null) DebugConsole.LogError("[NetworkRuntime] " + error);
-                return;
-            }
-            if (IsCurrentOperation(owner, operation)) completed();
+                if (!IsCurrentOperation(owner, operation)) return;
+                if (!owner.TryStop(out string error))
+                {
+                    DebugConsole.LogError("[NetworkRuntime] Client cleanup remains unresolved: " + error);
+                    return;
+                }
+                if (!IsCurrentOperation(owner, operation)) return;
+                if (IsSteam && !SteamLobby.TryReleaseClientLobby(out error, (success, failure) =>
+                {
+                    if (success && IsCurrentOperation(owner, operation))
+                        Lifecycle.Handle(Lifecycle.Event.SessionCleared);
+                    else if (!success)
+                        DebugConsole.LogError("[NetworkRuntime] Client lobby cleanup remains unresolved: " + failure);
+                }))
+                {
+                    if (error != null) DebugConsole.LogError("[NetworkRuntime] " + error);
+                    return;
+                }
+                if (IsCurrentOperation(owner, operation))
+                    Lifecycle.Handle(Lifecycle.Event.SessionCleared);
+            });
         }
     }
 }

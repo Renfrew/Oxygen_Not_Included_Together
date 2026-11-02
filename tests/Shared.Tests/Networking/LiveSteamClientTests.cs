@@ -87,11 +87,10 @@ public sealed class LiveSteamClientTests : IDisposable
     public void LateOldHandleCannotCompleteOrDisconnectNewAttempt()
     {
         var old = Connect(); NetworkRuntime.DisconnectClient();
-        int notificationsAfterCleanup = ended;
         var current = Connect();
         Notify(old, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Notify(old, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
-        Assert.Equal(current, SteamworksClient.Connection); Assert.Equal(notificationsAfterCleanup, ended); Assert.Equal(0, established);
+        Assert.Equal(current, SteamworksClient.Connection); Assert.Equal(0, ended); Assert.Equal(0, established);
         Notify(current, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Assert.Equal(1, established);
     }
@@ -102,7 +101,6 @@ public sealed class LiveSteamClientTests : IDisposable
         var old = Connect();
         var retired = Callback<SteamNetConnectionStatusChangedCallback_t>.CaptureDispatch();
         NetworkRuntime.DisconnectClient();
-        int notificationsAfterCleanup = ended;
         SteamNetworkingSockets.NextClientHandle = old.m_HSteamNetConnection;
         var current = Connect();
         Assert.Equal(old, current);
@@ -117,7 +115,7 @@ public sealed class LiveSteamClientTests : IDisposable
         retired(new() { m_hConn = old, m_info = connected });
         Assert.Equal(Lifecycle.Phase.Joining, Lifecycle.Current);
         Assert.Equal(0, established);
-        Assert.Equal(notificationsAfterCleanup, ended);
+        Assert.Equal(0, ended);
         Assert.Equal(current, SteamworksClient.Connection);
         Notify(current, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Assert.Equal(1, established);

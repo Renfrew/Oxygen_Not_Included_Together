@@ -58,8 +58,8 @@ physical establishment never admits gameplay.
 
 StartHost establishes a fresh NetworkRuntime token before scene/presentation
 callbacks and delegates native startup to NetworkRuntime only if that original
-attempt is still current. Join establishes ownership using the new
-`ClientTransport.Operation`. Selected owning transport plus token must both
+attempt is still current. Join establishes ownership using the selected
+`TransportClient.Operation`. Selected owning transport plus token must both
 match; a retained historical client token does not imply an active operation.
 Ownership survives preparation, gameplay, synchronization and failed cleanup.
 Accepted SessionCleared clears normal ownership.

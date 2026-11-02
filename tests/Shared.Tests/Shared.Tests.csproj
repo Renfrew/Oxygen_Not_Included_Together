@@ -34,10 +34,8 @@
     <Compile Include="../../ONI_United/Core/LifecycleEventActions.cs" Link="Core/LifecycleEventActions.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/TransportServer.cs" Link="Networking/TransportServer.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/ServerTransport.cs" Link="Networking/ServerTransport.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/ClientTransport.cs" Link="Networking/ClientTransport.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/TransportClient.cs" Link="Networking/TransportClient.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksClient.cs" Link="Networking/SteamworksClient.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksClientDraft.cs" Link="Networking/SteamworksClientDraft.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksServerDraft.cs" Link="Networking/SteamworksServerDraft.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/LiteNetLib/LiteNetLibServerDraft.cs" Link="LAN/LiteNetLibServerDraft.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakePacket.cs" Link="LAN/SessionHandshakePacket.cs" />

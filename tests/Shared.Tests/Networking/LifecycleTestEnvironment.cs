@@ -110,7 +110,6 @@ namespace ONI_United.Networking.Runtime
             Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("client:prepare:" + Core.Lifecycle.Current);
             Shared.Tests.Networking.LifecycleTestEnvironment.PreparingClient?.Invoke();
         }
-        public static void BeginConnection(bool showLoadingScreen = true, string ip = "", int port = 7777) { }
         public static class ReadyManager
         {
             public static void SendReadyStatusPacket(ONI_United.Networking.Sessions.States.ClientReadyState state) =>
@@ -152,11 +151,7 @@ namespace ONI_United.Core
         public sealed class TestClient : Networking.Transport.TransportClient
         {
             public bool CleanupSucceeds = true;
-            public bool CompleteDisconnectImmediately = true;
             public int CleanupAttempts;
-            public int ConnectAttempts;
-            public int PollAttempts;
-            private Action PendingDisconnect;
             public override bool TryStop(out string error)
             {
                 CleanupAttempts++;
@@ -165,31 +160,6 @@ namespace ONI_United.Core
             }
             public override void Prepare() { }
             protected override void ConnectProtocol(string ip, int port) { }
-            protected override void InternalConnect()
-            {
-                ConnectAttempts++;
-                Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("native:connect:" + Lifecycle.Current);
-            }
-            protected override void InternalDisconnect()
-            {
-                if (CompleteDisconnectImmediately)
-                {
-                    base.InternalDisconnect();
-                    return;
-                }
-
-                var operation = ActiveOperation;
-                PendingDisconnect = () => OnDisconnected(operation);
-            }
-            protected override void InternalPoll()
-            {
-                PollAttempts++;
-                Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("native:poll:" + Lifecycle.Current);
-            }
-            public void RaiseConnected() => OnConnected();
-            public void RaiseConnectionFailed(string reason) => OnConnectFailed(reason);
-            public void RaiseProtocolDisconnect() => OnDisconnect();
-            public void CompleteDisconnect() => PendingDisconnect?.Invoke();
             public override object CurrentConnection => null;
             public override bool IsCurrentConnection(object connection) => false;
             public override void Update() { }
