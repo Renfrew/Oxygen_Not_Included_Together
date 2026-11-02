@@ -66,39 +66,36 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
-            bool IsCurrentOperation() => NetworkRuntime.IsCurrentOperation(owner, operation);
-            owner.OnClientDisconnected = () =>
-            {
-                if (IsCurrentOperation() && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
-            };
-            owner.OnConnectionFailed = reason =>
-            {
-                if (IsCurrentOperation() && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
-            };
-            owner.OnClientConnected = () => { if (IsCurrentOperation()) NetworkRuntime.TransportEstablished(owner, operation); };
-			owner.OnContinueConnectionFlow = () => { if (IsCurrentOperation()) ContinueConnectionFlow(); };
+			var owner = NetworkRuntime.TransportClient;
+			owner.OnClientDisconnected = () =>
+			{
+			    if (Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
+			};
+			owner.OnConnectionFailed = reason =>
+			{
+			    if (Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
+			};
+			owner.OnClientConnected = () => NetworkRuntime.TransportEstablished(owner);
+			owner.OnContinueConnectionFlow = ContinueConnectionFlow;
 			NetworkRuntime.TransportClient.OnReturnToMenu = (reason, message) =>
 			{
-                if (ReferenceEquals(owner, NetworkRuntime.TransportClient) && owner.IsCurrentOperation(operation)
-                    && (!NetworkRuntime.HasActiveOperation || IsCurrentOperation()))
-                    CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message, skipIfReconnected: true));
+			    if (ReferenceEquals(owner, NetworkRuntime.TransportClient))
+			        CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message, skipIfReconnected: true));
 			};
 			NetworkRuntime.TransportClient.OnRequestStateOrReturn = () =>
 			{
-                if (!IsCurrentOperation() || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
-                GameplayPacketSender.Instance.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
-                if (!IsCurrentOperation() || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
-                MP_Timer.Instance.StartDelayedAction(10, () =>
-                {
-                    if (IsCurrentOperation() && NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
-                        CoroutineRunner.RunOne(ShowMessageAndReturnToTitle());
-                });
-            };
-            NetworkRuntime.TransportClient.Prepare();
-            if (IsCurrentOperation() && Lifecycle.Current == Lifecycle.Phase.Joining)
-                CursorManager.Instance.AssignColor();
+			    if (!Session.IsClient || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
+			    GameplayPacketSender.Instance.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
+			    if (!Session.IsClient || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
+			    MP_Timer.Instance.StartDelayedAction(10, () =>
+			    {
+			        if (Session.IsClient && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+			            CoroutineRunner.RunOne(ShowMessageAndReturnToTitle());
+			    });
+			};
+			NetworkRuntime.TransportClient.Prepare();
+			if (ReferenceEquals(owner, NetworkRuntime.TransportClient) && Lifecycle.Current == Lifecycle.Phase.Joining)
+			    CursorManager.Instance.AssignColor();
         }
 
         public static void ConnectToHost(bool showLoadingScreen = true, string ip = "", int port = 7777)
@@ -109,9 +106,8 @@ namespace ONI_United.Networking.Runtime
 			using var _ = Profiler.Scope();
 
             var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
             Init();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation) || Lifecycle.Current != Lifecycle.Phase.Joining) return;
+            if (!ReferenceEquals(owner, NetworkRuntime.TransportClient) || Lifecycle.Current != Lifecycle.Phase.Joining) return;
 
 			if (showLoadingScreen)
 			{
@@ -129,12 +125,12 @@ namespace ONI_United.Networking.Runtime
 
 			try
 			{
-                if (NetworkRuntime.IsCurrentOperation(owner, operation) && Lifecycle.Current == Lifecycle.Phase.Joining)
+                if (ReferenceEquals(owner, NetworkRuntime.TransportClient) && Lifecycle.Current == Lifecycle.Phase.Joining)
 				    owner.StartConnection(ip, port);
 			}
 			catch
 			{
-                if (NetworkRuntime.IsCurrentOperation(owner, operation)
+                if (ReferenceEquals(owner, NetworkRuntime.TransportClient)
                     && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
 				throw;
 			}
@@ -166,7 +162,7 @@ namespace ONI_United.Networking.Runtime
 
 			NetworkRuntime.TransportClient.Update();
 
-            if (NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+            if (Session.IsClient && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
                 NetworkRuntime.TransportClient.OnMessageRecieved();
 		}
 
@@ -174,10 +170,7 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
-            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
-                && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
+			bool IsCurrent() => Session.IsClient && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
 			DebugConsole.Log("Gamestate packet received");
 			MP_Timer.Instance.Abort();
 			if (!TryValidateHostProtocol(packet, out string protocolReason, out string protocolMessage))
@@ -295,13 +288,9 @@ namespace ONI_United.Networking.Runtime
 		private static void ContinueConnectionFlow()
 		{
 			using var _ = Profiler.Scope();
+            bool IsCurrent() => Session.IsClient && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
 
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
-            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
-                && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
-			if (!Session.IsClient || !NetworkRuntime.HasClientOperation
-                || Lifecycle.Current == Lifecycle.Phase.ClearingSession)
+			if (!Session.IsClient || Lifecycle.Current == Lifecycle.Phase.ClearingSession)
 			{
 				DebugConsole.Log("[GameClient] ContinueConnectionFlow requires an active admitted client - ignoring");
 				return;
@@ -332,14 +321,7 @@ namespace ONI_United.Networking.Runtime
 
 		private static IEnumerator ShowMessageAndReturnToTitle(string reason = "", string message = "", bool skipIfReconnected = false)
         {
-            var owner = NetworkRuntime.TransportClient;
-            return ShowMessageAndReturnToTitle(owner, owner.Operation, reason, message, skipIfReconnected);
-        }
-
-        private static IEnumerator ShowMessageAndReturnToTitle(ONI_United.Networking.Transport.TransportClient owner,
-            object operation, string reason, string message, bool skipIfReconnected)
-		{
-			string displayText;
+            string displayText;
 			if (string.IsNullOrEmpty(reason) && string.IsNullOrEmpty(message))
 			{
 				displayText = ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION;
@@ -359,10 +341,7 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Show(displayText);
 			yield return new WaitForSecondsRealtime(3f);
-            if (!ReferenceEquals(owner, NetworkRuntime.TransportClient)
-                || !owner.IsCurrentOperation(operation)) yield break;
-            if (skipIfReconnected && (NetworkRuntime.HasHostOperation
-                || (NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession))) yield break;
+            if (skipIfReconnected && Session.IsActive) yield break;
 			//PauseScreen.TriggerQuitGame(); // Force exit to frontend, getting a crash here
 			if (Utils.IsInGame())
 			{

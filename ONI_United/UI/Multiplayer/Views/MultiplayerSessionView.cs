@@ -27,7 +27,7 @@ namespace ONI_United.UI.Multiplayer.Views
         internal void Refresh()
         {
             string status, role;
-            if (NetworkRuntime.HasHostOperation)
+            if (Lifecycle.Current == Lifecycle.Phase.StartingHost || Session.IsHost)
             {
                 status = NetworkRuntime.TransportServer.OperationError ?? (Lifecycle.IsHostGameplay
                     ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.ClearingSession ? "Stopping host" : "Starting host");
@@ -41,8 +41,9 @@ namespace ONI_United.UI.Multiplayer.Views
             { status = "In a Steam lobby; gameplay connection is not confirmed."; role = "Role: lobby member"; }
             else { status = "No active multiplayer session."; role = "Role: none"; }
             view.SetState(status, role, $"Transport: {(NetworkRuntime.IsSteam ? "STEAMWORKS" : "LITENETLIB")}",
-                NetworkRuntime.HasHostOperation,
-                NetworkRuntime.HasClientOperation);
+                Lifecycle.Current == Lifecycle.Phase.StartingHost || Session.IsHost,
+                Lifecycle.Current is Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession
+                    or Lifecycle.Phase.Joined or Lifecycle.Phase.Synchronizing || Session.IsClient);
             players.Clear();
             foreach (var pair in Session.Players)
             {
@@ -55,7 +56,8 @@ namespace ONI_United.UI.Multiplayer.Views
         }
         private void CancelConnection()
         {
-            if (!NetworkRuntime.HasClientOperation) return;
+            if (!(Lifecycle.Current is Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession
+                or Lifecycle.Phase.Joined or Lifecycle.Phase.Synchronizing) && !Session.IsClient) return;
             GameClient.CancelConnectionAttempt(); screen.RefreshActiveView();
         }
         private void StopHosting()

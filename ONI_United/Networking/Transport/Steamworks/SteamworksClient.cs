@@ -44,9 +44,8 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (_connectionStatusChangedCallback == null)
             {
-                var operation = NetworkRuntime.ActiveOperation;
                 _connectionStatusChangedCallback = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(
-                    data => OnConnectionStatusChanged(operation, data));
+                    OnConnectionStatusChanged);
                 DebugConsole.Log("[GameClient] Registered connection status callback.");
             }
         }
@@ -135,8 +134,6 @@ namespace ONI_United.Networking.Transport.Steamworks
         private void ProcessIncomingMessages(HSteamNetConnection conn)
         {
             using var _ = Profiler.Scope();
-            var operation = NetworkRuntime.ActiveOperation;
-
             var scope = Profiler.Scope();
             int totalBytes = 0;
 
@@ -151,7 +148,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             for (int i = 0; i < msgCount; i++)
             {
-                if (!NetworkRuntime.IsCurrentOperation(this, operation) || !IsCurrentConnection(conn))
+                if (!IsCurrentConnection(conn))
                 {
                     SteamNetworkingMessage_t.Release(messages[i]);
                     continue;
@@ -178,9 +175,8 @@ namespace ONI_United.Networking.Transport.Steamworks
             scope.End(msgCount, totalBytes);
         }
 
-        private void OnConnectionStatusChanged(object operation, SteamNetConnectionStatusChangedCallback_t data)
+        private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t data)
         {
-            if (!NetworkRuntime.IsCurrentOperation(this, operation)) return;
             using var _ = Profiler.Scope();
 
             var state = data.m_info.m_eState;
@@ -209,7 +205,7 @@ namespace ONI_United.Networking.Transport.Steamworks
                     if (Lifecycle.Current == Lifecycle.Phase.ClearingSession) break;
                     var returnToMenu = OnReturnToMenu;
                     OnClientDisconnected?.Invoke();
-                    if (ReferenceEquals(this, NetworkRuntime.TransportClient) && IsCurrentOperation(operation))
+                    if (ReferenceEquals(this, NetworkRuntime.TransportClient))
                         returnToMenu?.Invoke(
                         state == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer
                             ? STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED

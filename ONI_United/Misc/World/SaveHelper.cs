@@ -135,12 +135,10 @@ public static class SaveHelper
 	{
 		using var _ = Profiler.Scope();
 
-        var owner = NetworkRuntime.OperationTransport;
-        var operation = NetworkRuntime.ActiveOperation;
-		CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(owner, operation, msg));
+		CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(msg));
 	}
 
-	private static IEnumerator ShowMessageAndReturnToTitle(object owner, object operation, string msg)
+	private static IEnumerator ShowMessageAndReturnToTitle(string msg)
 	{
 		using var _ = Profiler.Scope();
 
@@ -153,8 +151,7 @@ public static class SaveHelper
 			}
 
 			MultiplayerOverlay.Show(msg);
-            if (NetworkRuntime.IsCurrentOperation(owner, operation)
-                && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+            if (Lifecycle.Current != Lifecycle.Phase.ClearingSession)
                 NetworkRuntime.Stop();
 		}
 		catch (Exception e)
@@ -166,9 +163,6 @@ public static class SaveHelper
 		}
 
 		yield return new WaitForSeconds(5);
-        if (NetworkRuntime.HasActiveOperation && !NetworkRuntime.IsCurrentOperation(owner, operation)) yield break;
-        if (owner is ONI_United.Networking.Transport.TransportClient client && !client.IsCurrentOperation(operation)) yield break;
-
 		try
 		{
 			MultiplayerOverlay.Close();

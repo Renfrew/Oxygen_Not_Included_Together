@@ -59,14 +59,16 @@ namespace ONI_United.Core
             if (!ReferenceEquals(instance, this)) return;
             try
             {
-                if (Lifecycle.IsAvailable && HasClientOperation) DisconnectClient();
+                if (Lifecycle.IsAvailable && (Session.IsClient
+                    || Lifecycle.Current is Lifecycle.Phase.Joining or Lifecycle.Phase.Joined))
+                    DisconnectClient();
                 if (!TransportClient.TryStop(out string error))
                     DebugConsole.LogError("[NetworkRuntime] Client disposal remains unresolved: " + error);
                 if (IsSteam && !SteamLobby.TryReleaseClientLobby(out error) && error != null)
                     DebugConsole.LogError("[NetworkRuntime] Client lobby disposal remains unresolved: " + error);
                 TransportServer.DisposeHost();
             }
-            finally { ClearOperation(); instance = null!; }
+            finally { instance = null!; }
         }
 
         private void OnApplicationQuit()
@@ -75,8 +77,7 @@ namespace ONI_United.Core
             try { Stop(); }
             finally
             {
-                try { TransportServer.DisposeHost(); }
-                finally { ClearOperation(); }
+                TransportServer.DisposeHost();
             }
         }
 
@@ -139,7 +140,10 @@ namespace ONI_United.Core
             var lobby = SteamLobby.CurrentLobby;
             string ip = MultiplayerSession.ServerIp;
             int port = MultiplayerSession.ServerPort;
-            if (HasClientOperation) DisconnectClient();
+            if (Session.IsClient
+                || Lifecycle.Current is Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession
+                    or Lifecycle.Phase.Joined or Lifecycle.Phase.Synchronizing or Lifecycle.Phase.ClearingSession)
+                DisconnectClient();
             if (Lifecycle.Current != Lifecycle.Phase.Idle) return; // Release must finish before a new Join.
             if (IsSteam)
             {
@@ -178,6 +182,71 @@ namespace ONI_United.Core
         {
             Configuration.Instance.Network.Transport = (int)transport;
             Configuration.Instance.Save();
+        }
+
+        internal static void StartHostTransport()
+        {
+            if (Lifecycle.Current == Lifecycle.Phase.StartingHost)
+                TransportServer.Start();
+        }
+
+        public static void StartServer()
+        {
+            if (!Lifecycle.Handle(Lifecycle.Event.StartHost))
+                DebugConsole.LogError("[NetworkRuntime] Host start is not permitted in the current lifecycle state.");
+        }
+
+        public static void Stop()
+        {
+            if (Session.IsHost || Lifecycle.Current == Lifecycle.Phase.StartingHost)
+                StopHost();
+            else if (Session.IsClient || Lifecycle.Current is Lifecycle.Phase.Joining
+                or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.Joined
+                or Lifecycle.Phase.Synchronizing)
+                DisconnectClient();
+        }
+
+        public static void StopHost()
+        {
+            Lifecycle.Handle(Lifecycle.Event.ClearHostSession, () => TransportServer.Stop());
+        }
+
+        internal static void TransportEstablished(TransportClient owner)
+        {
+            if (ReferenceEquals(owner, TransportClient)
+                && Lifecycle.Current == Lifecycle.Phase.Joining)
+                Lifecycle.Handle(Lifecycle.Event.PrepareClientSession);
+        }
+
+        internal static bool ClientAdmitted(TransportClient owner)
+        {
+            return ReferenceEquals(owner, TransportClient)
+                && Lifecycle.Handle(Lifecycle.Event.ClientAdmitted, () =>
+                    owner.OnRequestStateOrReturn?.Invoke());
+        }
+
+        public static void DisconnectClient()
+        {
+            var owner = TransportClient;
+            Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () =>
+            {
+                if (!owner.TryStop(out string error))
+                {
+                    DebugConsole.LogError("[NetworkRuntime] Client cleanup remains unresolved: " + error);
+                    return;
+                }
+
+                if (IsSteam && !SteamLobby.TryReleaseClientLobby(out error, (success, failure) =>
+                {
+                    if (success) Lifecycle.Handle(Lifecycle.Event.SessionCleared);
+                    else DebugConsole.LogError("[NetworkRuntime] Client lobby cleanup remains unresolved: " + failure);
+                }))
+                {
+                    if (error != null) DebugConsole.LogError("[NetworkRuntime] " + error);
+                    return;
+                }
+                Lifecycle.Handle(Lifecycle.Event.SessionCleared);
+            });
         }
 
         public static ulong GetLocalID()

@@ -183,9 +183,7 @@ internal static class SessionHandshakeCoordinator
         object physicalConnection)
     {
         var owner = NetworkRuntime.TransportClient;
-        var operation = NetworkRuntime.ActiveOperation;
-        if (!NetworkRuntime.IsCurrentOperation(owner, operation)
-            || !owner.IsCurrentConnection(physicalConnection)
+        if (!owner.IsCurrentConnection(physicalConnection)
             || Lifecycle.Current != Lifecycle.Phase.PreparingSession
             || Session.IsHost
             || Session.IsActive)
@@ -237,10 +235,10 @@ internal static class SessionHandshakeCoordinator
         // Complete admitted metadata before subscribers can synchronously stop this join.
         MultiplayerSession.OnConnectedToHost(packet.HostPlayerId, physicalConnection);
         Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
-        if (!NetworkRuntime.IsCurrentOperation(owner, operation) || !owner.IsCurrentConnection(physicalConnection)
+        if (!ReferenceEquals(owner, NetworkRuntime.TransportClient) || !owner.IsCurrentConnection(physicalConnection)
             || Lifecycle.Current != Lifecycle.Phase.PreparingSession || !Session.IsClient) return;
 
-        NetworkRuntime.ClientAdmitted(owner, operation);
+        NetworkRuntime.ClientAdmitted(owner);
     }
 
     private static void SendWelcome(ulong playerId, object physicalConnection)

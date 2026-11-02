@@ -12,9 +12,9 @@
 
 This approved refinement supersedes the host-only phase/event examples below.
 Lifecycle remains the only global multiplayer state machine. NetworkRuntime owns
-the selected transports and one active attempt identity; Session owns logical
-membership and derives host/client role. Native transports retain their handles,
-request correlation and cleanup. No menu-hosting or new `InSession` phase is added.
+the selected transports and public routing; Session owns logical membership and
+derives host/client role. Native transports retain their handles and cleanup.
+No menu-hosting or new `InSession` phase is added.
 
 ### Phases and grouped transitions
 
@@ -29,12 +29,12 @@ grants host authority.
 | Event | Source phases | Destination | Additional permission |
 |---|---|---|---|
 | Initialize | Uninitialized | Idle | Bootstrap only |
-| StartHost | Idle | StartingHost | No active operation or membership |
+| StartHost | Idle | StartingHost | No active membership |
 | PrepareHostSession | StartingHost | PreparingSession | Phase only |
 | PrepareClientSession | Joining | PreparingSession | Phase only |
 | HostSessionReady | PreparingSession | InGameSession | Host Session |
 | ClearHostSession | StartingHost, PreparingSession, InGameSession, Synchronizing, ClearingSession | ClearingSession | Phase only |
-| Join | Idle | Joining | No active operation or membership |
+| Join | Idle | Joining | No active membership |
 | ClientAdmitted | PreparingSession | Joined | Client Session |
 | StartHostSync | InGameSession | Synchronizing | Host Session |
 | StartClientSync | Joined, InGameSession | Synchronizing | Client Session |
@@ -48,7 +48,7 @@ Definitions remain compact and grouped; a precomputed
 EventAction, afterAction ordering, exception logging/rethrow and nested events.
 Rejected events execute neither action.
 
-### Actions, routing and identity
+### Actions and routing
 
 The private `LifecycleEventActions` dictionary maps StartHost, Join, both
 preparation events, HostSessionReady, both clear events and SessionCleared.
@@ -56,41 +56,13 @@ Host preparation always registers complete host membership before submitting
 matching HostSessionReady. Client preparation always sends the existing Hello;
 physical establishment never admits gameplay.
 
-StartHost establishes a fresh NetworkRuntime token before scene/presentation
-callbacks and delegates native startup to NetworkRuntime only if that original
-attempt is still current. Join establishes ownership using the selected
-`TransportClient.Operation`. Selected owning transport plus token must both
-match; a retained historical client token does not imply an active operation.
-Ownership survives preparation, gameplay, synchronization and failed cleanup.
-Accepted SessionCleared clears normal ownership.
-Terminal disposal invalidates it. Unresolved ownership blocks new attempts and
-transport replacement.
-
-Production host readiness/failure continuations carry captured tokens.
-Preparation revalidates after synchronous Session activation notifications.
-Welcome preserves its physical connection/identity validation and captures the
-operation before activation. Each accepted ClearHostSession/ClearClientSession
-executes its mandatory existing reset action, including either repeated clear event
-in ClearingSession. NetworkRuntime routes Stop/Disconnect according to the
-originating operation transport, not reset Session membership. Native release
-remains in the existing protocol/resource owners; their idempotency, coalescing
-and explicit recovery behavior is unchanged.
-Delayed menu and native disconnection callbacks do not implicitly retry failed
-cleanup. Pending Steam lobby acquisition is drained by its retained request and
-cleanup completion, not by restarting failed socket cleanup.
-
-Lifecycle does not distinguish first/repeated cleanup or retain progress/retry
-flags. Failed or asynchronous cleanup retains the operation token and transport
-in ClearingSession. Protocol completion calls
-`Lifecycle.Handle(Lifecycle.Event.SessionCleared)` through the normal event entry
-point. There is no completion owner/token validation or alternate completion API.
-In ClearingSession it is accepted; in Idle it is rejected without actions.
-Protocols may report completion more than once: the transition table handles
-repeated notifications normally. Completion arriving during a later clearing
-operation is explicitly outside this design's scope. Already-initiated native
-cleanup does not depend on subsequent Lifecycle phase changes.
-Accepted SessionCleared clears runtime ownership through its EventAction.
-Terminal disposal remains the existing special-case invalidation path.
+StartHost and Join enter their Lifecycle phases before the selected transport
+does native work. Native connection establishment prepares a client Session;
+only the existing handshake/admission path establishes client membership.
+Host preparation registers host membership before submitting HostSessionReady.
+Lifecycle permissions and Session membership determine which gameplay actions
+are accepted. No application-level connection-attempt token is maintained.
+Native resources remain owned by their protocol implementations.
 
 ### Synchronization and verification boundaries
 
@@ -101,13 +73,12 @@ Both roles return to InGameSession, without a role-dependent destination or
 automatic unpause. Synchronization IDs, packet encodings and the host-controlled
 round algorithm are unchanged.
 
-Delayed client save loads, queued TCP callbacks and world-spawn subscriptions
-capture operation identity as well as synchronization ID. Host drain/overlay
-continuations also retain their operation. World-spawn completion only sends
-readiness; it does not independently grant gameplay admission.
+Delayed synchronization work uses the existing synchronization ID. World-spawn
+completion only sends readiness; it does not independently grant gameplay
+admission.
 
-Shared.Tests source-links Lifecycle, EventActions, NetworkRuntime's operation
-routing, TransportServer, the live Steam client and client synchronization
+Shared.Tests source-links Lifecycle, EventActions, NetworkRuntime routing,
+TransportServer, the live Steam client and client synchronization
 continuations. Session activation, Unity scheduling/world loading and Steam/LAN
 native APIs still use deterministic doubles. Passing these tests or a
 non-deploying Debug build is not live multiplayer verification.
@@ -276,7 +247,7 @@ Idle
 
 Uninitialized admits no operational hosting event. During normal successful execution, Hosting guarantees transport initialization and host Session preparation, not remote-player presence or client synchronization/gameplay readiness. An unexpected integrity failure is not permission to continue from a partially executed phase. No separate generic Ready phase is needed.
 
-### 4.2 Event meaning and operation identity
+### 4.2 Event meaning and native callback correlation
 
 Phases describe conditions; descriptive events identify occurrences. Stopped means complete host-operation cleanup, not merely a closed listener. Repeatable Stop is intentional and adds no separate cleanup phase. Meaningful shared and protocol-specific events may represent genuine permission changes; internal native milestones need not become events. This does not add any particular event or phase to the approved host route.
 

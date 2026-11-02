@@ -17,7 +17,7 @@ public sealed class LifecycleRefinementTests : IDisposable
     public void Dispose() { PreparingClient = null; Registered = null; Session.Reset(); Invoke("OnDestroy"); }
 
     [Fact]
-    public void InitializeIsTheOnlyBootstrapEventAndCannotResetAnActiveOperation()
+    public void InitializeIsTheOnlyBootstrapEventAndCannotResetAnActiveJoin()
     {
         foreach (var evt in Enum.GetValues<Lifecycle.Event>())
             if (evt != Lifecycle.Event.Initialize) Assert.False(Lifecycle.Handle(evt));
@@ -98,33 +98,6 @@ public sealed class LifecycleRefinementTests : IDisposable
             afterAction: () => { Assert.Contains("client:prepare:PreparingSession", Trace); throw error; })));
         Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
         Assert.Contains(Trace, x => x.Contains("after failure"));
-    }
-
-    [Theory]
-    [InlineData(false)] [InlineData(true)]
-    public void PostCallbackIdentityRejectsRetiredOperationEvenWhenPhaseAndOwnerMatch(bool replaceOwner)
-    {
-        Lifecycle.Initialize(); Lifecycle.Handle(Lifecycle.Event.Join);
-        var owner = NetworkRuntime.TransportClient;
-        var operation = owner.Operation;
-        bool continued = false;
-        PreparingClient = () =>
-        {
-            Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearClientSession));
-            Assert.True(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
-            if (replaceOwner) NetworkRuntime.TransportClient = new NetworkRuntime.TestClient();
-            Assert.True(Lifecycle.Handle(Lifecycle.Event.Join));
-            // A synchronous replacement join may reach the same phase before the old call unwinds.
-            PreparingClient = null;
-            Assert.True(Lifecycle.Handle(Lifecycle.Event.PrepareClientSession));
-        };
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.PrepareClientSession, afterAction: () =>
-        {
-            if (ReferenceEquals(owner, NetworkRuntime.TransportClient) && owner.IsCurrentOperation(operation)
-                && Lifecycle.Current == Lifecycle.Phase.PreparingSession) continued = true;
-        }));
-        Assert.False(continued);
-        Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
     }
 
     [Fact]

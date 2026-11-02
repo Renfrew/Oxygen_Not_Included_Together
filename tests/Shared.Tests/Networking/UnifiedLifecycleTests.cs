@@ -60,8 +60,8 @@ public sealed class UnifiedLifecycleTests : IDisposable
         {
             Assert.True(Lifecycle.Handle(host ? Lifecycle.Event.StartHostSync : Lifecycle.Event.StartClientSync));
             Assert.Equal(Lifecycle.Phase.Synchronizing, Lifecycle.Current);
-            Assert.Equal(host, NetworkRuntime.HasHostOperation);
-            Assert.Equal(!host, NetworkRuntime.HasClientOperation);
+            Assert.Equal(host, Session.IsHost);
+            Assert.Equal(!host, Session.IsClient);
             Assert.False(Lifecycle.Handle(host ? Lifecycle.Event.StartHostSync : Lifecycle.Event.StartClientSync));
             Assert.False(Lifecycle.CanSelectTransport);
             Assert.True(Lifecycle.Handle(Lifecycle.Event.CompleteSync));
@@ -128,21 +128,6 @@ public sealed class UnifiedLifecycleTests : IDisposable
         Assert.False(Lifecycle.Handle(Lifecycle.Event.Join));
         Assert.True(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
         Assert.True(Lifecycle.Handle(Lifecycle.Event.Join));
-    }
-
-    [Fact]
-    public void OperationIdentityChangesOnlyForAnAcceptedNewJoin()
-    {
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.Join));
-        var original = ONI_United.Core.NetworkRuntime.TransportClient.Operation;
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.Join));
-        Assert.Same(original, ONI_United.Core.NetworkRuntime.TransportClient.Operation);
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearClientSession));
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearClientSession));
-        Assert.Same(original, ONI_United.Core.NetworkRuntime.TransportClient.Operation);
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.Join));
-        Assert.NotSame(original, ONI_United.Core.NetworkRuntime.TransportClient.Operation);
     }
 
     [Fact]

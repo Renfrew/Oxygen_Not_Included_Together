@@ -19,7 +19,7 @@ namespace ONI_United.Patches
 			{
 				using var _ = Profiler.Scope();
 
-				if (!Session.IsActive && !NetworkRuntime.HasHostOperation && !NetworkRuntime.HasClientOperation)
+				if (!Session.IsActive && Lifecycle.Current == Lifecycle.Phase.Idle)
 					return;
 
 				MultiplayerSession.IsQuitting = true;

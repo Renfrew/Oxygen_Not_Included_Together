@@ -43,7 +43,7 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
 
             connectionStatusChanged = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
-            SteamLobby.CreateHostLobby(Core.NetworkRuntime.ActiveOperation, error =>
+            SteamLobby.CreateHostLobby(error =>
             {
                 if (error != null) OnStartFailed(error);
                 else OnStarted();

@@ -88,7 +88,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 			}
 		}
 
-        internal static void CreateHostLobby(object operation, Action<string> completed)
+        internal static void CreateHostLobby(Action<string> completed)
         {
             if (_hostCreation != null || InLobby)
                 throw new InvalidOperationException("A Steam lobby operation is already owned.");
@@ -96,10 +96,9 @@ namespace ONI_United.Networking.Transport.Steamworks
             MaxLobbySize = Configuration.GetHostProperty<int>("MaxLobbySize");
             _hostCreated = completed;
             // One CallResult object per native request: never rebind it from its own callback.
-            var owner = NetworkRuntime.TransportServer;
             CallResult<LobbyCreated_t> request = null;
             request = CallResult<LobbyCreated_t>.Create((result, failure) =>
-                OnHostLobbyCreated(request, owner, operation, result, failure));
+                OnHostLobbyCreated(request, result, failure));
             _hostCreation = request;
             var handle = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, MaxLobbySize);
             if (handle == SteamAPICall_t.Invalid)
@@ -178,7 +177,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         }
 
         private static void OnHostLobbyCreated(CallResult<LobbyCreated_t> request,
-            ONI_United.Networking.Transport.TransportServer owner, object operation, LobbyCreated_t result, bool ioFailure)
+            LobbyCreated_t result, bool ioFailure)
         {
             if (!ReferenceEquals(request, _hostCreation))
             {
@@ -196,7 +195,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             var completed = _hostCreated;
             _hostCreated = null;
-            if (completed == null || !NetworkRuntime.IsCurrentOperation(owner, operation))
+            if (completed == null)
             {
                 ReleaseHostLobby();
                 return;
@@ -275,7 +274,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         }
 
         private static void OnClientLobbyEntered(CallResult<LobbyEnter_t> request,
-            ONI_United.Networking.Transport.TransportClient owner, object operation, LobbyEnter_t callback, bool ioFailure)
+            LobbyEnter_t callback, bool ioFailure)
         {
             var entered = new CSteamID(callback.m_ulSteamIDLobby);
             if (!ReferenceEquals(request, _clientJoin))
@@ -299,7 +298,7 @@ namespace ONI_United.Networking.Transport.Steamworks
                 completed?.Invoke(success, error);
                 return;
             }
-            if (!Lifecycle.IsAvailable || !NetworkRuntime.IsCurrentOperation(owner, operation))
+            if (!Lifecycle.IsAvailable)
             {
                 if (!ioFailure && entered.IsValid()
                     && callback.m_EChatRoomEnterResponse == (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
@@ -331,8 +330,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 				MultiplayerSession.SetHost(hostId);
 			}
 
-            bool StillJoining() => NetworkRuntime.IsCurrentOperation(owner, operation)
-                && Lifecycle.Current == Lifecycle.Phase.Joining;
+            bool StillJoining() => Lifecycle.Current == Lifecycle.Phase.Joining;
 			SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – In Lobby");
 			_onLobbyJoined?.Invoke(CurrentLobby);
             if (!StillJoining()) return;
@@ -380,8 +378,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 
         internal static void StartClientJoin(CSteamID lobbyId, Action<CSteamID> onJoined, string password)
         {
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
             _onLobbyJoined = onJoined;
             _pendingPassword = password;
             _joiningLobby = lobbyId;
@@ -389,7 +385,7 @@ namespace ONI_United.Networking.Transport.Steamworks
             // cannot correlate a late result with a later attempt to the same lobby.
             CallResult<LobbyEnter_t> result = null;
             result = CallResult<LobbyEnter_t>.Create((entered, ioFailure) =>
-                OnClientLobbyEntered(result, owner, operation, entered, ioFailure));
+                OnClientLobbyEntered(result, entered, ioFailure));
             _clientJoin = result;
             try
             {

@@ -18,12 +18,9 @@ namespace ONI_United.Networking.Runtime
         public static ulong ActiveSynchronizationId { get; private set; }
         private static bool _loadSubmitted;
         private static bool _worldSpawnComplete;
-        private static object? synchronizationOperation;
-        private static object? synchronizationTransport;
 
         internal static bool IsCurrentSynchronization(ulong synchronizationId) =>
-            NetworkRuntime.IsCurrentOperation(synchronizationTransport, synchronizationOperation)
-            && Session.IsClient && Lifecycle.Current == Lifecycle.Phase.Synchronizing
+            Session.IsClient && Lifecycle.Current == Lifecycle.Phase.Synchronizing
             && synchronizationId != 0 && synchronizationId == ActiveSynchronizationId;
 
         internal static bool CanReceiveSynchronizationSave(ulong synchronizationId) =>
@@ -31,16 +28,12 @@ namespace ONI_United.Networking.Runtime
 
         internal static Func<bool> CaptureSynchronization(ulong synchronizationId)
         {
-            var owner = synchronizationTransport;
-            var operation = synchronizationOperation;
-            return () => NetworkRuntime.IsCurrentOperation(owner, operation)
-                && IsCurrentSynchronization(synchronizationId);
+            return () => IsCurrentSynchronization(synchronizationId);
         }
 
         internal static void ResetSynchronizationState()
         {
             ActiveSynchronizationId = 0;
-            synchronizationOperation = synchronizationTransport = null;
             _loadSubmitted = _worldSpawnComplete = false;
             SaveChunkAssembler.Clear();
         }
@@ -68,7 +61,7 @@ namespace ONI_United.Networking.Runtime
 
         public static bool BeginSynchronization(ulong synchronizationId)
         {
-            if (!Session.IsClient || !NetworkRuntime.HasClientOperation) return false;
+            if (!Session.IsClient) return false;
             if (synchronizationId == 0)
             {
                 DebugConsole.LogWarning($"[Synchronization] Ignored invalid HardSync {synchronizationId}.");
@@ -79,16 +72,12 @@ namespace ONI_United.Networking.Runtime
                 DebugConsole.LogWarning($"[Synchronization] Rejected HardSync {synchronizationId} while loading {ActiveSynchronizationId}.");
                 return false;
             }
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
             if (!Lifecycle.Handle(Lifecycle.Event.StartClientSync)) return false;
-            synchronizationTransport = owner;
-            synchronizationOperation = operation;
             ActiveSynchronizationId = synchronizationId;
             _loadSubmitted = _worldSpawnComplete = false;
             SaveChunkAssembler.Clear();
             SpeedControlScreen.Instance?.Pause(false);
-            return NetworkRuntime.IsCurrentOperation(owner, operation) && IsCurrentSynchronization(synchronizationId);
+            return IsCurrentSynchronization(synchronizationId);
         }
 
         public static void OnWorldSpawnComplete()
@@ -106,14 +95,11 @@ namespace ONI_United.Networking.Runtime
                 DebugConsole.LogWarning($"[Synchronization] Ignored AllReady for inactive/unloaded sync {synchronizationId}.");
                 return false;
             }
-            var owner = synchronizationTransport;
-            var operation = synchronizationOperation;
             if (!Lifecycle.Handle(Lifecycle.Event.CompleteSync)) return false;
             ResetSynchronizationState();
             MultiplayerSession.CreateConnectedPlayerCursors();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)) return false;
             SelectToolPatch.UpdateColor();
-            return NetworkRuntime.IsCurrentOperation(owner, operation) && Lifecycle.Current == Lifecycle.Phase.InGameSession;
+            return Lifecycle.Current == Lifecycle.Phase.InGameSession;
         }
     }
 }

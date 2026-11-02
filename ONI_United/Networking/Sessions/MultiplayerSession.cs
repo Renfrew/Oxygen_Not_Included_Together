@@ -221,10 +221,8 @@ namespace ONI_United.Networking.Sessions
 
 		private static void EndSession(Action<object> close)
 		{
-            var operation = NetworkRuntime.ActiveOperation;
 			bool wasActive = InActiveSession;
 			ClearConnectedPlayers(close);
-            if (!ReferenceEquals(operation, NetworkRuntime.ActiveOperation)) return;
 			KnownPlayerNames.Clear();
 			ReadyManager.ResetSynchronizationState();
 
@@ -254,9 +252,7 @@ namespace ONI_United.Networking.Sessions
 		{
 			using var _ = Profiler.Scope();
 
-            var operation = NetworkRuntime.ActiveOperation;
 			EndSession(null);
-            if (!ReferenceEquals(operation, NetworkRuntime.ActiveOperation)) return;
 			ONI_United.Networking.Replication.InterestGroupManager.Clear();
 			WorkProgressPatch.ClearTracking();
 			RemoteProgressRegistry.ClearAll();

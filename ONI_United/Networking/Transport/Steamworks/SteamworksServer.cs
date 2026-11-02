@@ -24,16 +24,16 @@ namespace ONI_United.Networking.Transport.Steamworks
         private float _srvInBw, _srvOutBw;
         private int _srvInPps, _srvOutPps;
 
-        private bool Prepare(object operation)
+        private bool Prepare()
         {
             if (SteamManager.Initialized && !SteamLobby.InLobby && !SteamLobby.HasPendingJoin) return true;
-            ReportStartupFailure(operation, "Steam must be initialized and outside a lobby before hosting.");
+            ReportStartupFailure("Steam must be initialized and outside a lobby before hosting.");
             return false;
         }
 
-        protected override void StartProtocol(object operation)
+        protected override void StartProtocol()
         {
-            if (!Prepare(operation)) return;
+            if (!Prepare()) return;
 
             // Create listen socket for P2P
             var options = new SteamNetworkingConfigValue_t[2];
@@ -53,7 +53,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (ListenSocket.m_HSteamListenSocket == 0)
             {
-                ReportStartupFailure(operation, "Steam failed to create its listen socket.");
+                ReportStartupFailure("Steam failed to create its listen socket.");
                 return;
             }
 
@@ -61,21 +61,20 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             if (PollGroup.m_HSteamNetPollGroup == 0)
             {
-                ReportStartupFailure(operation, "Steam failed to create its poll group.");
+                ReportStartupFailure("Steam failed to create its poll group.");
                 return;
             }
 
             _connectionStatusChangedCallback = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(
-                data => OnConnectionStatusChanged(operation, data));
+                OnConnectionStatusChanged);
 
-            SteamLobby.CreateHostLobby(operation, error =>
+            SteamLobby.CreateHostLobby(error =>
             {
-                if (!NetworkRuntime.IsCurrentOperation(this, operation)) return;
-                if (error != null) ReportStartupFailure(operation, error);
+                if (error != null) ReportStartupFailure(error);
                 else
                 {
                     OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "Steam"));
-                    ReportTransportStarted(operation);
+                    ReportTransportStarted();
                 }
             });
         }
@@ -196,8 +195,6 @@ namespace ONI_United.Networking.Transport.Steamworks
         public override void OnMessageRecieved()
         {
             using var _ = Profiler.Scope();
-            var operation = NetworkRuntime.ActiveOperation;
-
             var scope = Profiler.Scope();
             int totalBytes = 0;
 
@@ -209,7 +206,6 @@ namespace ONI_United.Networking.Transport.Steamworks
             {
                 for (int i = 0; i < msgCount; i++)
                 {
-                    if (!NetworkRuntime.IsCurrentOperation(this, operation)) continue;
                     var msg = Marshal.PtrToStructure<SteamNetworkingMessage_t>(messages[i]);
                     totalBytes += msg.m_cbSize;
                     byte[] bytes = new byte[msg.m_cbSize];
@@ -240,9 +236,8 @@ namespace ONI_United.Networking.Transport.Steamworks
             scope.End(msgCount, totalBytes);
         }
 
-        private void OnConnectionStatusChanged(object operation, SteamNetConnectionStatusChangedCallback_t data)
+        private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t data)
         {
-            if (!NetworkRuntime.IsCurrentOperation(this, operation)) return;
             using var _ = Profiler.Scope();
 
             var conn = data.m_hConn;

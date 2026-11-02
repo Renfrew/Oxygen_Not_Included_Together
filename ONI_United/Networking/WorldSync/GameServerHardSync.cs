@@ -32,9 +32,6 @@ namespace ONI_United.Networking.WorldSync
 				DebugConsole.LogWarning("[HardSync] Only the host can start synchronization.");
 				return;
 			}
-            var owner = NetworkRuntime.TransportServer;
-            var operation = NetworkRuntime.ActiveOperation;
-
 			if (ReadyManager.IsSynchronizing)
 			{
 				DebugConsole.Log("[HardSync] Synchronization is already in progress.");
@@ -49,7 +46,7 @@ namespace ONI_United.Networking.WorldSync
 
 			if (SpeedControlScreen.Instance?.IsPaused != true)
 				SpeedControlScreen.Instance?.TogglePause();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation) || !Session.IsHost) return;
+            if (!Session.IsHost) return;
 
 			_consumeDailyUse = consumeDailyUse;
 			ulong synchronizationId = ReadyManager.ActiveSynchronizationId;
@@ -59,8 +56,7 @@ namespace ONI_United.Networking.WorldSync
 			{
 				clientCount++;
 				PacketSender.SendToPlayer(participant, new HardSyncPacket { SynchronizationId = synchronizationId });
-                if (!NetworkRuntime.IsCurrentOperation(owner, operation)
-                    || !ReadyManager.IsCurrentSynchronization(synchronizationId)) return;
+                if (!ReadyManager.IsCurrentSynchronization(synchronizationId)) return;
 			}
 
 			foreach (PlayerCursor cursor in MultiplayerSession.PlayerCursors.Values)
@@ -68,16 +64,13 @@ namespace ONI_United.Networking.WorldSync
 
 			ReadyManager.StartGameplayDrain(ClientTrafficDrainSeconds);
 			DebugConsole.Log($"[HardSync] Synchronization started for {clientCount} client(s).");
-			CoroutineRunner.RunOne(DrainClientTrafficThenTransfer(
-                owner, operation, synchronizationId));
+			CoroutineRunner.RunOne(DrainClientTrafficThenTransfer(synchronizationId));
 			ReadyManager.RefreshReadyState();
 		}
 
-		private static IEnumerator DrainClientTrafficThenTransfer(
-            ONI_United.Networking.Transport.TransportServer owner, object operation, ulong synchronizationId)
+		private static IEnumerator DrainClientTrafficThenTransfer(ulong synchronizationId)
 		{
-            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
-                && ReadyManager.IsCurrentSynchronization(synchronizationId);
+            bool IsCurrent() => ReadyManager.IsCurrentSynchronization(synchronizationId);
 			while (IsCurrent()
 				&& UnityEngine.Time.realtimeSinceStartup < ReadyManager.GameplayDrainUntil)
 				yield return null;

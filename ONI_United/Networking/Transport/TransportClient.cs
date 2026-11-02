@@ -9,10 +9,6 @@ namespace ONI_United.Networking.Transport
 {
     public abstract class TransportClient
     {
-        internal object Operation { get; private set; }
-        internal void BeginOperation() => Operation = new object();
-        internal bool IsCurrentOperation(object operation) => operation != null && ReferenceEquals(operation, Operation);
-
         public System.Action OnClientConnected;
         public System.Action OnClientDisconnected;
         public System.Action<string> OnConnectionFailed;

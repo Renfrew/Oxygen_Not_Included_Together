@@ -84,7 +84,7 @@ namespace ONI_United.Core
 
         internal static bool IsAvailable => instance != null;
         internal static Phase Current => instance.current;
-        internal static bool CanSelectTransport => Current == Phase.Idle && !NetworkRuntime.HasActiveOperation;
+        internal static bool CanSelectTransport => Current == Phase.Idle;
         internal static bool IsHostGameplay => Session.IsHost
             && (Current == Phase.InGameSession || Current == Phase.Synchronizing);
 
@@ -127,7 +127,7 @@ namespace ONI_United.Core
             {
                 case Event.StartHost:
                 case Event.Join:
-                    if (NetworkRuntime.HasActiveOperation || Session.IsActive || Session.Players.Count != 0) return false;
+                    if (Session.IsActive || Session.Players.Count != 0) return false;
                     break;
                 case Event.HostSessionReady:
                     if (!Session.IsHost) return false;

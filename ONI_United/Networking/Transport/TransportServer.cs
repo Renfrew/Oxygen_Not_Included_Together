@@ -12,41 +12,36 @@ namespace ONI_United.Networking.Transport
 
         internal void Start()
         {
-            var operation = NetworkRuntime.ActiveOperation;
-            if (!NetworkRuntime.IsCurrentOperation(this, operation)
-                || Lifecycle.Current != Lifecycle.Phase.StartingHost) return;
+            if (Lifecycle.Current != Lifecycle.Phase.StartingHost) return;
             OperationError = null;
             if (!Misc.Utils.IsInGame() || Grid.CellCount <= 0)
             {
-                ReportStartupFailure(operation, "Load a colony before starting a multiplayer host.");
+                ReportStartupFailure("Load a colony before starting a multiplayer host.");
                 return;
             }
-            StartProtocol(operation);
+            StartProtocol();
         }
 
-        protected abstract void StartProtocol(object operation);
+        protected abstract void StartProtocol();
         protected abstract void CancelProtocol(Action<bool, string> completed);
         protected abstract void DisposeProtocol();
         public virtual void PollCancellation() { }
 
-        protected void ReportTransportStarted(object operation)
+        protected void ReportTransportStarted()
         {
-            if (!NetworkRuntime.IsCurrentOperation(this, operation)) return;
             Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, () =>
             {
-                if (NetworkRuntime.IsCurrentOperation(this, operation) && Session.IsHost
-                    && Lifecycle.Current == Lifecycle.Phase.InGameSession)
+                if (Session.IsHost && Lifecycle.Current == Lifecycle.Phase.InGameSession)
                     OnSessionPlayerAdmitted(Session.LocalPlayerId);
             });
         }
 
-        protected void ReportStartupFailure(object operation, string reason)
+        protected void ReportStartupFailure(string reason)
         {
-            if (!NetworkRuntime.IsCurrentOperation(this, operation)
-                || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
+            if (Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
             OperationError = string.IsNullOrEmpty(reason) ? "Host startup failed." : reason;
             DebugConsole.LogError("[TransportServer] " + OperationError);
-            NetworkRuntime.Stop();
+            NetworkRuntime.StopHost();
         }
 
         internal void Stop()
@@ -75,7 +70,6 @@ namespace ONI_United.Networking.Transport
         internal void DisposeHost()
         {
             stopCompletion = null;
-            NetworkRuntime.InvalidateOperation(this);
             DisposeProtocol();
         }
 

@@ -29,7 +29,6 @@
     <Compile Include="../../Shared/Replication/SnapshotTimeline.cs" Link="Replication/SnapshotTimeline.cs" />
     <Compile Include="../../Shared/Networking/TransportConfigurationMigration.cs" Link="Networking/TransportConfigurationMigration.cs" />
     <Compile Include="../../ONI_United/Core/Lifecycle.cs" Link="Core/Lifecycle.cs" />
-    <Compile Include="../../ONI_United/Core/NetworkRuntime.Operation.cs" Link="Core/NetworkRuntime.Operation.cs" />
     <Compile Include="../../ONI_United/Networking/Runtime/GameClient.Synchronization.cs" Link="Networking/GameClient.Synchronization.cs" />
     <Compile Include="../../ONI_United/Core/LifecycleEventActions.cs" Link="Core/LifecycleEventActions.cs" />
     <Compile Include="../../ONI_United/Networking/Transport/TransportServer.cs" Link="Networking/TransportServer.cs" />

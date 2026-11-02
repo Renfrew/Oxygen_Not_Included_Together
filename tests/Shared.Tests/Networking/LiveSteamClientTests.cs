@@ -96,66 +96,6 @@ public sealed class LiveSteamClientTests : IDisposable
     }
 
     [Fact]
-    public void RetiredCallbackCannotAffectNewAttemptEvenWhenNativeHandleIsReused()
-    {
-        var old = Connect();
-        var retired = Callback<SteamNetConnectionStatusChangedCallback_t>.CaptureDispatch();
-        NetworkRuntime.DisconnectClient();
-        SteamNetworkingSockets.NextClientHandle = old.m_HSteamNetConnection;
-        var current = Connect();
-        Assert.Equal(old, current);
-        var connected = new SteamNetConnectionInfo_t
-        {
-            m_eState = ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected,
-            m_identityRemote = new() { SteamId = new(20) }
-        };
-        SteamNetworkingSockets.Connections[current] = connected;
-        retired(new() { m_hConn = old, m_info = connected });
-        connected.m_eState = ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer;
-        retired(new() { m_hConn = old, m_info = connected });
-        Assert.Equal(Lifecycle.Phase.Joining, Lifecycle.Current);
-        Assert.Equal(0, established);
-        Assert.Equal(0, ended);
-        Assert.Equal(current, SteamworksClient.Connection);
-        Notify(current, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
-        Assert.Equal(1, established);
-    }
-
-    [Fact]
-    public void OldReceiveBatchReleasesButDoesNotDispatchAfterSameHandleRestart()
-    {
-        var old = Connect();
-        var data = Marshal.AllocHGlobal(1);
-        var messages = new[] { Marshal.AllocHGlobal(Marshal.SizeOf<SteamNetworkingMessage_t>()),
-            Marshal.AllocHGlobal(Marshal.SizeOf<SteamNetworkingMessage_t>()) };
-        int dispatched = 0;
-        int released = SteamNetworkingMessage_t.Released.Count;
-        try
-        {
-            foreach (var pointer in messages)
-                Marshal.StructureToPtr(new SteamNetworkingMessage_t { m_pData = data, m_cbSize = 1 }, pointer, false);
-            SteamNetworkingSockets.Received.Enqueue(messages);
-            ONI_United.Networking.Packets.Architecture.PacketHandler.OnIncoming = () =>
-            {
-                dispatched++;
-                NetworkRuntime.DisconnectClient();
-                SteamNetworkingSockets.NextClientHandle = old.m_HSteamNetConnection;
-                Assert.Equal(old, Connect());
-            };
-            client.OnMessageRecieved();
-            Assert.Equal(1, dispatched);
-            Assert.Equal(released + 2, SteamNetworkingMessage_t.Released.Count);
-            foreach (var pointer in messages) Assert.Contains(pointer, SteamNetworkingMessage_t.Released);
-        }
-        finally
-        {
-            ONI_United.Networking.Packets.Architecture.PacketHandler.OnIncoming = null;
-            foreach (var pointer in messages) Marshal.FreeHGlobal(pointer);
-            Marshal.FreeHGlobal(data);
-        }
-    }
-
-    [Fact]
     public void QueuedConnectedNotificationCannotOverrideFailedNativeState()
     {
         var handle = Connect();

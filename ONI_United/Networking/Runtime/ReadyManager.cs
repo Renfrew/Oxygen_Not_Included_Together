@@ -112,8 +112,6 @@ namespace ONI_United.Networking.Runtime
 
 			if (!MultiplayerSession.IsHost || IsSynchronizing)
 				return false;
-            var owner = NetworkRuntime.TransportServer;
-            var operation = NetworkRuntime.ActiveOperation;
             if (!Lifecycle.Handle(Lifecycle.Event.StartHostSync)) return false;
 
 			ActiveSynchronizationId = checked(++LastIssuedSynchronizationId);
@@ -136,11 +134,9 @@ namespace ONI_United.Networking.Runtime
 			}
 
 			RefreshScreen();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)
-                || !IsCurrentSynchronization(synchronizationId) || !Session.IsHost) return false;
+            if (!IsCurrentSynchronization(synchronizationId) || !Session.IsHost) return false;
 			SendStatusUpdatePacketToClients();
-			return NetworkRuntime.IsCurrentOperation(owner, operation)
-                && IsCurrentSynchronization(synchronizationId) && Session.IsHost;
+			return IsCurrentSynchronization(synchronizationId) && Session.IsHost;
 		}
 
 		internal static void StartGameplayDrain(float durationSeconds)
@@ -164,15 +160,12 @@ namespace ONI_United.Networking.Runtime
 			if (!IsSynchronizing || !IsEveryoneReady())
 				return;
 
-            var owner = NetworkRuntime.TransportServer;
-            var operation = NetworkRuntime.ActiveOperation;
             if (!Lifecycle.Handle(Lifecycle.Event.CompleteSync)) return;
 			ulong synchronizationId = ActiveSynchronizationId;
 			foreach (ulong participant in SynchronizationParticipants)
             {
 				PacketSender.SendToPlayer(participant, new AllClientsReadyPacket { SynchronizationId = synchronizationId }, PacketSendMode.Reliable);
-                if (!NetworkRuntime.IsCurrentOperation(owner, operation)
-                    || ActiveSynchronizationId != synchronizationId) return;
+                if (ActiveSynchronizationId != synchronizationId) return;
             }
 			ActiveSynchronizationId = 0;
 			Participants.Clear();
@@ -180,15 +173,13 @@ namespace ONI_United.Networking.Runtime
 			GameplayDrainUntil = 0f;
 			GameServerHardSync.OnSynchronizationCompleted();
 			MultiplayerOverlay.Show(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC);
-			CoroutineRunner.RunOne(CloseHostOverlayAfterGrace(owner, operation, synchronizationId));
+			CoroutineRunner.RunOne(CloseHostOverlayAfterGrace(synchronizationId));
 		}
 
-		private static IEnumerator CloseHostOverlayAfterGrace(
-            ONI_United.Networking.Transport.TransportServer owner, object operation, ulong synchronizationId)
+		private static IEnumerator CloseHostOverlayAfterGrace(ulong synchronizationId)
 		{
 			yield return new UnityEngine.WaitForSecondsRealtime(HostOverlayCloseGraceSeconds);
-			if (NetworkRuntime.IsCurrentOperation(owner, operation) && Session.IsHost
-                && !IsSynchronizing && LastIssuedSynchronizationId == synchronizationId)
+			if (Session.IsHost && !IsSynchronizing && LastIssuedSynchronizationId == synchronizationId)
 				MultiplayerOverlay.Close();
 		}
 

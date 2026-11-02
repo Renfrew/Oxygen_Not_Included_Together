@@ -31,29 +31,22 @@ namespace ONI_United.Core
 
         private static void StartHost(Lifecycle.Phase source)
         {
-            NetworkRuntime.BeginHostOperation();
-            var operation = NetworkRuntime.ActiveOperation;
-            var owner = NetworkRuntime.TransportServer;
             if (Session.IsActive || Session.Players.Count != 0)
                 throw new InvalidOperationException("A multiplayer session or connection is already active.");
             if (Utils.IsInGame()) NetworkIdentityRegistry.RebuildFromScene();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)) return;
             CursorManager.Instance.AssignColor();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)) return;
             NetworkRuntime.InitializeHostTick();
-            NetworkRuntime.StartHostTransport(operation);
+            NetworkRuntime.StartHostTransport();
         }
 
         private static void PrepareHostSession(Lifecycle.Phase source)
         {
             if (source != Lifecycle.Phase.StartingHost)
                 throw new InvalidOperationException("Invalid host preparation source: " + source + ".");
-            var owner = NetworkRuntime.TransportServer;
-            var operation = NetworkRuntime.ActiveOperation;
             if (!MultiplayerSession.RegisterAsHost())
                 throw new InvalidOperationException("The local host Session could not be registered.");
 
-            NetworkRuntime.HostSessionReady(owner, operation);
+            Lifecycle.Handle(Lifecycle.Event.HostSessionReady);
         }
 
         private static void PrepareClientSession(Lifecycle.Phase source)
@@ -68,17 +61,14 @@ namespace ONI_United.Core
             SelectToolPatch.UpdateColor();
         }
 
-        private static void Join(Lifecycle.Phase source) => NetworkRuntime.BeginClientOperation();
+        private static void Join(Lifecycle.Phase source) { }
 
-        private static void SessionCleared(Lifecycle.Phase source) => NetworkRuntime.ClearOperation();
+        private static void SessionCleared(Lifecycle.Phase source) { }
 
         private static void ClearClientSession(Lifecycle.Phase source)
         {
-            var owner = NetworkRuntime.TransportClient;
-            var operation = NetworkRuntime.ActiveOperation;
             GameClient.ResetSynchronizationState();
             MultiplayerSession.Clear();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)) return;
             NetworkIdentityRegistry.Clear();
             NetworkRuntime.TransportPacketSender.ClearPending();
             SelectToolPatch.UpdateColor();
@@ -86,10 +76,7 @@ namespace ONI_United.Core
 
         private static void ClearHostSession(Lifecycle.Phase source)
         {
-            var owner = NetworkRuntime.TransportServer;
-            var operation = NetworkRuntime.ActiveOperation;
             MultiplayerSession.Clear();
-            if (!NetworkRuntime.IsCurrentOperation(owner, operation)) return;
             NetworkIdentityRegistry.Clear();
             NetworkRuntime.TransportPacketSender.ClearPending();
             SelectToolPatch.UpdateColor();

@@ -16,7 +16,6 @@ namespace Shared.Tests.Networking
         {
             Trace.Clear(); Registered = null; Clearing = null; PreparingClient = null;
             RegistrationSucceeds = true; Session.Reset();
-            ONI_United.Core.NetworkRuntime.ClearOperation();
             ONI_United.Core.NetworkRuntime.TransportServer = new ONI_United.Core.NetworkRuntime.TestServer();
             ONI_United.Core.NetworkRuntime.TransportClient = new ONI_United.Core.NetworkRuntime.TestClient();
             LoadedWorld = true;
@@ -172,7 +171,7 @@ namespace ONI_United.Core
         }
         public sealed class TestServer : Networking.Transport.TransportServer
         {
-            protected override void StartProtocol(object operation) { }
+            protected override void StartProtocol() { }
             protected override void CancelProtocol(Action<bool, string> completed) => completed(true, null);
             protected override void DisposeProtocol() { }
             public override void CloseConnections() { }
@@ -186,7 +185,28 @@ namespace ONI_United.Core
         internal static int ServerCapacity = 16;
         public static int GetMaxServerCapacity() => ServerCapacity;
         public static class PingRanges { public static readonly int DEGRADED = 120, BAD = 150; }
-        // Connection setup substitute only; production operation routing and native client are linked.
+        internal static void StartHostTransport() => TransportServer.Start();
+        public static void StartServer() => Lifecycle.Handle(Lifecycle.Event.StartHost);
+        public static void StopHost() => Lifecycle.Handle(Lifecycle.Event.ClearHostSession, TransportServer.Stop);
+        public static void Stop()
+        {
+            if (Session.IsHost || Lifecycle.Current == Lifecycle.Phase.StartingHost)
+                StopHost();
+            else DisconnectClient();
+        }
+        public static void DisconnectClient() => Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () =>
+        {
+            if (!TransportClient.TryStop(out _)) return;
+            Lifecycle.Handle(Lifecycle.Event.SessionCleared);
+        });
+        internal static void TransportEstablished(Networking.Transport.TransportClient owner)
+        {
+            if (ReferenceEquals(owner, TransportClient))
+                Lifecycle.Handle(Lifecycle.Event.PrepareClientSession);
+        }
+        internal static bool ClientAdmitted(Networking.Transport.TransportClient owner) =>
+            ReferenceEquals(owner, TransportClient) && Lifecycle.Handle(Lifecycle.Event.ClientAdmitted);
+        // Connection setup substitute; production native clients are not linked.
         public static bool ConnectClient(bool showLoadingScreen = true, string ip = "", int port = 7777) =>
             Lifecycle.Handle(Lifecycle.Event.Join, () =>
             {

@@ -173,7 +173,7 @@ namespace ONI_United.Networking.Transport.Steamworks
     {
         internal static bool InLobby;
         internal static bool HasPendingJoin => false;
-        internal static void CreateHostLobby(object operation, Action<string> done) { InLobby = true; done(null); }
+        internal static void CreateHostLobby(Action<string> done) { InLobby = true; done(null); }
         internal static bool TryReleaseClientLobby(out string error, Action<bool, string> completed = null)
         { error = null; return true; }
         internal static void CancelHostLobby(Action<bool, string> done) { InLobby = false; done(true, null); }
