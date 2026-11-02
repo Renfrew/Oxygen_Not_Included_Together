@@ -139,10 +139,11 @@ namespace ONI_United.Networking.Sessions
 				DebugConsole.LogError("[MultiplayerSession] Cannot register host with an invalid local player ID.");
 				return false;
 			}
-			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
 			Session.UpdatePlayerName(hostId, Utils.GetLocalPlayerName());
 			hostPlayer.readyState = ClientReadyState.Ready;
 			KnownPlayerNames[hostId] = hostPlayer.PlayerName;
+			// Publish only fully initialized membership; subscribers may stop and restart.
+			Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
 			return true;
 		}
 
@@ -220,8 +221,10 @@ namespace ONI_United.Networking.Sessions
 
 		private static void EndSession(Action<object> close)
 		{
+            var operation = NetworkRuntime.ActiveOperation;
 			bool wasActive = InActiveSession;
 			ClearConnectedPlayers(close);
+            if (!ReferenceEquals(operation, NetworkRuntime.ActiveOperation)) return;
 			KnownPlayerNames.Clear();
 			ReadyManager.ResetSynchronizationState();
 
@@ -251,7 +254,9 @@ namespace ONI_United.Networking.Sessions
 		{
 			using var _ = Profiler.Scope();
 
+            var operation = NetworkRuntime.ActiveOperation;
 			EndSession(null);
+            if (!ReferenceEquals(operation, NetworkRuntime.ActiveOperation)) return;
 			ONI_United.Networking.Replication.InterestGroupManager.Clear();
 			WorkProgressPatch.ClearTracking();
 			RemoteProgressRegistry.ClearAll();
@@ -277,6 +282,7 @@ namespace ONI_United.Networking.Sessions
 			var players = new List<MultiplayerPlayer>(ConnectedPlayers.Values);
 			Session.Reset();
 			_targetHostId = null;
+			ReadyManager.ResetSynchronizationState();
 			if (wasActive)
 				Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.False);
 			foreach (var player in players)
@@ -285,7 +291,6 @@ namespace ONI_United.Networking.Sessions
 				close?.Invoke(player.Connection);
 				player.Connection = null;
 			}
-			ReadyManager.ResetSynchronizationState();
 		}
 
         /// <summary>

@@ -52,13 +52,14 @@ namespace ONI_United.Networking.Packets.World
 				return;
 
 			string hostIp = Configuration.Instance.Client.LanSettings.Ip;
+            ulong synchronizationId = SynchronizationId;
+            Func<bool> isCurrent = GameClient.CaptureSynchronization(synchronizationId);
 
 			DebugConsole.Log($"[TcpTransferStart] Starting TCP download from {hostIp}:{TcpPort}, file '{FileName}' ({FileSize} bytes), clientId={ClientId}");
 
 			MultiplayerOverlay.Show("Connecting for save download...");
+            if (!isCurrent()) return;
 
-			ulong synchronizationId = SynchronizationId;
-			Func<bool> isCurrent = () => GameClient.IsCurrentSynchronization(synchronizationId);
 			TcpFileTransferClient.Download(hostIp, TcpPort, ClientId, synchronizationId, isCurrent,
 				(fileName, data) =>
 				{

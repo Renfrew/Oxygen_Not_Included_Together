@@ -27,22 +27,22 @@ namespace ONI_United.UI.Multiplayer.Views
         internal void Refresh()
         {
             string status, role;
-            if (Lifecycle.HasHostOperation)
+            if (NetworkRuntime.HasHostOperation)
             {
-                status = NetworkRuntime.TransportServer.OperationError ?? (Lifecycle.Current == Lifecycle.Phase.Hosting
-                    ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.Stopping ? "Stopping host" : "Starting host");
+                status = NetworkRuntime.TransportServer.OperationError ?? (Lifecycle.IsHostGameplay
+                    ? "Hosting Game" : Lifecycle.Current == Lifecycle.Phase.ClearingSession ? "Stopping host" : "Starting host");
                 role = "Role: host";
             }
             else if (Session.IsActive)
             { status = Session.IsHost ? "Hosting Game" : "Connected to a multiplayer session"; role = $"Role: {(Session.IsHost ? "Host" : "Client")}"; }
-            else if (GameClient.State != ClientState.Disconnected)
-            { status = $"Connection in progress: {GameClient.State}"; role = "Role: awaiting session admission"; }
+            else if (Lifecycle.Current != Lifecycle.Phase.Idle)
+            { status = $"Connection in progress: {Lifecycle.Current}"; role = "Role: awaiting session admission"; }
             else if (SteamLobby.InLobby)
             { status = "In a Steam lobby; gameplay connection is not confirmed."; role = "Role: lobby member"; }
             else { status = "No active multiplayer session."; role = "Role: none"; }
             view.SetState(status, role, $"Transport: {(NetworkRuntime.IsSteam ? "STEAMWORKS" : "LITENETLIB")}",
-                Lifecycle.HasHostOperation,
-                GameClient.State == ClientState.Connecting);
+                NetworkRuntime.HasHostOperation,
+                NetworkRuntime.HasClientOperation);
             players.Clear();
             foreach (var pair in Session.Players)
             {
@@ -55,7 +55,7 @@ namespace ONI_United.UI.Multiplayer.Views
         }
         private void CancelConnection()
         {
-            if (GameClient.State != ClientState.Connecting) return;
+            if (!NetworkRuntime.HasClientOperation) return;
             GameClient.CancelConnectionAttempt(); screen.RefreshActiveView();
         }
         private void StopHosting()

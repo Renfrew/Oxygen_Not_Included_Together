@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Core;
 using ONI_United.Networking.Packets.World;
@@ -31,6 +32,8 @@ namespace ONI_United.Networking.WorldSync
 				DebugConsole.LogWarning("[HardSync] Only the host can start synchronization.");
 				return;
 			}
+            var owner = NetworkRuntime.TransportServer;
+            var operation = NetworkRuntime.ActiveOperation;
 
 			if (ReadyManager.IsSynchronizing)
 			{
@@ -46,6 +49,7 @@ namespace ONI_United.Networking.WorldSync
 
 			if (SpeedControlScreen.Instance?.IsPaused != true)
 				SpeedControlScreen.Instance?.TogglePause();
+            if (!NetworkRuntime.IsCurrentOperation(owner, operation) || !Session.IsHost) return;
 
 			_consumeDailyUse = consumeDailyUse;
 			ulong synchronizationId = ReadyManager.ActiveSynchronizationId;
@@ -55,6 +59,8 @@ namespace ONI_United.Networking.WorldSync
 			{
 				clientCount++;
 				PacketSender.SendToPlayer(participant, new HardSyncPacket { SynchronizationId = synchronizationId });
+                if (!NetworkRuntime.IsCurrentOperation(owner, operation)
+                    || !ReadyManager.IsCurrentSynchronization(synchronizationId)) return;
 			}
 
 			foreach (PlayerCursor cursor in MultiplayerSession.PlayerCursors.Values)
@@ -62,34 +68,41 @@ namespace ONI_United.Networking.WorldSync
 
 			ReadyManager.StartGameplayDrain(ClientTrafficDrainSeconds);
 			DebugConsole.Log($"[HardSync] Synchronization started for {clientCount} client(s).");
-			CoroutineRunner.RunOne(DrainClientTrafficThenTransfer(synchronizationId));
+			CoroutineRunner.RunOne(DrainClientTrafficThenTransfer(
+                owner, operation, synchronizationId));
 			ReadyManager.RefreshReadyState();
 		}
 
-		private static IEnumerator DrainClientTrafficThenTransfer(ulong synchronizationId)
+		private static IEnumerator DrainClientTrafficThenTransfer(
+            ONI_United.Networking.Transport.TransportServer owner, object operation, ulong synchronizationId)
 		{
-			while (ReadyManager.IsCurrentSynchronization(synchronizationId)
+            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
+                && ReadyManager.IsCurrentSynchronization(synchronizationId);
+			while (IsCurrent()
 				&& UnityEngine.Time.realtimeSinceStartup < ReadyManager.GameplayDrainUntil)
 				yield return null;
 
-			if (!ReadyManager.IsCurrentSynchronization(synchronizationId))
+			if (!IsCurrent())
 				yield break;
 
 			// Close gameplay admission before yielding so admitted dispatches finish before capture.
 			yield return null;
-			if (!ReadyManager.IsCurrentSynchronization(synchronizationId))
+			if (!IsCurrent())
 				yield break;
 
 			try
 			{
-				_synchronizationSnapshot = SaveHelper.GetWorldSave();
+                var snapshot = SaveHelper.GetWorldSave();
+                if (!IsCurrent()) yield break;
+				_synchronizationSnapshot = snapshot;
 				SaveFileRequestPacket.SendSaveFileToAll(_synchronizationSnapshot, synchronizationId);
+                if (!IsCurrent()) yield break;
 				ReadyManager.RefreshReadyState();
 			}
 			catch (Exception ex)
 			{
 				DebugConsole.LogError($"[HardSync] Failed to capture or start the synchronization snapshot transfer: {ex}");
-				ReadyManager.ResetSynchronizationState();
+                if (IsCurrent()) NetworkRuntime.StopHost();
 			}
 		}
 

@@ -37,11 +37,11 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     public void Dispose()
     {
         NetManager.StopThrows = false;
-        Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+        Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
         Invoke("OnDestroy"); Session.Reset();
     }
-    private void Start() => Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
-    private void Stop() => Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+    private void Start() => Lifecycle.Handle(Lifecycle.Event.StartHost, server.Start);
+    private void Stop() => Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
     private static byte[] RequestData(ulong id = 20, string magic = "ONI_TOGETHER")
     {
         using var stream = new MemoryStream();
@@ -71,7 +71,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     {
         Start();
         var native = NetManager.Last;
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
         Assert.Equal(7777, native.Port);
         Assert.True(native.AutoRecycle); Assert.False(native.UnsyncedEvents);
         Assert.Equal(30000, native.DisconnectTimeout); Assert.Equal(4, native.ChannelsCount);
@@ -223,7 +223,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     {
         Start(); var peer = Connect(); Hello(peer);
         NetManager.StopThrows = true; Stop();
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.True(Peers.Contains(peer)); Assert.False(server.TryGetConnection(20, out _));
         NetManager.StopThrows = false; Stop();
         Assert.Empty(Peers); Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);

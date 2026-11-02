@@ -2,17 +2,25 @@ using ONI_United.DebugTools;
 
 namespace ONI_United.Networking.Transport
 {
-    // INACTIVE MIGRATION CONTRACT. Notifications describe native transport outcomes,
+    // Notifications describe native transport outcomes,
     // not Session admission or gameplay readiness. No host Lifecycle events are emitted.
     public abstract class ClientTransport
     {
-        public event System.Action OnClientConnected;
-        public event System.Action OnClientDisconnected;
-        public event System.Action<string> OnConnectionFailed;
+        // Identity for delayed application callbacks; native handles remain protocol-owned.
+        internal object Operation { get; private set; }
+        internal void BeginOperation() => Operation = new object();
+        internal bool IsCurrentOperation(object operation) => operation != null && ReferenceEquals(operation, Operation);
+
+        public System.Action OnClientConnected;
+        public System.Action OnClientDisconnected;
+        public System.Action<string> OnConnectionFailed;
 
         public void Connect() => InternalConnect();
         public void Stop() => InternalStop();
         public void Poll() => InternalPoll();
+
+        // A false result retains native ownership for explicit cleanup retry.
+        public abstract bool TryStop(out string error);
 
         protected abstract void InternalConnect();
         protected abstract void InternalStop();

@@ -104,6 +104,7 @@ namespace ONI_United.Networking.Transfer
 			if (!SaveFileRequestPacket.TryGetSynchronizationId(chunk.TransferId, out ulong synchronizationId)
 				|| !GameClient.CanReceiveSynchronizationSave(synchronizationId))
 				return;
+            var isCurrent = GameClient.CaptureSynchronization(synchronizationId);
 			if (!InProgress.TryGetValue(chunk.FileName, out var save))
 			{
 				// Determine chunk size from first received chunk
@@ -114,12 +115,14 @@ namespace ONI_United.Networking.Transfer
 
 				// Send initial progress (0%) to host
 				SendProgressToHost(chunk.FileName, 0, save.TotalChunks, 0);
+                if (!isCurrent()) return;
 				save.LastReportedProgress = 0;
 
 				// Show initial progress bar (0%) to client
 				string initialProgressBar = CreateClientProgressBar(0);
                 string initialDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, initialProgressBar, "0", "0", save.TotalChunks);
 				MultiplayerOverlay.Show(initialDisplay);
+                if (!isCurrent()) return;
 			}
 
 			isDownloading = true;
@@ -158,11 +161,13 @@ namespace ONI_United.Networking.Transfer
 			string progressDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE, progressBar, percent, receivedChunks, save.TotalChunks);
 
 			MultiplayerOverlay.Show(progressDisplay);
+            if (!isCurrent()) return;
 
 			// Send progress to host when percentage changes
 			if (percent != save.LastReportedProgress && percent % 5 == 0) // Every 5% or first time
 			{
 				SendProgressToHost(chunk.FileName, receivedChunks, save.TotalChunks, percent);
+                if (!isCurrent()) return;
 				save.LastReportedProgress = percent;
 			}
 
@@ -173,11 +178,13 @@ namespace ONI_United.Networking.Transfer
 
 				// Send final progress (100%) to host
 				SendProgressToHost(chunk.FileName, save.TotalChunks, save.TotalChunks, 100);
+                if (!isCurrent()) return;
 
 				// Show completion visual to client
 				string completeProgressBar = CreateClientProgressBar(100);
                 string completeDisplay = string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOAD_COMPLETE, completeProgressBar, save.TotalChunks, save.TotalChunks);
 				MultiplayerOverlay.Show(completeDisplay);
+                if (!isCurrent()) return;
 
 				InProgress.Remove(chunk.FileName);
 				isDownloading = false;

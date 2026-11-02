@@ -55,6 +55,13 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
         }
 
+        public override bool TryStop(out string error)
+        {
+            InternalStop();
+            error = connection.HasValue ? "Steam client release remains unresolved." : null;
+            return !connection.HasValue;
+        }
+
         protected override void InternalStop()
         {
             if (!connection.HasValue) return;

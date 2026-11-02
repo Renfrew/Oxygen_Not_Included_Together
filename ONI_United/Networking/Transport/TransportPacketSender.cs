@@ -39,6 +39,12 @@ namespace ONI_United.Networking.Transport
 				&& (sendType & PacketSendMode.NoDelay) != 0;
 		}
 
+        internal void ClearPending()
+        {
+            _pendingQueues.Clear();
+            _emptyConnections.Clear();
+        }
+
         public void Flush()
         {
             if (!Configuration.Instance.EnablePacketQueue)

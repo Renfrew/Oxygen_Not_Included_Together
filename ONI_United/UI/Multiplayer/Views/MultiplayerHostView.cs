@@ -52,9 +52,9 @@ namespace ONI_United.UI.Multiplayer.Views
             Show(false);
         }
 
-        internal void RefreshAvailability() => startButton.isInteractable = Lifecycle.Current == Lifecycle.Phase.Idle
+        internal void RefreshAvailability() => startButton.isInteractable = Lifecycle.CanSelectTransport
             && !disposed && NetworkRuntime.IsLan && Utils.IsInGame() && Grid.CellCount > 0
-            && !Session.IsActive && GameClient.State == ClientState.Disconnected;
+            && !Session.IsActive;
 
         internal void RefreshTransport()
         {
@@ -67,7 +67,7 @@ namespace ONI_United.UI.Multiplayer.Views
         private void OnClickHost()
         {
             if (disposed || !NetworkRuntime.IsLan || !Utils.IsInGame() || Grid.CellCount <= 0
-                || Session.IsActive || GameClient.State != ClientState.Disconnected) return;
+                || Session.IsActive || !Lifecycle.CanSelectTransport) return;
             if (!int.TryParse(lanSettings.Port.Trim(), out int port) || port < 1 || port > 65535)
             { return; }
             if (!int.TryParse(players.PlayerLimit.Trim(), out int maxPlayers)

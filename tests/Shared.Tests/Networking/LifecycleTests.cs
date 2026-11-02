@@ -35,46 +35,253 @@ public sealed class LifecycleTests : IDisposable
     private void Initialize() => Lifecycle.Initialize();
 
     // Exercises the production dispatcher/transport contract, not NetworkRuntime routing.
-    private bool Start() => Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
-    // Stop admission uses the runtime substitute; transport completion remains production code.
+    private bool Start() => Lifecycle.Handle(Lifecycle.Event.StartHost);
+    // Cleanup routing and transport completion are source-linked production code.
     private void Stop() => NetworkRuntime.Stop();
 
+    [Theory]
+    [InlineData(false, 0, false)] [InlineData(false, 0, true)]
+    [InlineData(false, 1, false)] [InlineData(false, 1, true)]
+    [InlineData(false, 2, false)] [InlineData(false, 2, true)]
+    [InlineData(true, 0, false)] [InlineData(true, 0, true)]
+    [InlineData(true, 1, false)] [InlineData(true, 1, true)]
+    [InlineData(true, 2, false)] [InlineData(true, 2, true)]
+    public void GameplayEventsUsePhaseAndSessionRoleIndependentlyOfWorldState(bool synchronize, int role, bool loadedWorld)
+    {
+        if (role == 1) Assert.True(Session.BeginHosting(new Player(10, "Host")));
+        else if (role == 2) Assert.True(Session.AdmitClient(new Player(20, "Client"), new Player(10, "Host")));
+        LoadedWorld = loadedWorld;
+        var source = synchronize ? Lifecycle.Phase.Synchronizing : Lifecycle.Phase.PreparingSession;
+        var evt = synchronize ? Lifecycle.Event.CompleteSync : Lifecycle.Event.HostSessionReady;
+        typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, source);
+        Trace.Clear();
+        bool after = false;
+        bool permitted = synchronize ? role != 0 : role == 1;
+        Assert.Equal(permitted, Lifecycle.Handle(evt, () =>
+        {
+            after = true;
+            Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
+            if (!synchronize) Assert.Contains("color:InGameSession", Trace);
+        }));
+        Assert.Equal(permitted, after);
+        Assert.Equal(permitted ? Lifecycle.Phase.InGameSession : source, Lifecycle.Current);
+        if (!permitted) Assert.Empty(Trace);
+        typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, Lifecycle.Phase.Idle);
+        Trace.Clear();
+        Assert.False(Lifecycle.Handle(evt, () => throw new Exception("rejected callback")));
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.Empty(Trace);
+    }
+
+    // Exhaustive contract matrix, independent of the production permission dictionary.
+    // Domain mismatches are intentional: phase membership alone must not grant admission.
     public static IEnumerable<object[]> Permissions()
     {
         foreach (var phase in Enum.GetValues<Lifecycle.Phase>())
         foreach (var evt in Enum.GetValues<Lifecycle.Event>())
+        foreach (int role in new[] { 0, 1, 2 }) // No Session, host Session, client Session.
+        foreach (int operationRole in new[] { 0, 1, 2 })
         {
             Lifecycle.Phase? destination = (phase, evt) switch
             {
-                (Lifecycle.Phase.Idle, Lifecycle.Event.Start) => Lifecycle.Phase.StartingHost,
-                (Lifecycle.Phase.StartingHost, Lifecycle.Event.TransportStarted) => Lifecycle.Phase.Hosting,
-                (Lifecycle.Phase.PrepareSession, Lifecycle.Event.SessionPrepared) => Lifecycle.Phase.Hosting,
-                (Lifecycle.Phase.StartingHost or Lifecycle.Phase.PrepareSession or Lifecycle.Phase.Hosting or Lifecycle.Phase.Stopping,
-                    Lifecycle.Event.Stop) => Lifecycle.Phase.Stopping,
-                (Lifecycle.Phase.Stopping, Lifecycle.Event.Stopped) => Lifecycle.Phase.Idle,
+                (Lifecycle.Phase.Uninitialized, Lifecycle.Event.Initialize) => Lifecycle.Phase.Idle,
+                (Lifecycle.Phase.Idle, Lifecycle.Event.StartHost) when role == 0 && operationRole == 0 => Lifecycle.Phase.StartingHost,
+                (Lifecycle.Phase.StartingHost, Lifecycle.Event.PrepareHostSession) => operationRole == 1
+                    ? Lifecycle.Phase.InGameSession : Lifecycle.Phase.PreparingSession,
+                (Lifecycle.Phase.Joining, Lifecycle.Event.PrepareClientSession) => Lifecycle.Phase.PreparingSession,
+                (Lifecycle.Phase.PreparingSession, Lifecycle.Event.HostSessionReady) when role == 1 => Lifecycle.Phase.InGameSession,
+                (Lifecycle.Phase.StartingHost or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.InGameSession or Lifecycle.Phase.ClearingSession,
+                    Lifecycle.Event.ClearHostSession) => Lifecycle.Phase.ClearingSession,
+                (Lifecycle.Phase.Synchronizing, Lifecycle.Event.ClearHostSession) => Lifecycle.Phase.ClearingSession,
+                (Lifecycle.Phase.Idle, Lifecycle.Event.Join) when role == 0 && operationRole == 0 => Lifecycle.Phase.Joining,
+                (Lifecycle.Phase.PreparingSession, Lifecycle.Event.ClientAdmitted) when role == 2 => Lifecycle.Phase.Joined,
+                (Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.Joined
+                    or Lifecycle.Phase.InGameSession or Lifecycle.Phase.ClearingSession, Lifecycle.Event.ClearClientSession) => Lifecycle.Phase.ClearingSession,
+                (Lifecycle.Phase.Synchronizing, Lifecycle.Event.ClearClientSession) => Lifecycle.Phase.ClearingSession,
+                (Lifecycle.Phase.ClearingSession, Lifecycle.Event.SessionCleared) => Lifecycle.Phase.Idle,
+                (Lifecycle.Phase.InGameSession, Lifecycle.Event.StartHostSync) when role == 1 => Lifecycle.Phase.Synchronizing,
+                (Lifecycle.Phase.Joined or Lifecycle.Phase.InGameSession, Lifecycle.Event.StartClientSync) when role == 2 => Lifecycle.Phase.Synchronizing,
+                (Lifecycle.Phase.Synchronizing, Lifecycle.Event.CompleteSync) when role != 0 => Lifecycle.Phase.InGameSession,
                 _ => null
             };
-            yield return new object[] { (int)phase, (int)evt, destination.HasValue ? (int)destination.Value : -1 };
+            int expected = destination.HasValue ? (int)destination.Value : -1;
+            // Existing permission admits preparation; essential registration then fails on pre-existing membership.
+            if (phase == Lifecycle.Phase.StartingHost && evt == Lifecycle.Event.PrepareHostSession && role != 0)
+                expected = -2;
+            yield return new object[] { (int)phase, (int)evt, expected, role, operationRole };
         }
     }
 
     [Theory]
     [MemberData(nameof(Permissions))]
-    public void CompletePermissionTable(int phaseValue, int eventValue, int destinationValue)
+    public void CompletePermissionTable(int phaseValue, int eventValue, int destinationValue, int role, int operationRole)
     {
         var phase = (Lifecycle.Phase)phaseValue;
         var evt = (Lifecycle.Event)eventValue;
+        if (operationRole == 1) NetworkRuntime.BeginHostOperation();
+        else if (operationRole == 2) NetworkRuntime.BeginClientOperation();
+        if (role == 1) Assert.True(Session.BeginHosting(new Player(10, "Host")));
+        else if (role == 2) Assert.True(Session.AdmitClient(new Player(20, "Client"), new Player(10, "Host")));
         typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, phase);
         bool called = false;
-        bool admitted = Lifecycle.Handle(evt, () =>
+        Action afterAction = () =>
         {
             called = true;
             Assert.Equal((Lifecycle.Phase)destinationValue, Lifecycle.Current);
-        });
+        };
+        if (destinationValue == -2)
+        {
+            Assert.Throws<InvalidOperationException>(() => Lifecycle.Handle(evt, afterAction));
+            Assert.False(called);
+            Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
+            return;
+        }
+        bool admitted = Lifecycle.Handle(evt, afterAction);
         Assert.Equal(destinationValue >= 0, admitted);
         Assert.Equal(admitted, called);
         Assert.Equal(destinationValue >= 0 ? (Lifecycle.Phase)destinationValue : phase, Lifecycle.Current);
         if (!admitted) Assert.Empty(Trace);
+    }
+
+    public static IEnumerable<object[]> CleanupPermissions()
+    {
+        foreach (var phase in Enum.GetValues<Lifecycle.Phase>())
+        foreach (bool host in new[] { false, true })
+        {
+            bool permitted = host
+                ? phase is Lifecycle.Phase.StartingHost or Lifecycle.Phase.PreparingSession
+                    or Lifecycle.Phase.InGameSession or Lifecycle.Phase.Synchronizing or Lifecycle.Phase.ClearingSession
+                : phase is Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.Joined
+                    or Lifecycle.Phase.InGameSession or Lifecycle.Phase.Synchronizing or Lifecycle.Phase.ClearingSession;
+            yield return new object[] { (int)phase, host, permitted };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CleanupPermissions))]
+    public void ClearPermissionDependsOnPhaseNotOperationOwner(int phaseValue, bool host, bool permitted)
+    {
+        var phase = (Lifecycle.Phase)phaseValue;
+        if (host) NetworkRuntime.BeginClientOperation(); else NetworkRuntime.BeginHostOperation();
+        typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, phase);
+        var owner = NetworkRuntime.OperationTransport;
+        var operation = NetworkRuntime.ActiveOperation;
+        var matching = host ? Lifecycle.Event.ClearHostSession : Lifecycle.Event.ClearClientSession;
+        bool after = false;
+        Assert.Equal(permitted, Lifecycle.Handle(matching, () =>
+        {
+            after = true;
+            Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
+            Assert.Contains("session:stop", Trace);
+            Assert.True(NetworkRuntime.IsCurrentOperation(owner, operation));
+        }));
+        Assert.Equal(permitted, after);
+        if (!permitted) { Assert.Empty(Trace); return; }
+
+        int logs = Trace.Count(x => x == "[Lifecycle] ClearingSession");
+        Assert.True(Lifecycle.Handle(matching));
+        Assert.Equal(2, Trace.Count(x => x == "session:stop"));
+        Assert.Equal(logs, Trace.Count(x => x == "[Lifecycle] ClearingSession"));
+        Assert.Same(operation, NetworkRuntime.ActiveOperation);
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.SessionCleared, () =>
+        {
+            Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+            Assert.Null(NetworkRuntime.ActiveOperation);
+            Assert.Null(NetworkRuntime.OperationTransport);
+        }));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionCleared, () => throw new Exception("rejected completion action")));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
+    }
+
+    [Fact]
+    public void BothClearActionsRunOnEveryAcceptedClearingSelfTransition()
+    {
+        Initialize(); Start();
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearHostSession));
+        Trace.Clear();
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () => Trace.Add("after:client")));
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearHostSession, () => Trace.Add("after:host")));
+        Assert.Equal(2, Trace.Count(x => x == "session:stop"));
+        Assert.True(Trace.IndexOf("session:stop") < Trace.IndexOf("after:client"));
+        Assert.True(Trace.LastIndexOf("session:stop") < Trace.IndexOf("after:host"));
+        Assert.DoesNotContain("[Lifecycle] ClearingSession", Trace);
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
+        var completed = Trace.ToArray();
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionCleared, () => throw new Exception()));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.ClearHostSession, () => throw new Exception()));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () => throw new Exception()));
+        Assert.Equal(completed, Trace);
+    }
+
+    [Fact]
+    public void ConfirmedCompletionCannotEnterIdleBeforeClearIsRequested()
+    {
+        Initialize(); Start();
+        var token = NetworkRuntime.ActiveOperation;
+        Trace.Clear();
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionCleared));
+        Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
+        Assert.Same(token, NetworkRuntime.ActiveOperation);
+        Assert.Empty(Trace);
+    }
+
+    [Fact]
+    public void AsynchronousClearKeepsOriginalIdentityUntilProtocolConfirms()
+    {
+        Initialize(); Start(); server.Ready();
+        var token = NetworkRuntime.ActiveOperation;
+        Stop();
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
+        Assert.False(Session.IsActive);
+        Assert.Same(token, NetworkRuntime.ActiveOperation);
+        Assert.Same(server, NetworkRuntime.OperationTransport);
+        Stop();
+        Assert.Equal(2, Trace.Count(x => x == "session:stop"));
+        Assert.Same(token, NetworkRuntime.ActiveOperation);
+        server.Complete(true, null);
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.Null(NetworkRuntime.ActiveOperation);
+    }
+
+    [Fact]
+    public void TransitionLookupHasExactlyOneEntryPerGroupedSource()
+    {
+        var definitions = (System.Collections.IDictionary)typeof(Lifecycle)
+            .GetField("Transitions", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        var lookup = (Dictionary<(Lifecycle.Event, Lifecycle.Phase), Lifecycle.Phase>)typeof(Lifecycle)
+            .GetField("TransitionLookup", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        var expected = new Dictionary<(Lifecycle.Event, Lifecycle.Phase), Lifecycle.Phase>();
+        foreach (System.Collections.DictionaryEntry entry in definitions)
+        foreach (object transition in (Array)entry.Value)
+        {
+            var sources = (Lifecycle.Phase[])transition.GetType().GetProperty("From").GetValue(transition);
+            var destination = (Lifecycle.Phase)transition.GetType().GetProperty("To").GetValue(transition);
+            foreach (var source in sources) expected.Add(((Lifecycle.Event)entry.Key, source), destination);
+        }
+        Assert.Equal(expected.Count, lookup.Count);
+        foreach (var entry in expected) Assert.Equal(entry.Value, lookup[entry.Key]);
+        Assert.Equal(9, Enum.GetValues<Lifecycle.Phase>().Length);
+        Assert.Equal(13, Enum.GetValues<Lifecycle.Event>().Length);
+    }
+
+    [Fact]
+    public void UnknownEventIsRejectedWithoutActions()
+    {
+        Initialize(); Trace.Clear();
+        Assert.False(Lifecycle.Handle((Lifecycle.Event)int.MaxValue, () => throw new Exception("rejected callback")));
+        Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
+        Assert.Empty(Trace);
+    }
+
+    [Theory]
+    [InlineData(int.MinValue)]
+    [InlineData(int.MaxValue)]
+    public void UnknownSourcePhaseIsRejectedWithoutActions(int source)
+    {
+        typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, (Lifecycle.Phase)source);
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.StartHost, () => throw new Exception("rejected callback")));
+        Assert.Equal((Lifecycle.Phase)source, Lifecycle.Current);
+        Assert.Empty(Trace);
     }
 
     [Fact]
@@ -83,11 +290,11 @@ public sealed class LifecycleTests : IDisposable
         Initialize(); server.SynchronousReady = true;
         Assert.True(Start());
         server.Ready(); // Duplicate readiness must not repeat successful-host actions.
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () => throw new Exception("duplicate completion")));
-        Assert.Single(Trace, line => line == "color:Hosting");
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.HostSessionReady, () => throw new Exception("duplicate completion")));
+        Assert.Single(Trace, line => line == "color:InGameSession");
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         Assert.Single(Trace, line => line == "protocol:admitted");
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
         Assert.True(Session.IsHost);
     }
 
@@ -95,7 +302,8 @@ public sealed class LifecycleTests : IDisposable
     public void UninitializedRejectsEveryEventWithoutActions()
     {
         foreach (var evt in Enum.GetValues<Lifecycle.Event>())
-            Assert.False(Lifecycle.Handle(evt, () => throw new Exception("rejected callback")));
+            if (evt != Lifecycle.Event.Initialize)
+                Assert.False(Lifecycle.Handle(evt, () => throw new Exception("rejected callback")));
         Assert.Empty(Trace);
         Assert.Equal(Lifecycle.Phase.Uninitialized, Lifecycle.Current);
     }
@@ -109,54 +317,53 @@ public sealed class LifecycleTests : IDisposable
         Assert.False(Session.IsActive);
         Assert.False(Start());
         Assert.Single(Trace, line => line == "protocol:start");
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         server.Ready();
         Assert.Equal(new[] { "[Lifecycle] Idle", "[Lifecycle] StartingHost", "identity:start", "color:start",
-            "tick:start", "protocol:start", "[Lifecycle] PrepareSession", "session:start",
-            "[Lifecycle] Hosting", "color:Hosting", "protocol:admitted" }, Trace);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted, () => throw new Exception("rejected readiness callback")));
+            "tick:start", "protocol:start", "[Lifecycle] PreparingSession", "session:start",
+            "[Lifecycle] InGameSession", "color:InGameSession", "protocol:admitted" }, Trace);
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, () => throw new Exception("rejected readiness callback")));
     }
 
     [Fact]
-    public void TransportStartedActionPreparesSessionAndCompletesWithoutTransportCallback()
+    public void HostPrepareSessionActionCompletesWithoutTransportCallback()
     {
         Initialize(); Start();
-        Registered = () => Assert.Equal(Lifecycle.Phase.PrepareSession, Lifecycle.Current);
+        Registered = () => Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
 
-        Assert.True(Lifecycle.Handle(Lifecycle.Event.TransportStarted, null));
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, null));
 
         Assert.True(Session.IsHost);
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.TransportStarted, null));
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, null));
         Assert.Single(Trace, line => line == "session:start");
-        Assert.Single(Trace, line => line == "color:Hosting");
+        Assert.Single(Trace, line => line == "color:InGameSession");
     }
 
     [Fact]
-    public void NestedStopDuringRegistrationRejectsLaterSessionPrepared()
+    public void NestedStopDuringRegistrationRejectsLaterHostSessionReady()
     {
         Initialize(); Start();
         Registered = () => Stop();
         server.Ready();
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionPrepared, () => throw new Exception()));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.HostSessionReady, () => throw new Exception()));
         Assert.Equal(1, server.Cancellations);
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
     }
 
     [Fact]
-    public void FailedStartEventActionSkipsProtocolExecution()
+    public void ClientJoinRejectsHostBeforeTransitionOrActions()
     {
         Initialize();
-        ONI_United.Networking.Runtime.GameClient.State = ONI_United.Networking.Sessions.States.ClientState.Connecting;
-        Assert.Throws<InvalidOperationException>(() => Start());
-        Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
-        Assert.DoesNotContain("protocol:start", Trace);
-        Assert.DoesNotContain("color:Hosting", Trace);
-        Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
+        Assert.True(Lifecycle.Handle(Lifecycle.Event.Join));
+        Trace.Clear();
+        Assert.False(Start());
+        Assert.Equal(Lifecycle.Phase.Joining, Lifecycle.Current);
+        Assert.Empty(Trace);
     }
 
     [Fact]
@@ -175,10 +382,10 @@ public sealed class LifecycleTests : IDisposable
     {
         Initialize(); Start(); RegistrationSucceeds = false;
         Assert.Throws<InvalidOperationException>(() => server.Ready());
-        Assert.Equal(Lifecycle.Phase.PrepareSession, Lifecycle.Current);
-        Assert.Contains(Trace, line => line.Contains("Event TransportStarted failed in phase PrepareSession"));
-        Assert.DoesNotContain("[Lifecycle] Hosting", Trace);
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
+        Assert.Contains(Trace, line => line.Contains("Event PrepareHostSession failed in phase PreparingSession"));
+        Assert.DoesNotContain("[Lifecycle] InGameSession", Trace);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
     }
 
@@ -187,7 +394,7 @@ public sealed class LifecycleTests : IDisposable
     {
         Initialize();
         var error = new Exception("callback failure");
-        Assert.Same(error, Assert.Throws<Exception>(() => Lifecycle.Handle(Lifecycle.Event.Start, () => throw error)));
+        Assert.Same(error, Assert.Throws<Exception>(() => Lifecycle.Handle(Lifecycle.Event.StartHost, () => throw error)));
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
     }
 
@@ -202,12 +409,12 @@ public sealed class LifecycleTests : IDisposable
         Stop();
         Assert.Same(completion, server.Completion);
         Assert.Equal(1, server.Cancellations);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Start());
         server.Complete(true, null);
         completion(true, null); // Duplicate completion must not enter Idle again.
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
-        Assert.Single(Trace, line => line == "[Lifecycle] Stopping");
+        Assert.Single(Trace, line => line == "[Lifecycle] ClearingSession");
         Assert.Equal(2, Trace.Count(line => line == "[Lifecycle] Idle"));
     }
 
@@ -215,7 +422,7 @@ public sealed class LifecycleTests : IDisposable
     public void RejectedStopEventDoesNotRunTransport()
     {
         Initialize();
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop));
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
         Assert.Equal(0, server.Cancellations);
         Assert.Null(server.Completion);
@@ -238,7 +445,7 @@ public sealed class LifecycleTests : IDisposable
     {
         Initialize(); Start(); Stop();
         server.Complete(false, "");
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Start());
         Assert.False(string.IsNullOrEmpty(server.OperationError));
         Assert.Equal(1, server.Cancellations);
@@ -255,8 +462,8 @@ public sealed class LifecycleTests : IDisposable
         Initialize(); Start(); server.FailStart();
         Assert.Equal("native startup failure", server.OperationError);
         Assert.Equal(1, server.Cancellations);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         server.Ready(); // A late protocol readiness event has no registration side effects.
         Assert.False(Session.IsActive);
@@ -273,23 +480,7 @@ public sealed class LifecycleTests : IDisposable
         server.Complete(true, null);
         Start(); server.Ready();
         oldCompletion(true, null);
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
-    }
-
-    [Fact]
-    public void TransportDisposalInvalidatesLateCompletion()
-    {
-        Initialize(); Start(); Stop();
-        var lateCompletion = server.Completion;
-        var phase = Lifecycle.Current;
-        int idleEntries = Trace.Count(line => line == "[Lifecycle] Idle");
-        server.DisposeHost();
-        Assert.Equal(1, server.Disposals);
-        lateCompletion(true, null);
-        server.DisposeHost();
-        Assert.Equal(2, server.Disposals);
-        Assert.Equal(phase, Lifecycle.Current);
-        Assert.Equal(idleEntries, Trace.Count(line => line == "[Lifecycle] Idle"));
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
     }
 
     [Fact]
@@ -312,33 +503,35 @@ public sealed class LifecycleTests : IDisposable
         var error = new Exception("essential cleanup failure");
         Clearing = () => throw error;
         Assert.Same(error, Assert.Throws<Exception>(() => Stop()));
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.Equal(0, server.Cancellations);
         Assert.Null(server.Completion);
-        Assert.Contains(Trace, line => line.Contains("Event Stop failed in phase Stopping"));
+        Assert.Contains(Trace, line => line.Contains("Event ClearHostSession failed in phase ClearingSession"));
     }
 
     private sealed class TestTransport : TransportServer
     {
+        private object operation;
         public Action<bool, string> Completion;
         public int Cancellations, Disposals;
         public bool SynchronousReady, SynchronousCancellation;
-        protected override void StartProtocol()
+        protected override void StartProtocol(object operation)
         {
+            this.operation = operation;
             Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
             Trace.Add("protocol:start");
             if (SynchronousReady) Ready();
         }
         public override void OnSessionPlayerAdmitted(ulong playerId)
         {
-            Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+            Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
             Assert.True(Session.IsHost);
-            Assert.Single(Trace, line => line == "color:Hosting");
+            Assert.Single(Trace, line => line == "color:InGameSession");
             Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
             Trace.Add("protocol:admitted");
         }
-        public void Ready() => ReportTransportStarted();
-        public void FailStart() => ReportStartupFailure("native startup failure");
+        public void Ready() => ReportTransportStarted(operation);
+        public void FailStart() => ReportStartupFailure(operation, "native startup failure");
         protected override void CancelProtocol(Action<bool, string> completed)
         {
             if (Completion != null) return;

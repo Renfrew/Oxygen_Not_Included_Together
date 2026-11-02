@@ -124,15 +124,14 @@ namespace ONI_United.UI.Multiplayer.Views
             catch (Exception ex) { ModLog.Warning(string.Format(JOINSECTIONS.STEAM_JOIN_ERROR, ex.Message)); RefreshStatus(); }
         }
         private static bool CanJoinFromFrontend() => !Utils.IsInGame() && Grid.CellCount == 0
-            && !Session.IsActive && GameClient.State == ClientState.Disconnected
-            && Lifecycle.Current == Lifecycle.Phase.Idle && !SteamLobby.InLobby;
+            && !Session.IsActive && Lifecycle.CanSelectTransport && !SteamLobby.InLobby;
         private void Connect()
         {
             string address = lanJoin.Address.Trim();
             string name = lanJoin.PlayerName.Trim();
             if (!NetworkRuntime.IsLan || Utils.IsInGame() || Grid.CellCount > 0)
             { return; }
-            if (Session.IsActive || GameClient.State != ClientState.Disconnected || Lifecycle.Current != Lifecycle.Phase.Idle)
+            if (Session.IsActive || Lifecycle.Current != Lifecycle.Phase.Idle)
             { return; }
             if (!MultiplayerJoinValidation.TryValidate(address, lanJoin.Port, name, Utils.MaxLocalPlayerNameLength, out _))
             { return; }
@@ -171,7 +170,7 @@ namespace ONI_United.UI.Multiplayer.Views
             steamSettings.SetAvailability(steamReady);
             steamJoin.SetAvailability(SteamJoiningVerified && idle && steamReady);
             hostButton.isInteractable = !Session.IsActive
-                && GameClient.State == ClientState.Disconnected && Lifecycle.Current == Lifecycle.Phase.Idle;
+                && Lifecycle.Current == Lifecycle.Phase.Idle;
         }
         internal void StopEditing() { lanJoin.StopEditing(); steamJoin.StopEditing(); }
         internal void Show(bool show)

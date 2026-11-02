@@ -86,6 +86,7 @@ namespace ONI_United
     internal sealed class Configuration
     {
         internal static readonly Configuration Instance = new();
+        internal static T GetClientProperty<T>(string name) => (T)(object)128;
         internal readonly HostSettings Host = new();
         internal readonly NetworkSettings Network = new();
         internal readonly ClientSettings Client = new();

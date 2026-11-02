@@ -151,22 +151,18 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             using var _ = Profiler.Scope();
         }
 
-        public override void ConnectToHost(string ip, int port)
+        protected override void ConnectProtocol(string ip, int port)
         {
             using var _ = Profiler.Scope();
+            var operation = NetworkRuntime.ActiveOperation;
 
             StopLanDiscovery();
 
             if (_connectAttemptInFlight)
                 return;
 
-            if (_client != null && _client.IsRunning)
-            {
-                if (_serverPeer != null && _serverPeer.ConnectionState == ConnectionState.Connected)
-                    return;
-
-                Disconnect();
-            }
+            if (_client != null)
+                throw new InvalidOperationException("The previous LAN client manager is still owned.");
 
             int timeout = Configuration.Instance.Client.TimeoutSeconds;
             ulong clientId = NetworkRuntime.GetLocalID();
@@ -191,7 +187,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 EnableStatistics = true
             };
 
-            _client.Start();
+            if (!_client.Start()) throw new InvalidOperationException("LAN client socket startup failed.");
             DebugConsole.Log("[LiteNetLibClient] Connecting to " + ip + ":" + port + "...");
 
             var writer = new NetDataWriter();
@@ -201,10 +197,10 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _serverPeer = _client.Connect(ip, port, writer);
 
             _connectAttemptInFlight = true;
-            CoroutineRunner.RunOne(WaitForConnectionSuccess(timeout));
+            CoroutineRunner.RunOne(WaitForConnectionSuccess(operation, timeout, _client, _serverPeer));
         }
 
-        private IEnumerator WaitForConnectionSuccess(int timeoutSeconds)
+        private IEnumerator WaitForConnectionSuccess(object operation, int timeoutSeconds, NetManager owner, NetPeer attempt)
         {
             try
             {
@@ -213,7 +209,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
                 while (Time.realtimeSinceStartup - startedAt < timeoutSeconds)
                 {
-                    if (!_connectAttemptInFlight)
+                    if (!NetworkRuntime.IsCurrentOperation(this, operation)
+                        || !ReferenceEquals(owner, _client) || !ReferenceEquals(attempt, _serverPeer) || !_connectAttemptInFlight)
                         yield break;
 
                     if (_connectedEventDelivered && MultiplayerSession.InActiveSession)
@@ -233,22 +230,23 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                         {
                             DebugConsole.LogWarning($"[LiteNetLibClient] Peer has been Connected for {now - connectedWithoutEventSince:0.0}s ({now - startedAt:0.0}s since connect) but PeerConnectedEvent never arrived - completing the connection from the poll loop.");
                             OnConnectedToServer(_serverPeer);
-                            yield break;
                         }
                     }
 
                     yield return null;
                 }
 
-                if (!_connectAttemptInFlight)
+                if (!NetworkRuntime.IsCurrentOperation(this, operation)
+                    || !ReferenceEquals(owner, _client) || !ReferenceEquals(attempt, _serverPeer) || !_connectAttemptInFlight)
                     yield break;
 
                 if (!_connectedEventDelivered || !MultiplayerSession.InActiveSession)
                 {
                     DebugConsole.LogError("[LiteNetLibClient] Connection timed out before the session handshake completed.");
-                    OnConnectionFailed?.Invoke();
-                    Disconnect();
-                    OnReturnToMenu?.Invoke(
+                    var returnToMenu = OnReturnToMenu;
+                    OnConnectionFailed?.Invoke("LAN connection timed out.");
+                    if (ReferenceEquals(this, NetworkRuntime.TransportClient) && IsCurrentOperation(operation))
+                        returnToMenu?.Invoke(
                         ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
                         ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
@@ -256,7 +254,9 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
             finally
             {
-                _connectAttemptInFlight = false;
+                if (NetworkRuntime.IsCurrentOperation(this, operation)
+                    && ReferenceEquals(owner, _client) && ReferenceEquals(attempt, _serverPeer))
+                    _connectAttemptInFlight = false;
             }
         }
 
@@ -266,27 +266,27 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
             // Reached either from PeerConnectedEvent or from WaitForConnectionSuccess when
             // the event failed to arrive; whichever comes second must not run this twice.
-            if (_connectedEventDelivered)
+            if (!ReferenceEquals(peer, _serverPeer) || _connectedEventDelivered
+                || Lifecycle.Current != Lifecycle.Phase.Joining)
                 return;
             _connectedEventDelivered = true;
 
             _serverPeer = peer;
-            SessionHandshakeCoordinator.SendClientHello(peer);
+            OnClientConnected?.Invoke();
         }
 
         private void OnDisconnectedFromServer(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             using var _ = Profiler.Scope();
 
-            _connectAttemptInFlight = false;
-            _serverPeer = null;
-            _connectedEventDelivered = false;
-            OnClientDisconnected?.Invoke();
-            MultiplayerSession.OnDisconnectedFromHost(null);
-
+            if (!ReferenceEquals(peer, _serverPeer) || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
+            var operation = NetworkRuntime.ActiveOperation;
+            var returnToMenu = OnReturnToMenu;
             var (reason, message) = GetDisconnectInfo(disconnectInfo);
+            OnClientDisconnected?.Invoke();
             DebugConsole.Log($"[LiteNetLibClient] Disconnected from server. Reason: {disconnectInfo.Reason} ({reason})");
-            OnReturnToMenu?.Invoke(reason, message);
+            if (ReferenceEquals(this, NetworkRuntime.TransportClient) && IsCurrentOperation(operation))
+                returnToMenu?.Invoke(reason, message);
         }
 
         private (string reason, string message) GetDisconnectInfo(DisconnectInfo info)
@@ -340,39 +340,32 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             DebugConsole.LogWarning("[LiteNetLibClient] Network error: " + socketError);
         }
 
-        public override void Disconnect()
+        public override bool TryStop(out string error)
         {
-            using var _ = Profiler.Scope();
-
+            error = null;
             _connectAttemptInFlight = false;
-
-            if (_listener != null)
+            try
             {
-                _listener.PeerConnectedEvent -= OnConnectedToServer;
-                _listener.PeerDisconnectedEvent -= OnDisconnectedFromServer;
-                _listener.NetworkReceiveEvent -= OnNetworkReceive;
-                _listener.NetworkErrorEvent -= OnNetworkError;
+                // Stop discards queued native events. Retain manager/peer on failure for retry.
+                _client?.Stop();
+                if (_listener != null)
+                {
+                    _listener.PeerConnectedEvent -= OnConnectedToServer;
+                    _listener.PeerDisconnectedEvent -= OnDisconnectedFromServer;
+                    _listener.NetworkReceiveEvent -= OnNetworkReceive;
+                    _listener.NetworkErrorEvent -= OnNetworkError;
+                }
                 _listener = null;
+                _client = null;
+                _serverPeer = null;
+                _connectedEventDelivered = false;
+                while (_incomingPackets.TryDequeue(out var ignored)) { }
+                return true;
             }
-
-            _serverPeer?.Disconnect();
-            _client?.Stop();
-            _serverPeer = null;
-            _connectedEventDelivered = false;
-            if (MultiplayerSession.InActiveSession)
-                MultiplayerSession.OnDisconnectedFromHost(null);
-            else
-                MultiplayerSession.SetHost(Utils.NilUlong());
-            _client = null;
-
-            while (_incomingPackets.TryDequeue(out var _)) { }
-        }
-
-        public override void ReconnectToSession()
-        {
-            if (!string.IsNullOrEmpty(MultiplayerSession.ServerIp) && MultiplayerSession.ServerPort > 0)
+            catch (Exception ex)
             {
-                ConnectToHost(MultiplayerSession.ServerIp, MultiplayerSession.ServerPort);
+                error = ex.ToString();
+                return false;
             }
         }
 
@@ -386,7 +379,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
 
             _client.PollEvents();
-            OnMessageRecieved();
             UpdateMetrics();
         }
 
@@ -396,6 +388,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
             while (_incomingPackets.TryDequeue(out var packet))
             {
+                if (!ReferenceEquals(packet.peer, _serverPeer)
+                    || !NetworkRuntime.HasClientOperation || Lifecycle.Current == Lifecycle.Phase.ClearingSession) continue;
                 try
                 {
                     ulong? senderId = MultiplayerSession.HostUserID.IsValid()

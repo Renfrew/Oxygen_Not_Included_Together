@@ -31,12 +31,12 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         SteamFriends.Names.Clear();
         Invoke("Awake");
         Lifecycle.Initialize();
-        Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
+        Lifecycle.Handle(Lifecycle.Event.StartHost, server.Start);
     }
     public void Dispose()
     {
         SteamNetworkingSockets.CloseFailures.Clear();
-        Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+        Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
         Invoke("OnDestroy");
         Session.Reset();
     }
@@ -168,10 +168,10 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         Assert.False(server.TryGetConnection(20, out _));
         Assert.True(Connections.Contains(handle));
 
-        Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         SteamNetworkingSockets.CloseFailures.Clear();
-        Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+        Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
         Assert.Empty(Connections);
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
     }
@@ -180,12 +180,12 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
     public void StopReleasesCallbackAndAllowsSameInstanceRestart()
     {
         Connect();
-        Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+        Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
         Assert.Empty(Session.Players);
         Assert.Empty(Connections);
         Assert.False(server.TryGetConnection(20, out _));
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
-        Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
+        Lifecycle.Handle(Lifecycle.Event.StartHost, server.Start);
         var current = Connect(2);
         Assert.True(Session.Players.ContainsKey(20));
         Assert.True(server.TryGetConnection(20, out var registered));

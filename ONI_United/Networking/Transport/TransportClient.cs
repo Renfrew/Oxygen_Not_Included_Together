@@ -7,21 +7,8 @@ using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 
 namespace ONI_United.Networking.Transport
 {
-    public abstract class TransportClient
+    public abstract class TransportClient : ClientTransport
     {
-        /// <summary>
-        /// When the client is connected to the server
-        /// </summary>
-        public System.Action OnClientConnected;
-        /// <summary>
-        /// When the client is disconnected from the server
-        /// </summary>
-        public System.Action OnClientDisconnected;
-        /// <summary>
-        /// When a connection attempt fails before the client connects
-        /// </summary>
-        public System.Action OnConnectionFailed;
-
         /// <summary>
         /// Continue the connection flow
         /// </summary>
@@ -38,15 +25,21 @@ namespace ONI_United.Networking.Transport
 
         public abstract void Prepare();
 
-        public abstract void ConnectToHost(string ip, int port);
+        public void ConnectToHost(string ip, int port) => Core.NetworkRuntime.ConnectClient(ip: ip, port: port);
+        internal void StartConnection(string ip, int port) => ConnectProtocol(ip, port);
+        protected abstract void ConnectProtocol(string ip, int port);
+        protected override void InternalConnect() => Core.NetworkRuntime.ConnectClient();
+        protected override void InternalStop() => Core.NetworkRuntime.DisconnectClient();
+        protected override void InternalPoll() => Update();
+        public abstract override bool TryStop(out string error);
 
         public abstract object CurrentConnection { get; }
 
         public abstract bool IsCurrentConnection(object connection);
 
-        public abstract void Disconnect();
+        public void Disconnect() => Core.NetworkRuntime.DisconnectClient();
 
-        public abstract void ReconnectToSession();
+        public void ReconnectToSession() => Core.NetworkRuntime.ReconnectClient();
 
         public abstract void Update();
 

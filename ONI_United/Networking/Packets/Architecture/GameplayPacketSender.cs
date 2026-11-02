@@ -89,10 +89,10 @@ namespace ONI_United.Networking.Packets.Architecture
 
 			if (Session.IsClient)
 			{
-				if (GameClient.State == States.ClientState.InGame)
+				if (Lifecycle.Current == Lifecycle.Phase.InGameSession)
 					return true;
 
-				if (GameClient.State == States.ClientState.LoadingWorld)
+				if (Lifecycle.Current == Lifecycle.Phase.Synchronizing)
 					return PacketHandler.IsLoadingWorldRequest(packet);
 
 				return packet is IModApiPacket;

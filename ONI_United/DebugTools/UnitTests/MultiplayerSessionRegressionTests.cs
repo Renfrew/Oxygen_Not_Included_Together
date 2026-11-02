@@ -16,7 +16,6 @@ namespace ONI_United.DebugTools.UnitTests
 		private static bool SessionIsIdle =>
 			!MultiplayerSession.InActiveSession
 			&& MultiplayerSession.ConnectedPlayers.Count == 0
-			&& GameClient.State == ClientState.Disconnected
 			&& Lifecycle.Current == Lifecycle.Phase.Idle;
 
 		[UnitTest(name: "Networking: replacement connection resets protocol verification", category: "Networking")]
@@ -183,12 +182,12 @@ namespace ONI_United.DebugTools.UnitTests
 			Game.Instance.Subscribe(MP_HASHES.OnDisconnected, onDisconnected);
 			try
 			{
-				GameClient.Handle(ClientEvent.BeginConnect);
-				GameClient.Handle(ClientEvent.CancelConnect);
+				Lifecycle.Handle(Lifecycle.Event.Join);
+				NetworkRuntime.DisconnectClient();
 				MultiplayerSession.OnDisconnectedFromHost(null);
 
-				GameClient.Handle(ClientEvent.BeginConnect);
-				GameClient.Handle(ClientEvent.ConnectionFailed);
+				Lifecycle.Handle(Lifecycle.Event.Join);
+				NetworkRuntime.DisconnectClient();
 				MultiplayerSession.OnDisconnectedFromHost(null);
 
 				return disconnectEvents == 0
@@ -197,7 +196,7 @@ namespace ONI_United.DebugTools.UnitTests
 			}
 			finally
 			{
-				GameClient.Handle(ClientEvent.TransportDisconnected);
+				NetworkRuntime.DisconnectClient();
 				MultiplayerSession.Clear();
 				Game.Instance.Unsubscribe(MP_HASHES.OnDisconnected, onDisconnected);
 			}

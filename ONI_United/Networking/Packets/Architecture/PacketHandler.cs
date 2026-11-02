@@ -135,10 +135,10 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
             if (Session.IsClient)
             {
-                if (GameClient.State == ClientState.InGame)
+                if (Lifecycle.Current == Lifecycle.Phase.InGameSession)
                     return true;
 
-                if (GameClient.State == ClientState.LoadingWorld)
+                if (Lifecycle.Current == Lifecycle.Phase.Synchronizing)
                     return packet is IAllowedWithoutWorldPacket || IsLoadingWorldResponse(packet);
 
                 return packet is IAllowedWithoutWorldPacket || packet is IModApiPacket;

@@ -19,7 +19,7 @@ using Shared.Networking;
 
 namespace ONI_United.Core
 {
-    public class NetworkRuntime : MonoBehaviour
+    public partial class NetworkRuntime : MonoBehaviour
     {
         public class PingRanges
         {
@@ -57,8 +57,27 @@ namespace ONI_United.Core
         private void OnDestroy()
         {
             if (!ReferenceEquals(instance, this)) return;
-            try { TransportServer.DisposeHost(); }
-            finally { instance = null!; }
+            try
+            {
+                if (Lifecycle.IsAvailable && HasClientOperation) DisconnectClient();
+                if (!TransportClient.TryStop(out string error))
+                    DebugConsole.LogError("[NetworkRuntime] Client disposal remains unresolved: " + error);
+                if (IsSteam && !SteamLobby.TryReleaseClientLobby(out error) && error != null)
+                    DebugConsole.LogError("[NetworkRuntime] Client lobby disposal remains unresolved: " + error);
+                TransportServer.DisposeHost();
+            }
+            finally { ClearOperation(); instance = null!; }
+        }
+
+        private void OnApplicationQuit()
+        {
+            if (!ReferenceEquals(instance, this)) return;
+            try { Stop(); }
+            finally
+            {
+                try { TransportServer.DisposeHost(); }
+                finally { ClearOperation(); }
+            }
         }
 
         public static void Initialize()
@@ -103,69 +122,55 @@ namespace ONI_United.Core
         public static readonly int LOBBY_SIZE_DEFAULT = 4;
         public static readonly int LOBBY_SIZE_MAX = 16;
 
-        public static void StartServer()
+        public static bool JoinSteamLobby(CSteamID lobbyId, Action<CSteamID> onJoined = null, string password = null)
         {
-            if (!Lifecycle.Handle(Lifecycle.Event.Start, TransportServer.Start))
-                DebugConsole.LogError("[NetworkRuntime] Host start is not permitted in the current lifecycle state.");
+            if (!SteamManager.Initialized || !IsSteam || !lobbyId.IsValid()) return false;
+            return Lifecycle.Handle(Lifecycle.Event.Join, () => SteamLobby.StartClientJoin(lobbyId, onJoined, password));
         }
 
-        /// <summary>
-        /// Stops the server based off the current transport
-        /// </summary>
-        public static void Stop()
+        public static bool ConnectClient(bool showLoadingScreen = true, string ip = "", int port = 7777)
         {
-            if (Lifecycle.HasHostOperation)
+            return Lifecycle.Handle(Lifecycle.Event.Join, () => GameClient.BeginConnection(showLoadingScreen, ip, port));
+        }
+
+        public static void ReconnectClient()
+        {
+            // Preserve the existing endpoint before logical cleanup clears the target.
+            var lobby = SteamLobby.CurrentLobby;
+            string ip = MultiplayerSession.ServerIp;
+            int port = MultiplayerSession.ServerPort;
+            if (HasClientOperation) DisconnectClient();
+            if (Lifecycle.Current != Lifecycle.Phase.Idle) return; // Release must finish before a new Join.
+            if (IsSteam)
             {
-                if (!Lifecycle.Handle(Lifecycle.Event.Stop, TransportServer.Stop))
-                    DebugConsole.LogError("[NetworkRuntime] Stop is not permitted in the current lifecycle state.");
-                return;
+                if (lobby.IsValid()) SteamLobby.JoinLobby(lobby);
             }
-            switch(transport)
-            {
-                case NetworkTransport.STEAMWORKS:
-                    StopSteamworks();
-                    break;
-                case NetworkTransport.LITENETLIB:
-                    StopRaw();
-                    break;
-            }
-
-            MultiplayerSession.Clear();
-            GameClient.Handle(ClientEvent.TransportDisconnected);
-        }
-
-        private static void StopSteamworks()
-        {
-            SteamLobby.LeaveLobby();
-        }
-
-        private static void StopRaw()
-        {
-            if (MultiplayerSession.IsClient)
-                GameClient.Disconnect();
-
-            NetworkIdentityRegistry.Clear();
-
-            SelectToolPatch.UpdateColor();
+            else if (!string.IsNullOrEmpty(ip) && port > 0) ConnectClient(ip: ip, port: port);
         }
 
         public static void UpdateTransport(NetworkTransport newTransport)
         {
             newTransport = (NetworkTransport)TransportConfigurationMigration.NormalizeNetworkTransport((int)newTransport);
 
-            // A lobby join owns its native result before GameClient becomes Connecting.
-            if (SteamLobby.HasPendingJoin && !transport.Equals(newTransport))
-                throw new InvalidOperationException("Wait for the pending Steam lobby join before changing transport.");
-            if (Lifecycle.HasHostOperation && !transport.Equals(newTransport))
-                throw new InvalidOperationException("Stop the owned host before changing transport.");
+            if (!Lifecycle.CanSelectTransport && !transport.Equals(newTransport))
+                throw new InvalidOperationException("Stop the owned multiplayer operation before changing transport.");
 
             if (transport.Equals(newTransport))
                 return;
 
+            // Construct a consistent replacement before publishing any new selection.
+            var driver = TransportRegistry.GetTransport((TransportProtocol)newTransport);
+            if (driver.Protocol != (TransportProtocol)newTransport)
+                throw new InvalidOperationException("Selected transport does not match its registered driver.");
+            var server = driver.CreateServer();
+            var client = driver.CreateClient();
+            var sender = driver.CreatePacketSender();
+            if (IsLan) LiteNetLibClient.StopLanDiscovery();
+            TransportPacketSender.ClearPending();
             transport = newTransport;
-            TransportServer = GetTransportServer();
-            TransportClient = GetTransportClient();
-            TransportPacketSender = GetTransportPacketSender();
+            TransportServer = server;
+            TransportClient = client;
+            TransportPacketSender = sender;
             DebugConsole.Log($"Updated network transport to: {newTransport.ToString()}");
         }
 
@@ -173,24 +178,6 @@ namespace ONI_United.Core
         {
             Configuration.Instance.Network.Transport = (int)transport;
             Configuration.Instance.Save();
-        }
-
-        private static TransportServer GetTransportServer()
-        {
-            using var _ = Profiler.Scope();
-            return TransportRegistry.GetTransport((TransportProtocol)transport).CreateServer();
-        }
-
-        private static TransportClient GetTransportClient()
-        {
-            using var _ = Profiler.Scope();
-            return TransportRegistry.GetTransport((TransportProtocol)transport).CreateClient();
-        }
-
-        private static TransportPacketSender GetTransportPacketSender()
-        {
-            using var _ = Profiler.Scope();
-            return TransportRegistry.GetTransport((TransportProtocol)transport).CreatePacketSender();
         }
 
         public static ulong GetLocalID()
@@ -297,7 +284,7 @@ namespace ONI_United.Core
                     return;
             }
 
-            if (Lifecycle.Current == Lifecycle.Phase.Hosting && MultiplayerSession.IsHost)
+            if (Lifecycle.IsHostGameplay && MultiplayerSession.IsHost)
             {
                 _tickAccumulator += Time.unscaledDeltaTime;
                 _tickAccumulator = Mathf.Min(_tickAccumulator, _tickInterval * MaxMissedTicks);

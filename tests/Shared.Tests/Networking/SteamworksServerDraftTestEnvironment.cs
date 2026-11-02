@@ -8,13 +8,13 @@ internal static class SteamManager { internal static bool Initialized = true; }
 
 namespace Steamworks
 {
-    internal readonly record struct HSteamListenSocket(uint m_HSteamListenSocket)
+    public readonly record struct HSteamListenSocket(uint m_HSteamListenSocket)
     { internal static HSteamListenSocket Invalid => default; }
-    internal readonly record struct HSteamNetPollGroup(uint m_HSteamNetPollGroup)
+    public readonly record struct HSteamNetPollGroup(uint m_HSteamNetPollGroup)
     { internal static HSteamNetPollGroup Invalid => default; }
-    internal readonly record struct HSteamNetConnection(uint m_HSteamNetConnection)
+    public readonly record struct HSteamNetConnection(uint m_HSteamNetConnection)
     { internal static HSteamNetConnection Invalid => default; }
-    internal readonly record struct CSteamID(ulong m_SteamID)
+    public readonly record struct CSteamID(ulong m_SteamID)
     { internal bool IsValid() => m_SteamID != 0; }
     internal enum ESteamNetworkingConfigValue { k_ESteamNetworkingConfig_TimeoutInitial, k_ESteamNetworkingConfig_TimeoutConnected }
     internal enum ESteamNetworkingConfigDataType { k_ESteamNetworkingConfig_Int32 }
@@ -25,7 +25,7 @@ namespace Steamworks
         internal ConfigValue m_val;
         internal struct ConfigValue { internal int m_int32; }
     }
-    internal enum EResult { k_EResultOK, k_EResultFail }
+    public enum EResult { k_EResultOK, k_EResultFail }
     internal enum ESteamNetworkingConnectionState
     {
         k_ESteamNetworkingConnectionState_Connecting,
@@ -71,6 +71,11 @@ namespace Steamworks
         internal static Callback<T> Create(Action<T> handler) => new(handler);
         internal static void Dispatch(T data)
         { foreach (var callback in callbacks.ToArray()) callback.handler(data); }
+        internal static Action<T> CaptureDispatch()
+        {
+            var captured = callbacks.ToArray();
+            return data => { foreach (var callback in captured) callback.handler(data); };
+        }
         internal static int Count => callbacks.Count;
         public void Dispose() => callbacks.Remove(this);
     }
@@ -87,6 +92,15 @@ namespace Steamworks
         internal static string GetFriendPersonaName(CSteamID identity) =>
             Names.TryGetValue(identity, out var name) ? name : "[unknown]";
     }
+    public struct SteamNetConnectionRealTimeStatus_t
+    {
+        internal int m_nPing, m_cbSentUnackedReliable, m_cbPendingUnreliable;
+        internal long m_usecQueueTime;
+        internal float m_flConnectionQualityLocal, m_flConnectionQualityRemote;
+        internal float m_flInBytesPerSec, m_flOutBytesPerSec, m_flInPacketsPerSec, m_flOutPacketsPerSec;
+        internal ESteamNetworkingConnectionState m_eState;
+    }
+    public struct SteamNetConnectionRealTimeLaneStatus_t { }
     internal static class SteamNetworkingSockets
     {
         internal static readonly Dictionary<HSteamNetConnection, SteamNetConnectionInfo_t> Connections = new();
@@ -108,6 +122,13 @@ namespace Steamworks
             Connections.Add(handle, new() { m_identityRemote = identity,
                 m_eState = ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting });
             return handle;
+        }
+        internal static EResult GetConnectionRealTimeStatus(HSteamNetConnection connection,
+            ref SteamNetConnectionRealTimeStatus_t status, int count, ref SteamNetConnectionRealTimeLaneStatus_t lane)
+        {
+            if (!Connections.TryGetValue(connection, out var info)) return EResult.k_EResultFail;
+            status.m_eState = info.m_eState;
+            return EResult.k_EResultOK;
         }
         internal static void RunCallbacks()
         {
@@ -151,7 +172,9 @@ namespace ONI_United.Networking.Transport.Steamworks
     {
         internal static bool InLobby;
         internal static bool HasPendingJoin => false;
-        internal static void CreateHostLobby(Action<string> done) { InLobby = true; done(null); }
+        internal static void CreateHostLobby(object operation, Action<string> done) { InLobby = true; done(null); }
+        internal static bool TryReleaseClientLobby(out string error, Action<bool, string> completed = null)
+        { error = null; return true; }
         internal static void CancelHostLobby(Action<bool, string> done) { InLobby = false; done(true, null); }
     }
 }

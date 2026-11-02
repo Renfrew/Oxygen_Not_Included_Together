@@ -14,7 +14,8 @@ namespace ONI_United.Networking.Sessions;
 internal static class SessionHandshakeCoordinator
 {
     private static bool CanAdmitRemotePlayer(int maxPlayers) =>
-        Session.IsHost && maxPlayers > 0 && Session.Players.Count < maxPlayers;
+        Session.IsHost && Lifecycle.IsHostGameplay && Lifecycle.Current == Lifecycle.Phase.InGameSession
+        && maxPlayers > 0 && Session.Players.Count < maxPlayers;
 
     private const int MaximumHandshakeBytes = 2048;
 
@@ -24,7 +25,7 @@ internal static class SessionHandshakeCoordinator
         if (connection == null || localPlayerId == 0)
         {
             DebugConsole.LogError("[SessionHandshake] Cannot send hello without a physical connection and valid local player ID.");
-            NetworkRuntime.TransportClient.Disconnect();
+            NetworkRuntime.DisconnectClient();
             return;
         }
 
@@ -32,7 +33,7 @@ internal static class SessionHandshakeCoordinator
         if (!NetworkRuntime.TransportPacketSender.SendPacket(connection, hello, PacketSendMode.ReliableImmediate))
         {
             DebugConsole.LogError("[SessionHandshake] Failed to queue client hello.");
-            NetworkRuntime.TransportClient.Disconnect();
+            NetworkRuntime.DisconnectClient();
         }
     }
 
@@ -181,7 +182,11 @@ internal static class SessionHandshakeCoordinator
         ulong? senderPlayerId,
         object physicalConnection)
     {
-        if (!NetworkRuntime.TransportClient.IsCurrentConnection(physicalConnection)
+        var owner = NetworkRuntime.TransportClient;
+        var operation = NetworkRuntime.ActiveOperation;
+        if (!NetworkRuntime.IsCurrentOperation(owner, operation)
+            || !owner.IsCurrentConnection(physicalConnection)
+            || Lifecycle.Current != Lifecycle.Phase.PreparingSession
             || Session.IsHost
             || Session.IsActive)
             return;
@@ -229,16 +234,13 @@ internal static class SessionHandshakeCoordinator
             return;
         }
 
-        Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
+        // Complete admitted metadata before subscribers can synchronously stop this join.
         MultiplayerSession.OnConnectedToHost(packet.HostPlayerId, physicalConnection);
-        if (!Session.IsClient)
-        {
-            RejectLocalConnection("Session role could not be established.");
-            return;
-        }
+        Game.Instance?.Trigger(MP_HASHES.OnInSessionChanged, BoxedBools.True);
+        if (!NetworkRuntime.IsCurrentOperation(owner, operation) || !owner.IsCurrentConnection(physicalConnection)
+            || Lifecycle.Current != Lifecycle.Phase.PreparingSession || !Session.IsClient) return;
 
-        NetworkRuntime.TransportClient.OnClientConnected?.Invoke();
-        NetworkRuntime.TransportClient.OnRequestStateOrReturn?.Invoke();
+        NetworkRuntime.ClientAdmitted(owner, operation);
     }
 
     private static void SendWelcome(ulong playerId, object physicalConnection)
@@ -271,8 +273,7 @@ internal static class SessionHandshakeCoordinator
     private static void RejectLocalConnection(string reason)
     {
         DebugConsole.LogWarning("[SessionHandshake] Session join rejected: " + reason);
-        NetworkRuntime.TransportClient.OnConnectionFailed?.Invoke();
+        NetworkRuntime.TransportClient.OnConnectionFailed?.Invoke(reason);
         NetworkRuntime.TransportClient.OnReturnToMenu?.Invoke(reason, reason);
-        NetworkRuntime.TransportClient.Disconnect();
     }
 }

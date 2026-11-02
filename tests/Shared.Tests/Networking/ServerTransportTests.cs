@@ -17,8 +17,8 @@ public sealed class ServerTransportTests : IDisposable
         .GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(machine, null);
     public ServerTransportTests() { Reset(); Invoke("Awake"); Lifecycle.Initialize(); }
     public void Dispose() { Clearing = null; Invoke("OnDestroy"); Session.Reset(); }
-    private void Start() => Lifecycle.Handle(Lifecycle.Event.Start, server.Start);
-    private void Stop() => Lifecycle.Handle(Lifecycle.Event.Stop, server.Stop);
+    private void Start() => Lifecycle.Handle(Lifecycle.Event.StartHost, server.Start);
+    private void Stop() => Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
 
     [Fact]
     public void ValidConnectionAdmitsLogicalPlayerWithoutGameplayReadiness()
@@ -32,7 +32,7 @@ public sealed class ServerTransportTests : IDisposable
 
         var player = Assert.IsType<Player>(Session.Players[20]);
         Assert.Equal("Remote Steam user", player.UserName);
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
     }
 
     [Theory]
@@ -210,10 +210,10 @@ public sealed class ServerTransportTests : IDisposable
 
         Assert.Throws<InvalidOperationException>(() => server.Ready());
 
-        Assert.Equal(Lifecycle.Phase.PrepareSession, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.PreparingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
-        Assert.DoesNotContain("[Lifecycle] Hosting", Trace);
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain("[Lifecycle] InGameSession", Trace);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         server.Ready();
         Assert.Single(Trace, line => line == "session:start");
     }
@@ -225,9 +225,9 @@ public sealed class ServerTransportTests : IDisposable
 
         server.Ready();
 
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
-        Assert.DoesNotContain("color:Hosting", Trace);
+        Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.Single(Trace, line => line == "session:start");
     }
 
@@ -254,13 +254,13 @@ public sealed class ServerTransportTests : IDisposable
         server.Ready();
         transport.Poll();
         Assert.Equal(2, server.Polls);
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
         Assert.True(Session.IsHost);
 
         Stop();
         transport.Poll();
         Assert.Equal(3, server.Polls);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
     }
 
@@ -278,7 +278,7 @@ public sealed class ServerTransportTests : IDisposable
     {
         Start(); Stop(); Stop();
         Assert.Equal(2, server.Stops);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
     }
 
@@ -287,8 +287,8 @@ public sealed class ServerTransportTests : IDisposable
     {
         Start(); server.Ready();
         Assert.True(Session.IsHost);
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
-        Assert.True(Trace.IndexOf("session:start") < Trace.LastIndexOf("[Lifecycle] Hosting"));
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
+        Assert.True(Trace.IndexOf("session:start") < Trace.LastIndexOf("[Lifecycle] InGameSession"));
     }
 
     [Fact]
@@ -296,7 +296,7 @@ public sealed class ServerTransportTests : IDisposable
     {
         Start(); server.Ready(); Stop();
         Assert.False(Session.IsActive);
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         server.Stopped();
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
     }
@@ -313,7 +313,7 @@ public sealed class ServerTransportTests : IDisposable
         Assert.Equal(Lifecycle.Phase.StartingHost, Lifecycle.Current);
         Assert.False(Session.IsActive);
         server.Ready();
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
         Assert.True(Session.IsHost);
         Stop(); server.Stopped();
         Assert.Equal(2, server.Stops);
@@ -325,7 +325,7 @@ public sealed class ServerTransportTests : IDisposable
     public void StartupFailureRequestsCleanupWithoutReportingReadiness()
     {
         Start(); server.StartFailed("native failure");
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive); Assert.Equal(1, server.Stops);
         Assert.Contains("[ServerTransport] native failure", Trace);
         Assert.DoesNotContain("session:start", Trace);
@@ -335,7 +335,7 @@ public sealed class ServerTransportTests : IDisposable
     public void StopFailureDoesNotCompleteOrAutomaticallyRetry()
     {
         Start(); Stop(); server.StopFailed("");
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.Equal(1, server.Stops);
         Assert.Contains("[ServerTransport] Host cleanup failed.", Trace);
         Stop(); Assert.Equal(2, server.Stops);
@@ -350,25 +350,30 @@ public sealed class ServerTransportTests : IDisposable
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
         Assert.False(Session.IsActive);
         Start(); server.Ready(); server.Stopped();
-        Assert.Equal(Lifecycle.Phase.Hosting, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.InGameSession, Lifecycle.Current);
         Stop(); server.Ready();
-        Assert.Equal(Lifecycle.Phase.Stopping, Lifecycle.Current);
+        Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
     }
 
     private sealed class NativeServer : ServerTransport
     {
+        private Action completion;
         public int Polls;
         public int Starts;
         public int Stops;
         protected override void InternalPoll() => Polls++;
         protected override void InternalStart() => Starts++;
-        protected override void InternalStop() => Stops++;
+        protected override void InternalStop()
+        {
+            Stops++;
+            completion = OnStopped;
+        }
         public bool ConnectionEstablished(ulong clientId, string playerName, object connection) =>
             OnConnected(clientId, playerName, connection);
         public bool Disconnected(ulong clientId, object connection) => OnDisconnect(clientId, connection);
         public void Ready() => OnStarted();
-        public void Stopped() => OnStopped();
+        public void Stopped() => completion?.Invoke();
         public void StartFailed(string reason) => OnStartFailed(reason);
         public void StopFailed(string reason) => OnStopFailed(reason);
     }

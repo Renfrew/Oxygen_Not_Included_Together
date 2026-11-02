@@ -25,27 +25,8 @@ using ONI_United.Networking.Identity;
 
 namespace ONI_United.Networking.Runtime
 {
-	public static class GameClient
+	public static partial class GameClient
 	{
-
-		private static ClientState _state = ClientState.Disconnected;
-		public static ClientState State => _state;
-		public static ulong ActiveSynchronizationId { get; private set; }
-		private static bool _loadSubmitted;
-
-		internal static bool IsCurrentSynchronization(ulong synchronizationId) =>
-			Session.IsClient && _state == ClientState.LoadingWorld
-			&& synchronizationId != 0 && synchronizationId == ActiveSynchronizationId;
-
-		internal static bool CanReceiveSynchronizationSave(ulong synchronizationId) =>
-			IsCurrentSynchronization(synchronizationId) && !_loadSubmitted;
-
-		internal static void ResetSynchronizationState()
-		{
-			ActiveSynchronizationId = 0;
-			_loadSubmitted = false;
-			SaveChunkAssembler.Clear();
-		}
 
 		internal static void RequestSynchronizationTransferRetry(ulong synchronizationId, bool forceGeneric = false)
 		{
@@ -74,158 +55,63 @@ namespace ONI_United.Networking.Runtime
 			PacketSender.SendToHost(normalRetryPacket);
 		}
 
-		internal static bool SubmitSynchronizationSave(ulong synchronizationId, WorldSave save, bool delay)
-		{
-			if (!CanReceiveSynchronizationSave(synchronizationId))
-			{
-				DebugConsole.LogWarning($"[Synchronization] Ignored duplicate/stale save completion for sync {synchronizationId}.");
-				return false;
-			}
-			_loadSubmitted = true;
-			SaveChunkAssembler.Clear();
-			CoroutineRunner.RunOne(LoadSynchronizationSave());
-			return true;
+        public static bool IsHardSyncInProgress => Session.IsClient && Lifecycle.Current == Lifecycle.Phase.Synchronizing;
 
-			IEnumerator LoadSynchronizationSave()
-			{
-				if (delay)
-					yield return new WaitForSecondsRealtime(1f);
-				if (!IsCurrentSynchronization(synchronizationId))
-					yield break;
-				SaveHelper.RequestWorldLoad(save, () => IsCurrentSynchronization(synchronizationId));
-			}
-		}
+        // Native establishment has already been confirmed by the owning driver.
+        // Lifecycle selects this essential preparation from (Joining, PrepareClientSession).
+        internal static void PrepareSession() =>
+            SessionHandshakeCoordinator.SendClientHello(NetworkRuntime.TransportClient.CurrentConnection);
 
-		private static bool _cancellingConnectionAttempt = false;
-
-		public static bool IsHardSyncInProgress => _state == ClientState.LoadingWorld;
-		public static bool Handle(ClientEvent evt)
+        private static void Init()
 		{
 			using var _ = Profiler.Scope();
 
-			ClientState nextState;
-			switch (evt)
-			{
-				case ClientEvent.BeginConnect:
-					if (_state == ClientState.Disconnected)
-						nextState = ClientState.Connecting;
-					else
-						return RejectTransition(evt, $"Cannot begin connecting while in {_state} state.");
-					break;
-				case ClientEvent.ConnectionFailed:
-					if (_state == ClientState.Disconnected)
-						return ApplyStateTransition(_state, evt);
-					if (_state == ClientState.Connecting)
-						nextState = ClientState.Disconnected;
-					else
-						return RejectTransition(evt, $"Cannot fail a connection attempt while in {_state} state.");
-					break;
-				case ClientEvent.CancelConnect:
-					if (_state == ClientState.Disconnected)
-						return ApplyStateTransition(_state, evt);
-					if (_state == ClientState.Connecting)
-						nextState = ClientState.Disconnected;
-					else
-						return RejectTransition(evt, $"Cannot cancel a connection attempt while in {_state} state.");
-					break;
-				case ClientEvent.TransportConnected:
-					if (_state == ClientState.Connecting)
-						nextState = ClientState.Connected;
-					else
-						return RejectTransition(evt, $"Cannot complete transport connection while in {_state} state.");
-					break;
-				case ClientEvent.WorldLoadStarted:
-					if (_state == ClientState.LoadingWorld)
-						return ApplyStateTransition(_state, evt);
-					if (_state == ClientState.Connected || _state == ClientState.InGame)
-						nextState = ClientState.LoadingWorld;
-					else
-						return RejectTransition(evt, $"Cannot start a world load while in {_state} state.");
-					break;
-				case ClientEvent.SynchronizationCompleted:
-					if (_state == ClientState.LoadingWorld)
-						nextState = ClientState.InGame;
-					else
-						return RejectTransition(evt, $"Cannot complete synchronization while in {_state} state.");
-					break;
-				case ClientEvent.TransportDisconnected:
-					if (_state == ClientState.Disconnected)
-						return ApplyStateTransition(_state, evt);
-					if (_state == ClientState.Connecting || _state == ClientState.Connected ||
-						_state == ClientState.LoadingWorld || _state == ClientState.InGame)
-						nextState = ClientState.Disconnected;
-					else
-						return RejectTransition(evt, $"Cannot disconnect while in {_state} state.");
-					break;
-				default:
-					return RejectTransition(evt, $"Unknown client event {evt}.");
-			}
-
-			return ApplyStateTransition(nextState, evt);
-		}
-
-		private static bool ApplyStateTransition(ClientState nextState, ClientEvent evt)
-		{
-			if (nextState == ClientState.Disconnected)
-				ResetSynchronizationState();
-			if (_state != nextState)
-			{
-				ClientState previousState = _state;
-				_state = nextState;
-				DebugConsole.Log($"[GameClientLifecycle] {previousState} -> {_state} via {evt}");
-			}
-
-			return true;
-		}
-
-		private static bool RejectTransition(ClientEvent evt, string reason)
-		{
-			DebugConsole.LogWarning($"[GameClientLifecycle] Rejected {evt} while in {_state}. Reason: {reason}");
-			return false;
-		}
-
-		public static void Init()
-		{
-			using var _ = Profiler.Scope();
-
-			// I fucking hate this, maybe replace this with hashes?
-			NetworkRuntime.TransportClient.OnClientDisconnected = () =>
-			{
-				if (_cancellingConnectionAttempt)
-					return;
-
-				ClientState previousState = _state;
-				Handle(previousState == ClientState.Connecting ? ClientEvent.ConnectionFailed : ClientEvent.TransportDisconnected);
-			};
-			NetworkRuntime.TransportClient.OnConnectionFailed = () =>
-			{
-				if (!_cancellingConnectionAttempt)
-					Handle(ClientEvent.ConnectionFailed);
-			};
-			NetworkRuntime.TransportClient.OnClientConnected = () =>
-			{
-				if (!_cancellingConnectionAttempt)
-					Handle(ClientEvent.TransportConnected);
-			};
-			NetworkRuntime.TransportClient.OnContinueConnectionFlow = () => ContinueConnectionFlow();
+            var owner = NetworkRuntime.TransportClient;
+            var operation = NetworkRuntime.ActiveOperation;
+            bool IsCurrentOperation() => NetworkRuntime.IsCurrentOperation(owner, operation);
+            owner.OnClientDisconnected = () =>
+            {
+                if (IsCurrentOperation() && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
+            };
+            owner.OnConnectionFailed = reason =>
+            {
+                if (IsCurrentOperation() && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
+            };
+            owner.OnClientConnected = () => { if (IsCurrentOperation()) NetworkRuntime.TransportEstablished(owner, operation); };
+			owner.OnContinueConnectionFlow = () => { if (IsCurrentOperation()) ContinueConnectionFlow(); };
 			NetworkRuntime.TransportClient.OnReturnToMenu = (reason, message) =>
 			{
-				CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message, skipIfReconnected: true));
+                if (ReferenceEquals(owner, NetworkRuntime.TransportClient) && owner.IsCurrentOperation(operation)
+                    && (!NetworkRuntime.HasActiveOperation || IsCurrentOperation()))
+                    CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(reason, message, skipIfReconnected: true));
 			};
 			NetworkRuntime.TransportClient.OnRequestStateOrReturn = () =>
 			{
+                if (!IsCurrentOperation() || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
                 GameplayPacketSender.Instance.SendToHost(GameStateRequestPacket.CreateClientRequest(MultiplayerSession.LocalUserID));
-                MP_Timer.Instance.StartDelayedAction(10, () => CoroutineRunner.RunOne(ShowMessageAndReturnToTitle()));
+                if (!IsCurrentOperation() || Lifecycle.Current == Lifecycle.Phase.ClearingSession) return;
+                MP_Timer.Instance.StartDelayedAction(10, () =>
+                {
+                    if (IsCurrentOperation() && NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+                        CoroutineRunner.RunOne(ShowMessageAndReturnToTitle());
+                });
             };
             NetworkRuntime.TransportClient.Prepare();
-            CursorManager.Instance.AssignColor();
+            if (IsCurrentOperation() && Lifecycle.Current == Lifecycle.Phase.Joining)
+                CursorManager.Instance.AssignColor();
         }
 
-		public static void ConnectToHost(bool showLoadingScreen = true, string ip = "", int port = 7777)
-		{
+        public static void ConnectToHost(bool showLoadingScreen = true, string ip = "", int port = 7777)
+            => NetworkRuntime.ConnectClient(showLoadingScreen, ip, port);
+
+        internal static void BeginConnection(bool showLoadingScreen = true, string ip = "", int port = 7777)
+        {
 			using var _ = Profiler.Scope();
 
+            var owner = NetworkRuntime.TransportClient;
+            var operation = NetworkRuntime.ActiveOperation;
             Init();
+            if (!NetworkRuntime.IsCurrentOperation(owner, operation) || Lifecycle.Current != Lifecycle.Phase.Joining) return;
 
 			if (showLoadingScreen)
 			{
@@ -241,16 +127,15 @@ namespace ONI_United.Networking.Runtime
 					MultiplayerOverlay.Show(string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST, hostName));
 			}
 
-			if (!Handle(ClientEvent.BeginConnect))
-				return;
-
 			try
 			{
-				NetworkRuntime.TransportClient.ConnectToHost(ip, port);
+                if (NetworkRuntime.IsCurrentOperation(owner, operation) && Lifecycle.Current == Lifecycle.Phase.Joining)
+				    owner.StartConnection(ip, port);
 			}
 			catch
 			{
-				Handle(ClientEvent.ConnectionFailed);
+                if (NetworkRuntime.IsCurrentOperation(owner, operation)
+                    && Lifecycle.Current != Lifecycle.Phase.ClearingSession) NetworkRuntime.DisconnectClient();
 				throw;
 			}
 		}
@@ -262,27 +147,11 @@ namespace ONI_United.Networking.Runtime
 			NetworkRuntime.TransportClient.Disconnect();
 		}
 
-		public static void CancelConnectionAttempt()
-		{
-			using var _ = Profiler.Scope();
-
-			if (_state != ClientState.Connecting)
-				return;
-
-			_cancellingConnectionAttempt = true;
-			try
-			{
-				NetworkRuntime.TransportClient.Disconnect();
-			}
-			finally
-			{
-				_cancellingConnectionAttempt = false;
-
-				Handle(ClientEvent.CancelConnect);
-
-				MultiplayerOverlay.Close();
-			}
-		}
+        public static void CancelConnectionAttempt()
+        {
+            NetworkRuntime.DisconnectClient();
+            MultiplayerOverlay.Close();
+        }
 
 		public static void ReconnectToSession()
 		{
@@ -297,24 +166,18 @@ namespace ONI_United.Networking.Runtime
 
 			NetworkRuntime.TransportClient.Update();
 
-			switch (State)
-			{
-				case ClientState.Connecting:
-				case ClientState.Connected:
-				case ClientState.LoadingWorld:
-				case ClientState.InGame:
-					NetworkRuntime.TransportClient.OnMessageRecieved();
-					break;
-				case ClientState.Disconnected:
-				default:
-					break;
-			}
+            if (NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+                NetworkRuntime.TransportClient.OnMessageRecieved();
 		}
 
 		public static void OnHostResponseReceived(GameStateRequestPacket packet)
 		{
 			using var _ = Profiler.Scope();
 
+            var owner = NetworkRuntime.TransportClient;
+            var operation = NetworkRuntime.ActiveOperation;
+            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
+                && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
 			DebugConsole.Log("Gamestate packet received");
 			MP_Timer.Instance.Abort();
 			if (!TryValidateHostProtocol(packet, out string protocolReason, out string protocolMessage))
@@ -352,11 +215,11 @@ namespace ONI_United.Networking.Runtime
 				{
 					UiUtil.CreateConfirmDialogFrontend(ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE, text,
 		   ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC,
-					() => { SaveHelper.SyncModsAndRestart(notEnabled, notDisabled, missingMods); },
+					() => { if (IsCurrent()) SaveHelper.SyncModsAndRestart(notEnabled, notDisabled, missingMods); },
 					ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL,
-					BackToMainMenu,
+					() => { if (IsCurrent()) BackToMainMenu(); },
 					ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.DENY_SYNC,
-					ContinueConnectionFlow);
+					() => { if (IsCurrent()) ContinueConnectionFlow(); });
 					DebugConsole.Log("mods not synced!");
 				}
 				return;
@@ -424,7 +287,8 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Close();
 			NetworkIdentityRegistry.Clear();
-			NetworkRuntime.Stop();
+            if (Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+			    NetworkRuntime.Stop();
 			App.LoadScene("frontend");
 		}
 
@@ -432,19 +296,26 @@ namespace ONI_United.Networking.Runtime
 		{
 			using var _ = Profiler.Scope();
 
-			if (Session.IsHost)
+            var owner = NetworkRuntime.TransportClient;
+            var operation = NetworkRuntime.ActiveOperation;
+            bool IsCurrent() => NetworkRuntime.IsCurrentOperation(owner, operation)
+                && Lifecycle.Current != Lifecycle.Phase.ClearingSession;
+			if (!Session.IsClient || !NetworkRuntime.HasClientOperation
+                || Lifecycle.Current == Lifecycle.Phase.ClearingSession)
 			{
-				DebugConsole.Log("[GameClient] ContinueConnectionFlow called on host - ignoring");
+				DebugConsole.Log("[GameClient] ContinueConnectionFlow requires an active admitted client - ignoring");
 				return;
 			}
 
 			DebugConsole.Log($"[GameClient] ContinueConnectionFlow - IsInMenu: {Utils.IsInMenu()}, IsInGame: {Utils.IsInGame()}, HardSyncInProgress: {IsHardSyncInProgress}");
 			ReadyManager.SendReadyStatusPacket(ClientReadyState.Unready);
+            if (!IsCurrent()) return;
 
 			if (Utils.IsInMenu())
 			{
 				DebugConsole.Log("[GameClient] Client is in menu - requesting save file or sending ready status");
 				MultiplayerOverlay.Show(string.Format(ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.WAITING_FOR_PLAYER, SteamFriends.GetFriendPersonaName(MultiplayerSession.HostUserID.AsCSteamID())));
+                if (!IsCurrent()) return;
 				DebugConsole.Log("[GameClient] Requesting synchronized save file from host");
 				PacketSender.SendToHost(new SynchronizationRequestPacket { Requester = MultiplayerSession.LocalUserID });
 			}
@@ -459,60 +330,14 @@ namespace ONI_United.Networking.Runtime
 			}
 		}
 
-		public static bool BeginSynchronization(ulong synchronizationId)
-		{
-			using var _ = Profiler.Scope();
-
-			if (synchronizationId == 0)
-			{
-				DebugConsole.LogWarning($"[Synchronization] Ignored invalid HardSync {synchronizationId}.");
-				return false;
-			}
-			if (_state == ClientState.LoadingWorld)
-			{
-				DebugConsole.LogWarning($"[Synchronization] Rejected HardSync {synchronizationId} while loading {ActiveSynchronizationId}.");
-				return false;
-			}
-			if (!Handle(ClientEvent.WorldLoadStarted))
-				return false;
-
-			ActiveSynchronizationId = synchronizationId;
-			_loadSubmitted = false;
-			SaveChunkAssembler.Clear();
-			SpeedControlScreen.Instance?.Pause(false);
-			return true;
-		}
-
-		public static void OnWorldSpawnComplete()
-		{
-			using var _ = Profiler.Scope();
-
-			if (_state != ClientState.LoadingWorld || !_loadSubmitted)
-				return;
-
-			ReadyManager.SendReadyStatusPacket(ClientReadyState.Ready);
-		}
-
-		public static bool CompleteSynchronization(ulong synchronizationId)
-		{
-			using var _ = Profiler.Scope();
-
-			if (!IsCurrentSynchronization(synchronizationId))
-			{
-				DebugConsole.LogWarning($"[Synchronization] Ignored AllReady for inactive sync {synchronizationId}.");
-				return false;
-			}
-
-			if (!Handle(ClientEvent.SynchronizationCompleted))
-				return false;
-			ActiveSynchronizationId = 0;
-			SaveChunkAssembler.Clear();
-			MultiplayerSession.CreateConnectedPlayerCursors();
-			SelectToolPatch.UpdateColor();
-			return true;
-		}
-
 		private static IEnumerator ShowMessageAndReturnToTitle(string reason = "", string message = "", bool skipIfReconnected = false)
+        {
+            var owner = NetworkRuntime.TransportClient;
+            return ShowMessageAndReturnToTitle(owner, owner.Operation, reason, message, skipIfReconnected);
+        }
+
+        private static IEnumerator ShowMessageAndReturnToTitle(ONI_United.Networking.Transport.TransportClient owner,
+            object operation, string reason, string message, bool skipIfReconnected)
 		{
 			string displayText;
 			if (string.IsNullOrEmpty(reason) && string.IsNullOrEmpty(message))
@@ -534,8 +359,10 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Show(displayText);
 			yield return new WaitForSecondsRealtime(3f);
-			if (skipIfReconnected && State != ClientState.Disconnected)
-				yield break;
+            if (!ReferenceEquals(owner, NetworkRuntime.TransportClient)
+                || !owner.IsCurrentOperation(operation)) yield break;
+            if (skipIfReconnected && (NetworkRuntime.HasHostOperation
+                || (NetworkRuntime.HasClientOperation && Lifecycle.Current != Lifecycle.Phase.ClearingSession))) yield break;
 			//PauseScreen.TriggerQuitGame(); // Force exit to frontend, getting a crash here
 			if (Utils.IsInGame())
 			{
@@ -545,7 +372,9 @@ namespace ONI_United.Networking.Runtime
 
 			MultiplayerOverlay.Close();
             NetworkIdentityRegistry.Clear();
-            NetworkRuntime.Stop();
+            // Menu return must not implicitly retry an unresolved native cleanup.
+            if (Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+                NetworkRuntime.Stop();
 		}
 	}
 }

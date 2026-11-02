@@ -7,10 +7,9 @@ namespace ONI_United.Networking.Transport
 {
     // INACTIVE MIGRATION CONTRACT: no production protocol derives from this class.
     // NetworkRuntime admits Start/Stop through Lifecycle before these entry points.
-    // Protocol owners must retain/cancel their native work and suppress obsolete
-    // completion/failure notifications after Stop. Lifecycle rejects
-    // invalid phases; it cannot identify an old result during a newer compatible phase.
-    // Repeated Stop is admitted in Stopping: native coalescing/retry belongs to the
+    // Protocol owners retain/cancel their native work and may repeat cleanup completion.
+    // Lifecycle rejects invalid phases; old completion during a newer clearing is outside scope.
+    // Repeated ClearHostSession is admitted in ClearingSession: native coalescing/retry belongs to the
     // protocol. This base keeps no operation identity, pending flag or callback state.
     public abstract class ServerTransport
     {
@@ -38,13 +37,13 @@ namespace ONI_United.Networking.Transport
 
         protected void OnStarted()
         {
-            Lifecycle.Handle(Lifecycle.Event.TransportStarted, null);
+            Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, null);
         }
 
         protected bool OnConnected(ulong clientId, string playerName, object connection)
         {
             if (connection == null || connections.ContainsKey(clientId)
-                || Lifecycle.Current != Lifecycle.Phase.Hosting
+                || !Lifecycle.IsHostGameplay || Lifecycle.Current != Lifecycle.Phase.InGameSession
                 || !Session.TryAdmitPlayer(clientId, playerName))
                 return false;
 
@@ -56,19 +55,19 @@ namespace ONI_United.Networking.Transport
         {
             DebugConsole.LogError("[ServerTransport] " +
                 (string.IsNullOrEmpty(reason) ? "Host startup failed." : reason));
-            Lifecycle.Handle(Lifecycle.Event.Stop, Stop);
+            Lifecycle.Handle(Lifecycle.Event.ClearHostSession, Stop);
         }
 
         protected void OnStopped()
         {
-            Lifecycle.Handle(Lifecycle.Event.Stopped, null);
+            Lifecycle.Handle(Lifecycle.Event.SessionCleared);
         }
 
         protected void OnStopFailed(string reason)
         {
             DebugConsole.LogError("[ServerTransport] " +
                 (string.IsNullOrEmpty(reason) ? "Host cleanup failed." : reason));
-            // No Stopped event and no retry: an unsuccessful shutdown stays Stopping.
+            // No SessionCleared event and no retry: an unsuccessful shutdown stays ClearingSession.
         }
 
         internal bool TryGetConnection(ulong clientId, out object connection) =>

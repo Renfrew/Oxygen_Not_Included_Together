@@ -91,7 +91,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             using var _ = Profiler.Scope();
         }
 
-        protected override void StartProtocol()
+        protected override void StartProtocol(object operation)
         {
             using var _ = Profiler.Scope();
 
@@ -99,12 +99,12 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             LastStartFailure = null;
             if (!Utils.IsInGame() || Grid.CellCount <= 0)
             {
-                ReportStartupFailure("Load a colony before starting a LAN host.");
+                ReportStartupFailure(operation, "Load a colony before starting a LAN host.");
                 return;
             }
             if (Configuration.Instance.Host.LanPort < 1 || Configuration.Instance.Host.LanPort > 65535)
             {
-                ReportStartupFailure("The configured LAN port is outside the valid range.");
+                ReportStartupFailure(operation, "The configured LAN port is outside the valid range.");
                 return;
             }
             if (_tcpTransfer != null && !_tcpTransfer.IsStopped)
@@ -112,7 +112,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _tcpTransfer = null;
             if (_server != null)
             {
-                ReportStartupFailure("A LiteNetLib server instance already exists.");
+                ReportStartupFailure(operation, "A LiteNetLib server instance already exists.");
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (hostId == 0)
             {
                 LastStartFailure = "Cannot start with an empty persistent host ID.";
-                ReportStartupFailure(LastStartFailure);
+                ReportStartupFailure(operation, LastStartFailure);
                 return;
             }
 
@@ -149,20 +149,21 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             try { started = _server.Start(port); }
             catch (SocketException ex)
             {
-                ReportStartupFailure(ex.Message);
+                ReportStartupFailure(operation, ex.Message);
                 return;
             }
             if (!started)
             {
                 LastStartFailure = "Failed to bind the LiteNetLib listener to port " + port + ".";
-                ReportStartupFailure(LastStartFailure);
+                ReportStartupFailure(operation, LastStartFailure);
                 return;
             }
 
             DebugConsole.Log("[LiteNetLibServer] Listener started on port " + port);
             OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
 
-            if (_server == null || !_server.IsRunning) return;
+            if (!NetworkRuntime.IsCurrentOperation(this, operation)
+                || Lifecycle.Current != Lifecycle.Phase.StartingHost || _server == null || !_server.IsRunning) return;
 
             try
             {
@@ -177,17 +178,23 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 try { _tcpTransfer?.Stop(); }
                 catch (Exception cleanupError)
                 {
-                    ReportStartupFailure("Partial TCP startup cleanup failed: " + cleanupError);
+                    ReportStartupFailure(operation, "Partial TCP startup cleanup failed: " + cleanupError);
                     return;
                 }
             }
 
             ClientList.Clear();
-            ReportTransportStarted();
+            ReportTransportStarted(operation);
         }
 
         private void OnConnectionRequest(ConnectionRequest request)
         {
+            if (!Session.IsHost || !Lifecycle.IsHostGameplay
+                || Lifecycle.Current != Lifecycle.Phase.InGameSession)
+            {
+                request.Reject();
+                return;
+            }
             if (_server.ConnectedPeersCount >= Configuration.Instance.Host.MaxLobbySize)
             {
                 request.Reject();

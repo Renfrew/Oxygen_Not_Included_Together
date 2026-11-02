@@ -125,7 +125,7 @@ namespace ONI_United.UI.Multiplayer
         internal void RefreshActiveView()
         {
             if (closed) return;
-            sessionShown = Session.IsActive || Lifecycle.HasHostOperation;
+            sessionShown = Session.IsActive || NetworkRuntime.HasHostOperation || NetworkRuntime.HasClientOperation;
             KScreen next;
             if (sessionShown)
             {
@@ -167,7 +167,7 @@ namespace ONI_United.UI.Multiplayer
             while (!closed && dialog != null)
             {
                 var visible = child ?? this;
-                if (visible.sessionShown != (Session.IsActive || Lifecycle.HasHostOperation) || Time.unscaledTime >= visible.nextRefresh)
+                if (visible.sessionShown != (Session.IsActive || NetworkRuntime.HasHostOperation || NetworkRuntime.HasClientOperation) || Time.unscaledTime >= visible.nextRefresh)
                     visible.RefreshActiveView();
                 yield return null;
             }

@@ -19,13 +19,14 @@ namespace ONI_United.Patches
 			{
 				using var _ = Profiler.Scope();
 
-				if (!Session.IsActive && !Lifecycle.HasHostOperation)
+				if (!Session.IsActive && !NetworkRuntime.HasHostOperation && !NetworkRuntime.HasClientOperation)
 					return;
 
 				MultiplayerSession.IsQuitting = true;
 
-                // The host owner clears membership only as part of its cleanup attempt.
-                NetworkRuntime.Stop();
+                // Lifecycle owns logical cleanup for both host and client termination.
+                if (Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+                    NetworkRuntime.Stop();
 			}
 		}
 
