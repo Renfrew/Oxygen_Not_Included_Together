@@ -4,7 +4,6 @@ using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport.Steamworks;
 using Steamworks;
 using Xunit;
-using ModConfiguration = ONI_United.Configuration;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
 
 namespace Shared.Tests.Networking;
@@ -22,7 +21,6 @@ public sealed class SteamworksClientDraftTests : IDisposable
     {
         Reset(); SteamManager.Initialized = true; SteamLobby.InLobby = true;
         MultiplayerSession.HostUserID = 20;
-        ModConfiguration.Instance.Client.TimeoutSeconds = 30;
         SteamNetworkingSockets.Connections.Clear();
         SteamNetworkingSockets.CloseFailures.Clear();
         SteamNetworkingSockets.Closed.Clear();
@@ -40,7 +38,7 @@ public sealed class SteamworksClientDraftTests : IDisposable
     public void Dispose()
     {
         SteamNetworkingSockets.CloseFailures.Clear();
-        client.Stop(); SteamLobby.InLobby = false; Session.Reset();
+        client.Disconnect(); SteamLobby.InLobby = false; Session.Reset();
         SteamNetworkingSockets.PendingCallbacks.Clear();
     }
     private HSteamNetConnection Connect() { client.Connect(); return Handle.Value; }
@@ -60,12 +58,12 @@ public sealed class SteamworksClientDraftTests : IDisposable
         Notify(handle, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
 
     [Fact]
-    public void NativeConnectionUsesLobbyHostAndReportsSuccessOnceWithoutSessionAdmission()
+    public void NativeConnectionUsesSessionHostAndReportsSuccessWithoutSessionAdmission()
     {
         var handle = Connect();
         Assert.Equal(new CSteamID(20), SteamNetworkingSockets.Connections[handle].m_identityRemote.GetSteamID());
         Assert.Equal(0, SteamNetworkingSockets.LastVirtualPort);
-        Assert.All(SteamNetworkingSockets.LastOptions, option => Assert.Equal(30000, option.m_val.m_int32));
+        Assert.Empty(SteamNetworkingSockets.LastOptions);
         Assert.Equal(0, connected);
         Ready(handle); Ready(handle);
         Assert.Equal(1, connected); Assert.Empty(failures);
@@ -81,19 +79,65 @@ public sealed class SteamworksClientDraftTests : IDisposable
         SteamNetworkingSockets.ConnectFails = true; SteamNetworkingSockets.ConnectThrows = throws;
         client.Connect();
         Assert.Null(Handle); Assert.Single(failures); Assert.Equal(0, connected);
+        Assert.Equal(1, disconnected);
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
         Assert.Empty(SteamNetworkingSockets.Connections);
     }
 
     [Fact]
-    public void MissingLobbyOrHostOrSteamRejectsBeforeNativeAcquisition()
+    public void MissingSteamOrInvalidHostRejectsBeforeNativeAcquisition()
     {
-        SteamLobby.InLobby = false; client.Connect();
-        SteamLobby.InLobby = true; MultiplayerSession.HostUserID = 0; client.Connect();
-        MultiplayerSession.HostUserID = 20; SteamManager.Initialized = false; client.Connect();
-        Assert.Equal(3, failures.Count);
+        SteamManager.Initialized = false;
+        client.Connect();
+        SteamManager.Initialized = true;
+        MultiplayerSession.HostUserID = 0;
+        client.Connect();
+        Assert.Equal(2, failures.Count);
         Assert.Equal(0, SteamNetworkingSockets.ConnectCalls);
         Assert.Null(Handle);
+    }
+
+    [Fact]
+    public void PollRequiresSteamAndAnOwnedNativeConnection()
+    {
+        Assert.Throws<InvalidOperationException>(client.Poll);
+        Assert.Equal(0, SteamNetworkingSockets.RunCallbackCalls);
+
+        Connect();
+        SteamManager.Initialized = false;
+        Assert.Throws<InvalidOperationException>(client.Poll);
+        Assert.Equal(0, SteamNetworkingSockets.RunCallbackCalls);
+        SteamManager.Initialized = true;
+    }
+
+    [Fact]
+    public void PollServicesConnectingCallbackBeforeAttemptingMessageReception()
+    {
+        var handle = Connect();
+        var message = new IntPtr(1);
+        SteamNetworkingSockets.Received.Enqueue(new[] { message });
+
+        client.Poll();
+
+        Assert.Equal(1, SteamNetworkingSockets.RunCallbackCalls);
+        Assert.Single(SteamNetworkingSockets.Received);
+        Assert.Empty(SteamNetworkingMessage_t.Released);
+
+        Ready(handle);
+
+        Assert.Empty(SteamNetworkingSockets.Received);
+        Assert.Equal(new[] { message }, SteamNetworkingMessage_t.Released);
+    }
+
+    [Fact]
+    public void NativeConnectionUsesCurrentSessionHostWithoutLobbyValidation()
+    {
+        SteamLobby.InLobby = false;
+        var handle = Connect();
+        Ready(handle);
+        Assert.Equal(1, connected);
+        Assert.Empty(failures);
+        Assert.False(Session.IsActive);
     }
 
     [Fact]
@@ -101,7 +145,7 @@ public sealed class SteamworksClientDraftTests : IDisposable
     {
         var handle = Connect();
         Notify(handle, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally);
-        Assert.Single(failures); Assert.Equal(0, connected); Assert.Equal(0, disconnected);
+        Assert.Single(failures); Assert.Equal(0, connected); Assert.Equal(1, disconnected);
         Assert.Null(Handle); Assert.Contains(handle, SteamNetworkingSockets.Closed);
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
     }
@@ -111,7 +155,7 @@ public sealed class SteamworksClientDraftTests : IDisposable
     {
         var handle = Connect();
         Notify(handle, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected, host: 30);
-        Assert.Single(failures); Assert.Equal(0, connected); Assert.Null(Handle);
+        Assert.Single(failures); Assert.Equal(0, connected); Assert.Equal(1, disconnected); Assert.Null(Handle);
     }
 
     [Fact]
@@ -122,25 +166,58 @@ public sealed class SteamworksClientDraftTests : IDisposable
         info.m_eState = ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer;
         SteamNetworkingSockets.Connections[handle] = info;
         Notify(handle, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected, updateNative: false);
-        Assert.Single(failures); Assert.Equal(0, connected); Assert.Null(Handle);
+        Assert.Single(failures); Assert.Equal(0, connected); Assert.Equal(1, disconnected); Assert.Null(Handle);
     }
 
     [Fact]
-    public void DisconnectDuringSetupAndRepeatedStopNotifyOnlyOnce()
+    public void DisconnectDuringSetupAndRepeatedDisconnectNotifyOnlyOnce()
     {
-        var old = Connect(); client.Stop(); client.Stop();
-        Ready(old);
-        Assert.Single(failures); Assert.Equal(0, connected); Assert.Null(Handle);
+        Connect(); client.Disconnect(); client.Disconnect();
+        Assert.Empty(failures); Assert.Equal(0, connected); Assert.Equal(1, disconnected); Assert.Null(Handle);
+        Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
+    }
+
+    [Fact]
+    public void InvalidNativeReceiveHandleInitiatesCleanupAndReportsCompletion()
+    {
+        var handle = Connect();
+        Ready(handle);
+        SteamNetworkingSockets.Connections.Remove(handle);
+
+        client.Poll();
+
+        Assert.Null(Handle);
+        Assert.Equal(1, disconnected);
+        Assert.Empty(failures);
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
     }
 
     [Fact]
     public void RepeatedConnectCannotReplaceConnectingOrConnectedHandle()
     {
-        var handle = Connect(); client.Connect(); Ready(handle); client.Connect();
+        var handle = Connect();
+        Assert.Throws<InvalidOperationException>(client.Connect);
+        Ready(handle);
+        Assert.Throws<InvalidOperationException>(client.Connect);
         Assert.Equal(1, SteamNetworkingSockets.ConnectCalls); Assert.Equal(handle, Handle);
-        client.Stop(); client.Stop();
+        client.Disconnect(); client.Disconnect();
         Assert.Equal(1, disconnected); Assert.Empty(failures);
+    }
+
+    [Fact]
+    public void ExplicitDisconnectNotifiesOnlyAfterNativeHandleIsReleased()
+    {
+        var handle = Connect(); Ready(handle);
+        client.OnClientDisconnected += () =>
+        {
+            Assert.Null(Handle);
+            Assert.False(SteamNetworkingSockets.Connections.ContainsKey(handle));
+        };
+        client.Disconnect();
+        Assert.Equal(1, disconnected);
+        Assert.Single(SteamNetworkingSockets.Closed);
+        client.Disconnect();
+        Assert.Equal(1, disconnected);
     }
 
     [Fact]
@@ -158,27 +235,20 @@ public sealed class SteamworksClientDraftTests : IDisposable
     }
 
     [Fact]
-    public void FailedCleanupRetainsHandleAndBlocksConnectUntilExplicitStopRetry()
+    public void FailedNativeCloseRetainsHandleAndCallbackUntilOwnershipEnds()
     {
         var old = Connect(); Ready(old);
         SteamNetworkingSockets.CloseFailures.Add(old);
-        client.Stop(); client.Connect(); client.Stop(); Ready(old);
+        client.Disconnect();
+        Assert.Throws<InvalidOperationException>(client.Connect);
         Assert.Equal(old, Handle); Assert.Equal(1, SteamNetworkingSockets.ConnectCalls);
-        Assert.Equal(1, disconnected); Assert.Equal(1, connected);
-        Assert.Contains(Trace, line => line.Contains("Native cleanup failed"));
-        SteamNetworkingSockets.CloseFailures.Clear(); client.Stop();
-        Assert.Null(Handle); Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
-        var current = Connect(); Ready(current);
-        Assert.Equal(2, connected);
-    }
+        Assert.Equal(0, disconnected); Assert.Equal(1, connected);
+        Assert.Equal(1, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
 
-    [Fact]
-    public void AlreadyInvalidNativeHandleCanStillCompleteCleanup()
-    {
-        var handle = Connect(); Ready(handle);
-        SteamNetworkingSockets.Connections.Remove(handle);
-        client.Stop();
-        Assert.Null(Handle); Assert.Equal(1, disconnected);
+        SteamNetworkingSockets.CloseFailures.Clear();
+        client.Disconnect();
+        Assert.Null(Handle);
+        Assert.Equal(1, disconnected);
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
     }
 
@@ -188,10 +258,46 @@ public sealed class SteamworksClientDraftTests : IDisposable
         var handle = Connect(); Ready(handle);
         var first = new IntPtr(1); var failed = new IntPtr(2); var last = new IntPtr(3);
         SteamNetworkingMessage_t.ReleaseFailures.Add(failed);
-        SteamNetworkingSockets.Received.Enqueue(new[] { first, IntPtr.Zero, failed, last });
+        SteamNetworkingSockets.Received.Enqueue(new[] { first, failed, last });
         client.Poll();
         Assert.Equal(new[] { first, failed, last }, SteamNetworkingMessage_t.Released);
         Assert.Equal(handle, Handle); Assert.Equal(1, connected);
         Assert.Contains(Trace, line => line.Contains("Native message release failed"));
+    }
+
+    [Fact]
+    public void UnownedConnectionNotificationsCannotChangeTheClient()
+    {
+        var current = Connect();
+        var other = new HSteamNetConnection(999);
+        Notify(other, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
+        Notify(other, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
+        Assert.Equal(current, Handle);
+        Assert.Equal(0, connected);
+        Assert.Equal(0, disconnected);
+        Assert.Empty(failures);
+        Ready(current);
+        Assert.Equal(1, connected);
+    }
+
+    [Fact]
+    public void DisconnectionSubscriberCanReconnectWithoutOldCleanupReleasingNewHandle()
+    {
+        var old = Connect();
+        Ready(old);
+        Action reconnect = () =>
+        {
+            Assert.Null(Handle);
+            Assert.False(SteamNetworkingSockets.Connections.ContainsKey(old));
+            client.Connect();
+        };
+        client.OnClientDisconnected += reconnect;
+        client.Disconnect();
+        Assert.NotNull(Handle);
+        Assert.NotEqual(old, Handle.Value);
+        Assert.True(SteamNetworkingSockets.Connections.ContainsKey(Handle.Value));
+        Assert.Equal(1, disconnected);
+        Assert.Equal(1, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
+        client.OnClientDisconnected -= reconnect;
     }
 }

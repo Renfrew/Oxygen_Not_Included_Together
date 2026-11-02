@@ -137,6 +137,7 @@ namespace Steamworks
         }
         internal static int ReceiveMessagesOnConnection(HSteamNetConnection connection, IntPtr[] messages, int max)
         {
+            if (!Connections.ContainsKey(connection)) return -1;
             if (!Received.TryDequeue(out var batch)) return 0;
             Array.Copy(batch, messages, batch.Length);
             return batch.Length;

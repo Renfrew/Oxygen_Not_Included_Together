@@ -102,6 +102,9 @@ public sealed class LifecycleTests : IDisposable
                 (Lifecycle.Phase.InGameSession, Lifecycle.Event.StartHostSync) when role == 1 => Lifecycle.Phase.Synchronizing,
                 (Lifecycle.Phase.Joined or Lifecycle.Phase.InGameSession, Lifecycle.Event.StartClientSync) when role == 2 => Lifecycle.Phase.Synchronizing,
                 (Lifecycle.Phase.Synchronizing, Lifecycle.Event.CompleteSync) when role != 0 => Lifecycle.Phase.InGameSession,
+                (Lifecycle.Phase.Joining or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.Joined
+                    or Lifecycle.Phase.InGameSession or Lifecycle.Phase.Synchronizing or Lifecycle.Phase.ClearingSession,
+                    Lifecycle.Event.PollClient) when operationRole == 2 => phase,
                 _ => null
             };
             int expected = destination.HasValue ? (int)destination.Value : -1;
@@ -261,7 +264,7 @@ public sealed class LifecycleTests : IDisposable
         Assert.Equal(expected.Count, lookup.Count);
         foreach (var entry in expected) Assert.Equal(entry.Value, lookup[entry.Key]);
         Assert.Equal(9, Enum.GetValues<Lifecycle.Phase>().Length);
-        Assert.Equal(13, Enum.GetValues<Lifecycle.Event>().Length);
+        Assert.Equal(14, Enum.GetValues<Lifecycle.Event>().Length);
     }
 
     [Fact]

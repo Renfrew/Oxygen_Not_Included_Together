@@ -167,7 +167,7 @@ public static class SaveHelper
 
 		yield return new WaitForSeconds(5);
         if (NetworkRuntime.HasActiveOperation && !NetworkRuntime.IsCurrentOperation(owner, operation)) yield break;
-        if (owner is ONI_United.Networking.Transport.ClientTransport client && !client.IsCurrentOperation(operation)) yield break;
+        if (owner is ONI_United.Networking.Transport.TransportClient client && !client.IsCurrentOperation(operation)) yield break;
 
 		try
 		{
