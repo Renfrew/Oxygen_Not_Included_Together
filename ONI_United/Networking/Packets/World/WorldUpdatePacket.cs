@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {

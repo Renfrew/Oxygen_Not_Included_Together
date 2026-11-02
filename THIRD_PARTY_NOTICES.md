@@ -6,7 +6,6 @@ This file covers third-party software incorporated into or distributed with Mult
 
 - DiscordRichPresence 1.6.1.70 — Lachee and contributors — https://github.com/Lachee/discord-rpc-csharp
 - LiteNetLib 1.3.1 — Copyright 2024 Ruslan Pyrch — https://github.com/RevenantX/LiteNetLib
-- Riptide Networking 2.1.0 — Copyright © 2022 Tom Weiland — https://github.com/RiptideNetworking/Riptide
 - PLib 4.22.0 — Copyright 2025 Peter Han — https://github.com/peterhaneve/ONIMods
 - DropdownEx / Unity UI Extensions contributors, including the copyright notice retained in `ONI_United/UI/lib/FUI/Unity_UI_Extensions/Scripts/Controls/DropdownEx/DropdownEx.cs`.
 

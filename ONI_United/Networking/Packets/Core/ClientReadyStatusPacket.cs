@@ -1,14 +1,14 @@
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Replication.Components;
 using Shared.Profiling;
 using System.IO;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Core
 {
@@ -107,7 +107,7 @@ namespace ONI_United.Networking.Packets.Core
 
 			DebugConsole.Log($"[ClientReadyStatusPacket] {SenderId} marked as {Status}");
 
-			if (NetworkConfig.IsLanConfig() && nameChanged)
+			if (NetworkRuntime.IsLan && nameChanged)
 			{
 				OxySyncChat.AddSystemMessage(
 					string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, player.PlayerName));

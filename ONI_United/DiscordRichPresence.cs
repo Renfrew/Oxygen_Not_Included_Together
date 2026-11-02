@@ -1,10 +1,11 @@
 using DiscordRPC;
 using DiscordRPC.Message;
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
-using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Sessions;
+using ONI_United.Networking.Sessions.Lobbies;
 using ONI_United.Networking.Transport.Steamworks;
 using ONI_United.UI.Screens;
 using Steamworks;
@@ -167,13 +168,13 @@ namespace ONI_United
                     : $"{baseName} — Cycle {cycle} with {dupeCount} dupes";
 
                 string role = MultiplayerSession.IsHost ? "Hosting" : "Playing";
-                string transport = NetworkConfig.IsSteamConfig() ? "Steam" : "LAN";
+                string transport = NetworkRuntime.IsSteam ? "Steam" : "LAN";
                 presence.State = $"{role} over {transport}";
 
                 string party_id = "oni_together_session";
                 bool isPublic = false;
                 
-                if (_client.HasRegisteredUriScheme && NetworkConfig.IsSteamConfig() && SteamLobby.InLobby)
+                if (_client.HasRegisteredUriScheme && NetworkRuntime.IsSteam && SteamLobby.InLobby)
                 {
                     party_id = $"{SteamLobby.CurrentLobby.m_SteamID}";
                     string visibility = SteamMatchmaking.GetLobbyData(SteamLobby.CurrentLobby, "visibility");
@@ -190,8 +191,8 @@ namespace ONI_United
                 presence.Party = new DiscordRPC.Party
                 {
                     ID = party_id,
-                    Size = NetworkConfig.GetConnectedClients().Count,
-                    Max = NetworkConfig.GetMaxServerCapacity(),
+                    Size = NetworkRuntime.GetConnectedClients().Count,
+                    Max = NetworkRuntime.GetMaxServerCapacity(),
                     Privacy = isPublic ? Party.PrivacySetting.Public : Party.PrivacySetting.Private,
                 };
             }
@@ -236,7 +237,7 @@ namespace ONI_United
                 if (LobbyCodeHelper.TryParseCode(msg.Secret, out ulong lobbyId))
                 {
                     DebugConsole.Log($"[DiscordRichPresence] Joining Steam lobby: {lobbyId}");
-                    NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
+                    NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.STEAMWORKS);
                     StartCoroutine(JoinViaDiscord(lobbyId.AsCSteamID()));
                 }
             }

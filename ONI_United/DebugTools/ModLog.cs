@@ -40,7 +40,7 @@ namespace ONI_United.DebugTools
 
             if (triggerErrorScreen)
             {
-                UnityEngine.Debug.LogError(Format(LogLevel.Error, message));
+                global::Debug.LogError(Format(message));
             }
             else
             {
@@ -55,23 +55,28 @@ namespace ONI_United.DebugTools
             if (!IsEnabled(level))
                 return;
 
-            string formatted = Format(level, message);
+            string formatted = Format(message);
             switch (level)
             {
                 case LogLevel.Trace:
                 case LogLevel.Debug:
                 case LogLevel.Info:
-                    UnityEngine.Debug.Log(formatted);
+                    global::Debug.Log(formatted);
                     break;
                 case LogLevel.Warning:
+                    global::Debug.LogWarning(formatted);
+                    break;
                 case LogLevel.Error:
                 default:
-                    UnityEngine.Debug.LogWarning(formatted);
+                    // Use ONI's formatter without raising Unity's error screen. These native
+                    // members are available through the project's existing publicized references.
+                    if (!global::Debug.s_loggingDisabled)
+                        global::Debug.WriteTimeStamped(["[ERROR]", formatted]);
                     break;
             }
         }
 
-        private static string Format(LogLevel level, string message) =>
-            $"[ONI_United][{level}] {message}";
+        private static string Format(string message) =>
+            $"[ONI_United] {message}";
     }
 }

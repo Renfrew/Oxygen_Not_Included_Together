@@ -9,18 +9,9 @@ namespace ONI_United.Networking.Transport
 {
     public abstract class TransportClient
     {
-        /// <summary>
-        /// When the client is connected to the server
-        /// </summary>
         public System.Action OnClientConnected;
-        /// <summary>
-        /// When the client is disconnected from the server
-        /// </summary>
         public System.Action OnClientDisconnected;
-        /// <summary>
-        /// When a connection attempt fails before the client connects
-        /// </summary>
-        public System.Action OnConnectionFailed;
+        public System.Action<string> OnConnectionFailed;
 
         /// <summary>
         /// Continue the connection flow
@@ -38,11 +29,18 @@ namespace ONI_United.Networking.Transport
 
         public abstract void Prepare();
 
-        public abstract void ConnectToHost(string ip, int port);
+        public void ConnectToHost(string ip, int port) => Core.NetworkRuntime.ConnectClient(ip: ip, port: port);
+        internal void StartConnection(string ip, int port) => ConnectProtocol(ip, port);
+        protected abstract void ConnectProtocol(string ip, int port);
+        public abstract bool TryStop(out string error);
 
-        public abstract void Disconnect();
+        public abstract object CurrentConnection { get; }
 
-        public abstract void ReconnectToSession();
+        public abstract bool IsCurrentConnection(object connection);
+
+        public void Disconnect() => Core.NetworkRuntime.DisconnectClient();
+
+        public void ReconnectToSession() => Core.NetworkRuntime.ReconnectClient();
 
         public abstract void Update();
 

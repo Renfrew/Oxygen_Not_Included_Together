@@ -2,13 +2,12 @@
 using KMod;
 using ONI_United.Networking.Presentation;
 using ONI_United.DebugTools;
+using ONI_United.Core;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Overlay;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Transport.Steamworks;
 using PeterHan.PLib.AVC;
 using System;
 using System.Collections.Generic;
@@ -23,29 +22,34 @@ namespace ONI_United
 {
 	public class MultiplayerMod : UserMod2
 	{
+        internal static string ModVersion { get; private set; }
 
         public override void OnLoad(Harmony harmony)
 		{
 			using var _ = Profiler.Scope();
 
-			var version = mod?.packagedModInfo?.version ?? "unknown";
-			UnityEngine.Debug.Log($"    - version: {version}");
+			var version = mod?.packagedModInfo?.version
+                ?? System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(MultiplayerMod).Assembly)?.InformationalVersion;
+            ModVersion = version;
+			Debug.Log($"    - version: {version}");
 
 			PUtil.InitLibrary(false);
 			new POptions().RegisterOptions(this, typeof(Configuration));
 
-			ModAssets.LoadAssetBundles();
-			Configuration.Instance.EnsurePersistentUserId();
+			ModAssets.Initialize();
 			PacketTracker.Init();
-
-#if DEBUG
-			NetworkStatisticsMenu.Init();
-#endif
 
 			var go = new GameObject("Multiplayer_Modules");
 			UnityEngine.Object.DontDestroyOnLoad(go);
 
-			go.AddComponent<NetworkingComponent>();
+#if DEBUG
+			NetworkStatisticsMenu.Init();
+			DevToolMultiplayer.Register();
+			go.AddComponent<NativeUiGallery>();
+#endif
+
+			go.AddComponent<Lifecycle>();
+			go.AddComponent<NetworkRuntime>();
 			go.AddComponent<UIVisibilityController>();
 			go.AddComponent<MainThreadExecutor>();
 			go.AddComponent<CursorManager>();
@@ -64,29 +68,11 @@ namespace ONI_United
 
 			ReadyManager.SetupListeners();
 
-			ModAssets.LoadEmbeddedBundles();
-
-			RegisterDevTools();
-			NetworkConfig.ApplyConfiguredTransport();
-
 			var versionChecker = new PVersionCheck();
 			versionChecker.Register(this, new SteamVersionChecker());
 
 			base.OnLoad(harmony);
-			SteamLobby.Initialize();
         }
-
-		private static void RegisterDevTools()
-		{
-			using var _ = Profiler.Scope();
-
-#if DEBUG // DevTool is not accessible on mac.
-			var baseMethod = AccessTools.Method(typeof(DevToolManager), "RegisterDevTool");
-			var twitchDevToolRegister = baseMethod.MakeGenericMethod(typeof(DevToolMultiplayer));
-			twitchDevToolRegister.Invoke(DevToolManager.Instance, new object[] { "Mods/MultiplayerMod" });
-			DevToolManager.Instance.showImGui = true;
-#endif
-		}
 
 		public override void OnAllModsLoaded(Harmony harmony, IReadOnlyList<Mod> mods)
         {
@@ -94,6 +80,8 @@ namespace ONI_United
 
             base.OnAllModsLoaded(harmony, mods);
 			PacketRegistry.RegisterDefaults();
+            Lifecycle.Initialize();
+			NetworkRuntime.Initialize();
 #if DEBUG
             UnitTestRegistry.DiscoverTests();
 #endif

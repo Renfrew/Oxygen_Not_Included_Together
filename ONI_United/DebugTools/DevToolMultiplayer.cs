@@ -8,8 +8,8 @@ using System.IO;
 using ImGuiNET;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking.Packets.World;
 using ONI_United.Networking.Packets.Architecture;
@@ -17,7 +17,6 @@ using UnityEngine;
 using static ONI_United.STRINGS.UI;
 using ONI_United.UI.Screens;
 using ONI_United.Misc;
-using ONI_United.Networking.Runtime;
 using Shared.Profiling;
 using System.Text;
 using ONI_United.Patches.ToolPatches;
@@ -34,6 +33,7 @@ using Shared.Replication;
 using System.Linq;
 using Shared;
 using ONI_United;
+using ONI_United.Core;
 
 namespace ONI_United.DebugTools
 {
@@ -55,12 +55,9 @@ namespace ONI_United.DebugTools
 
         // Network transport
         private int selectedTransportType = 0; // 0 = Steam, 1 = LAN
-        private int selectedLanType = 0; // 0 = LiteNetLib
-        private string hostIP = "";
         private int hostPort = 7777;
         private string clientIP = "";
         private int clientPort = 7777;
-        LanSettings settings_host = new LanSettings();
         LanSettings settings_client = new LanSettings();
 
         // Unit testing
@@ -98,6 +95,11 @@ namespace ONI_United.DebugTools
             "oni_mp.dll"
         );
 
+        internal static void Register()
+        {
+            DevToolManager.Instance.RegisterDevTool<DevToolMultiplayer>("Mods/ONI United");
+        }
+
         public DevToolMultiplayer()
         {
             using var _ = Profiler.Scope();
@@ -111,36 +113,13 @@ namespace ONI_United.DebugTools
             playerColor = new Vector3(loadedColor.R / 255, loadedColor.G / 255, loadedColor.B / 255);
             useRandomColor = Configuration.GetClientProperty<bool>("UseRandomPlayerColor");
 
-            OnInit += () => Init();
-            OnUpdate += () => Update();
-            OnUninit += () => UnInit();
-
-            selectedTransportType = Configuration.Instance.Host.NetworkTransport;
-            selectedLanType = (int)Configuration.Instance.Host.LanSettings.Transport - 1;
-            hostIP = Configuration.Instance.Host.LanSettings.Ip;
-            hostPort = Configuration.Instance.Host.LanSettings.Port;
-            settings_host.Ip = hostIP;
-            settings_host.Port = hostPort;
+            selectedTransportType = Configuration.Instance.Network.Transport;
+            hostPort = Configuration.Instance.Host.LanPort;
 
             clientIP = Configuration.Instance.Client.LanSettings.Ip;
             clientPort = Configuration.Instance.Client.LanSettings.Port;
             settings_client.Ip = clientIP;
             settings_client.Port = clientPort;
-        }
-
-        void Init()
-        {
-
-        }
-
-        void Update()
-        {
-
-        }
-
-        void UnInit()
-        {
-
         }
 
         public override void RenderTo(DevPanel panel)
@@ -281,51 +260,26 @@ namespace ONI_United.DebugTools
                 ImGui.TextColored(new Vector4(1f, 0.3f, 0.3f, 1f), "Multiplayer Not Active");
             ImGui.Separator();
 
-            switch (NetworkConfig.transport)
+            if (NetworkRuntime.IsSteam)
             {
-                case NetworkConfig.NetworkTransport.STEAMWORKS:
-                    if (ImGui.Button("Create Lobby"))
-                        SteamLobby.CreateLobby();
+                if (ImGui.Button("Create Lobby"))
+                    NetworkRuntime.StartServer();
+                
+                ImGui.SameLine();
+                if (ImGui.Button("Leave Lobby"))
+                    SteamLobby.LeaveLobby();
+            }
 
-                    ImGui.SameLine();
-                    if (ImGui.Button("Leave Lobby"))
-                        SteamLobby.LeaveLobby();
-                    break;
-                case NetworkConfig.NetworkTransport.LITENETLIB:
-                    if (ImGui.Button("Start Lan"))
-                    {
-                        MultiplayerSession.Clear();
-                        try
-                        {
-                            DebugConsole.Log("Starting GameServer...");
-                            ONI_United.Networking.Lifecycle.GameServer.Start();
-                            DebugConsole.Log("GameServer started successfully.");
-                        }
-                        catch (Exception ex)
-                        {
-                            DebugConsole.LogError($"GameServer.Start() failed: {ex}");
-                        }
-                        SelectToolPatch.UpdateColor();
-                    }
+            if (NetworkRuntime.IsLan)
+            {
+                if (ImGui.Button("Start Lan"))
+                {
+                    NetworkRuntime.StartServer();
+                }
 
-                    ImGui.SameLine();
-                    if (ImGui.Button("Stop Lan"))
-                    {
-                        if (MultiplayerSession.IsHost)
-                            ONI_United.Networking.Lifecycle.GameServer.Shutdown();
-
-                        if (MultiplayerSession.IsClient)
-                            GameClient.Disconnect();
-
-                        NetworkIdentityRegistry.Clear();
-                        MultiplayerSession.Clear();
-
-                        SelectToolPatch.UpdateColor();
-                        Game.Instance.Trigger(MP_HASHES.OnDisconnected);
-                    }
-                    break;
-                default:
-                    break;
+                ImGui.SameLine();
+                if (ImGui.Button("Stop Lan"))
+                    NetworkRuntime.Stop();
             }
 
             ImGui.SameLine();
@@ -393,13 +347,13 @@ namespace ONI_United.DebugTools
 
             if (ImGui.Button("Start Current Config Server"))
             {
-                NetworkConfig.TransportServer.Start();
+                NetworkRuntime.StartServer();
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Stop Current Config Server"))
             {
-                NetworkConfig.TransportServer.Stop();
+                NetworkRuntime.Stop();
             }
             ImGui.Separator();
             DisplayUnitTests();
@@ -579,15 +533,11 @@ namespace ONI_United.DebugTools
             ImGui.Separator();
             ImGui.Text("Players in Lobby:");
 
-            switch (NetworkConfig.transport)
-            {
-                case NetworkConfig.NetworkTransport.STEAMWORKS:
-                    SteamworksPlayerList();
-                    break;
-                case NetworkConfig.NetworkTransport.LITENETLIB:
-                    LiteNetLibPlayerList();
-                    break;
-            }
+            
+            if (NetworkRuntime.IsSteam)
+                SteamworksPlayerList();
+            else if (NetworkRuntime.IsLan)
+                LiteNetLibPlayerList();
         }
 
         void SteamworksPlayerList()
@@ -634,7 +584,7 @@ namespace ONI_United.DebugTools
                     ImGui.SameLine();
                     if (ImGui.Button($"Kick##{player.m_SteamID}")) // ensure unique ID
                     {
-                        server = NetworkConfig.GetTransportServer();
+                        server = NetworkRuntime.TransportServer;
                         server?.KickClient(player.m_SteamID);
                     }
                 }
@@ -648,7 +598,7 @@ namespace ONI_United.DebugTools
             if(MultiplayerSession.IsHost)
             {
                 var players = MultiplayerSession.ConnectedPlayers;
-                var server = NetworkConfig.GetTransportServer() as LiteNetLibServer;
+                var server = NetworkRuntime.TransportServer as LiteNetLibServer;
 
                 foreach (var player in players)
                 {
@@ -709,7 +659,7 @@ namespace ONI_United.DebugTools
             int ping = 0;
             if (MultiplayerSession.IsClient)
             {
-                ping = NetworkConfig.GetTransportClient().GetPing();
+                ping = NetworkRuntime.TransportClient.GetPing();
             }
             ImGui.Text($"Ping: {ping}");
             ImGui.Text($"Latency: {Utils.NetworkStateToString(NetworkIndicatorsScreen.latencyState)}");
@@ -809,7 +759,7 @@ namespace ONI_United.DebugTools
             ImGui.Text("Network Transport Settings");
 
             string[] display_options = new string[] { "Steam", "LAN (LiteNetLib)" };
-            int currentTransportIndex = Mathf.Clamp((int)NetworkConfig.transport, 0, display_options.Length - 1);
+            int currentTransportIndex = NetworkRuntime.IsSteam ? 0 : 1;
             ImGui.Text($"Currently used transport: {display_options[currentTransportIndex]}");
 
             string[] options = new string[] { "Steam", "LAN" };
@@ -822,16 +772,9 @@ namespace ONI_United.DebugTools
                 ImGui.Indent();
                 ImGui.Separator();
 
-                string[] lan_options = new string[] { "LiteNetLib (UDP)", "Riptide" };
-                ImGui.Combo("Lan Type", ref selectedLanType, lan_options, lan_options.Length);
-                ImGui.Separator();
-
                 // Host section
                 ImGui.Text("Host Settings (Used for hosting a server)");
-                ImGui.InputText("Host IP", ref hostIP, 64);
                 ImGui.InputInt("Host Port", ref hostPort);
-                settings_host.Ip = hostIP;
-                settings_host.Port = hostPort;
 
                 ImGui.Separator();
 
@@ -839,28 +782,22 @@ namespace ONI_United.DebugTools
                 ImGui.Text("Client Settings (The server you are connecting too)");
                 ImGui.InputText("Client IP", ref clientIP, 64);
                 ImGui.InputInt("Client Port", ref clientPort);
-                settings_client.Ip = hostIP;
                 settings_client.Port = hostPort;
                 ImGui.Unindent();
             }
 
             if (ImGui.Button("Save & Apply"))
             {
-                Configuration.Instance.Host.LanSettings.Ip = hostIP;
-                Configuration.Instance.Host.LanSettings.Port = hostPort;
+                Configuration.Instance.Host.LanPort = hostPort;
                 Configuration.Instance.Client.LanSettings.Ip = clientIP;
                 Configuration.Instance.Client.LanSettings.Port = clientPort;
 
-                NetworkConfig.NetworkTransport selected_transport = selectedTransportType == 0
-                    ? NetworkConfig.NetworkTransport.STEAMWORKS
-                    : (NetworkConfig.NetworkTransport)(selectedLanType + 1);
+                NetworkRuntime.NetworkTransport selected_transport = selectedTransportType == 0
+                    ? NetworkRuntime.NetworkTransport.STEAMWORKS
+                    : NetworkRuntime.NetworkTransport.LITENETLIB;
 
-                Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
-                Configuration.Instance.Host.LanSettings.Transport = (LanTransportType)(selectedLanType + 1);
-                if (selectedTransportType == 1)
-                    NetworkConfig.UpdateLanTransport();
-                else
-                    NetworkConfig.UpdateTransport(selected_transport);
+                Configuration.Instance.Network.Transport = (int)selected_transport;
+                NetworkRuntime.UpdateTransport(selected_transport);
                 Configuration.Instance.Save();
             }
         }
@@ -1177,7 +1114,7 @@ namespace ONI_United.DebugTools
                 go.AddComponent<OxySyncTestComponent>();
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 NetworkIdentityRegistry.TryGet(go.GetComponent<ONI_United.Networking.Identity.NetworkIdentity>().NetId, out _);
-                DebugConsole.Log("[OxySync] Spawned test entity at runtime");
+                ModLog.Info("[OxySync] Spawned test entity at runtime");
             }
 
             ImGui.SameLine();
@@ -1191,7 +1128,7 @@ namespace ONI_United.DebugTools
                     {
                         go.AddComponent<ONI_United.Networking.Identity.NetworkIdentity>();
                         go.AddComponent<OxySyncTestComponent>();
-                        DebugConsole.Log($"[OxySync] Attached test component to {go.name}");
+                        ModLog.Info($"[OxySync] Attached test component to {go.name}");
                     }
                 }
             }

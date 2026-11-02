@@ -1,25 +1,11 @@
 ﻿using HarmonyLib;
-using ONI_United;
-using ONI_United.DebugTools;
-using ONI_United.Misc;
-using ONI_United.Networking;
-using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Session;
-using ONI_United.Networking.Session.Lobbies;
-using ONI_United.Networking.Synchronization.Trackers;
-using ONI_United.Networking.Transfer;
-using ONI_United.Networking.WorldSync;
-using Shared.Interfaces.Networking;
-using ONI_United.UI.Screens;
-using Steamworks;
 using System;
 using System.Linq;
 using System.Reflection;
 using Shared.Profiling;
 using UnityEngine;
 using UnityEngine.UI;
+using ONI_United.UI.Multiplayer;
 
 namespace ONI_United.Patches.MainMenuScreenPatches;
 
@@ -39,11 +25,8 @@ internal static class MainMenuPatch
 
 		// Multiplayer - Opens the multiplayer screen with all options
 		var multiplayerInfo = CreateButtonInfo(
-				ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL,
-				new System.Action(() =>
-				{
-					UnityMultiplayerScreen.OpenFromMainMenu();
-				}),
+				ONI_United.STRINGS.UI.MULTIPLAYER_BUTTONS.TITLE,
+				new System.Action(() => MultiplayerScreen.Open(__instance)),
 				normalFontSize,
 				normalStyle,
 				buttonInfoType
@@ -82,7 +65,7 @@ internal static class MainMenuPatch
 			var children = buttonParent.GetComponentsInChildren<KButton>(true);
 
 			// Find Multiplayer button
-			var multiplayerBtn = children.FirstOrDefault(b => b.GetComponentInChildren<LocText>()?.text.ToUpper().Contains(ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL) == true);
+			var multiplayerBtn = children.FirstOrDefault(b => string.Equals(b.GetComponentInChildren<LocText>()?.text, ONI_United.STRINGS.UI.MULTIPLAYER_BUTTONS.TITLE, StringComparison.Ordinal));
 
 			int siblingIndex = children.Length >= 10 ? 4 : 3;
 			multiplayerBtn.transform.SetSiblingIndex(siblingIndex);
@@ -100,16 +83,8 @@ internal static class MainMenuPatch
 			var image = logoObj.GetComponent<UnityEngine.UI.Image>();
 			if (image != null)
 			{
-				Texture2D tex = ResourceLoader.LoadEmbeddedTexture("ONI_United.Assets.ONI_United_logo.png");
-				if (tex != null)
-				{
-					Sprite newSprite = Sprite.Create(
-							tex,
-							new Rect(0, 0, tex.width, tex.height),
-							new Vector2(0.5f, 0.5f)
-					);
-					image.sprite = newSprite;
-				}
+				if (ModAssets.Images.Logo != null)
+					image.sprite = ModAssets.Images.Logo;
 			}
 		}
 
@@ -137,8 +112,8 @@ internal static class MainMenuPatch
         layout.childControlHeight = false;
         layout.childControlWidth = false;
 
-        var discordSprite = ResourceLoader.LoadEmbeddedTexture("ONI_Together.Assets.discord.png");
-        AddSocialButton(socialsContainer.transform, ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO, "https://discord.gg/jpxveK6mmY", discordSprite);
+        AddSocialButton(socialsContainer.transform, ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO,
+            "https://discord.gg/jpxveK6mmY", ModAssets.Images.DiscordNormal, ModAssets.Images.DiscordHighlighted, ModAssets.Images.DiscordPressed);
 
         int buttonCount = socialsContainer.transform.childCount;
         float buttonHeight = 96f;
@@ -146,11 +121,12 @@ internal static class MainMenuPatch
         socialsRect.sizeDelta = new Vector2(100f, totalHeight);
     }
 
-    private static void AddSocialButton(Transform parent, string tooltip, string url, Texture2D spriteSheet)
+    private static void AddSocialButton(Transform parent, string tooltip, string url,
+        Sprite normalSprite, Sprite highlightedSprite, Sprite pressedSprite)
 	{
 		using var _ = Profiler.Scope();
 
-		if (spriteSheet == null)
+		if (normalSprite == null)
 			return;
 
 		GameObject buttonGO = new GameObject($"SocialButton_{tooltip}", typeof(RectTransform));
@@ -162,11 +138,6 @@ internal static class MainMenuPatch
 
 		var rectTransform = button.GetComponent<RectTransform>();
 		rectTransform.sizeDelta = new Vector2(96f, 96f);
-
-		// slice the spritesheet (3 frames horizontally)
-		Sprite normalSprite = Sprite.Create(spriteSheet, new Rect(0, 0, 512, 512), new Vector2(0.5f, 0.5f));
-		Sprite highlightedSprite = Sprite.Create(spriteSheet, new Rect(512, 0, 512, 512), new Vector2(0.5f, 0.5f));
-		Sprite pressedSprite = Sprite.Create(spriteSheet, new Rect(1024, 0, 512, 512), new Vector2(0.5f, 0.5f));
 
 		buttonImage.sprite = normalSprite;
 

@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using ONI_United.Core;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
@@ -16,7 +17,7 @@ using UnityEngine;
 using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 using ONI_United;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 
 namespace ONI_United.Networking.Transport.LiteNetLib
@@ -40,7 +41,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         /// </summary>
         private static bool _connectedEventDelivered;
         private static bool _connectAttemptInFlight;
-        private const string HostIdentityHandshake = "ONI_TOGETHER_HOST";
 
         // LAN Discovery
         private static NetManager _discoveryClient;
@@ -51,10 +51,11 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public static NetPeer ServerPeer => _serverPeer;
 
         public bool IsConnected => _serverPeer != null && _serverPeer.ConnectionState == ConnectionState.Connected;
+        public override object CurrentConnection => _serverPeer;
         public static int MaxServerCapacity { get; internal set; } = 16;
         public bool IsLoadingReconnect { get; set; }
 
-        private static readonly ConcurrentQueue<byte[]> _incomingPackets = new ConcurrentQueue<byte[]>();
+        private static readonly ConcurrentQueue<(NetPeer peer, byte[] data)> _incomingPackets = new ConcurrentQueue<(NetPeer, byte[])>();
 
         // Network health
         private const int JITTER_SAMPLE_COUNT = 20;
@@ -71,6 +72,9 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public override float OutgoingBandwidth => _clientOutBw;
         public override int IncomingPps => _clientInPps;
         public override int OutgoingPps => _clientOutPps;
+
+        public override bool IsCurrentConnection(object connection) =>
+            connection is NetPeer peer && ReferenceEquals(peer, _serverPeer);
 
         public static void StartLanDiscovery(int targetPort = 8080)
         {
@@ -147,25 +151,19 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             using var _ = Profiler.Scope();
         }
 
-        public override void ConnectToHost(string ip, int port)
+        protected override void ConnectProtocol(string ip, int port)
         {
             using var _ = Profiler.Scope();
-
             StopLanDiscovery();
 
             if (_connectAttemptInFlight)
                 return;
 
-            if (_client != null && _client.IsRunning)
-            {
-                if (_serverPeer != null && _serverPeer.ConnectionState == ConnectionState.Connected)
-                    return;
-
-                Disconnect();
-            }
+            if (_client != null)
+                throw new InvalidOperationException("The previous LAN client manager is still owned.");
 
             int timeout = Configuration.Instance.Client.TimeoutSeconds;
-            ulong clientId = NetworkConfig.GetLocalID();
+            ulong clientId = NetworkRuntime.GetLocalID();
 
             MultiplayerSession.ServerIp = ip;
             MultiplayerSession.ServerPort = port;
@@ -187,7 +185,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 EnableStatistics = true
             };
 
-            _client.Start();
+            if (!_client.Start()) throw new InvalidOperationException("LAN client socket startup failed.");
             DebugConsole.Log("[LiteNetLibClient] Connecting to " + ip + ":" + port + "...");
 
             var writer = new NetDataWriter();
@@ -197,10 +195,10 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _serverPeer = _client.Connect(ip, port, writer);
 
             _connectAttemptInFlight = true;
-            CoroutineRunner.RunOne(WaitForConnectionSuccess(timeout));
+            CoroutineRunner.RunOne(WaitForConnectionSuccess(timeout, _client, _serverPeer));
         }
 
-        private IEnumerator WaitForConnectionSuccess(int timeoutSeconds)
+        private IEnumerator WaitForConnectionSuccess(int timeoutSeconds, NetManager owner, NetPeer attempt)
         {
             try
             {
@@ -209,7 +207,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
                 while (Time.realtimeSinceStartup - startedAt < timeoutSeconds)
                 {
-                    if (!_connectAttemptInFlight)
+                    if (!ReferenceEquals(owner, _client) || !ReferenceEquals(attempt, _serverPeer) || !_connectAttemptInFlight)
                         yield break;
 
                     if (_connectedEventDelivered && MultiplayerSession.InActiveSession)
@@ -229,22 +227,22 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                         {
                             DebugConsole.LogWarning($"[LiteNetLibClient] Peer has been Connected for {now - connectedWithoutEventSince:0.0}s ({now - startedAt:0.0}s since connect) but PeerConnectedEvent never arrived - completing the connection from the poll loop.");
                             OnConnectedToServer(_serverPeer);
-                            yield break;
                         }
                     }
 
                     yield return null;
                 }
 
-                if (!_connectAttemptInFlight)
+                if (!ReferenceEquals(owner, _client) || !ReferenceEquals(attempt, _serverPeer) || !_connectAttemptInFlight)
                     yield break;
 
                 if (!_connectedEventDelivered || !MultiplayerSession.InActiveSession)
                 {
-                    DebugConsole.LogError("[LiteNetLibClient] Connection timed out before host identity exchange completed.");
-                    OnConnectionFailed?.Invoke();
-                    Disconnect();
-                    OnReturnToMenu?.Invoke(
+                    DebugConsole.LogError("[LiteNetLibClient] Connection timed out before the session handshake completed.");
+                    var returnToMenu = OnReturnToMenu;
+                    OnConnectionFailed?.Invoke("LAN connection timed out.");
+                    if (ReferenceEquals(this, NetworkRuntime.TransportClient))
+                        returnToMenu?.Invoke(
                         ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED,
                         ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC
                     );
@@ -252,7 +250,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
             finally
             {
-                _connectAttemptInFlight = false;
+                if (ReferenceEquals(owner, _client) && ReferenceEquals(attempt, _serverPeer))
+                    _connectAttemptInFlight = false;
             }
         }
 
@@ -262,39 +261,25 @@ namespace ONI_United.Networking.Transport.LiteNetLib
 
             // Reached either from PeerConnectedEvent or from WaitForConnectionSuccess when
             // the event failed to arrive; whichever comes second must not run this twice.
-            if (_connectedEventDelivered)
+            if (!ReferenceEquals(peer, _serverPeer) || _connectedEventDelivered)
                 return;
             _connectedEventDelivered = true;
 
             _serverPeer = peer;
-            CompleteConnectionAfterIdentityExchange();
-        }
-
-        private void CompleteConnectionAfterIdentityExchange()
-        {
-            if (!_connectedEventDelivered || MultiplayerSession.HostUserID == 0 || MultiplayerSession.InActiveSession)
-                return;
-
-            MultiplayerSession.OnConnectedToHost(MultiplayerSession.HostUserID, _serverPeer);
-
             OnClientConnected?.Invoke();
-            DebugConsole.Log("[LiteNetLibClient] Connected to host! Assigned Client ID: " + MultiplayerSession.LocalUserID);
-            OnRequestStateOrReturn?.Invoke();
         }
 
         private void OnDisconnectedFromServer(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             using var _ = Profiler.Scope();
 
-            _connectAttemptInFlight = false;
-            _serverPeer = null;
-            _connectedEventDelivered = false;
-            OnClientDisconnected?.Invoke();
-            MultiplayerSession.OnDisconnectedFromHost(null);
-
+            if (!ReferenceEquals(peer, _serverPeer)) return;
+            var returnToMenu = OnReturnToMenu;
             var (reason, message) = GetDisconnectInfo(disconnectInfo);
+            OnClientDisconnected?.Invoke();
             DebugConsole.Log($"[LiteNetLibClient] Disconnected from server. Reason: {disconnectInfo.Reason} ({reason})");
-            OnReturnToMenu?.Invoke(reason, message);
+            if (ReferenceEquals(this, NetworkRuntime.TransportClient))
+                returnToMenu?.Invoke(reason, message);
         }
 
         private (string reason, string message) GetDisconnectInfo(DisconnectInfo info)
@@ -340,41 +325,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         private void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
         {
             byte[] rawData = reader.GetRemainingBytes();
-            if (TryHandleHostIdentity(peer, rawData))
-                return;
-
-            _incomingPackets.Enqueue(rawData);
-        }
-
-        private bool TryHandleHostIdentity(NetPeer peer, byte[] data)
-        {
-            var identityReader = new NetDataReader(data);
-            if (!identityReader.TryGetString(out string magic) || magic != HostIdentityHandshake)
-                return false;
-
-            if (!identityReader.TryGetULong(out ulong hostId)
-                || hostId == 0
-                || identityReader.AvailableBytes != 0)
-            {
-                DebugConsole.LogError("[LiteNetLibClient] Received malformed host identity response.");
-                peer.Disconnect();
-                return true;
-            }
-
-            ulong currentHostId = MultiplayerSession.HostUserID;
-            if (currentHostId != 0)
-            {
-                if (currentHostId == hostId)
-                    return true;
-
-                DebugConsole.LogError("[LiteNetLibClient] Received conflicting host identity response.");
-                peer.Disconnect();
-                return true;
-            }
-
-            MultiplayerSession.SetHost(hostId);
-            CompleteConnectionAfterIdentityExchange();
-            return true;
+            _incomingPackets.Enqueue((peer, rawData));
         }
 
         private void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -382,39 +333,32 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             DebugConsole.LogWarning("[LiteNetLibClient] Network error: " + socketError);
         }
 
-        public override void Disconnect()
+        public override bool TryStop(out string error)
         {
-            using var _ = Profiler.Scope();
-
+            error = null;
             _connectAttemptInFlight = false;
-
-            if (_listener != null)
+            try
             {
-                _listener.PeerConnectedEvent -= OnConnectedToServer;
-                _listener.PeerDisconnectedEvent -= OnDisconnectedFromServer;
-                _listener.NetworkReceiveEvent -= OnNetworkReceive;
-                _listener.NetworkErrorEvent -= OnNetworkError;
+                // Stop discards queued native events. Retain manager/peer on failure for retry.
+                _client?.Stop();
+                if (_listener != null)
+                {
+                    _listener.PeerConnectedEvent -= OnConnectedToServer;
+                    _listener.PeerDisconnectedEvent -= OnDisconnectedFromServer;
+                    _listener.NetworkReceiveEvent -= OnNetworkReceive;
+                    _listener.NetworkErrorEvent -= OnNetworkError;
+                }
                 _listener = null;
+                _client = null;
+                _serverPeer = null;
+                _connectedEventDelivered = false;
+                while (_incomingPackets.TryDequeue(out var ignored)) { }
+                return true;
             }
-
-            _serverPeer?.Disconnect();
-            _client?.Stop();
-            _serverPeer = null;
-            _connectedEventDelivered = false;
-            if (MultiplayerSession.InActiveSession)
-                MultiplayerSession.OnDisconnectedFromHost(null);
-            else
-                MultiplayerSession.SetHost(Utils.NilUlong());
-            _client = null;
-
-            while (_incomingPackets.TryDequeue(out var _)) { }
-        }
-
-        public override void ReconnectToSession()
-        {
-            if (!string.IsNullOrEmpty(MultiplayerSession.ServerIp) && MultiplayerSession.ServerPort > 0)
+            catch (Exception ex)
             {
-                ConnectToHost(MultiplayerSession.ServerIp, MultiplayerSession.ServerPort);
+                error = ex.ToString();
+                return false;
             }
         }
 
@@ -428,7 +372,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
 
             _client.PollEvents();
-            OnMessageRecieved();
             UpdateMetrics();
         }
 
@@ -436,11 +379,15 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         {
             using var _ = Profiler.Scope();
 
-            while (_incomingPackets.TryDequeue(out var data))
+            while (_incomingPackets.TryDequeue(out var packet))
             {
+                if (!ReferenceEquals(packet.peer, _serverPeer) || !Session.IsClient) continue;
                 try
                 {
-                    PacketHandler.HandleIncoming(data);
+                    ulong? senderId = MultiplayerSession.HostUserID.IsValid()
+                        ? MultiplayerSession.HostUserID
+                        : null;
+                    PacketHandler.HandleIncoming(packet.data, senderId, packet.peer);
                 }
                 catch (Exception ex)
                 {
@@ -483,8 +430,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         {
             int ping = GetPing();
             if (ping < 0) return NetworkState.BAD;
-            if (ping > NetworkConfig.PingRanges.BAD) return NetworkState.BAD;
-            if (ping > NetworkConfig.PingRanges.DEGRADED) return NetworkState.DEGRADED;
+            if (ping > NetworkRuntime.PingRanges.BAD) return NetworkState.BAD;
+            if (ping > NetworkRuntime.PingRanges.DEGRADED) return NetworkState.DEGRADED;
             return NetworkState.GOOD;
         }
 

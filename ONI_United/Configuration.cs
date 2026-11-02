@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
-using Shared.Profiling;
 using UnityEngine;
 
 namespace ONI_United
@@ -13,24 +12,6 @@ namespace ONI_United
     [ConfigFile(SharedConfigLocation: true)]
     public class Configuration : SingletonOptions<Configuration>, IOptions
     {
-        public void EnsurePersistentUserId()
-        {
-            using var _ = Profiler.Scope();
-
-            if (Network.PersistentUserId != 0)
-                return;
-
-            ulong persistentUserId;
-            do
-            {
-                persistentUserId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
-            }
-            while (persistentUserId == 0);
-
-            Network.PersistentUserId = persistentUserId;
-            Save();
-        }
- 
         [JsonProperty]
         public HostSettings Host { get; set; } = new HostSettings();
 
@@ -104,20 +85,12 @@ namespace ONI_United
             set => Client.TimeoutSeconds = Mathf.Max(value, 30);
         }
 
-        [Option("STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT", "STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
-        [JsonIgnore]
-        public LanTransportType LanTransport
-        {
-            get => Host.LanSettings.Transport;
-            set => Host.LanSettings.Transport = value;
-        }
-
         [Option("STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME", "STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
         [JsonIgnore]
         public string LanDisplayName
         {
-            get => Host.LanSettings.DisplayName;
-            set => Host.LanSettings.DisplayName = value;
+            get => Network.DisplayName;
+            set => Network.DisplayName = value;
         }
 
         [Option("STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE", "STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE", "STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS")]
@@ -251,13 +224,13 @@ namespace ONI_United
     [Serializable]
     public class HostSettings
     {
-        [JsonProperty] public int NetworkTransport { get; set; } = 0;
         [JsonProperty] public int MaxLobbySize { get; set; } = 4;
         [JsonProperty] public int MaxMessagesPerPoll { get; set; } = 128;
         [JsonProperty] public int SaveFileTransferChunkKB { get; set; } = 256;
         [JsonProperty] public int TimeoutSeconds { get; set; } = 30;
 
-        [JsonProperty] public LanSettings LanSettings { get; set; } = new LanSettings();
+        [JsonProperty] public int LanPort { get; set; } = 8080;
+
         [JsonProperty] public LobbySettings Lobby { get; set; } = new LobbySettings();
         [JsonProperty] public ServerSettings Server { get; set; } = new ServerSettings();
 
@@ -311,7 +284,9 @@ namespace ONI_United
     [Serializable]
     public class NetworkSettings
     {
+        [JsonProperty] public int Transport { get; set; } = 0;
         [JsonProperty] public ulong PersistentUserId { get; set; } = 0;
+        [JsonProperty] public string DisplayName { get; set; } = "";
         [JsonProperty] public bool EnablePacketQueue { get; set; } = false;
         [JsonProperty] public int MaxPacketsPerSecond { get; set; } = 500;
         [JsonProperty] public bool BypassProtocolCompatibilityChecks { get; set; } = false;
@@ -327,19 +302,11 @@ namespace ONI_United
         [JsonProperty] public string Region { get; set; } = "";
     }
 
-    public enum LanTransportType
-    {
-        LiteNetLib = 1,
-        Riptide = 2
-    }
-
     [Serializable]
     public class LanSettings
     {
         [JsonProperty] public string Ip { get; set; } = "127.0.0.1";
         [JsonProperty] public int Port { get; set; } = 8080;
-        [JsonProperty] public LanTransportType Transport { get; set; } = LanTransportType.LiteNetLib;
-        [JsonProperty] public string DisplayName { get; set; } = "";
 
         public string GetHashedAddress()
         {

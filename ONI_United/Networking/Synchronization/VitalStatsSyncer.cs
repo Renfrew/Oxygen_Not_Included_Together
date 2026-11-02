@@ -9,7 +9,7 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 using static global::STRINGS.DUPLICANTS.STATS;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Synchronization
@@ -47,8 +47,8 @@ namespace ONI_United.Networking.Synchronization
 
 				// Previously: foreach(var amountInstance in _amounts) ... — loop variable unused,
 				// sent the same full packet N times (N = 12 Amounts) per dupe per second, Reliable.
-				// That storm (12 * num_dupes Reliable packets/s) triggered Riptide pendingMessages
-				// key collisions and the ~20-cycle session crash. One Unreliable send is sufficient:
+				// That storm (12 * num_dupes Reliable packets/s) caused message queue collisions and
+				// the ~20-cycle session crash. One Unreliable send is sufficient:
 				// VitalStatsPacket is idempotent set-last-value, next tick resyncs if dropped.
 				var sw = Stopwatch.StartNew();
 				var packet = new VitalStatsPacket(_identity.NetId, _amounts, _element);

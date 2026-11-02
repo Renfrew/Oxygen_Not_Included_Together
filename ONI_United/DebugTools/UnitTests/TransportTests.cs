@@ -1,45 +1,42 @@
-using System.Linq;
-using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Core;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport.LiteNetLib;
 using ONI_United.Networking.Transport.Steamworks;
-using ONI_United.DebugTools;
 
 namespace ONI_United.DebugTools.UnitTests
 {
 	public static class TransportTests
 	{
-		[UnitTest(name: "Transport server/client types match NetworkConfig", category: "Transport")]
+		[UnitTest(name: "Transport server/client types match NetworkRuntime", category: "Transport")]
 		public static UnitTestResult TransportMatchesConfig()
 		{
-			var transport = NetworkConfig.transport;
-			var server = NetworkConfig.TransportServer;
-			var client = NetworkConfig.TransportClient;
+			var server = NetworkRuntime.TransportServer;
+			var client = NetworkRuntime.TransportClient;
 
 			if (server == null)
 				return UnitTestResult.Fail("TransportServer is null");
 			if (client == null)
 				return UnitTestResult.Fail("TransportClient is null");
 
-			switch (transport)
+			if (NetworkRuntime.IsSteam)
 			{
-				case NetworkConfig.NetworkTransport.STEAMWORKS:
-					if (server is not SteamworksServer)
-						return UnitTestResult.Fail($"transport=STEAMWORKS but server is {server.GetType().Name}");
-					if (client is not SteamworksClient)
-						return UnitTestResult.Fail($"transport=STEAMWORKS but client is {client.GetType().Name}");
-					return UnitTestResult.Pass("STEAMWORKS config matches SteamworksServer/SteamworksClient");
-
-				case NetworkConfig.NetworkTransport.LITENETLIB:
-					if (server is not LiteNetLibServer)
-						return UnitTestResult.Fail($"transport={transport} but server is {server.GetType().Name}");
-					if (client is not LiteNetLibClient)
-						return UnitTestResult.Fail($"transport={transport} but client is {client.GetType().Name}");
-					return UnitTestResult.Pass($"{transport} config matches LiteNetLibServer/LiteNetLibClient");
-
-				default:
-					return UnitTestResult.Fail($"Unknown transport: {transport}");
+				if (server is not SteamworksServer)
+					return UnitTestResult.Fail($"transport=STEAMWORKS but server is {server.GetType().Name}");
+				if (client is not SteamworksClient)
+					return UnitTestResult.Fail($"transport=STEAMWORKS but client is {client.GetType().Name}");
+				return UnitTestResult.Pass("STEAMWORKS config matches SteamworksServer/SteamworksClient");
 			}
+
+			if (NetworkRuntime.IsLan)
+			{
+				if (server is not LiteNetLibServer)
+					return UnitTestResult.Fail($"transport=LITENETLIB but server is {server.GetType().Name}");
+				if (client is not LiteNetLibClient)
+					return UnitTestResult.Fail($"transport=LITENETLIB but client is {client.GetType().Name}");
+				return UnitTestResult.Pass("LITENETLIB config matches LiteNetLibServer/LiteNetLibClient");
+			}
+
+			return UnitTestResult.Fail("Unknown transport");
 		}
 
 		[UnitTest(name: "Connection stable (LAN)", category: "Transport")]
@@ -48,12 +45,12 @@ namespace ONI_United.DebugTools.UnitTests
 			if (!MultiplayerSession.InActiveSession)
 				return UnitTestResult.Fail("Not in a multiplayer session");
 
-			if (!NetworkConfig.IsLanConfig())
+			if (!NetworkRuntime.IsLan)
 				return UnitTestResult.Fail("Stability check only implemented for LAN/LiteNetLib transport");
 
 			if (MultiplayerSession.IsHost)
 			{
-				var server = NetworkConfig.TransportServer as LiteNetLibServer;
+				var server = NetworkRuntime.TransportServer as LiteNetLibServer;
 				if (server == null || !server.IsRunning)
 					return UnitTestResult.Fail("LiteNetLib Server is not running");
 
@@ -64,7 +61,7 @@ namespace ONI_United.DebugTools.UnitTests
 				return UnitTestResult.Pass($"Server running with {connected} active connection(s)");
 			}
 
-			var client = NetworkConfig.TransportClient as LiteNetLibClient;
+			var client = NetworkRuntime.TransportClient as LiteNetLibClient;
 			if (client == null)
 				return UnitTestResult.Fail("LiteNetLib Client instance is null");
 			if (!client.IsConnected)

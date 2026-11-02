@@ -1,7 +1,5 @@
-﻿using ONI_United.DebugTools;
-using ONI_United.Misc;
-using ONI_United.Networking.Packets;
-using ONI_United.Networking.Packets.Architecture;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Core;
 using Shared.Interfaces.Networking;
 using System;
@@ -10,12 +8,9 @@ using System.Linq;
 using Shared.Profiling;
 using UnityEngine;
 using ONI_United.Networking.Synchronization;
-using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Replication;
 using ONI_United.Networking.Overlay;
-using States = ONI_United.Networking.Session.States;
 
 namespace ONI_United.Networking.Packets.Architecture
 {
@@ -57,15 +52,7 @@ namespace ONI_United.Networking.Packets.Architecture
         public static byte[] SerializePacketForSending(IPacket packet)
 		{
 			using var _ = Profiler.Scope();
-
-			using (var ms = new System.IO.MemoryStream())
-			using (var writer = new System.IO.BinaryWriter(ms))
-			{
-				int packet_type = PacketRegistry.GetPacketId(packet);
-				writer.Write(packet_type);
-				packet.Serialize(writer);
-				return ms.ToArray();
-			}
+			return PacketSerialization.Serialize(packet);
 		}
 
 		static Dictionary<int, PacketUpdateRunner> UpdateRunners = [];
@@ -181,7 +168,7 @@ namespace ONI_United.Networking.Packets.Architecture
 			byteTotals[packetId] = runningTotal;
 
 			bool atCapacity = false;
-			if (NetworkConfig.IsLanConfig())
+			if (NetworkRuntime.IsLan)
 			{
 				float maxSize = MAX_PACKET_SIZE_LAN * 1024f;
 				if (runningTotal >= maxSize)
@@ -214,7 +201,7 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
 			using var _ = Profiler.Scope();
 
-			if (!CanSendPacket(packet))
+			if (!GameplayPacketSender.CanSendPacket(packet))
 				return false;
 
 			if (packet is IBulkablePacket bp)
@@ -234,29 +221,12 @@ namespace ONI_United.Networking.Packets.Architecture
 				}
 			}
 
-			return NetworkConfig.TransportPacketSender.SendToConnection(conn, packet, sendType);
+			return GameplayPacketSender.Instance.SendToConnection(conn, packet, sendType);
 		}
 
 		private static bool CanSendPacket(IPacket packet)
 		{
-			if (packet is IAllowedWithoutWorldPacket)
-				return true;
-
-			if (MultiplayerSession.IsClient)
-			{
-				if (GameClient.State == States.ClientState.InGame)
-					return true;
-
-				if (GameClient.State == States.ClientState.LoadingWorld)
-					return PacketHandler.IsLoadingWorldRequest(packet);
-
-				return packet is IModApiPacket;
-			}
-
-			if (MultiplayerSession.IsHost && ReadyManager.IsSynchronizing)
-				return PacketHandler.IsLoadingWorldResponse(packet);
-
-			return true;
+			return GameplayPacketSender.CanSendPacket(packet);
 		}
 
 		/// <summary>
@@ -267,7 +237,7 @@ namespace ONI_United.Networking.Packets.Architecture
 			using var _ = Profiler.Scope();
 
 			// Prevent host from sending packets to itself (can cause loops and errors)
-			if (MultiplayerSession.IsHost && steamID == MultiplayerSession.HostUserID)
+			if (Session.IsHost && steamID == Session.HostPlayerId)
 			{
 				DebugConsole.LogWarning($"[PacketSender] Host attempted to send packet {packet.GetType().Name} to itself - blocked");
 				return false;
@@ -291,7 +261,7 @@ namespace ONI_United.Networking.Packets.Architecture
 				return false;
 			}
 
-			if (!MultiplayerSession.IsHost || player.PlayerId == MultiplayerSession.HostUserID)
+			if (!Session.IsHost || player.PlayerId == Session.HostPlayerId)
 			{
 				return true;
 			}
@@ -303,12 +273,12 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
 			using var _ = Profiler.Scope();
 
-			if (!MultiplayerSession.HostUserID.IsValid())
+			if (Session.HostPlayerId == 0)
 			{
 				DebugConsole.LogWarning($"[PacketSender] Failed to send to host. Host is invalid.");
 				return;
 			}
-			SendToPlayer(MultiplayerSession.HostUserID, packet, sendType);
+			SendToPlayer(Session.HostPlayerId, packet, sendType);
 		}
 
 		// Throttle counter for per-connection send failures so a transport storm
@@ -323,8 +293,8 @@ namespace ONI_United.Networking.Packets.Architecture
 			}
 			catch (Exception ex)
 			{
-				// A throw from the transport layer (e.g. Riptide pendingMessages key collision)
-				// must not skip remaining connections in the broadcast. Log-and-continue.
+				// A throw from the transport layer must not skip remaining connections in the broadcast.
+				// Log-and-continue.
 				long n = ++_sendErrorCount;
 				if (n <= 5 || n % 100 == 0)
 				{
@@ -366,7 +336,7 @@ namespace ONI_United.Networking.Packets.Architecture
         {
             using var _ = Profiler.Scope();
 
-            if (!MultiplayerSession.IsHost)
+            if (!Session.IsHost)
             {
                 DebugConsole.LogWarning("[PacketSender] Only the host can send to groups. Tried sending: " + packet.GetType());
                 return;
@@ -374,13 +344,13 @@ namespace ONI_United.Networking.Packets.Architecture
 
             if (groupId == -1)
             {
-                SendToAll(packet, MultiplayerSession.HostUserID, sendType);
+                SendToAll(packet, Session.HostPlayerId, sendType);
                 return;
             }
 
             foreach (var playerId in InterestGroupManager.GetGroupMemberIds(groupId))
             {
-                if (playerId == MultiplayerSession.HostUserID) continue;
+                if (playerId == Session.HostPlayerId) continue;
                 if (!MultiplayerSession.ConnectedPlayers.TryGetValue(playerId, out var player)) continue;
                 if (!CanBroadcastTo(player)) continue;
                 TrySendToConnection(player, packet, sendType);
@@ -391,12 +361,12 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
 			using var _ = Profiler.Scope();
 
-			if (!MultiplayerSession.IsHost)
+			if (!Session.IsHost)
 			{
 				DebugConsole.LogWarning("[PacketSender] Only the host can send to all clients. Tried sending: " + packet.GetType());
 				return;
 			}
-			SendToAll(packet, MultiplayerSession.HostUserID, sendType);
+			SendToAll(packet, Session.HostPlayerId, sendType);
 		}
 
 		public static void SendToAllExcluding(IPacket packet, HashSet<ulong> excludedIds, PacketSendMode sendType = PacketSendMode.Reliable)
@@ -438,17 +408,17 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
 			using var _ = Profiler.Scope();
 
-			if (!MultiplayerSession.InActiveSession)
+			if (!Session.IsActive)
 			{
 				DebugConsole.LogWarning("[PacketSender] Not in a multiplayer session, cannot send to other peers");
 				return;
 			}
 			//DebugConsole.Log("[PacketSender] Sending packet to all other peers: " + packet.GetType().Name + " from host");
 
-			if (MultiplayerSession.IsHost)
+			if (Session.IsHost)
 				SendToAllClients(packet);
 			else
-				SendToHost(new HostBroadcastPacket(packet, Utils.NilUlong()));
+				SendToHost(new HostBroadcastPacket(packet, Session.LocalPlayerId));
 		}
 
 		public static void SendToAllOtherPeersFromHost_API(object api_packet)
@@ -480,19 +450,19 @@ namespace ONI_United.Networking.Packets.Architecture
 		{
 			using var _ = Profiler.Scope();
 
-			if (!MultiplayerSession.InActiveSession)
+			if (!Session.IsActive)
 			{
 				DebugConsole.LogWarning("[PacketSender] Not in a multiplayer session, cannot send to other peers");
 				return;
 			}
 			//DebugConsole.Log("[PacketSender] Sending packet to all other peers: " + packet.GetType().Name);
 
-			if (MultiplayerSession.IsHost)
+			if (Session.IsHost)
 				SendToAllClients(packet);
 			else if (packet is IBulkablePacket && packet is not IClientRelayable)
 				SendToHost(packet);
 			else
-				SendToHost(new HostBroadcastPacket(packet, MultiplayerSession.LocalUserID));
+				SendToHost(new HostBroadcastPacket(packet, Session.LocalPlayerId));
 		}
 
 		public static void SendToAllOtherPeers_API(object api_packet)

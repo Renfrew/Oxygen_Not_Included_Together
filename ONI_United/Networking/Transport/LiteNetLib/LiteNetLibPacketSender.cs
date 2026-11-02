@@ -20,7 +20,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (peer.ConnectionState != ConnectionState.Connected)
                 return false;
 
-            byte[] bytes = PacketSender.SerializePacketForSending(packet);
+            byte[] bytes = PacketSerialization.Serialize(packet);
 
             return SendChunkedIfNeeded(peer, bytes, packet, sendType, SendRaw);
         }

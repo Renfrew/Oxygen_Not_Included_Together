@@ -1,15 +1,13 @@
+using ONI_United.Core;
 using HarmonyLib;
 using Klei;
-using ONI_United;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
-using ONI_United.Misc;
-using ONI_United.Networking;
+
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
 using ONI_United.Networking.Runtime;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 using System;
 using System.Collections;
@@ -29,7 +27,7 @@ public static class SaveHelper
 	{
 		get
 		{
-			int minChunkKB = NetworkConfig.IsLanConfig() ? 1 : 64;
+			int minChunkKB = NetworkRuntime.IsLan ? 1 : 64;
 			return Math.Max(minChunkKB, Configuration.GetHostProperty<int>("SaveFileTransferChunkKB"));
 		}
 	}
@@ -37,18 +35,18 @@ public static class SaveHelper
 	{
 		using var _ = Profiler.Scope();
 
-		NetworkingComponent.scheduler.Run(() =>
+		NetworkRuntime.scheduler.Run(() =>
 		{
 			if (isCurrent != null && !isCurrent())
 			{
 				DebugConsole.LogWarning("[SaveHelper] Ignored stale scheduled synchronization save.");
 				return;
 			}
-			LoadWorldSave(Path.GetFileNameWithoutExtension(world.Name), world.Data);
+			LoadWorldSave(Path.GetFileNameWithoutExtension(world.Name), world.Data, isCurrent);
 		});
 	}
 
-	private static void LoadWorldSave(string name, byte[] data)
+	private static void LoadWorldSave(string name, byte[] data, Func<bool> isCurrent)
 	{
 		using var _ = Profiler.Scope();
 
@@ -94,7 +92,7 @@ public static class SaveHelper
 			return;
 		}
 
-		if (MultiplayerSession.IsClient && GameClient.State != ClientState.LoadingWorld)
+		if (MultiplayerSession.IsClient && Lifecycle.Current != Lifecycle.Phase.Synchronizing)
 		{
 			DebugConsole.LogError("[SaveHelper] Aborting save load because the host has not begun synchronization.");
 			return;
@@ -104,6 +102,11 @@ public static class SaveHelper
 		MultiplayerOverlay.Show(global::STRINGS.UI.FRONTEND.LOADING);
 
 		CloseWorldUiBeforeReload();
+        if (isCurrent != null && !isCurrent())
+        {
+            DebugConsole.LogWarning("[SaveHelper] Ignored synchronization load retired during world UI cleanup.");
+            return;
+        }
 		LoadScreen.DoLoad(path);
 	}
 
@@ -135,7 +138,7 @@ public static class SaveHelper
 		CoroutineRunner.RunOne(ShowMessageAndReturnToTitle(msg));
 	}
 
-	private static IEnumerator ShowMessageAndReturnToTitle(string msg = null)
+	private static IEnumerator ShowMessageAndReturnToTitle(string msg)
 	{
 		using var _ = Profiler.Scope();
 
@@ -148,26 +151,27 @@ public static class SaveHelper
 			}
 
 			MultiplayerOverlay.Show(msg);
+            if (Lifecycle.Current != Lifecycle.Phase.ClearingSession)
+                NetworkRuntime.Stop();
 		}
 		catch (Exception e)
 		{
+            DebugConsole.LogError("[SaveHelper] Could not display/stop failed world load: " + e);
 			// Something went wrong
 			MultiplayerOverlay.Close();
 			App.LoadScene("frontend");
 		}
 
 		yield return new WaitForSeconds(5);
-
 		try
 		{
 			MultiplayerOverlay.Close();
 			NetworkIdentityRegistry.Clear();
-			NetworkConfig.Stop();
-
 			App.LoadScene("frontend");
 		}
 		catch (Exception e)
 		{
+            DebugConsole.LogError("[SaveHelper] Could not return to menu after failed world load: " + e);
 			MultiplayerOverlay.Close();
 			// Something else went wrong
 			App.LoadScene("frontend");
@@ -456,7 +460,7 @@ public static class SaveHelper
 			return;
 		}
 
-		if (GameClient.State != ClientState.LoadingWorld)
+		if (!Session.IsClient || Lifecycle.Current != Lifecycle.Phase.Synchronizing)
 		{
 			DebugConsole.LogError("[SaveHelper] Aborting downloaded save load because the host has not begun synchronization.");
 			return;

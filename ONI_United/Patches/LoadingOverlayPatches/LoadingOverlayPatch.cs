@@ -30,7 +30,7 @@ public class LoadingOverlayPatch
         if (usePuft)
         {
             var image = instance.transform.Find("Image").GetComponent<Image>();
-            var replacementImage = ResourceLoader.LoadEmbeddedSprite("ONI_Together.Assets.mod_mascot.png", out var texture);
+            var replacementImage = ModAssets.Images.ModMascot;
             if (replacementImage == null)
                 return;
 

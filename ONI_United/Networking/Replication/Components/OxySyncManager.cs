@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,11 +10,9 @@ using ONI_United.Networking.Replication.Packets;
 using Shared.Helpers;
 using Shared.Replication;
 using Shared.Replication.Attributes;
-using Shared.Profiling;
 using UnityEngine;
 
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Packets.Architecture;
 
@@ -268,10 +267,10 @@ namespace ONI_United.Networking.Replication.Components
             if (_behaviours.Count == 0) return;
 
             _tickAccumulator += Time.unscaledDeltaTime;
-            _tickAccumulator = Mathf.Min(_tickAccumulator, GameServer.TickInterval * GameServer.MaxMissedTicks);
-            if (_tickAccumulator < GameServer.TickInterval)
+            _tickAccumulator = Mathf.Min(_tickAccumulator, NetworkRuntime.TickInterval * NetworkRuntime.MaxMissedTicks);
+            if (_tickAccumulator < NetworkRuntime.TickInterval)
                 return;
-            _tickAccumulator -= GameServer.TickInterval;
+            _tickAccumulator -= NetworkRuntime.TickInterval;
 
             var sw = Stopwatch.StartNew();
             int totalChanges = 0;

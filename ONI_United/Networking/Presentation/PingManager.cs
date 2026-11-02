@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Social;
 using Shared.Profiling;
@@ -5,8 +6,7 @@ using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Presentation
 {
@@ -285,7 +285,7 @@ namespace ONI_United.Networking.Presentation
 		{
 			using var _ = Profiler.Scope();
 
-			if (NetworkConfig.IsSteamConfig() && SteamFriends.HasFriend(playerID.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
+			if (NetworkRuntime.IsSteam && SteamFriends.HasFriend(playerID.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
 				return SteamFriends.GetFriendPersonaName(playerID.AsCSteamID());
 
 			var player = MultiplayerSession.GetPlayer(playerID);

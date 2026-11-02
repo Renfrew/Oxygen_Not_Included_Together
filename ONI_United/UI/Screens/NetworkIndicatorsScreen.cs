@@ -4,10 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport.Steamworks;
 using Shared.Profiling;
 using Steamworks;
@@ -47,18 +48,10 @@ namespace ONI_United.UI.Screens
         {
             using var _ = Profiler.Scope();
 
-			const string bundleKey = "networkindicators";
-			const string prefabPath = "assets/networkindicators/prefabs/network indicators.prefab";
-			if (!ModAssets.LoadedBundles.TryGetValue(bundleKey, out var bundle) || bundle == null)
-			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: embedded AssetBundle '{bundleKey}' is unavailable.");
-				return;
-			}
-
-			var prefab = ResourceLoader.LoadFromBundle<GameObject>(bundleKey, prefabPath);
+			var prefab = ModAssets.NetworkIndicatorsPrefab;
 			if (prefab == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: prefab '{prefabPath}' is missing from embedded AssetBundle '{bundleKey}'.");
+				DebugConsole.LogWarning("Skipping optional network indicators: prefab unavailable; see ModAssets initialization errors.");
 				return;
 			}
 
@@ -76,7 +69,7 @@ namespace ONI_United.UI.Screens
 				parentCanvas.transform);
 			if (indicators == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: instantiation of prefab '{prefabPath}' returned null.");
+				DebugConsole.LogWarning("Skipping optional network indicators: instantiation returned null.");
 				return;
 			}
 			indicators.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
@@ -84,7 +77,7 @@ namespace ONI_United.UI.Screens
             var rect = indicators.GetComponent<RectTransform>();
 			if (rect == null)
 			{
-				DebugConsole.LogWarning($"Skipping optional network indicators: instantiated prefab '{prefabPath}' has no RectTransform.");
+				DebugConsole.LogWarning("Skipping optional network indicators: instantiated prefab has no RectTransform.");
 				UnityEngine.Object.Destroy(indicators);
 				indicators = null;
 				return;
@@ -204,7 +197,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetJitterState();
+            return NetworkRuntime.TransportClient.GetJitterState();
         }
 
         public static NetworkState GetLatencyState()
@@ -217,7 +210,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetLatencyState();
+            return NetworkRuntime.TransportClient.GetLatencyState();
         }
 
         public static NetworkState GetPacketlossState()
@@ -230,7 +223,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetPacketlossState();
+            return NetworkRuntime.TransportClient.GetPacketlossState();
         }
 
         public static NetworkState GetServerPerformanceState()
@@ -243,7 +236,7 @@ namespace ONI_United.UI.Screens
             if (MultiplayerSession.IsHost)
                 return NetworkState.GOOD;
 
-            return NetworkConfig.TransportClient.GetServerPerformanceState();
+            return NetworkRuntime.TransportClient.GetServerPerformanceState();
         }
 
     }

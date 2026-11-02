@@ -1,10 +1,11 @@
+using ONI_United.Core;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transfer;
 using Shared.Profiling;
 using System;
@@ -16,7 +17,7 @@ using UnityEngine;
 using ONI_United.Misc.World;
 using ONI_United;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transport;
 
 namespace ONI_United.Networking.Transport.LiteNetLib
@@ -24,19 +25,24 @@ namespace ONI_United.Networking.Transport.LiteNetLib
     public class LiteNetLibServer : TransportServer
     {
         private const string ClientIdentityHandshake = "ONI_TOGETHER";
-        private const string HostIdentityHandshake = "ONI_TOGETHER_HOST";
         private static NetManager _server;
         private static EventBasedNetListener _listener;
 
         private TcpFileTransferServer _tcpTransfer;
+        private System.Action<bool, string> _shutdownFinished;
+        private string _shutdownFailure;
         private readonly Dictionary<ulong, NetPeer> _peersByClientId = new Dictionary<ulong, NetPeer>();
         private readonly Dictionary<int, ulong> _clientIdByPeerId = new Dictionary<int, ulong>();
-        private readonly ConcurrentQueue<(ulong clientId, byte[] data)> _incomingPackets = new ConcurrentQueue<(ulong, byte[])>();
+        private readonly ConcurrentQueue<(ulong clientId, NetPeer peer, byte[] data)> _incomingPackets =
+            new ConcurrentQueue<(ulong, NetPeer, byte[])>();
 
         public static NetManager ServerInstance => _server;
         public bool IsRunning => _server != null && _server.IsRunning;
+        public string LastStartFailure { get; private set; }
+        private string CleanupFailure => _tcpTransfer?.CleanupFailure;
+        private bool IsStopped => _server == null && (_tcpTransfer == null || _tcpTransfer.IsStopped);
         public int ConnectedClientCount => _server != null ? _server.ConnectedPeersCount : 0;
-        public TcpFileTransferServer TcpTransfer => _tcpTransfer;
+        public TcpFileTransferServer TcpTransfer => _tcpTransfer?.IsRunning == true ? _tcpTransfer : null;
 
         public List<ulong> ClientList { get; internal set; } = new List<ulong>();
 
@@ -52,28 +58,71 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         public override int IncomingPps => _srvInPps;
         public override int OutgoingPps => _srvOutPps;
 
-        public override void Prepare()
+        public override bool TryGetRemotePlayerId(object connection, out ulong playerId)
+        {
+            if (connection is NetPeer peer)
+                return _clientIdByPeerId.TryGetValue(peer.Id, out playerId);
+
+            playerId = 0;
+            return false;
+        }
+
+        public override void DisconnectConnection(object connection, string reason)
+        {
+            if (connection is NetPeer peer)
+                peer.Disconnect();
+        }
+
+        public override void OnSessionPlayerAdmitted(ulong playerId)
+        {
+            if (!ClientList.Contains(playerId))
+            {
+                ClientList.Add(playerId);
+                if (playerId == NetworkRuntime.GetLocalID())
+                {
+                    OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
+                    DebugConsole.Log("[LiteNetLibServer] Host session registered for " + playerId);
+                }
+            }
+        }
+
+        private void Prepare()
         {
             using var _ = Profiler.Scope();
         }
 
-        public override void Start()
+        protected override void StartProtocol()
         {
             using var _ = Profiler.Scope();
 
-            if (_server != null)
+            Prepare();
+            LastStartFailure = null;
+            if (!Utils.IsInGame() || Grid.CellCount <= 0)
+            {
+                ReportStartupFailure("Load a colony before starting a LAN host.");
                 return;
+            }
+            if (Configuration.Instance.Host.LanPort < 1 || Configuration.Instance.Host.LanPort > 65535)
+            {
+                ReportStartupFailure("The configured LAN port is outside the valid range.");
+                return;
+            }
+            if (_tcpTransfer != null && !_tcpTransfer.IsStopped)
+                throw new InvalidOperationException("The previous TCP transfer server has not finished stopping.");
+            _tcpTransfer = null;
+            if (_server != null)
+            {
+                ReportStartupFailure("A LiteNetLib server instance already exists.");
+                return;
+            }
 
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
-
-            string ip = Configuration.Instance.Host.LanSettings.Ip;
-            int port = Configuration.Instance.Host.LanSettings.Port;
+            int port = Configuration.Instance.Host.LanPort;
             int maxClients = Configuration.Instance.Host.MaxLobbySize;
-            ulong hostId = NetworkConfig.GetLocalID();
+            ulong hostId = NetworkRuntime.GetLocalID();
             if (hostId == 0)
             {
-                DebugConsole.LogError("[LiteNetLibServer] Cannot start with an empty persistent host ID.");
-                OnError?.Invoke();
+                LastStartFailure = "Cannot start with an empty persistent host ID.";
+                ReportStartupFailure(LastStartFailure);
                 return;
             }
 
@@ -96,15 +145,24 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 EnableStatistics = true
             };
 
-            bool started = _server.Start(port);
+            bool started;
+            try { started = _server.Start(port); }
+            catch (SocketException ex)
+            {
+                ReportStartupFailure(ex.Message);
+                return;
+            }
             if (!started)
             {
-                DebugConsole.LogError("[LiteNetLibServer] Failed to start server on port " + port);
-                OnError?.Invoke();
+                LastStartFailure = "Failed to bind the LiteNetLib listener to port " + port + ".";
+                ReportStartupFailure(LastStartFailure);
                 return;
             }
 
-            DebugConsole.Log("[LiteNetLibServer] LiteNetLib server started on port " + port);
+            DebugConsole.Log("[LiteNetLibServer] Listener started on port " + port);
+            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED, "LiteNetLib (LAN)"));
+
+            if (Lifecycle.Current != Lifecycle.Phase.StartingHost || _server == null || !_server.IsRunning) return;
 
             try
             {
@@ -114,20 +172,28 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             catch (Exception ex)
             {
                 DebugConsole.LogWarning("[LiteNetLibServer] TCP file transfer server failed to start: " + ex.Message);
-                _tcpTransfer = null;
+                // Preserve the optional TCP fallback, but release partial acquisitions and
+                // retain the owner until its workers have finished. Cleanup failure cancels startup.
+                try { _tcpTransfer?.Stop(); }
+                catch (Exception cleanupError)
+                {
+                    ReportStartupFailure("Partial TCP startup cleanup failed: " + cleanupError);
+                    return;
+                }
             }
 
-            // Register Local Host
-            MultiplayerSession.RegisterAsHost();
-
             ClientList.Clear();
-            ClientList.Add(hostId);
-
-            OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, Utils.GetLocalPlayerName()));
+            ReportTransportStarted();
         }
 
         private void OnConnectionRequest(ConnectionRequest request)
         {
+            if (!Session.IsHost || !Lifecycle.IsHostGameplay
+                || Lifecycle.Current != Lifecycle.Phase.InGameSession)
+            {
+                request.Reject();
+                return;
+            }
             if (_server.ConnectedPeersCount >= Configuration.Instance.Host.MaxLobbySize)
             {
                 request.Reject();
@@ -145,7 +211,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
             }
 
-            if (clientId == NetworkConfig.GetLocalID() || _peersByClientId.ContainsKey(clientId))
+            if (clientId == NetworkRuntime.GetLocalID() || _peersByClientId.ContainsKey(clientId))
             {
                 DebugConsole.LogWarning($"[LiteNetLibServer] Rejected duplicate persistent client ID {clientId} from {request.RemoteEndPoint}.");
                 request.Reject();
@@ -174,7 +240,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                     writer.Put(GameClock.Instance != null ? GameClock.Instance.GetCycle() + 1 : 1);
                     writer.Put(MultiplayerSession.ConnectedPlayers.Count);
                     writer.Put(Configuration.Instance.Host.MaxLobbySize);
-                    writer.Put(Configuration.Instance.Host.LanSettings.Port);
+                    writer.Put(Configuration.Instance.Host.LanPort);
                     _server.SendUnconnectedMessage(writer, remoteEndPoint);
                 }
             }
@@ -195,17 +261,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 return;
             }
 
-            var identityWriter = new NetDataWriter();
-            identityWriter.Put(HostIdentityHandshake);
-            identityWriter.Put(NetworkConfig.GetLocalID());
-            peer.Send(identityWriter, DeliveryMethod.ReliableOrdered);
-
-            MultiplayerSession.RegisterClient(clientId, peer);
-
-            if (!ClientList.Contains(clientId))
-                ClientList.Add(clientId);
-
-            DebugConsole.Log("[LiteNetLibServer] Remote client connected: " + clientId + " (" + peer.Address + ":" + peer.Port + ")");
+            DebugConsole.Log("[LiteNetLibServer] Physical connection established from " + clientId + " (" + peer.Address + ":" + peer.Port + ")");
         }
 
         private void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -233,7 +289,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (_clientIdByPeerId.TryGetValue(peer.Id, out ulong clientId))
             {
                 byte[] rawData = reader.GetRemainingBytes();
-                _incomingPackets.Enqueue((clientId, rawData));
+                _incomingPackets.Enqueue((clientId, peer, rawData));
             }
         }
 
@@ -242,29 +298,73 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             DebugConsole.LogWarning("[LiteNetLibServer] Network error from " + endPoint + ": " + socketError);
         }
 
-        public override void Stop()
+        protected override void CancelProtocol(System.Action<bool, string> finished)
+        {
+            if (_shutdownFinished != null)
+            {
+                DebugConsole.Log("[LiteNetLibServer] Shutdown is already in progress; keeping its original completion. No additional request was scheduled.");
+                return;
+            }
+            _shutdownFinished = finished;
+            _shutdownFailure = StopResources();
+            // Deliver from PollCancellation after the action stack has unwound, including
+            // synchronous failures. No lifecycle state or frame-spread startup work here.
+        }
+
+        public override void PollCancellation()
+        {
+            var finished = _shutdownFinished;
+            if (finished == null) return;
+            string failure = _shutdownFailure ?? CleanupFailure;
+            if (failure == null && !IsStopped) return;
+            CancelShutdownObservation();
+            finished(failure == null, failure);
+        }
+
+        private void CancelShutdownObservation()
+        {
+            _shutdownFinished = null;
+            _shutdownFailure = null;
+        }
+
+        protected override void DisposeProtocol()
+        {
+            // Stop observing completion before terminal resource release.
+            CancelShutdownObservation();
+            string failure = StopResources();
+            if (failure != null) DebugConsole.LogError("[LiteNetLibServer] Disposal failed: " + failure);
+        }
+
+        private string StopResources()
+        {
+            var errors = new List<string>();
+            try { CloseConnections(); }
+            catch (Exception ex) { errors.Add(ex.Message); }
+            try { StopResourcesCore(); }
+            catch (Exception ex) { errors.Add(ex.Message); }
+            return errors.Count == 0 ? null : string.Join("; ", errors);
+        }
+
+        private void StopResourcesCore()
         {
             using var _ = Profiler.Scope();
 
-            if (_server == null)
-                return;
-
-            _server.Stop();
-            _server = null;
-            _listener = null;
-
-            _tcpTransfer?.Stop();
-            _tcpTransfer = null;
+            var errors = new List<Exception>();
+            try
+            {
+                _server?.Stop();
+                _server = null;
+                _listener = null;
+            }
+            catch (Exception ex) { errors.Add(ex); }
+            try { _tcpTransfer?.Stop(); }
+            catch (Exception ex) { errors.Add(ex); }
 
             _peersByClientId.Clear();
             _clientIdByPeerId.Clear();
             ClientList.Clear();
-
             while (_incomingPackets.TryDequeue(out var _)) { }
-
-            MultiplayerSession.UnRegisterAsHost(null);
-
-            DebugConsole.Log("[LiteNetLibServer] Server stopped.");
+            if (errors.Count != 0) throw new AggregateException("LAN transport cleanup failed.", errors);
         }
 
         public override void CloseConnections()
@@ -278,9 +378,6 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             _peersByClientId.Clear();
             _clientIdByPeerId.Clear();
             ClientList.Clear();
-            ClientList.Add(NetworkConfig.GetLocalID());
-
-            MultiplayerSession.UnRegisterAsHost(null);
         }
 
         public override void Update()
@@ -303,7 +400,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             {
                 try
                 {
-                    PacketHandler.HandleIncoming(packet.data);
+                    PacketHandler.HandleIncoming(packet.data, packet.clientId, packet.peer);
                 }
                 catch (Exception ex)
                 {

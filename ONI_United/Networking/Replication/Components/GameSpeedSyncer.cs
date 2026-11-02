@@ -4,7 +4,7 @@ using Shared.Replication;
 using Shared.Replication.Attributes;
 using UnityEngine;
 
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components

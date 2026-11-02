@@ -1,19 +1,13 @@
 using HarmonyLib;
-using ONI_United.DebugTools;
+using ONI_United.Core;
 using ONI_United.Misc;
-using ONI_United.Networking.Identity;
-using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Runtime;
-using ONI_United.Networking.Synchronization;
 using PeterHan.PLib.Core;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Emit;
 using Shared.Replication;
 using UnityEngine;
-using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Overlay
 {
@@ -151,7 +145,7 @@ namespace ONI_United.Networking.Overlay
 			var info = cons.Invoke(args) as KIconToggleMenu.ToggleInfo;
 			if (info != null)
 			{
-				info.getSpriteCB = () => NetworkingOverlayMode.OverlayIcon;
+				info.getSpriteCB = () => ModAssets.Images.NetworkOverlayIcon;
 				info.getTooltipText = () =>
 				{
 					var list = new List<Tuple<string, TextStyleSetting>>();
@@ -160,9 +154,9 @@ namespace ONI_United.Networking.Overlay
 					string hotkey = "<b><color=#F44A4A>[SHIFT + F5]</b></color>";
 					list.Add(new Tuple<string, TextStyleSetting>($"{ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.TOOLTIP} {hotkey}",
 						ToolTipScreen.Instance.defaultTooltipBodyStyle));
-					if (MultiplayerSession.IsClient && NetworkConfig.TransportClient != null)
+					if (MultiplayerSession.IsClient && NetworkRuntime.TransportClient != null)
 					{
-						int ping = NetworkConfig.TransportClient.GetPing();
+						int ping = NetworkRuntime.TransportClient.GetPing();
 						if (ping >= 0)
 							list.Add(new Tuple<string, TextStyleSetting>($"Ping: {ping}ms",
 								ToolTipScreen.Instance.defaultTooltipBodyStyle));
@@ -189,7 +183,7 @@ namespace ONI_United.Networking.Overlay
 			}
 
 			object infoUnit = null;
-			var sprite = NetworkingOverlayMode.OverlayIcon;
+			var sprite = ModAssets.Images.NetworkOverlayIcon;
 			foreach (var cons in infoUnitCons)
 			{
 				var ps = cons.GetParameters();

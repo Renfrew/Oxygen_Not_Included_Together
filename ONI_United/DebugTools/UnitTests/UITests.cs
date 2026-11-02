@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ONI_United.Core;
+
 using System.IO;
 using System.Text;
 using ONI_United.Misc;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Presentation;
 using ONI_United.Networking.Packets.Core;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.UI.Screens;
 using UnityEngine;
-using ONI_United.DebugTools;
 
 namespace ONI_United.DebugTools.UnitTests
 {
@@ -42,7 +41,7 @@ namespace ONI_United.DebugTools.UnitTests
             if (!MultiplayerSession.IsHost && !MultiplayerSession.IsClient)
                 return UnitTestResult.Fail("Not connected to a multiplayer session");
 
-            var clients = NetworkConfig.GetConnectedClients().Count;
+            var clients = NetworkRuntime.GetConnectedClients().Count;
             var cursors = MultiplayerSession.PlayerCursors.Count;
 
             // - 1 to remove local client

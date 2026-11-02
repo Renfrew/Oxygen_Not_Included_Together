@@ -8,7 +8,7 @@ using UnityEngine;
 using static STRINGS.UI.OUTFITS;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.DuplicantActions
 {

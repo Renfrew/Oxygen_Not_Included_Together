@@ -1,3 +1,4 @@
+using ONI_United.Core;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Identity;
@@ -10,50 +11,13 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Overlay
 {
 	public class NetworkingOverlayMode : OverlayModes.Mode
 	{
 		public static readonly HashedString ID = "NetworkActivity";
-		private static Sprite _overlayIcon;
-		public static Sprite OverlayIcon
-		{
-			get
-			{
-				if (_overlayIcon == null)
-				{
-					var tex = ONI_United.Misc.ResourceLoader.LoadEmbeddedTexture(
-						"ONI_Together.Assets.network_overlay_icon.png");
-					if (tex != null)
-					{
-						var small = ResizeTexture(tex, 36, 36);
-						UnityEngine.Object.Destroy(tex);
-						small.filterMode = FilterMode.Bilinear;
-						_overlayIcon = Sprite.Create(small,
-							new Rect(0, 0, small.width, small.height),
-							new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
-					}
-				}
-				return _overlayIcon;
-			}
-		}
-
-		private static Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)
-		{
-			var rt = RenderTexture.GetTemporary(newWidth, newHeight, 0,
-				RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
-			Graphics.Blit(source, rt);
-			var prev = RenderTexture.active;
-			RenderTexture.active = rt;
-			var result = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
-			result.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
-			result.Apply();
-			RenderTexture.active = prev;
-			RenderTexture.ReleaseTemporary(rt);
-			return result;
-		}
 		public const string OVERLAY_ACTION = "action_overlay_network";
 
 		public const string FILTER_OBJECTS = "OBJECTS";
@@ -88,26 +52,6 @@ namespace ONI_United.Networking.Overlay
 
 		private readonly Dictionary<int, GameObject> _syncIcons = new();
 		private float _lastLegendRefresh;
-
-		private static Sprite _syncIconSprite;
-		private static Sprite SyncSprite
-		{
-			get
-			{
-				if (_syncIconSprite == null)
-				{
-					var tex = ResourceLoader.LoadEmbeddedTexture("ONI_United.Assets.syncing.png");
-					if (tex != null)
-					{
-						tex.filterMode = FilterMode.Bilinear;
-						_syncIconSprite = Sprite.Create(tex,
-							new Rect(0, 0, tex.width, tex.height),
-							new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
-					}
-				}
-				return _syncIconSprite;
-			}
-		}
 
 		public NetworkingOverlayMode()
 		{
@@ -331,7 +275,7 @@ namespace ONI_United.Networking.Overlay
 			var canvas = GameScreenManager.Instance?.worldSpaceCanvas;
 			if (canvas == null) return;
 
-			if (SyncSprite == null) return;
+			if (ModAssets.Images.SyncingIcon == null) return;
 
 			var activeSet = new HashSet<int>();
 
@@ -366,7 +310,7 @@ namespace ONI_United.Networking.Overlay
 				go.transform.SetParent(canvas.transform, false);
 
 				var image = go.AddComponent<Image>();
-				image.sprite = SyncSprite;
+				image.sprite = ModAssets.Images.SyncingIcon;
 				image.raycastTarget = false;
 
 				var rect = go.GetComponent<RectTransform>();
@@ -424,16 +368,16 @@ namespace ONI_United.Networking.Overlay
 					Color.white, null, null, displaySprite: false),
 			};
 
-			if (MultiplayerSession.IsClient && NetworkConfig.TransportClient != null)
+			if (MultiplayerSession.IsClient && NetworkRuntime.TransportClient != null)
 			{
-				int ping = NetworkConfig.TransportClient.GetPing();
+				int ping = NetworkRuntime.TransportClient.GetPing();
 				entries.Add(new LegendEntry(ping >= 0 ? string.Format("Ping: {0}ms", ping) : "Ping: --",
 					null, Color.white, null, null, displaySprite: false));
 			}
 
             if (MultiplayerSession.IsHost)
             {
-                var server = NetworkConfig.TransportServer;
+                var server = NetworkRuntime.TransportServer;
                 if (server != null)
                 {
                     int inPps = server.IncomingPps;
@@ -451,7 +395,7 @@ namespace ONI_United.Networking.Overlay
             }
             else
             {
-                var client = NetworkConfig.TransportClient;
+                var client = NetworkRuntime.TransportClient;
                 if (client != null)
                 {
                     int inPps = client.IncomingPps;
@@ -480,7 +424,7 @@ namespace ONI_United.Networking.Overlay
 					Color.gray));
 
 				entries.Add(new LegendEntry("  Syncing (last 2s)", "OxySync actively syncing",
-					Color.white, sprite: SyncSprite));
+					Color.white, sprite: ModAssets.Images.SyncingIcon));
 			}
 
 			if (showViewports && MultiplayerSession.IsHost && WorldStateSyncer.Instance != null)

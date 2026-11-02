@@ -25,7 +25,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
             HSteamNetConnection s_conn = (HSteamNetConnection)conn;
 
-            var bytes = PacketSender.SerializePacketForSending(packet);
+            var bytes = PacketSerialization.Serialize(packet);
             var _sendType = ConvertSendType(sendType); //(int)sendType;
 
             IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytes.Length);

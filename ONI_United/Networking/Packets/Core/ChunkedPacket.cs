@@ -67,7 +67,10 @@ namespace ONI_United.Networking.Packets.Core
 				offset += chunk.Length;
 			}
 
-			PacketHandler.HandleIncoming(fullData);
+			PacketHandler.HandleIncoming(
+				fullData,
+				PacketHandler.CurrentSenderPlayerId,
+				PacketHandler.CurrentPhysicalConnection);
 		}
 
 		public static int GetNextSequenceId()

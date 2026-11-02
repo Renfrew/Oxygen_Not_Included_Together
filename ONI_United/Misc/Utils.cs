@@ -1,9 +1,10 @@
-﻿using KSerialization;
+﻿using ONI_United.Core;
+using KSerialization;
 using ONI_United.DebugTools;
 using ONI_United.UI.Screens;
 using ONI_United.Networking.WorldSync;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -385,10 +386,10 @@ namespace ONI_United.Misc
 	        using var _ = Profiler.Scope();
 
             string name;
-            if (NetworkConfig.IsLanConfig())
+            if (NetworkRuntime.IsLan)
             {
-                string displayName = Configuration.Instance.Host.LanSettings.DisplayName;
-                name = !string.IsNullOrWhiteSpace(displayName) ? displayName : $"Player {NetworkConfig.GetLocalID()}";
+                string displayName = Configuration.Instance.Network.DisplayName;
+                name = !string.IsNullOrWhiteSpace(displayName) ? displayName : $"Player {NetworkRuntime.GetLocalID()}";
             }
             else if (SteamManager.Initialized)
             {
@@ -396,7 +397,7 @@ namespace ONI_United.Misc
             }
             else
             {
-                name = $"Player {NetworkConfig.GetLocalID()}";
+                name = $"Player {NetworkRuntime.GetLocalID()}";
             }
             return TruncateLocalPlayerName(name);
         }

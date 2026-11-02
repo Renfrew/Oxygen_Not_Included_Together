@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using ONI_United.Networking.WorldSync;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Replication.Components.Plants;
@@ -53,6 +53,8 @@ namespace ONI_United.Patches.GamePatches
     {
       using var _ = Profiler.Scope();
 
+      var game = Game.Instance;
+      var isCurrent = GameClient.CaptureSynchronization(GameClient.ActiveSynchronizationId);
       Game.Instance.gameObject.AddComponent<LogicPortManager>();
 
       PlantLifecycleSyncer.Instance?.SetNetworkIdentity();
@@ -60,17 +62,11 @@ namespace ONI_United.Patches.GamePatches
 
       WorkableSyncer.RegisterNetId(Game.Instance.gameObject);
 
-      Game.Instance.OnSpawnComplete += OnSpawnComplete;
-    }
-
-    private static void OnSpawnComplete()
-    {
-      using var _ = Profiler.Scope();
-
-      if (MultiplayerSession.IsHost)
-        return;
-
-      GameClient.OnWorldSpawnComplete();
+      game.OnSpawnComplete += () =>
+      {
+        if (isCurrent())
+          GameClient.OnWorldSpawnComplete();
+      };
     }
   }
 }

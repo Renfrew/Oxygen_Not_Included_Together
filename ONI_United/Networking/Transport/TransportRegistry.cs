@@ -11,17 +11,10 @@ namespace ONI_United.Networking.Transport
     public static class TransportRegistry
     {
         private static readonly Dictionary<TransportProtocol, ITransport> _transports = new Dictionary<TransportProtocol, ITransport>();
-        private static ITransport _activeTransport;
-
-        public static ITransport ActiveTransport => _activeTransport ?? GetTransport(TransportProtocol.LiteNetLib);
-
         static TransportRegistry()
         {
             RegisterTransport(new LiteNetLibTransport());
             RegisterTransport(new SteamworksTransport());
-            RegisterTransport(new RiptideTransport());
-
-            _activeTransport = _transports[TransportProtocol.LiteNetLib];
         }
 
         public static void RegisterTransport(ITransport transport)
@@ -38,17 +31,6 @@ namespace ONI_United.Networking.Transport
 
             DebugConsole.LogWarning($"[TransportRegistry] Transport {protocol} not found, falling back to LiteNetLib.");
             return _transports[TransportProtocol.LiteNetLib];
-        }
-
-        public static bool SetActiveTransport(TransportProtocol protocol)
-        {
-            var transport = GetTransport(protocol);
-            if (transport == null) return false;
-
-            _activeTransport = transport;
-            _activeTransport.Initialize();
-            DebugConsole.Log($"[TransportRegistry] Active transport set to: {_activeTransport.DisplayName}");
-            return true;
         }
 
         public static IEnumerable<ITransport> GetAllTransports()

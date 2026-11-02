@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shared.Profiling;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 
 namespace ONI_United.Networking.Transfer
 {

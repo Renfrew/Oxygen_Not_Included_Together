@@ -1,6 +1,7 @@
+using ONI_United.Core;
 using ONI_United.Networking;
-using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Transport.Steamworks;
 using Steamworks;
 using ONI_United.Patches.ToolPatches;
@@ -23,7 +24,6 @@ namespace ONI_United.DebugTools
 		private Vector2 scrollPosition = Vector2.zero;
 
 		// LAN
-        private string lanHostIP = "127.0.0.1";
         private string lanHostPort = "7777";
         private string[] hostTransportOptions = new string[]
         {
@@ -44,8 +44,7 @@ namespace ONI_United.DebugTools
 			DontDestroyOnLoad(go);
 			_instance = go.AddComponent<DebugMenu>();
 
-            _instance.lanHostIP = Configuration.Instance.Host.LanSettings.Ip;
-            _instance.lanHostPort = Configuration.Instance.Host.LanSettings.Port.ToString();
+            _instance.lanHostPort = Configuration.Instance.Host.LanPort.ToString();
 
             _instance.lanJoinAddress = $"{Configuration.Instance.Client.LanSettings.Ip}:{Configuration.Instance.Client.LanSettings.Port}";
 
@@ -98,9 +97,6 @@ namespace ONI_United.DebugTools
 
             GUILayout.Space(5);
 
-            GUILayout.Label("Host IP:");
-            lanHostIP = GUILayout.TextField(lanHostIP);
-
             GUILayout.Label("Port:");
             lanHostPort = GUILayout.TextField(lanHostPort);
 
@@ -108,29 +104,28 @@ namespace ONI_United.DebugTools
             {
                 if(selectedHostTransport == 0)
                 {
-                    NetworkConfig.NetworkTransport selected_transport = NetworkConfig.NetworkTransport.STEAMWORKS;
-                    Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
-                    NetworkConfig.UpdateTransport(selected_transport);
+                    NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.STEAMWORKS;
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
+                    NetworkRuntime.UpdateTransport(selected_transport);
                     Configuration.Instance.Save();
 
-                    NetworkConfig.StartServer();
+                    NetworkRuntime.StartServer();
                     return;
                 }
 
                 if (int.TryParse(lanHostPort, out int port))
                 {
-                    DebugConsole.Log($"[LAN] Hosting on {lanHostIP}:{port}");
+                    DebugConsole.Log($"[LAN] Hosting on port {port}");
 
-                    Configuration.Instance.Host.LanSettings.Ip = lanHostIP;
-                    Configuration.Instance.Host.LanSettings.Port = port;
+                    Configuration.Instance.Host.LanPort = port;
 
-                    NetworkConfig.NetworkTransport selected_transport = NetworkConfig.NetworkTransport.LITENETLIB;
-                    Configuration.Instance.Host.NetworkTransport = (int)selected_transport;
-                    NetworkConfig.UpdateLanTransport();
+                    NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.LITENETLIB;
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
+                    NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
 
                     Configuration.Instance.Save();
 
-                    NetworkConfig.StartServer();
+                    NetworkRuntime.StartServer();
                 }
                 else
                 {
@@ -139,7 +134,7 @@ namespace ONI_United.DebugTools
             }
             if (GUILayout.Button("Stop Hosting"))
             {
-                NetworkConfig.Stop();
+                NetworkRuntime.Stop();
             }
 
 
@@ -152,7 +147,7 @@ namespace ONI_United.DebugTools
 
             if (GUILayout.Button("Join Server"))
             {
-                NetworkConfig.UpdateLanTransport();
+                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
                 DebugConsole.Log($"[LAN] Joining {lanJoinAddress}");
 
                 string[] address = lanJoinAddress.Split(':');

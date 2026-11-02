@@ -1,6 +1,7 @@
-﻿using ONI_United.DebugTools;
+﻿using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Misc;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 using System.Collections.Generic;
 using ONI_United.Networking.Replication;
@@ -9,7 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Presentation
 {
@@ -118,7 +119,7 @@ namespace ONI_United.Networking.Presentation
 			cursor.transform.SetParent(transform, false);
 			gameObject.SetLayerRecursively(LayerMask.NameToLayer("UI"));
 
-			string defaultName = NetworkConfig.IsLanConfig() ? (MultiplayerSession.GetPlayer(assignedPlayer)?.PlayerName ?? $"Player {assignedPlayer}") : SteamFriends.GetFriendPersonaName(assignedPlayer.AsCSteamID());
+			string defaultName = NetworkRuntime.IsLan ? (MultiplayerSession.GetPlayer(assignedPlayer)?.PlayerName ?? $"Player {assignedPlayer}") : SteamFriends.GetFriendPersonaName(assignedPlayer.AsCSteamID());
 			SetPlayerName(defaultName);
 			
 			OnCursorStateChanged += () => UpdateActionImage();
@@ -128,7 +129,7 @@ namespace ONI_United.Networking.Presentation
 			SetColor(Color.white);
 			SetVisibility(false);
 
-			playerCursorShader = ResourceLoader.LoadFromBundle<Shader>("playercursorbundle", "assets/playercursoraction/playercursoraction.shader");
+			playerCursorShader = ModAssets.PlayerCursorShader;
 
 			if (playerCursorShader != null)
 			{

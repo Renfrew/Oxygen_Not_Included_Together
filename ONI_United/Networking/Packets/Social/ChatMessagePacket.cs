@@ -1,6 +1,6 @@
-﻿using ONI_United.Misc;
+﻿using ONI_United.Core;
+using ONI_United.Misc;
 using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Replication.Components;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.UI.Screens;
 using Steamworks;
@@ -10,8 +10,7 @@ using System.IO;
 using Shared.Profiling;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
@@ -75,7 +74,7 @@ namespace ONI_United.Networking.Packets.Social
 				return;
 
             string senderName = SenderName;
-            if (NetworkConfig.IsSteamConfig() && SteamFriends.HasFriend(SenderId.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
+            if (NetworkRuntime.IsSteam && SteamFriends.HasFriend(SenderId.AsCSteamID(), EFriendFlags.k_EFriendFlagImmediate))
 			{
 				// Update the sender name to what we have them named as on our friends list
                 senderName = SteamFriends.GetFriendPersonaName(SenderId.AsCSteamID());

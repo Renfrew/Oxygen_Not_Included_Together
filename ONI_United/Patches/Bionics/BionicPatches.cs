@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using Klei.AI;
 using ONI_United.UI.Screens;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Patches.Bionics
 {

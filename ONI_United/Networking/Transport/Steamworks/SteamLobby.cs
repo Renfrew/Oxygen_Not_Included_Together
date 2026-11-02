@@ -2,28 +2,34 @@
 using ONI_United.Misc;
 using ONI_United.Patches.ToolPatches;
 using ONI_United.Networking.Replication.Components;
-using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Sessions.Lobbies;
 using ONI_United.UI.Screens;
-using GameServer = ONI_United.Networking.Lifecycle.GameServer;
+using ONI_United.Core;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using Shared;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Lifecycle;
+using ONI_United.Networking.Runtime;
 
 namespace ONI_United.Networking.Transport.Steamworks
 {
 	public static class SteamLobby
 	{
-		private static Callback<LobbyCreated_t> _lobbyCreated;
+		private static CallResult<LobbyCreated_t> _hostCreation;
+        private static CSteamID _hostLobby = CSteamID.Nil;
+        private static CSteamID _joiningLobby = CSteamID.Nil;
+        internal static bool HasPendingJoin => _joiningLobby.IsValid();
+        private static Action<string> _hostCreated;
+        private static Action<bool, string> _hostReleased;
+        private static Action<bool, string> _clientReleased;
 		private static Callback<GameLobbyJoinRequested_t> _lobbyJoinRequested;
-		private static Callback<LobbyEnter_t> _lobbyEntered;
+		private static CallResult<LobbyEnter_t> _clientJoin;
 		private static Callback<LobbyChatUpdate_t> _lobbyChatUpdate;
 
 		public static readonly List<CSteamID> LobbyMembers = new List<CSteamID>();
@@ -40,7 +46,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 		private static CallResult<LobbyMatchList_t> _lobbyListCallResult;
 		private static Action<List<LobbyListEntry>> _onLobbyListReceived;
 
-		private static event System.Action _onLobbyCreatedSuccess = null;
 		private static event Action<CSteamID> _onLobbyJoined = null;
 		private static string _pendingPassword = null;
 
@@ -60,19 +65,9 @@ namespace ONI_United.Networking.Transport.Steamworks
 			int registeredCallbacks = 0;
 			try
 			{
-				if (_lobbyCreated == null)
-				{
-					_lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
-					registeredCallbacks++;
-				}
 				if (_lobbyJoinRequested == null)
 				{
 					_lobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinRequested);
-					registeredCallbacks++;
-				}
-				if (_lobbyEntered == null)
-				{
-					_lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
 					registeredCallbacks++;
 				}
 				if (_lobbyChatUpdate == null)
@@ -93,78 +88,136 @@ namespace ONI_United.Networking.Transport.Steamworks
 			}
 		}
 
-		public static void CreateLobby(ELobbyType lobbyType = ELobbyType.k_ELobbyTypePublic, System.Action onSuccess = null)
-		{
-			using var _ = Profiler.Scope();
-
-			if (!NetworkConfig.IsSteamConfig())
-				return;
-
-			if (!SteamManager.Initialized) return;
-			//if (!GoogleDrive.Instance.IsInitialized)
-			//{
-			//	DebugConsole.LogWarning("[SteamLobby] Cannot create lobby. GoogleDrive needs to be initialized!");
-			//	return;
-			//}
-
-			if (InLobby)
-			{
-				DebugConsole.LogWarning("[SteamLobby] Cannot create a new lobby while already in one.");
-				return;
-			}
-			DebugConsole.Log("[SteamLobby] Creating new lobby...");
-			MaxLobbySize = Configuration.GetHostProperty<int>("MaxLobbySize");
-			_onLobbyCreatedSuccess = onSuccess;
-			SteamMatchmaking.CreateLobby(lobbyType, MaxLobbySize);
-		}
-
-		public static void LeaveLobby()
-		{
-			using var _ = Profiler.Scope();
-
-			if(!NetworkConfig.IsSteamConfig())
-				return;
-
-			if (InLobby)
-			{
-				DebugConsole.Log("[SteamLobby] Leaving lobby...");
-				if (MultiplayerSession.IsHost)
-					GameServer.Shutdown();
-
-				if (MultiplayerSession.IsClient)
-					GameClient.Disconnect();
-
-				NetworkIdentityRegistry.Clear();
-				SteamMatchmaking.LeaveLobby(CurrentLobby);
-				MultiplayerSession.Clear();
-				CurrentLobby = CSteamID.Nil;
-				MaxLobbySize = 0;
-				SteamRichPresence.Clear();
-
-                SelectToolPatch.UpdateColor();
+        internal static void CreateHostLobby(Action<string> completed)
+        {
+            if (_hostCreation != null || InLobby)
+                throw new InvalidOperationException("A Steam lobby operation is already owned.");
+            Initialize();
+            MaxLobbySize = Configuration.GetHostProperty<int>("MaxLobbySize");
+            _hostCreated = completed;
+            // One CallResult object per native request: never rebind it from its own callback.
+            CallResult<LobbyCreated_t> request = null;
+            request = CallResult<LobbyCreated_t>.Create((result, failure) =>
+                OnHostLobbyCreated(request, result, failure));
+            _hostCreation = request;
+            var handle = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, MaxLobbySize);
+            if (handle == SteamAPICall_t.Invalid)
+            {
+                _hostCreation.Dispose();
+                _hostCreation = null;
+                _hostCreated = null;
+                completed("Steam did not accept lobby creation.");
+                return;
             }
-		}
+            _hostCreation.Set(handle);
+        }
 
-		private static void OnLobbyCreated(LobbyCreated_t callback)
-		{
-			using var _ = Profiler.Scope();
+        internal static void CancelHostLobby(Action<bool, string> completed)
+        {
+            _hostCreated = null;
+            // Keep the original native request registered through cancellation. Cancel()
+            // unregisters delivery; it cannot cancel Steam's resource acquisition.
+            if (_hostReleased == null) _hostReleased = completed;
+            if (_hostCreation != null) return;
+            ReleaseHostLobby();
+        }
 
-			if (callback.m_eResult == EResult.k_EResultOK)
-			{
-				CurrentLobby = new CSteamID(callback.m_ulSteamIDLobby);
-				DebugConsole.Log($"[SteamLobby] Lobby created: {CurrentLobby}");
+        private static void ReleaseHostLobby()
+        {
+            string failure = null;
+            try
+            {
+                if (_hostLobby.IsValid())
+                {
+                    SteamMatchmaking.LeaveLobby(_hostLobby);
+                    if (CurrentLobby == _hostLobby)
+                    {
+                        CurrentLobby = CSteamID.Nil;
+                        MaxLobbySize = 0;
+                        CurrentLobbyCode = "";
+                        LobbyMembers.Clear();
+                        SteamRichPresence.Clear();
+                    }
+                    _hostLobby = CSteamID.Nil;
+                }
+            }
+            catch (Exception ex) { failure = ex.ToString(); }
+            var completed = _hostReleased;
+            _hostReleased = null;
+            completed?.Invoke(failure == null, failure);
+        }
 
+        public static void LeaveLobby() => NetworkRuntime.Stop();
+
+        internal static bool TryReleaseClientLobby(out string error, Action<bool, string> completed = null)
+        {
+            error = null;
+            // JoinLobby cannot cancel native acquisition. Its matching result must be drained.
+            if (HasPendingJoin)
+            {
+                if (_clientReleased == null) _clientReleased = completed;
+                return false;
+            }
+            _clientReleased = null;
+            try
+            {
+                if (InLobby) SteamMatchmaking.LeaveLobby(CurrentLobby);
+                CurrentLobby = CSteamID.Nil;
+                MaxLobbySize = 0;
+                CurrentLobbyCode = "";
+                LobbyMembers.Clear();
+                SteamRichPresence.Clear();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.ToString();
+                return false;
+            }
+        }
+
+        private static void OnHostLobbyCreated(CallResult<LobbyCreated_t> request,
+            LobbyCreated_t result, bool ioFailure)
+        {
+            if (!ReferenceEquals(request, _hostCreation))
+            {
+                var staleLobby = new CSteamID(result.m_ulSteamIDLobby);
+                if (!ioFailure && result.m_eResult == EResult.k_EResultOK
+                    && staleLobby.IsValid() && staleLobby != CurrentLobby)
+                    SteamMatchmaking.LeaveLobby(staleLobby);
+                request.Dispose();
+                return;
+            }
+            _hostCreation = null;
+            request.Dispose();
+            if (!ioFailure && result.m_eResult == EResult.k_EResultOK)
+                _hostLobby = new CSteamID(result.m_ulSteamIDLobby);
+
+            var completed = _hostCreated;
+            _hostCreated = null;
+            if (completed == null)
+            {
+                ReleaseHostLobby();
+                return;
+            }
+            if (ioFailure || result.m_eResult != EResult.k_EResultOK || !_hostLobby.IsValid())
+            {
+                completed("Steam lobby creation failed: " + (ioFailure ? "IO failure" : result.m_eResult.ToString()));
+                return;
+            }
+            // CreateLobby success establishes creator membership. A local owner query
+            // confirms it without waiting for the separately dispatched creator LobbyEnter.
+            if (SteamMatchmaking.GetLobbyOwner(_hostLobby) != SteamUser.GetSteamID())
+            {
+                completed("Steam did not confirm local lobby ownership.");
+                return;
+            }
+            CurrentLobby = _hostLobby;
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "name", SteamFriends.GetPersonaName() + "'s Lobby");
-				SteamMatchmaking.SetLobbyData(CurrentLobby, "host", NetworkConfig.GetLocalID().ToString());
+				SteamMatchmaking.SetLobbyData(CurrentLobby, "host", NetworkRuntime.GetLocalID().ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "hostname", SteamFriends.GetPersonaName());
 
-				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", ((int)NetworkConfig.transport).ToString());
-				if (NetworkConfig.IsLanConfig())
-				{
-					string address = Configuration.Instance.Host.LanSettings.GetHashedAddress();
-					DebugConsole.Log($"[SteamLobby] Detected Lan config! Hashed address: {address}");
-					SteamMatchmaking.SetLobbyData(CurrentLobby, "lan_address", address);
-				}
+				SteamMatchmaking.SetLobbyData(CurrentLobby, "relay", NetworkRuntime.IsSteam ? "0" : "1");
 
 				bool isPrivate = Configuration.Instance.Host.Lobby.IsPrivate;
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "visibility", isPrivate ? "private" : "public");
@@ -182,32 +235,16 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "region", GetLocalRegion());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "game_id", "oni_multiplayer");
 
-				MultiplayerSession.Clear();
-
-				GameServer.Start();
-				SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – Hosting Lobby");
-				_onLobbyCreatedSuccess?.Invoke();
-				_onLobbyCreatedSuccess = null;
-
-                // Update game info if available
-                UpdateGameInfo();
-
-				//CursorManager.Instance.AssignColor();
-				SelectToolPatch.UpdateColor();
-            }
-            else
-			{
-				DebugConsole.LogError($"[SteamLobby] Failed to create lobby: {callback.m_eResult}");
-				_onLobbyCreatedSuccess = null;
-			}
-		}
+            SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – Hosting Lobby");
+            completed(null);
+        }
 
 		private static void OnLobbyJoinRequested(GameLobbyJoinRequested_t callback)
 		{
 			using var _ = Profiler.Scope();
 
 			DebugConsole.Log($"[SteamLobby] Joining lobby invited by {callback.m_steamIDFriend}");
-			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS); // We're joining through the steam invite system so force steam transport
+			NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.STEAMWORKS); // We're joining through the steam invite system so force steam transport
 
             CSteamID lobbyId = callback.m_steamIDLobby;
 
@@ -236,14 +273,56 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
         }
 
-        private static void OnLobbyEntered(LobbyEnter_t callback)
-		{
-			using var _ = Profiler.Scope();
-
-			CurrentLobby = new CSteamID(callback.m_ulSteamIDLobby);
+        private static void OnClientLobbyEntered(CallResult<LobbyEnter_t> request,
+            LobbyEnter_t callback, bool ioFailure)
+        {
+            var entered = new CSteamID(callback.m_ulSteamIDLobby);
+            if (!ReferenceEquals(request, _clientJoin))
+            {
+                // A retired request may release its own result, never a newer lobby owner.
+                if (!ioFailure && entered.IsValid() && entered != CurrentLobby)
+                    SteamMatchmaking.LeaveLobby(entered);
+                request.Dispose();
+                return;
+            }
+            _clientJoin = null;
+            request.Dispose();
+            _joiningLobby = CSteamID.Nil;
+            if (_clientReleased != null)
+            {
+                if (!ioFailure && callback.m_EChatRoomEnterResponse == (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
+                    CurrentLobby = entered;
+                // Drain this request's acquisition, not a retry of failed socket cleanup.
+                var completed = _clientReleased;
+                bool success = TryReleaseClientLobby(out string error);
+                completed?.Invoke(success, error);
+                return;
+            }
+            if (!Lifecycle.IsAvailable)
+            {
+                if (!ioFailure && entered.IsValid()
+                    && callback.m_EChatRoomEnterResponse == (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
+                    SteamMatchmaking.LeaveLobby(entered);
+                return;
+            }
+            if (ioFailure)
+            {
+                NetworkRuntime.DisconnectClient();
+                return;
+            }
+            if (callback.m_EChatRoomEnterResponse != (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
+            {
+                NetworkRuntime.DisconnectClient();
+                return;
+            }
+            CurrentLobby = entered;
+            if (Lifecycle.Current != Lifecycle.Phase.Joining)
+            {
+                SteamMatchmaking.LeaveLobby(entered);
+                CurrentLobby = CSteamID.Nil;
+                return;
+            }
 			DebugConsole.Log($"[SteamLobby] Entered lobby: {CurrentLobby}");
-
-			MultiplayerSession.Clear();
 
 			string hostStr = SteamMatchmaking.GetLobbyData(CurrentLobby, "host");
 			if (ulong.TryParse(hostStr, out ulong hostId))
@@ -251,14 +330,18 @@ namespace ONI_United.Networking.Transport.Steamworks
 				MultiplayerSession.SetHost(hostId);
 			}
 
+            bool StillJoining() => Lifecycle.Current == Lifecycle.Phase.Joining;
 			SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – In Lobby");
 			_onLobbyJoined?.Invoke(CurrentLobby);
+            if (!StillJoining()) return;
 			RefreshLobbyMembers();
+            if (!StillJoining()) return;
 
 			if (!MultiplayerSession.IsHost && MultiplayerSession.HostUserID.IsValid())
 			{
-				GameClient.ConnectToHost();
+				GameClient.BeginConnection();
 			}
+            else NetworkRuntime.DisconnectClient();
 		}
 
 		private static void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
@@ -272,18 +355,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			if ((stateChange & EChatMemberStateChange.k_EChatMemberStateChangeEntered) != 0)
 			{
-				if (MultiplayerSession.IsHost)
-				{
-					if (!MultiplayerSession.ConnectedPlayers.ContainsKey(userId))
-						//MultiplayerSession.ConnectedPlayers[user] = new MultiplayerPlayer(user);
-						MultiplayerSession.ConnectedPlayers.Add(userId, new MultiplayerPlayer(user.m_SteamID));
-				}
-				else if (userId == MultiplayerSession.HostUserID && !MultiplayerSession.ConnectedPlayers.ContainsKey(userId))
-				{
-					//MultiplayerSession.ConnectedPlayers[user] = new MultiplayerPlayer(user);
-                    MultiplayerSession.ConnectedPlayers.Add(userId, new MultiplayerPlayer(user.m_SteamID));
-                }
-
 				DebugConsole.Log($"[SteamLobby] {name} joined the lobby.");
 				OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED, name));
                 var boxedId = Boxed<ulong>.Get(userId);
@@ -295,9 +366,6 @@ namespace ONI_United.Networking.Transport.Steamworks
 					(stateChange & EChatMemberStateChange.k_EChatMemberStateChangeDisconnected) != 0 ||
 					(stateChange & EChatMemberStateChange.k_EChatMemberStateChangeKicked) != 0)
 			{
-				if (MultiplayerSession.ConnectedPlayers.TryGetValue(userId, out var p))
-					MultiplayerSession.RemoveConnectedPlayer(userId, p.Connection);
-
 				RefreshLobbyMembers();
 				DebugConsole.Log($"[SteamLobby] {name} left the lobby.");
                 OxySyncChat.AddSystemMessage(string.Format(ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT, name));
@@ -305,24 +373,39 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
 		}
 
-		public static void JoinLobby(CSteamID lobbyId, Action<CSteamID> onJoinedLobby = null, string password = null)
-		{
-			using var _ = Profiler.Scope();
+        public static void JoinLobby(CSteamID lobbyId, Action<CSteamID> onJoinedLobby = null, string password = null)
+            => NetworkRuntime.JoinSteamLobby(lobbyId, onJoinedLobby, password);
 
-			if (!SteamManager.Initialized)
-				return;
-
-            if (InLobby)
-			{
-				DebugConsole.LogWarning("[SteamLobby] Already in a lobby, leaving current one first.");
-				LeaveLobby();
-			}
-
-			_onLobbyJoined = onJoinedLobby;
-			_pendingPassword = password;
-			DebugConsole.Log($"[SteamLobby] Attempting to join lobby: {lobbyId}");
-			SteamMatchmaking.JoinLobby(lobbyId);
-		}
+        internal static void StartClientJoin(CSteamID lobbyId, Action<CSteamID> onJoined, string password)
+        {
+            _onLobbyJoined = onJoined;
+            _pendingPassword = password;
+            _joiningLobby = lobbyId;
+            // One retained CallResult per JoinLobby request. Global LobbyEnter notifications
+            // cannot correlate a late result with a later attempt to the same lobby.
+            CallResult<LobbyEnter_t> result = null;
+            result = CallResult<LobbyEnter_t>.Create((entered, ioFailure) =>
+                OnClientLobbyEntered(result, entered, ioFailure));
+            _clientJoin = result;
+            try
+            {
+                var request = SteamMatchmaking.JoinLobby(lobbyId);
+                if (request != SteamAPICall_t.Invalid)
+                {
+                    result.Set(request);
+                    return;
+                }
+                result.Dispose();
+                _clientJoin = null;
+                _joiningLobby = CSteamID.Nil;
+            }
+            catch (Exception ex)
+            {
+                // An exception does not prove the native request acquired nothing.
+                DebugConsole.LogError("[SteamLobby] Join submission failed; native ownership remains unresolved: " + ex);
+            }
+            NetworkRuntime.DisconnectClient();
+        }
 
 		public static List<CSteamID> GetAllLobbyMembers()
 		{
@@ -330,7 +413,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 
 			List<CSteamID> members = new List<CSteamID>();
 
-			if (!NetworkConfig.IsSteamConfig()) return members;
+			if (!NetworkRuntime.IsSteam) return members;
 
 			if (!InLobby) return members;
 
@@ -361,6 +444,10 @@ namespace ONI_United.Networking.Transport.Steamworks
 			{
 				CSteamID member = SteamMatchmaking.GetLobbyMemberByIndex(CurrentLobby, i);
 				LobbyMembers.Add(member);
+				if (Session.Players.ContainsKey(member.m_SteamID))
+					Session.UpdatePlayerName(
+						member.m_SteamID,
+						SteamFriends.GetFriendPersonaName(member));
 				_OnLobbyMembersRefreshed?.Invoke(member);
 			}
 			ReadyManager.RefreshReadyState();
@@ -423,7 +510,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkConfig.IsSteamConfig())
+			if (!NetworkRuntime.IsSteam)
 				return false; // Default to invalid as these don't have passwords yet
 
 			string storedHash = SteamMatchmaking.GetLobbyData(lobbyId.AsCSteamID(), "password_hash");
@@ -506,7 +593,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 		{
 			using var _ = Profiler.Scope();
 
-			if (!NetworkConfig.IsSteamConfig())
+			if (!NetworkRuntime.IsSteam)
 				return;
 
 			if (!InLobby || !MultiplayerSession.IsHost)
@@ -528,7 +615,7 @@ namespace ONI_United.Networking.Transport.Steamworks
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_alive", aliveCount.ToString());
 				SteamMatchmaking.SetLobbyData(CurrentLobby, "duplicant_count", totalCount.ToString());
 
-				if (!NetworkConfig.transport.Equals(NetworkConfig.NetworkTransport.STEAMWORKS))
+				if (!NetworkRuntime.IsSteam)
 				{
                     SteamMatchmaking.SetLobbyData(CurrentLobby, "host_ping_location", "???");
                     return;
