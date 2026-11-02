@@ -13,7 +13,7 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Handshake
 {
-	public class GameStateRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class GameStateRequestPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public GameStateRequestPacket() { }
 		public GameStateRequestPacket(ulong steamID)
@@ -22,7 +22,6 @@ namespace ONI_United.Networking.Packets.Handshake
 		}
 
 		public ulong ClientId;
-		ulong IClientIdentityPacket.ClaimedSenderId => ClientId;
 		public HashSet<string> ActiveDlcIds = [];
 		public List<ulong> ActiveModIds = [];
 		public int ProtocolVersion;

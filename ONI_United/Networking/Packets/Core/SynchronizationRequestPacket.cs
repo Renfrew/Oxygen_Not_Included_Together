@@ -5,10 +5,9 @@ using ONI_United.Networking.Runtime;
 
 namespace ONI_United.Networking.Packets.Core
 {
-	public class SynchronizationRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class SynchronizationRequestPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong Requester;
-		ulong IClientIdentityPacket.ClaimedSenderId => Requester;
 
 		public void Serialize(BinaryWriter writer) => writer.Write(Requester);
 		public void Deserialize(BinaryReader reader) => Requester = reader.ReadUInt64();

@@ -17,10 +17,9 @@ using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Packets.Core
 {
-	public class PlayerCursorPacket : IPacket, IClientIdentityPacket
+	public class PlayerCursorPacket : IPacket
 	{
 		public ulong PlayerID;
-		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public string PlayerName;
 		public Vector3 Position;
 		public Color Color;

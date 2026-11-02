@@ -10,10 +10,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Tools.Attack;
 
-public class AttackToolPacket : IPacket, IClientIdentityPacket
+public class AttackToolPacket : IPacket
 {
     private ulong        SenderId = MultiplayerSession.LocalUserID;
-    ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
     private Vector2         Min;
     private Vector2         Max;
     private PrioritySetting Priority;

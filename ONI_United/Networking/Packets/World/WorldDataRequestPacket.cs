@@ -8,10 +8,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class WorldDataRequestPacket : IPacket, IClientIdentityPacket
+	public class WorldDataRequestPacket : IPacket
 	{
 		public ulong SenderId;
-		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 
 		public void Serialize(BinaryWriter writer)
 		{

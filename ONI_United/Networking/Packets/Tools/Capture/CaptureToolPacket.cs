@@ -10,10 +10,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Tools.Capture;
 
-public class CaptureToolPacket : IPacket, IClientIdentityPacket
+public class CaptureToolPacket : IPacket
 {
     private ulong        SenderId = MultiplayerSession.LocalUserID;
-    ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
     private Vector2         Min;
     private Vector2         Max;
     private PrioritySetting Priority;

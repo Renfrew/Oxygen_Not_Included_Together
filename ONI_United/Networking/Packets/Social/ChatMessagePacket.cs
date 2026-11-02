@@ -14,10 +14,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class ChatMessagePacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class ChatMessagePacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong SenderId;
-		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 		public string Message;
 		public Color PlayerColor;
 		public long Timestamp;

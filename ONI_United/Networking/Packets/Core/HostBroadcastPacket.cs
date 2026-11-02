@@ -10,7 +10,7 @@ namespace ONI_United.Networking.Packets.Core
 	/// <summary>
 	/// used by clients to broadcast a packet to all other clients via the host
 	/// </summary>
-	internal class HostBroadcastPacket : IPacket, IClientIdentityPacket
+	internal class HostBroadcastPacket : IPacket
 	{
 		public HostBroadcastPacket() { }
 		public HostBroadcastPacket(IPacket innerPacket, ulong sender)
@@ -28,7 +28,6 @@ namespace ONI_United.Networking.Packets.Core
 
 		int InnerPacketId;
 		public ulong SenderId;
-		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 		byte[] InnerPacketData;
 
 		public void Serialize(BinaryWriter writer)
@@ -63,13 +62,6 @@ namespace ONI_United.Networking.Packets.Core
 			using var ms = new MemoryStream(InnerPacketData);
 			using var reader = new BinaryReader(ms);
 			innerPacket.Deserialize(reader);
-			if (MultiplayerSession.IsHost
-				&& innerPacket is IClientIdentityPacket identityPacket
-				&& identityPacket.ClaimedSenderId != SenderId)
-			{
-				DebugConsole.LogWarning("[HostBroadcastPacket] Rejected inner packet with a mismatched sender identity.");
-				return;
-			}
 			DebugConsole.Log("[HostBroadcastPacket] received packet of type " + innerPacket.GetType().Name+", dispatching");
 			//this packet should only be sent by clients to the host
 			if (MultiplayerSession.IsHost)

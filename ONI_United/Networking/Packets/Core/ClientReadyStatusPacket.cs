@@ -12,10 +12,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Core
 {
-	class ClientReadyStatusPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	class ClientReadyStatusPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong SenderId;
-		ulong IClientIdentityPacket.ClaimedSenderId => SenderId;
 		public ulong SynchronizationId;
 		public ClientReadyState Status = ClientReadyState.Unready;
 		public string PlayerName = string.Empty;

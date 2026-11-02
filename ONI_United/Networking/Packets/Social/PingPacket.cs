@@ -8,10 +8,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class PingPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class PingPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong PlayerID;
-		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public float WorldX;
 		public float WorldY;
 		public Color PlayerColor;

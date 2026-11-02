@@ -69,15 +69,6 @@ namespace ONI_United.Networking.Packets.Architecture
                     return;
             }
 
-            if (Session.IsHost
-                && packet is IClientIdentityPacket identityPacket
-                && (!senderPlayerId.HasValue || identityPacket.ClaimedSenderId != senderPlayerId.Value))
-            {
-                DebugConsole.LogWarning(
-                    $"[PacketHandler] Rejected {packet.GetType().Name}: claimed sender does not match its physical connection.");
-                return;
-            }
-
             if (!ShouldDispatchPacket(packet))
                 return;
 

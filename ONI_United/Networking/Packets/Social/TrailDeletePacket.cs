@@ -8,10 +8,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class TrailDeletePacket : IPacket, IClientIdentityPacket
+	public class TrailDeletePacket : IPacket
 	{
 		public ulong PlayerID;
-		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public float WorldX;
 		public float WorldY;
 

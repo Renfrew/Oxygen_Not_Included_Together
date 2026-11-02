@@ -18,10 +18,9 @@ using ONI_United.Misc.World;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class SaveFileRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class SaveFileRequestPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong Requester;
-		ulong IClientIdentityPacket.ClaimedSenderId => Requester;
 		public ulong SynchronizationId;
 		private static readonly Dictionary<ulong, object> TransferRuns = new Dictionary<ulong, object>();
 

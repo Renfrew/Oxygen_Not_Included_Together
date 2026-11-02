@@ -9,10 +9,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Social
 {
-	public class TrailPointsPacket : IPacket, IClientIdentityPacket
+	public class TrailPointsPacket : IPacket
 	{
 		public ulong PlayerID;
-		ulong IClientIdentityPacket.ClaimedSenderId => PlayerID;
 		public Color PlayerColor;
 		public bool IsNewStroke;
 		public List<Vector2> Points = new List<Vector2>();

@@ -8,10 +8,9 @@ using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {
-	public class TcpFallbackRequestPacket : IPacket, IAllowedWithoutWorldPacket, IClientIdentityPacket
+	public class TcpFallbackRequestPacket : IPacket, IAllowedWithoutWorldPacket
 	{
 		public ulong Requester;
-		ulong IClientIdentityPacket.ClaimedSenderId => Requester;
 		public ulong SynchronizationId;
 
 		public void Serialize(BinaryWriter writer)
