@@ -1,12 +1,12 @@
 ﻿using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.World;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.Steamworks;
 using Shared.Profiling;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Synchronization

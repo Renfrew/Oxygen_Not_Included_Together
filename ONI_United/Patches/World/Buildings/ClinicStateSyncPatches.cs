@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Replication.Components.StateMachines;
 using UnityEngine;
 

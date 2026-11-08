@@ -1,6 +1,6 @@
 using ONI_United.DebugTools;
-using ONI_United.Networking.Session.Lobbies;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Sessions.Lobbies;
+using ONI_United.Networking.Transports.Steamworks;
 using Steamworks;
 using System.Collections.Generic;
 using System.Linq;

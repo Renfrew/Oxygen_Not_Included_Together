@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using ONI_United.Networking.Replication.Packets;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Steamworks;
 using ONI_United.Networking.Packets.Architecture;
 

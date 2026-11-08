@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Shared.Profiling;
 
 namespace ONI_United.Patches

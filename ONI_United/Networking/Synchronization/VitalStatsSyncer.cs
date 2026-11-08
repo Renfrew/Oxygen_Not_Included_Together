@@ -9,7 +9,7 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 using static global::STRINGS.DUPLICANTS.STATS;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Synchronization

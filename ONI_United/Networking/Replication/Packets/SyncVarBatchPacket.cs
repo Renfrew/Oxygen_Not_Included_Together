@@ -3,7 +3,7 @@ using System.IO;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Replication.Components;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Replication;
 using Shared.Profiling;

@@ -1,5 +1,5 @@
 ﻿using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using ONI_United.Networking.Synchronization;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking.Identity;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World.Buildings
 {

@@ -1,9 +1,9 @@
 ﻿using ONI_United.Misc;
 using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 using System.Collections;
 using System.Collections.Generic;

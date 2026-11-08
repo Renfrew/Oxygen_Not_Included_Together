@@ -8,7 +8,7 @@ using Shared.Profiling;
 using System.IO;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Tools.Clear
 {

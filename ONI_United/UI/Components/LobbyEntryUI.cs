@@ -1,5 +1,5 @@
 ﻿using ONI_United.Networking;
-using ONI_United.Networking.Session.Lobbies;
+using ONI_United.Networking.Sessions.Lobbies;
 using System;
 using System.Collections.Generic;
 using System.Linq;

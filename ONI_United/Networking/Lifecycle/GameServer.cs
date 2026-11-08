@@ -2,7 +2,7 @@
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Packets.Handshake;
 using Shared.Profiling;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Shared;
 using System;
 using ONI_United.Networking.Presentation;

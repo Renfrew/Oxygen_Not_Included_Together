@@ -1,7 +1,7 @@
 using HarmonyLib;
 using ONI_United.DebugTools;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using System.Reflection;
 using Shared.Profiling;
 

@@ -2,7 +2,7 @@
 using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Identity;
 using ONI_United.Scripts.Duplicants;
 using ONI_United.Networking.Packets.Animation;

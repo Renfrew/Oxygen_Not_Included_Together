@@ -2,7 +2,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using Shared.Profiling;
 using UnityEngine;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Synchronization
 {

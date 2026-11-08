@@ -9,7 +9,7 @@ using UnityEngine;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United;
 
 namespace ONI_United.Networking.Packets.Handshake
