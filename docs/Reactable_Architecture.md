@@ -144,9 +144,9 @@ Current navigation is host-authoritative through:
 
 
 
-\- \`ONI_Together/Networking/OxySync/Components/Entities/NavigatorSyncer.cs\`
+\- \`ONI_United/Networking/Replication/Components/Entities/NavigatorSyncer.cs\`
 
-\- \`ONI_Together/Patches/NavigationPatches/NavigatorPatch.cs\`
+\- \`ONI_United/Patches/NavigationPatches/NavigatorPatch.cs\`
 
 
 

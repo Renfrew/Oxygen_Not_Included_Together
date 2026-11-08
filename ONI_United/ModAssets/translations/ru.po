@@ -1,0 +1,1494 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ONI_United\n"
+"POT-Creation-Date: 2026-10-17 01:10+0000\n"
+"PO-Revision-Date: 2026-10-17 01:10+0000\n"
+"Last-Translator: Multiplayer ONI United Team\n"
+"Language-Team: ru\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Copilot SDK\n"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.A_HOST_SETTINGS"
+msgid "Host Settings"
+msgstr "Настройки хоста"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.B_CLIENT_SETTINGS"
+msgid "Client Settings"
+msgstr "Настройки клиента"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.C_NETWORK_SETTINGS"
+msgid "General Network Settings"
+msgstr "Общие сетевые настройки"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.D_CURSOR_SETTINGS"
+msgid "Cursor Settings"
+msgstr "Настройки курсора"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.E_MISC_SETTINGS"
+msgid "Misc Settings"
+msgstr "Прочие настройки"
+
+msgctxt "ONI_United.STRINGS.UI.CONFIGURATION.HEADERS.SERVER_SETTINGS"
+msgid "Server Settings"
+msgstr "Настройки сервера"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid "Max Messages Per Poll"
+msgstr "Макс. сообщений за опрос"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SAVE_FILE_TRANSFER_CHUNK"
+msgid "Save Chunk Size (KB)"
+msgstr "Размер блока сохранения (КБ)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START"
+msgid "Hard Sync On Cycle Start"
+msgstr "Жёсткая синхронизация в начале цикла"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.TIMEOUT_SECONDS"
+msgid "Connection Timeout (seconds)"
+msgstr "Таймаут подключения (сек)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT"
+msgid "Pause Simulation On Player Disconnect"
+msgstr "Пауза симуляции при отключении игрока"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE"
+msgid "Server Tick Rate"
+msgstr "Частота тиков сервера"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CLIENT_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid "Max Messages Per Poll"
+msgstr "Макс. сообщений за опрос"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CLIENT_SETTINGS.TIMEOUT_SECONDS"
+msgid "Connection Timeout (seconds)"
+msgstr "Таймаут подключения (сек)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE"
+msgid "Enable Packet Queue"
+msgstr "Включить очередь пакетов"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.MAX_PACKETS_PER_SECOND"
+msgid "Max Packets Per Second"
+msgstr "Макс. пакетов в секунду"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.NETWORK_SETTINGS.BYPASS_PROTOCOL_CHECKS"
+msgid "Bypass Protocol Checks"
+msgstr "Обход проверок протокола"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CURSOR_SETTINGS.RANDOM_COLOR"
+msgid "Use Random Color"
+msgstr "Случайный цвет"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.CURSOR_SETTINGS.CURSOR_COLOR"
+msgid "Cursor Color"
+msgstr "Цвет курсора"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.PUFT_LOADINGSCREEN"
+msgid "Use Puft Loading Icon"
+msgstr "Значок Паффта при загрузке"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.LOADINGSCREEN_COLOR"
+msgid "Use Custom Loading Screen Color"
+msgstr "Свой цвет экрана загрузки"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.MISC_SETTINGS.USE_DISCORD_RICH_PRESENCE"
+msgid "Use Discord Rich Presence"
+msgstr "Использовать Discord Rich Presence"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_TRANSPORT"
+msgid "Lan Transport"
+msgstr "Транспорт LAN"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TITLES.LAN_SETTINGS.LAN_DISPLAY_NAME"
+msgid "Lan Display Name"
+msgstr "Имя в LAN"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid ""
+"STEAMWORKS ONLY:\n"
+"Maximum number of incoming Steam networking messages processed per poll tick on the server.\n"
+"Higher values reduce latency spikes under heavy traffic but may increase CPU usage per frame.\n"
+"Lower values improve frame stability but can increase message backlog and delay processing during bursts.\n"
+"\n"
+"Recommended range: 32–128 (default: 128)"
+msgstr ""
+"ТОЛЬКО STEAMWORKS:\n"
+"Максимальное количество входящих сетевых сообщений Steam, обрабатываемых сервером за один тик опроса.\n"
+"Большие значения уменьшают всплески задержки при высокой нагрузке, но могут увеличить нагрузку на CPU на кадр.\n"
+"Меньшие значения повышают стабильность кадров, но могут вызвать накопление сообщений и задержку обработки при всплесках.\n"
+"\n"
+"Рекомендуемый диапазон: 32–128 (по умолчанию: 128)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SAVE_FILE_TRANSFER_CHUNK"
+msgid ""
+"Size (in kilobytes) of each data chunk used when transferring save files over the network.\n"
+"Smaller values reduce bandwidth spikes and improve reliability on unstable connections but increase transfer time due to more packets.\n"
+"Larger values speed up transfers but may cause higher bandwidth bursts or fragmentation.\n"
+"\n"
+"Recommended range: 16–256 KB (default: 256 KB)."
+msgstr ""
+"Размер (в килобайтах) каждого блока данных при передаче сохранений по сети.\n"
+"Меньшие значения уменьшают пиковую нагрузку на канал и повышают надёжность при нестабильном соединении, но увеличивают время передачи из-за большего числа пакетов.\n"
+"Большие значения ускоряют передачу, но могут вызывать всплески трафика и фрагментацию.\n"
+"\n"
+"Рекомендуемый диапазон: 16–256 КБ (по умолчанию: 256 КБ)."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.HARD_SYNC_AT_CYCLE_START"
+msgid ""
+"Perform a hard sync at the start of every new cycle\n"
+"\n"
+"Does not use up your one hard sync per cycle"
+msgstr ""
+"Выполнять жёсткую синхронизацию в начале каждого нового цикла\n"
+"\n"
+"Не расходует вашу одну жёсткую синхронизацию за цикл"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.TIMEOUT_SECONDS"
+msgid ""
+"How long the server waits (in seconds) for a response from a connecting or loading client before timing out.\n"
+"Increase this if your friends take a long time to load into the game.\n"
+"\n"
+"Minimum: 30. (default: 30)"
+msgstr ""
+"Сколько секунд сервер ждёт ответа от подключающегося или загружающегося клиента до таймаута.\n"
+"Увеличьте значение, если друзьям требуется много времени для загрузки игры.\n"
+"\n"
+"Минимум: 30 (по умолчанию: 30)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.PAUSE_SIM_ON_PLAYER_DISCONNECT"
+msgid ""
+"Automatically pauses the simulation when a player disconnects from the "
+"server."
+msgstr ""
+"Автоматически ставит симуляцию на паузу, когда игрок отключается от сервера."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.HOST_SETTINGS.SERVER_SETTINGS.SERVER_TICK_RATE"
+msgid ""
+"How many times per second the server processes incoming network messages.\n"
+"Higher values reduce latency but increase CPU and bandwidth usage.\n"
+"\n"
+"Range: 20–128 TPS (default: 60)"
+msgstr ""
+"Сколько раз в секунду сервер обрабатывает входящие сетевые сообщения.\n"
+"Более высокие значения уменьшают задержку, но увеличивают нагрузку на CPU и сеть.\n"
+"\n"
+"Диапазон: 20–128 TPS (по умолчанию: 60)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CLIENT_SETTINGS.MAX_MESSAGES_PER_POLL"
+msgid ""
+"STEAMWORKS ONLY:\n"
+"Maximum number of incoming Steam networking messages processed per poll tick on the client.\n"
+"Higher values reduce input and state update latency under heavy network load but may increase per-frame CPU usage.\n"
+"Lower values improve frame stability but can cause message backlog and delayed processing during traffic spikes.\n"
+"\n"
+"Recommended range: 8–64 (default: 16)"
+msgstr ""
+"ТОЛЬКО STEAMWORKS:\n"
+"Максимальное количество входящих сетевых сообщений Steam, обрабатываемых клиентом за тик опроса.\n"
+"Большие значения уменьшают задержку ввода и обновления состояния при высокой нагрузке, но могут увеличить нагрузку на CPU на кадр.\n"
+"Меньшие значения повышают стабильность кадров, но могут вызвать накопление сообщений и задержку обработки при всплесках трафика.\n"
+"\n"
+"Рекомендуемый диапазон: 8–64 (по умолчанию: 16)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CLIENT_SETTINGS.TIMEOUT_SECONDS"
+msgid ""
+"How long the client waits (in seconds) for a response from the server before timing out.\n"
+"Increase this if you are timing out while trying to connect.\n"
+"\n"
+"Minimum: 30. (default: 30)"
+msgstr ""
+"Сколько секунд клиент ждёт ответа сервера до таймаута.\n"
+"Увеличьте значение, если при подключении часто возникает таймаут.\n"
+"\n"
+"Минимум: 30 (по умолчанию: 30)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.ENABLE_PACKET_QUEUE"
+msgid ""
+"When enabled, outgoing packets are queued and sent at a limited rate per frame to prevent network saturation.\n"
+"When disabled, all packets are sent immediately without throttling."
+msgstr ""
+"Если включено, исходящие пакеты ставятся в очередь и отправляются с ограничением на кадр, чтобы избежать перегрузки сети.\n"
+"Если выключено, все пакеты отправляются сразу без ограничения."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.MAX_PACKETS_PER_SECOND"
+msgid ""
+"Maximum number of packets to send per second per connection when the packet queue is enabled.\n"
+"Excess packets are buffered and sent in subsequent frames.\n"
+"\n"
+"Ranges: (500 - 1000)"
+msgstr ""
+"Максимальное число пакетов в секунду на соединение при включённой очереди пакетов.\n"
+"Лишние пакеты буферизуются и отправляются в следующих кадрах.\n"
+"\n"
+"Диапазон: (500 - 1000)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.NETWORK_SETTINGS.BYPASS_PROTOCOL_CHECKS"
+msgid ""
+"Ignores protocol version, packet registry fingerprint, and mod version mismatches during connection handshake.\n"
+"\n"
+"Use this only for cross-platform testing between Debug and Release builds."
+msgstr ""
+"Игнорирует несоответствия версии протокола, отпечатка реестра пакетов и версии мода при рукопожатии подключения.\n"
+"\n"
+"Используйте только для кроссплатформенного тестирования сборок Debug и Release."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CURSOR_SETTINGS.RANDOM_COLOR"
+msgid "Select a random color for your cursor during online sessions."
+msgstr "Выбирать случайный цвет курсора в сетевой сессии."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.CURSOR_SETTINGS.CURSOR_COLOR"
+msgid ""
+"The color of your player cursor for yourself during an online session\n"
+"(visible to other players in the session)"
+msgstr ""
+"Цвет вашего курсора игрока в сетевой сессии\n"
+"(виден другим игрокам в сессии)"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.PUFT_LOADINGSCREEN"
+msgid "Override the loading icon with a Puft."
+msgstr "Заменить значок загрузки на Паффта."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.LOADINGSCREEN_COLOR"
+msgid "Override the purple background of the loading screen with turquoise."
+msgstr "Заменить фиолетовый фон экрана загрузки бирюзовым."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.MISC_SETTINGS.USE_DISCORD_RICH_PRESENCE"
+msgid ""
+"Enables Discord Rich Presence integration, showing your current game state "
+"(colony name, cycle, asteroid) on your Discord profile."
+msgstr ""
+"Включает Discord Rich Presence и показывает состояние игры (название "
+"колонии, цикл, астероид) в профиле Discord."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_TRANSPORT"
+msgid ""
+"Which network library is used for LAN games.\n"
+"\n"
+"LiteNetLib is the modern default transport. Riptide is the legacy LAN transport."
+msgstr ""
+"Сетевая библиотека для LAN-игр.\n"
+"\n"
+"LiteNetLib — современный транспорт по умолчанию, Riptide — устаревший LAN-транспорт."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.CONFIGURATION.TOOLTIPS.LAN_SETTINGS.LAN_DISPLAY_NAME"
+msgid ""
+"The name shown to other players when they discover or join your LAN game.\n"
+"Leave empty to default to 'Player <id>'."
+msgstr ""
+"Имя, которое видят другие игроки при обнаружении или входе в вашу LAN-игру.\n"
+"Оставьте пустым, чтобы использовать значение по умолчанию Player <id>."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.NO_METADATA"
+msgid "Peer is running a build without protocol metadata."
+msgstr "Пир использует сборку без метаданных протокола."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.PROTOCOL_MISMATCH"
+msgid "Protocol mismatch. Host={0}, Peer={1}."
+msgstr "Несовпадение протокола. Хост={0}, пир={1}."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.PACKET_REGISTRY_MISMATCH"
+msgid "Packet registry mismatch. Host={0}, Peer={1}."
+msgstr "Несовпадение реестра пакетов. Хост={0}, пир={1}."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.MOD_VERSION_MISMATCH"
+msgid "Mod version mismatch. Host={0}, Peer={1}."
+msgstr "Несовпадение версии мода. Хост={0}, пир={1}."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.INCOMPATIBLE"
+msgid "Peer is running an incompatible build."
+msgstr "Пир использует несовместимую сборку."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.TITLE"
+msgid "Protocol mismatch"
+msgstr "Несовпадение протокола"
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.NO_METADATA"
+msgid ""
+"The host is running a build without protocol metadata. Update both peers to "
+"the same build."
+msgstr ""
+"Хост использует сборку без метаданных протокола. Обновите обе стороны до "
+"одной и той же сборки."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.REJECTED"
+msgid "The host rejected this client due to an incompatible network protocol."
+msgstr "Хост отклонил этого клиента из-за несовместимого сетевого протокола."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.PROTOCOL_MISMATCH"
+msgid "Host protocol={0}, client protocol={1}."
+msgstr "Протокол хоста={0}, протокол клиента={1}."
+
+msgctxt "ONI_United.STRINGS.UI.PROTOCOL.VALIDATION.FINGERPRINT_MISMATCH"
+msgid "Host packet fingerprint={0}, client fingerprint={1}."
+msgstr "Отпечаток пакетов хоста={0}, отпечаток клиента={1}."
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.MULTIPLAYER_SESSION_TITLE"
+msgid "Multiplayer Session"
+msgstr "Сетевая сессия"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.LOBBY_CODE"
+msgid "Lobby Code:"
+msgstr "Код лобби:"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.COPY"
+msgid "Copy"
+msgstr "Копировать"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.COPIED"
+msgid "Copied!"
+msgstr "Скопировано!"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.CONNECTED_PLAYERS"
+msgid "Connected Players: {0}"
+msgstr "Подключено игроков: {0}"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.TITLE"
+msgid "Public Lobby Browser"
+msgstr "Браузер публичных лобби"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.COLONY"
+msgid "Colony"
+msgstr "Колония"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.HOST"
+msgid "Host"
+msgstr "Хост"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PLAYERS"
+msgid "Players"
+msgstr "Игроки"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.CYCLE"
+msgid "Cycle"
+msgstr "Цикл"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.DUPES"
+msgid "Dupes"
+msgstr "Дубликанты"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.HEADERS.PING"
+msgid "Ping"
+msgstr "Пинг"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BY_CODE"
+msgid "Join by Code"
+msgstr "Войти по коду"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.BACK"
+msgid "Back"
+msgstr "Назад"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES"
+msgid "Loading Lobbies..."
+msgstr "Загрузка лобби..."
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.NO_PUBLIC_LOBBIES_FOUND"
+msgid "No public lobbies found. Try hosting your own!"
+msgstr "Публичные лобби не найдены. Попробуйте создать своё!"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.FOUND_X_LOBBIES"
+msgid "Found {0} joinable lobby(s)"
+msgstr "Найдено доступных лобби: {0}"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON"
+msgid "Join"
+msgstr "Войти"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.FRIEND_ONLY"
+msgid "Friends Only"
+msgstr "Только друзья"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_REQUIRED"
+msgid "Password Required"
+msgstr "Требуется пароль"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.PASSWORD_INCORRECT"
+msgid "Incorrect password"
+msgstr "Неверный пароль"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.CANCEL"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.REFRESH"
+msgid "Refresh"
+msgstr "Обновить"
+
+msgctxt "ONI_United.STRINGS.UI.SERVERBROWSER.SEARCH"
+msgid "{0} Search..."
+msgstr "Поиск: {0}..."
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.HOST_LOBBY_SETTINGS"
+msgid "Host Lobby Settings"
+msgstr "Настройки лобби хоста"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY"
+msgid "Lobby Visibility:"
+msgstr "Видимость лобби:"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY_PUBLIC"
+msgid "Public"
+msgstr "Публичное"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_VISIBILITY_FRIENDSONLY"
+msgid "Friends Only"
+msgstr "Только друзья"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.PASSWORD_TITLE"
+msgid "Password (optional):"
+msgstr "Пароль (необязательно):"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.PASSWORD_NOTE"
+msgid "Leave empty for no password"
+msgstr "Оставьте пустым, если пароль не нужен"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.CONTINUE"
+msgid "Continue"
+msgstr "Продолжить"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.CANCEL"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "ONI_United.STRINGS.UI.HOSTLOBBYCONFIGSCREEN.LOBBY_SIZE"
+msgid "Lobby Size:"
+msgstr "Размер лобби:"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOIN_BY_CODE"
+msgid "Join By Code"
+msgstr "Войти по коду"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ENTER_LOBBY_CODE"
+msgid "Enter Lobby Code:"
+msgstr "Введите код лобби:"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.DEFAULT_CODE"
+msgid "XXXX-XXXX"
+msgstr "XXXX-XXXX"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.PASSWORD_REQUIRED"
+msgid "Password Required:"
+msgstr "Требуется пароль:"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ENTER_PASSWORD"
+msgid "Enter password"
+msgstr "Введите пароль"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOIN"
+msgid "Join"
+msgstr "Войти"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.CANCEL"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_ENTER_CODE"
+msgid "Please enter a lobby code"
+msgstr "Пожалуйста, введите код лобби"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_INVALID_CODE"
+msgid "Invalid lobby code format"
+msgstr "Неверный формат кода лобби"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.ERR_PARSE_CODE_FAILED"
+msgid "Could not parse lobby code"
+msgstr "Не удалось распознать код лобби"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.CHECKING_LOBBY"
+msgid "Checking lobby..."
+msgstr "Проверка лобби..."
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.LOBBY_REQUIRES_PASSWORD"
+msgid "This lobby requires a password"
+msgstr "Для этого лобби нужен пароль"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ENTER_PASSWORD"
+msgid "Please enter the password"
+msgstr "Пожалуйста, введите пароль"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.JOINBYDIALOGMENU.VALIDATE_ERR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "Неверный пароль"
+
+msgctxt "ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOINING"
+msgid "Joining..."
+msgstr "Подключение..."
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.TITLE"
+msgid "Multiplayer"
+msgstr "Мультиплеер"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD"
+msgid "Host World"
+msgstr "Хостить мир"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.HOST_WORLD_FLAVOR"
+msgid "Select a save to host"
+msgstr "Выберите сохранение для хостинга"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES"
+msgid "Browse Lobbies"
+msgstr "Обзор лобби"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BROWSE_LOBBIES_FLAVOR"
+msgid "Find public games to join"
+msgstr "Найти публичные игры"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE"
+msgid "Join by code"
+msgstr "Войти по коду"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_CODE_FLAVOR"
+msgid "Enter a lobby code"
+msgstr "Введите код лобби"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM"
+msgid "Join via Steam"
+msgstr "Войти через Steam"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.JOIN_BY_STEAM_FLAVOR"
+msgid "Find friends playing"
+msgstr "Найти играющих друзей"
+
+msgctxt "ONI_United.STRINGS.UI.MULTIPLAYERMENU.BACK"
+msgid "Back"
+msgstr "Назад"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.JOINGAME"
+msgid "JOIN GAME"
+msgstr "Войти в игру"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.DISCORD_INFO"
+msgid ""
+"Join Multiplayer: ONI United\n"
+"on Discord"
+msgstr ""
+"Присоединяйтесь к Multiplayer: ONI United\n"
+"в Discord"
+
+msgctxt "ONI_United.STRINGS.UI.MAINMENU.MULTIPLAYER.LABEL"
+msgid "MULTIPLAYER"
+msgstr "МУЛЬТИПЛЕЕР"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.MULTIPLAYER.LABEL"
+msgid "Multiplayer"
+msgstr "Мультиплеер"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HOSTGAME.LABEL"
+msgid "Host Game"
+msgstr "Создать игру"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.INVITE.LABEL"
+msgid "Invite Friends"
+msgstr "Пригласить друзей"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.DOHARDSYNC.LABEL"
+msgid "Perform Hard Sync"
+msgstr "Выполнить жёсткую синхронизацию"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.HARDSYNCNOTAVAILABLE.LABEL"
+msgid "Already hard synced this cycle!"
+msgstr "В этом цикле уже выполнялась жёсткая синхронизация!"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.ENDSESSION.LABEL"
+msgid "End Session"
+msgstr "Завершить сессию"
+
+msgctxt "ONI_United.STRINGS.UI.PAUSESCREEN.LEAVESESSION.LABEL"
+msgid "Leave Session"
+msgstr "Покинуть сессию"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_INITIALIZED"
+msgid "Chat initialized."
+msgstr "Чат инициализирован."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_REJECTED"
+msgid "<color=red>{0} was rejected due to mod incompatibility: {1}</color>"
+msgstr "<color=red>{0} отклонён из-за несовместимости модов: {1}</color>"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_JOINED"
+msgid "<b>{0}</b> joined the game."
+msgstr "<b>{0}</b> присоединился к игре."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_LEFT"
+msgid "<b>{0}</b> left the game."
+msgstr "<b>{0}</b> покинул игру."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_CLIENT_FAILED"
+msgid "<color=red>{0} failed to connect to the server.</color>"
+msgstr "<color=red>{0} не удалось подключиться к серверу.</color>"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STARTED"
+msgid "Started server over <b>{0}</b>"
+msgstr "Сервер запущен через <b>{0}</b>"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.CHAT_SERVER_STOPPED"
+msgid "Stopped <b>{0}</b> server"
+msgstr "Сервер <b>{0}</b> остановлен"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.RESIZE.EXPAND"
+msgid "Chat (+)"
+msgstr "Чат (+)"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATWINDOW.RESIZE.RETRACT"
+msgid "Chat (-)"
+msgstr "Чат (-)"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.HOST.STARTINGHOSTING"
+msgid "Hosting game..."
+msgstr "Создание игры..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.HOST.SEND_SAVE_FILE"
+msgid ""
+"Sending save file to a client!\n"
+"Please wait..."
+msgstr ""
+"Отправка сохранения клиенту!\n"
+"Пожалуйста, подождите..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_GAME"
+msgid "Downloading world: {0}%"
+msgstr "Загрузка мира: {0}%"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DEFAULT_LOST_CONNECTION"
+msgid ""
+msgstr ""
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MENU_LOST_CONNECTION"
+msgid "Connection to the host was lost!"
+msgstr "Соединение с хостом потеряно!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LOST_CONNECTION"
+msgid ""
+"Connection to the host was lost: {0}\n"
+"{1}"
+msgstr ""
+"Соединение с хостом потеряно: {0}\n"
+"{1}"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED"
+msgid "Host disconnected"
+msgstr "Хост отключился"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.HOST_DISCONNECTED_DESC"
+msgid "The host has ended the game or returned to the menu."
+msgstr "Хост завершил игру или вернулся в меню."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM"
+msgid "Connection lost"
+msgstr "Соединение потеряно"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.LOCAL_PROBLEM_DESC"
+msgid "A network error occurred or the connection timed out."
+msgstr "Произошла сетевая ошибка или истекло время ожидания подключения."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.KICKED"
+msgid "Kicked from server"
+msgstr "Вас кикнули с сервера"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.KICKED_DESC"
+msgid "You were removed from the session."
+msgstr "Вы были удалены из сессии."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN"
+msgid "Disconnected"
+msgstr "Отключено"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.STEAMWORKS.UNKNOWN_DESC"
+msgid "An unknown network error occurred."
+msgstr "Произошла неизвестная сетевая ошибка."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED"
+msgid "Connection failed"
+msgstr "Ошибка подключения"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_FAILED_DESC"
+msgid "Could not establish a connection to the server."
+msgstr "Не удалось подключиться к серверу."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED"
+msgid "Connection rejected"
+msgstr "Подключение отклонено"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_REJECTED_DESC"
+msgid "The server refused the connection."
+msgstr "Сервер отклонил подключение."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR"
+msgid "Network error"
+msgstr "Сетевая ошибка"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.NETWORK_ERROR_DESC"
+msgid "A network error occurred."
+msgstr "Произошла сетевая ошибка."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT"
+msgid "Connection timed out"
+msgstr "Таймаут подключения"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_TIMED_OUT_DESC"
+msgid "The server did not respond in time."
+msgstr "Сервер не ответил вовремя."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED"
+msgid "Kicked from server"
+msgstr "Вас кикнули с сервера"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.KICKED_DESC"
+msgid "You were removed from the session."
+msgstr "Вы были удалены из сессии."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED"
+msgid "Server closed"
+msgstr "Сервер закрыт"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.SERVER_CLOSED_DESC"
+msgid "The host has stopped the server."
+msgstr "Хост остановил сервер."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE"
+msgid "Connection unstable"
+msgstr "Нестабильное соединение"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.CONNECTION_UNSTABLE_DESC"
+msgid "The connection quality was too poor to continue."
+msgstr "Качество соединения слишком низкое для продолжения."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN"
+msgid "Disconnected"
+msgstr "Отключено"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.RIPTIDE.UNKNOWN_DESC"
+msgid "An unknown network error occurred."
+msgstr "Произошла неизвестная сетевая ошибка."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED"
+msgid "Connection failed"
+msgstr "Ошибка подключения"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_FAILED_DESC"
+msgid "Could not establish a connection to the host."
+msgstr "Не удалось подключиться к хосту."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED"
+msgid "Connection rejected"
+msgstr "Подключение отклонено"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_REJECTED_DESC"
+msgid "The host refused the connection."
+msgstr "Хост отклонил подключение."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED"
+msgid "Host disconnected"
+msgstr "Хост отключился"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.HOST_DISCONNECTED_DESC"
+msgid "The host has closed the game or ended the session."
+msgstr "Хост закрыл игру или завершил сессию."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT"
+msgid "Connection timed out"
+msgstr "Таймаут подключения"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.CONNECTION_TIMED_OUT_DESC"
+msgid "Lost connection to the host. No response received."
+msgstr "Соединение с хостом потеряно. Ответ не получен."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.KICKED"
+msgid "Kicked from server"
+msgstr "Вас кикнули с сервера"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.KICKED_DESC"
+msgid "You were disconnected by the host."
+msgstr "Хост отключил вас."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN"
+msgid "Disconnected"
+msgstr "Отключено"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.LITENETLIB.UNKNOWN_DESC"
+msgid "Disconnected from host."
+msgstr "Отключено от хоста."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.MISSING_SAVE_FILE"
+msgid "Downloaded save file not found."
+msgstr "Загруженный файл сохранения не найден."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTING_TO_HOST"
+msgid "Connecting to {0}!"
+msgstr "Подключение к {0}!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.WAITING_FOR_PLAYER"
+msgid "Waiting for {0}..."
+msgstr "Ожидание {0}..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOADING_SAVE_FILE"
+msgid ""
+"Downloading Save File\n"
+"\n"
+"{0} {1}%\n"
+"({2}/{3} chunks)"
+msgstr ""
+"Загрузка сохранения\n"
+"\n"
+"{0} {1}%\n"
+"({2}/{3} чанков)"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.TCP_DOWNLOADING_SAVE_FILE"
+msgid ""
+"Downloading LAN Save File\n"
+"\n"
+"{0} {1}%\n"
+"({2} remaining)"
+msgstr ""
+"Загрузка LAN-сохранения\n"
+"\n"
+"{0} {1}%\n"
+"(осталось {2})"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.DOWNLOAD_COMPLETE"
+msgid ""
+"Download Complete!\n"
+"\n"
+"{0} 100%\n"
+"({1}/{2} chunks)\n"
+"\n"
+"Loading world..."
+msgstr ""
+"Загрузка завершена!\n"
+"\n"
+"{0} 100%\n"
+"({1}/{2} чанков)\n"
+"\n"
+"Загрузка мира..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.CONNECTION_FAILED"
+msgid "Failed to connect to host."
+msgstr "Не удалось подключиться к хосту."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_JITTER"
+msgid "Network jitter is elevated"
+msgstr "Повышенный сетевой джиттер"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_LATENCY"
+msgid "Latency is elevated"
+msgstr "Повышенная задержка"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_PACKETLOSS"
+msgid "Packet loss detected"
+msgstr "Обнаружена потеря пакетов"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.DEGRADED_SERVERPERFORMANCE"
+msgid "Server performance is reduced"
+msgstr "Производительность сервера снижена"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_JITTER"
+msgid "Network jitter is very high"
+msgstr "Очень высокий сетевой джиттер"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_LATENCY"
+msgid "Latency is very high"
+msgstr "Очень высокая задержка"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_PACKETLOSS"
+msgid "Severe packet loss detected"
+msgstr "Обнаружена серьёзная потеря пакетов"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_OVERLAY.CLIENT.NETWORKINDICATORS.BAD_SERVERPERFORMANCE"
+msgid "Server performance is critically low"
+msgstr "Критически низкая производительность сервера"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.HARDSYNC_INPROGRESS"
+msgid "Hard sync in progress!"
+msgstr "Выполняется жёсткая синхронизация!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.FINALIZING_SYNC"
+msgid ""
+"All players are ready!\n"
+"Please wait..."
+msgstr ""
+"Все игроки готовы!\n"
+"Пожалуйста, подождите..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.WAITING_FOR_PLAYERS_SYNC"
+msgid "Waiting for players ({0}/{1} ready)...\n"
+msgstr "Ожидание игроков ({0}/{1} готовы)...\n"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_PROGRESS"
+msgid "Client Sync Progress"
+msgstr "Прогресс синхронизации клиентов"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_PROGRESS"
+msgid "{0}: {1} {2}%"
+msgstr "{0}: {1} {2}%"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_CHUNK_SYNC_DATA"
+msgid "({0}/{1})"
+msgstr "({0}/{1})"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.CLIENT_SYNC_COMPLETE"
+msgid "[COMPLETE]"
+msgstr "[COMPLETE]"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.ALL_CLIENTS_SYNCED"
+msgid ""
+"ALL CLIENTS SYNCHRONIZED!\n"
+"WAITING FOR THEM TO LOAD!"
+msgstr ""
+"ВСЕ КЛИЕНТЫ СИНХРОНИЗИРОВАНЫ!\n"
+"ОЖИДАНИЕ ИХ ЗАГРУЗКИ!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_FILLED"
+msgid "|"
+msgstr "|"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR_EMPTY"
+msgid " "
+msgstr " "
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.PROGRESS_BAR"
+msgid "[{0}]"
+msgstr "[{0}]"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.READY"
+msgid "Ready"
+msgstr "Готов"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNREADY"
+msgid "Loading"
+msgstr "Загрузка"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.READYSTATE.UNKNOWN"
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_BASEGAME"
+msgid "Server requires Spaced Out, cannot join without SpacedOut active!"
+msgstr ""
+"Серверу требуется Spaced Out; нельзя подключиться без активного SpacedOut!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_SPACEDOUT"
+msgid "Server requires Base Game, cannot join with Spaced Out active!"
+msgstr ""
+"Серверу нужна базовая игра; нельзя подключиться с активным Spaced Out!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.DLCSYNC.WRONGDLC_LISTHEADER"
+msgid "Server requires the following DLCs which are not installed or active:"
+msgstr "Сервер требует следующие DLC, которые не установлены или не активны:"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TITLE"
+msgid "Mod Differences Detected!"
+msgstr "Обнаружены различия модов!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TEXT"
+msgid ""
+"The game you want to join has different mods active than you.\n"
+"Do you want to synchronize your mods?"
+msgstr ""
+"В игре, к которой вы хотите подключиться, активны другие моды.\n"
+"Синхронизировать ваши моды?"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TODISABLE"
+msgid "• {0} mods will be disabled"
+msgstr "• Будет отключено модов: {0}"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.TOENABLE"
+msgid "• {0} mods will be enabled"
+msgstr "• Будет включено модов: {0}"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.MISSING"
+msgid "• {0} mods are missing and will be subscribed to."
+msgstr "• Отсутствуют моды ({0}), на них будет оформлена подписка."
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CONFIRM_SYNC"
+msgid "Yes, synchronize my mods and restart"
+msgstr "Да, синхронизировать моды и перезапустить"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.DENY_SYNC"
+msgid "No, connect anyway"
+msgstr "Нет, всё равно подключиться"
+
+msgctxt "ONI_United.STRINGS.UI.MP_OVERLAY.SYNC.MODSYNC.CANCEL"
+msgid "No, go back to the main menu"
+msgstr "Нет, вернуться в главное меню"
+
+msgctxt "ONI_United.STRINGS.UI.WORK_IN_PROGRESS"
+msgid ""
+"This feature is currently not finished and will be made usable in a future "
+"update."
+msgstr ""
+"Эта функция пока не завершена и станет доступной в будущем обновлении."
+
+msgctxt "ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_PUBLIC"
+msgid "Public"
+msgstr "Публичное"
+
+msgctxt "ONI_United.STRINGS.UI.FRIENDSONLYMODE.LOBBY_VISIBILITY_FRIENDSONLY"
+msgid "Friends Only"
+msgstr "Только друзья"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.LINK_IN_CHAT.TEXT"
+msgid "Link in Chat"
+msgstr "Ссылка в чате"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.LINK_IN_CHAT.TOOLTIP"
+msgid "Links this object in the multiplayer chat window."
+msgstr "Добавляет ссылку на этот объект в окно сетевого чата."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TEXTINPUT.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Text..."
+msgstr "Введите текст..."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.LABEL"
+msgid "Chat"
+msgstr "Чат"
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.TOOLTIP"
+msgid "Toggle the Multiplayer: ONI United chat window."
+msgstr "Показать/скрыть окно чата Multiplayer: ONI United."
+
+msgctxt "ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.TEXT"
+msgid "Settings"
+msgstr "Настройки"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT.RESETPOS.LABEL"
+msgid "Reset Position"
+msgstr "Сбросить позицию"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_CHATBOX.TOPBAR.FILTERBUTTON.DROPDOWNCONTENT.RESETSIZE.LABEL"
+msgid "Reset Size"
+msgstr "Сбросить размер"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.HOSTINGTITLE"
+msgid "Hosting"
+msgstr "Хостинг"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.HOSTGAMEBUTTON.TEXT"
+msgid "Host Game"
+msgstr "Создать игру"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOININGTITLE"
+msgid "Joining"
+msgstr "Подключение"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.STEAM.TEXT"
+msgid "Steam"
+msgstr "Steam"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.CODE.TEXT"
+msgid "Code"
+msgstr "Код"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.JOINVIABUTTONS.LAN.TEXT"
+msgid "LAN"
+msgstr "LAN"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.STEAMJOIN.JOINVIASTEAM.TEXT"
+msgid "Join via Steam"
+msgstr "Войти через Steam"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.STEAMJOIN.OPENLOBBYLISTBUTTON.TEXT"
+msgid "Open Lobby Browser"
+msgstr "Открыть браузер лобби"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Lobby Code..."
+msgstr "Введите код лобби..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.INPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LOBBYCODEJOIN.JOINWITHCODEBUTTON.TEXT"
+msgid "Join with Code"
+msgstr "Войти по коду"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.IPINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter IP address..."
+msgstr "Введите IP-адрес..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.IPINPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.PORT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Port..."
+msgstr "Введите порт..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.INPUTS.PORT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.LANJOIN.JOINLANBUTTON.TEXT"
+msgid "Join LAN address"
+msgstr "Войти по LAN-адресу"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.MAINMENU.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.TITLE"
+msgid "Host Lobby Settings"
+msgstr "Настройки лобби хоста"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.HOSTVIABUTTONS.STEAM.TEXT"
+msgid "Steam Session"
+msgstr "Сессия Steam"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.HOSTVIABUTTONS.LAN.TEXT"
+msgid "LAN Session"
+msgstr "LAN-сессия"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LABEL"
+msgid "Lobby Size:"
+msgstr "Размер лобби:"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LOBBYSIZEINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Lobby Size..."
+msgstr "Введите размер лобби..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LOBBYSIZE.LOBBYSIZEINPUT.TEXTAREA.TEXT"
+msgid "4​"
+msgstr "4​"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.FRIENDSONLY.LABEL"
+msgid "Private Lobby:"
+msgstr "Приватное лобби:"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.FRIENDSONLY.STATE"
+msgid "Friends Only"
+msgstr "Только друзья"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORD.PASSWORDTITLE"
+msgid "Password (optional):"
+msgstr "Пароль (необязательно):"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORDINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Leave empty for no password"
+msgstr "Оставьте пустым, если пароль не нужен"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.STEAMHOSTING.PASSWORDINPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.LABEL"
+msgid "Host IP:"
+msgstr "IP хоста:"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter IP address..."
+msgstr "Введите IP-адрес..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.IPTARGET.INPUT.TEXTAREA.TEXT"
+msgid "127.0.0.1​"
+msgstr "127.0.0.1​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.LABEL"
+msgid "Port"
+msgstr "Порт"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter Port..."
+msgstr "Введите порт..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.LANHOSTING.PORT.INPUT.TEXTAREA.TEXT"
+msgid "8080​"
+msgstr "8080​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.ADDITIONALSETTINGS.TEXT"
+msgid "Additional Lobby Settings"
+msgstr "Дополнительные настройки лобби"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.BUTTONS.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.HOSTMENU.BUTTONS.STARTHOSTING.TEXT"
+msgid "Start Hosting"
+msgstr "Начать хостинг"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.TITLE"
+msgid "Public Lobby Browser"
+msgstr "Браузер публичных лобби"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SEARCHBAR.INPUT.TEXTAREA.PLACEHOLDER"
+msgid "Search Lobbies..."
+msgstr "Поиск лобби..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SEARCHBAR.INPUT.TEXTAREA.TEXT"
+msgid "​"
+msgstr "​"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.WORLD"
+msgid "World Name"
+msgstr "Название мира"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.HOST"
+msgid "Host"
+msgstr "Хост"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.PLAYERS"
+msgid "Players"
+msgstr "Игроки"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.CYCLE"
+msgid "Cycle"
+msgstr "Цикл"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.DUPES"
+msgid "Dupes"
+msgstr "Дубликанты"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.INFO.PING"
+msgid "Ping"
+msgstr "Пинг"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SCROLLAREA.CONTENT.NOLOBBIES.LABEL"
+msgid "No public lobbies found. Try hosting your own!"
+msgstr "Публичные лобби не найдены. Попробуйте создать своё!"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_SCREEN.LOBBYLIST.SCROLLAREA.CONTENT.ENTRYPREFAB.JOINLOBBYBUTTON.TEXT"
+msgid "Join"
+msgstr "Войти"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.TOPBAR.LABEL"
+msgid "Multiplayer"
+msgstr "Мультиплеер"
+
+msgctxt "ONI_United.STRINGS.UI.MP_SCREEN.ADDITIONALHOSTSETTINGS.TITLE"
+msgid "Additional Lobby Settings"
+msgstr "Дополнительные настройки лобби"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.TITLE"
+msgid "Password Required!"
+msgstr "Требуется пароль!"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDTITLE"
+msgid "Enter password of Lobby:"
+msgstr "Введите пароль лобби:"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORD_INCORRECT"
+msgid "Incorrect password!"
+msgstr "Неверный пароль!"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDINPUT.TEXTAREA.PLACEHOLDER"
+msgid "Enter lobby password..."
+msgstr "Введите пароль лобби..."
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.PASSWORDINPUT.TEXTAREA.TEXT"
+msgid ""
+msgstr ""
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS.CANCEL.TEXT"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt ""
+"ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.HOSTMENU.BUTTONS.CONFIRM.TEXT"
+msgid "Confirm"
+msgstr "Подтвердить"
+
+msgctxt "ONI_United.STRINGS.UI.MP_PASSWORD_DIALOGUE.TOPBAR.LABEL"
+msgid "Joining password protected lobby"
+msgstr "Подключение к лобби с паролем"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.TOPBAR.LABEL"
+msgid "Multiplayer Session"
+msgstr "Сетевая сессия"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.LOBBYCODETITLE"
+msgid "Lobby Code:"
+msgstr "Код лобби:"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.INVITEFRIENDS.TEXT"
+msgid "Invite Friends"
+msgstr "Пригласить друзей"
+
+msgctxt "ONI_United.STRINGS.UI.MP_LOBBY_STATE_DIALOGUE.ENDSESSION.TEXT"
+msgid "End Session"
+msgstr "Завершить сессию"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.OBJECTS.NAME"
+msgid "Objects"
+msgstr "Объекты"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.OBJECTS.TOOLTIP"
+msgid "Show/hide all objects with network activity"
+msgstr "Показать/скрыть все объекты с сетевой активностью"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.VIEWPORTS.NAME"
+msgid "Viewports"
+msgstr "Области просмотра"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.VIEWPORTS.TOOLTIP"
+msgid "Show/hide other players' camera viewports"
+msgstr "Показать/скрыть области камеры других игроков"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.GROUPS.NAME"
+msgid "Interest Groups"
+msgstr "Группы интереса"
+
+msgctxt "ONI_United.STRINGS.UI.TOOLS.FILTERLAYERS.GROUPS.TOOLTIP"
+msgid "Show/hide network interest group regions"
+msgstr "Показать/скрыть области сетевых групп интереса"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.NAME"
+msgid "Network Activity"
+msgstr "Сетевая активность"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.DESCRIPTION"
+msgid "Shows real-time network sync activity per object"
+msgstr ""
+"Показывает активность сетевой синхронизации объектов в реальном времени"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.BUTTON"
+msgid "Network"
+msgstr "Сеть"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.TOOLTIP"
+msgid "Displays network activity per object"
+msgstr "Показывает сетевую активность объектов"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_TOOLTIP"
+msgid ""
+"Usage: {0}\n"
+"Net ID: {1}\n"
+"Sync Mode: {2}\n"
+"Last synced: {3}"
+msgstr ""
+"Использование: {0}\n"
+"ID сети: {1}\n"
+"Режим синхр.: {2}\n"
+"Последняя синхр.: {3}"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_HIGH"
+msgid "High ({0}/s)"
+msgstr "Высокая ({0}/с)"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_MEDIUM"
+msgid "Medium ({0}/s)"
+msgstr "Средняя ({0}/с)"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_LOW"
+msgid "Low ({0}/s)"
+msgstr "Низкая ({0}/с)"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.HOVER_IDLE"
+msgid "Idle (No activity)"
+msgstr "Простой (нет активности)"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_OXYSYNC"
+msgid "OxySync"
+msgstr "OxySync"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.SYNC_MODE_ADHOC"
+msgid "Ad-hoc"
+msgstr "Ad-hoc"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NOW"
+msgid "just now"
+msgstr "только что"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_SECS"
+msgid "{0}s ago"
+msgstr "{0} с назад"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_MINS"
+msgid "{0}m ago"
+msgstr "{0} мин назад"
+
+msgctxt "ONI_United.STRINGS.UI.OVERLAYS.NETWORKACTIVITY.LAST_SYNCED_NEVER"
+msgid "never"
+msgstr "никогда"

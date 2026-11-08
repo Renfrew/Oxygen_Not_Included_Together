@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using ONI_Together.Networking.Packets.Architecture;
 
 namespace Shared.Interfaces.Networking
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ONI_Together.Networking
+namespace Shared.Interfaces.Networking
 {
     /// <summary>
     /// Describes how a packet should be delivered across the network.
