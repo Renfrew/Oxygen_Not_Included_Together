@@ -1,7 +1,7 @@
-using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports.LiteNetLib;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.Drivers
+namespace ONI_United.Networking.Transports.Drivers
 {
     public class LiteNetLibTransport : ITransport
     {

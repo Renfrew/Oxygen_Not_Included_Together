@@ -18,9 +18,9 @@ using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.LiteNetLib
+namespace ONI_United.Networking.Transports.LiteNetLib
 {
     public class LiteNetLibClient : TransportClient
     {

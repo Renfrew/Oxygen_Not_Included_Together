@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using ONI_United.Core;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.Steamworks;
 using Steamworks;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
@@ -14,17 +14,17 @@ namespace Shared.Tests.Networking;
 public sealed class LiveSteamClientTests : IDisposable
 {
     private readonly Lifecycle machine = new();
-    private readonly SteamworksClient client = new();
+    private readonly SteamworksClientLegacy client = new();
     private int established, ended;
     public LiveSteamClientTests()
     {
         Reset(); Invoke("Awake"); Lifecycle.Initialize();
-        SteamManager.Initialized = true; SteamLobby.InLobby = true;
+        SteamManager.Initialized = true; SteamLobbyFixture.SetCurrentLobby(1);
         MultiplayerSession.HostUserID = 20;
         SteamNetworkingSockets.Connections.Clear(); SteamNetworkingSockets.CloseFailures.Clear();
         SteamNetworkingSockets.PendingCallbacks.Clear();
         SteamNetworkingSockets.ConnectFails = SteamNetworkingSockets.ConnectThrows = false;
-        NetworkRuntime.TransportClient = client;
+        NetworkRuntime.UseTestClient(client);
         client.OnClientConnected = () =>
         {
             established++;
@@ -38,13 +38,13 @@ public sealed class LiveSteamClientTests : IDisposable
     public void Dispose()
     {
         SteamNetworkingSockets.CloseFailures.Clear(); client.TryStop(out _);
-        Session.Reset(); Invoke("OnDestroy"); SteamLobby.InLobby = false;
-        NetworkRuntime.TransportClient = new NetworkRuntime.TestClient();
+        Session.Reset(); Invoke("OnDestroy"); SteamLobbyFixture.SetCurrentLobby(0);
+        NetworkRuntime.UseTestClient(new NetworkRuntime.TestClient());
     }
     private HSteamNetConnection Connect()
     {
         Assert.True(NetworkRuntime.ConnectClient());
-        return SteamworksClient.Connection.Value;
+        return SteamworksClientLegacy.Connection.Value;
     }
     private void Notify(HSteamNetConnection handle, ESteamNetworkingConnectionState state)
     {
@@ -70,7 +70,7 @@ public sealed class LiveSteamClientTests : IDisposable
     {
         var handle = Connect(); SteamNetworkingSockets.CloseFailures.Add(handle);
         NetworkRuntime.DisconnectClient();
-        Assert.Equal(handle, SteamworksClient.Connection);
+        Assert.Equal(handle, SteamworksClientLegacy.Connection);
         Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Lifecycle.CanSelectTransport);
         Assert.False(Lifecycle.Handle(Lifecycle.Event.StartHost));
@@ -78,7 +78,7 @@ public sealed class LiveSteamClientTests : IDisposable
         Notify(handle, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Assert.Equal(0, established);
         SteamNetworkingSockets.CloseFailures.Clear(); NetworkRuntime.DisconnectClient();
-        Assert.Null(SteamworksClient.Connection);
+        Assert.Null(SteamworksClientLegacy.Connection);
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
     }
@@ -90,7 +90,7 @@ public sealed class LiveSteamClientTests : IDisposable
         var current = Connect();
         Notify(old, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Notify(old, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
-        Assert.Equal(current, SteamworksClient.Connection); Assert.Equal(0, ended); Assert.Equal(0, established);
+        Assert.Equal(current, SteamworksClientLegacy.Connection); Assert.Equal(0, ended); Assert.Equal(0, established);
         Notify(current, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Assert.Equal(1, established);
     }
@@ -107,7 +107,7 @@ public sealed class LiveSteamClientTests : IDisposable
         Callback<SteamNetConnectionStatusChangedCallback_t>.Dispatch(new() { m_hConn = handle, m_info = queued });
         Assert.Equal(0, established);
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
-        Assert.Null(SteamworksClient.Connection);
+        Assert.Null(SteamworksClientLegacy.Connection);
     }
 
     [Fact]
@@ -122,6 +122,6 @@ public sealed class LiveSteamClientTests : IDisposable
         Assert.True(Lifecycle.Handle(Lifecycle.Event.ClientAdmitted));
         Notify(admitted, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
         Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
-        Assert.False(Session.IsActive); Assert.Null(SteamworksClient.Connection);
+        Assert.False(Session.IsActive); Assert.Null(SteamworksClientLegacy.Connection);
     }
 }

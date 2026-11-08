@@ -5,6 +5,22 @@ using ONI_United.Networking.Sessions;
 
 namespace Shared.Tests.Networking
 {
+    internal static class TransportTestAccess
+    {
+        private static readonly System.Reflection.MethodInfo TryGetConnection =
+            typeof(ONI_United.Networking.Transports.Transport).GetMethod(
+                "TryGetConnection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+
+        internal static bool TryGetTestConnection(this ONI_United.Networking.Transports.Transport transport,
+            ulong playerId, out object connection)
+        {
+            object[] arguments = [playerId, null];
+            bool found = (bool)TryGetConnection.Invoke(transport, arguments);
+            connection = arguments[1];
+            return found;
+        }
+    }
+
     internal static class LifecycleTestEnvironment
     {
         internal static readonly List<string> Trace = new();
@@ -16,13 +32,13 @@ namespace Shared.Tests.Networking
         {
             Trace.Clear(); Registered = null; Clearing = null; PreparingClient = null;
             RegistrationSucceeds = true; Session.Reset();
-            ONI_United.Core.NetworkRuntime.TransportServer = new ONI_United.Core.NetworkRuntime.TestServer();
-            ONI_United.Core.NetworkRuntime.TransportClient = new ONI_United.Core.NetworkRuntime.TestClient();
+            ONI_United.Core.NetworkRuntime.UseTestServer(new ONI_United.Core.NetworkRuntime.TestServer());
+            ONI_United.Core.NetworkRuntime.UseTestClient(new ONI_United.Core.NetworkRuntime.TestClient());
             LoadedWorld = true;
             ONI_United.Networking.Runtime.GameClient.ResetSynchronizationState();
             Coroutines.Clear();
             ScheduledLoads.Clear();
-            ONI_United.Core.NetworkRuntime.ServerCapacity = 16;
+            ONI_United.Configuration.Instance.Host.MaxLobbySize = 16;
 
         }
         internal static bool LoadedWorld = true;
@@ -41,11 +57,22 @@ namespace UnityEngine
 }
 namespace ONI_United.DebugTools
 {
+    public static class ModLog
+    {
+        public static void Trace(string message) => DebugConsole.Log(message);
+        public static void Debug(string message) => DebugConsole.Log(message);
+        public static void Info(string message) => DebugConsole.Log(message);
+        public static void Warning(string message) => DebugConsole.LogWarning(message);
+        public static void Error(string message, bool triggerErrorScreen = false) => DebugConsole.LogError(message);
+        public static void Exception(Exception exception) => Error(exception?.ToString() ?? "Unknown exception");
+    }
+
     public static class DebugConsole
     {
         public static void Log(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
         public static void LogWarning(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
-        public static void LogError(string text) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
+        public static void LogException(Exception exception) => LogError(exception.ToString());
+        public static void LogError(string text, bool triggerErrorScreen = false) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(text);
     }
 }
 namespace ONI_United.Misc
@@ -104,6 +131,13 @@ namespace ONI_United.Networking.Runtime
 {
     public static partial class GameClient
     {
+        public static void BeginConnection(bool showLoadingScreen, string ip, int port)
+        {
+            var client = Core.NetworkRuntime.TransportClient;
+            client.Prepare();
+            client.StartConnection(ip, port);
+        }
+
         public static void PrepareSession()
         {
             Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("client:prepare:" + Core.Lifecycle.Current);
@@ -141,13 +175,12 @@ namespace ONI_United.Networking.Sessions
 }
 namespace ONI_United.Core
 {
-    public sealed partial class NetworkRuntime
+    public partial class NetworkRuntime
     {
-        public static Networking.Transport.TransportServer TransportServer;
-        public static bool IsSteam => false;
-        public static readonly TestSender TransportPacketSender = new();
-        public static Networking.Transport.TransportClient TransportClient = new TestClient();
-        public sealed class TestClient : Networking.Transport.TransportClient
+        internal static void UseTestServer(Networking.Transports.TransportServer server) => TransportServer = server;
+        internal static void UseTestClient(Networking.Transports.TransportClient client) => TransportClient = client;
+
+        public sealed class TestClient : Networking.Transports.TransportClient
         {
             public bool CleanupSucceeds = true;
             public int CleanupAttempts;
@@ -169,7 +202,7 @@ namespace ONI_United.Core
             public override UI.Screens.NetworkIndicatorsScreen.NetworkState GetPacketlossState() => default;
             public override UI.Screens.NetworkIndicatorsScreen.NetworkState GetServerPerformanceState() => default;
         }
-        public sealed class TestServer : Networking.Transport.TransportServer
+        public sealed class TestServer : Networking.Transports.TransportServer
         {
             protected override void StartProtocol() { }
             protected override void CancelProtocol(Action<bool, string> completed) => completed(true, null);
@@ -181,40 +214,7 @@ namespace ONI_United.Core
             public override void OnMessageRecieved() { }
             public override void KickClient(ulong id) { }
         }
-        public sealed class TestSender { public void ClearPending() { } }
-        internal static int ServerCapacity = 16;
-        public static int GetMaxServerCapacity() => ServerCapacity;
-        public static class PingRanges { public static readonly int DEGRADED = 120, BAD = 150; }
-        internal static void StartHostTransport() => TransportServer.Start();
-        public static void StartServer() => Lifecycle.Handle(Lifecycle.Event.StartHost);
-        public static void StopHost() => Lifecycle.Handle(Lifecycle.Event.ClearHostSession, TransportServer.Stop);
-        public static void Stop()
-        {
-            if (Session.IsHost || Lifecycle.Current == Lifecycle.Phase.StartingHost)
-                StopHost();
-            else DisconnectClient();
-        }
-        public static void DisconnectClient() => Lifecycle.Handle(Lifecycle.Event.ClearClientSession, () =>
-        {
-            if (!TransportClient.TryStop(out _)) return;
-            Lifecycle.Handle(Lifecycle.Event.SessionCleared);
-        });
-        internal static void TransportEstablished(Networking.Transport.TransportClient owner)
-        {
-            if (ReferenceEquals(owner, TransportClient))
-                Lifecycle.Handle(Lifecycle.Event.PrepareClientSession);
-        }
-        internal static bool ClientAdmitted(Networking.Transport.TransportClient owner) =>
-            ReferenceEquals(owner, TransportClient) && Lifecycle.Handle(Lifecycle.Event.ClientAdmitted);
-        // Connection setup substitute; production native clients are not linked.
-        public static bool ConnectClient(bool showLoadingScreen = true, string ip = "", int port = 7777) =>
-            Lifecycle.Handle(Lifecycle.Event.Join, () =>
-            {
-                var client = TransportClient;
-                client.Prepare(); client.StartConnection(ip, port);
-            });
-        public static void ReconnectClient() => throw new NotSupportedException("Production facade is not linked.");
-        public static void InitializeHostTick() => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add("tick:start");
+
     }
 }
 public sealed class SpeedControlScreen
@@ -222,4 +222,24 @@ public sealed class SpeedControlScreen
     public static readonly SpeedControlScreen Instance = new();
     public void Pause(bool pause) => Shared.Tests.Networking.LifecycleTestEnvironment.Trace.Add(
         $"pause:{ONI_United.Core.Lifecycle.Current}:{pause}");
+}
+
+
+namespace ONI_United.Networking.Replication.Components
+{
+    internal static class OxySyncChat
+    {
+        internal static void AddSystemMessage(string message) { }
+    }
+}
+namespace ONI_United.Networking.Transfer
+{
+    public sealed class TcpFileTransferServer
+    {
+        public bool IsRunning { get; private set; }
+        public bool IsStopped => !IsRunning;
+        public string CleanupFailure => null;
+        public void Start(int lanPort) => IsRunning = true;
+        public void Stop() => IsRunning = false;
+    }
 }

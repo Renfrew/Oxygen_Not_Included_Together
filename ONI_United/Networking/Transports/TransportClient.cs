@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ONI_United.UI.Screens.NetworkIndicatorsScreen;
 
-namespace ONI_United.Networking.Transport
+namespace ONI_United.Networking.Transports
 {
     public abstract class TransportClient
     {

@@ -3,7 +3,7 @@ using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.Networking.Transports.LiteNetLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;

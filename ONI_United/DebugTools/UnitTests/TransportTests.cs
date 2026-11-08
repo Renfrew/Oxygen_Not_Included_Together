@@ -1,7 +1,7 @@
 using ONI_United.Core;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.LiteNetLib;
+using ONI_United.Networking.Transports.Steamworks;
 
 namespace ONI_United.DebugTools.UnitTests
 {
@@ -20,9 +20,9 @@ namespace ONI_United.DebugTools.UnitTests
 
 			if (NetworkRuntime.IsSteam)
 			{
-				if (server is not SteamworksServer)
+				if (server is not SteamworksServerLegacy)
 					return UnitTestResult.Fail($"transport=STEAMWORKS but server is {server.GetType().Name}");
-				if (client is not SteamworksClient)
+				if (client is not SteamworksClientLegacy)
 					return UnitTestResult.Fail($"transport=STEAMWORKS but client is {client.GetType().Name}");
 				return UnitTestResult.Pass("STEAMWORKS config matches SteamworksServer/SteamworksClient");
 			}

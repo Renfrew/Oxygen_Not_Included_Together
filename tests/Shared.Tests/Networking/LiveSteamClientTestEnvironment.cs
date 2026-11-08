@@ -18,8 +18,20 @@ namespace ONI_United.Networking.Packets.Architecture
 {
     internal static class PacketHandler
     {
+        internal static ulong? CurrentSenderPlayerId { get; private set; }
+        internal static object CurrentPhysicalConnection { get; private set; }
         internal static Action OnIncoming;
-        internal static void HandleIncoming(byte[] bytes, ulong? sender, object connection) => OnIncoming?.Invoke();
+        internal static void HandleIncoming(byte[] bytes, ulong? sender, object connection)
+        {
+            CurrentSenderPlayerId = sender;
+            CurrentPhysicalConnection = connection;
+            try { OnIncoming?.Invoke(); }
+            finally
+            {
+                CurrentSenderPlayerId = null;
+                CurrentPhysicalConnection = null;
+            }
+        }
     }
 }
 namespace ONI_United

@@ -3,7 +3,7 @@ using ONI_United.DebugTools;
 using ONI_United.Networking.Sessions;
 using ONI_United.Core;
 
-namespace ONI_United.Networking.Transport
+namespace ONI_United.Networking.Transports
 {
     public abstract class TransportServer
     {

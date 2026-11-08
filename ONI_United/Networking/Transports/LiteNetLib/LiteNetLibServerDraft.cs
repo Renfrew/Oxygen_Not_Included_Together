@@ -8,8 +8,9 @@ using LiteNetLib;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Sessions;
+using Shared.Interfaces.Networking;
 
-namespace ONI_United.Networking.Transport.LiteNetLib
+namespace ONI_United.Networking.Transports.LiteNetLib
 {
     internal sealed class LiteNetLibServerDraft : ServerTransport
     {
@@ -132,16 +133,27 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             if (!physicalPeers.TryGetValue(peer, out ulong clientId)
                 || peer.ConnectionState != ConnectionState.Connected)
                 return;
+            byte[] data = reader.GetRemainingBytes();
             if (TryGetConnection(clientId, out var admitted) && ReferenceEquals(admitted, peer))
-                return; // No gameplay receiving/dispatch in this increment.
+            {
+                try
+                {
+                    Transport.Receive(clientId, peer, data);
+                }
+                catch (Exception ex)
+                {
+                    DebugConsole.LogWarning("[LiteNetLibServerDraft] Rejected packet from " + clientId + ": " + ex);
+                }
+                return;
+            }
 
             try
             {
-                if (reader.AvailableBytes < sizeof(int) || reader.AvailableBytes > 2048)
+                if (data.Length < sizeof(int) || data.Length > 2048)
                     throw new InvalidDataException("Invalid LAN hello size.");
 
                 // TODO redesign
-                using var stream = new MemoryStream(reader.GetRemainingBytes());
+                using var stream = new MemoryStream(data);
                 using var binary = new BinaryReader(stream);
                 var hello = new SessionHandshakePacket();
                 if (binary.ReadInt32() != PacketRegistry.GetPacketId(hello))
@@ -166,7 +178,8 @@ namespace ONI_United.Networking.Transport.LiteNetLib
                 // This is a handshake response only, using the unchanged packet serializer.
                 var welcome = SessionHandshakePacket.CreateWelcome(clientId, Session.HostPlayerId,
                     Session.Players[Session.HostPlayerId].UserName);
-                peer.Send(PacketSerialization.Serialize(welcome), DeliveryMethod.ReliableOrdered);
+                if (!Transport.Send(peer, PacketSerialization.Serialize(welcome), PacketSendMode.ReliableImmediate))
+                    throw new InvalidOperationException("The session welcome could not be sent.");
             }
             catch (Exception ex)
             {

@@ -2,7 +2,7 @@
 using Shared.Profiling;
 using Steamworks;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
 	public static class SteamRichPresence
 	{

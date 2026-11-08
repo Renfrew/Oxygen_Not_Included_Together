@@ -6,7 +6,7 @@ using UnityEngine;
 using Shared.Interfaces.Networking;
 using ONI_United;
 
-namespace ONI_United.Networking.Transport
+namespace ONI_United.Networking.Transports
 {
     public abstract class TransportPacketSender
     {

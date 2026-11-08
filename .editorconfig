@@ -18,3 +18,7 @@ dotnet_style_prefer_collection_expression = when_types_exactly_match:suggestion
 
 # Prefer target-typed new when the type is already known
 csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+
+# manage using directives
+dotnet_sort_system_directives_first = true:suggestion
+dotnet_separate_import_directive_groups = false:suggestion

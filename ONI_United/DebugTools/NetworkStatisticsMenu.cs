@@ -4,12 +4,12 @@ using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions.States;
-using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.Networking.Transports.LiteNetLib;
 using Steamworks;
 using System;
 using Shared.Profiling;
 using UnityEngine;
-using SteamworksClient = ONI_United.Networking.Transport.Steamworks.SteamworksClient;
+using SteamworksClientLegacy = ONI_United.Networking.Transports.Steamworks.SteamworksClientLegacy;
 
 namespace ONI_United.DebugTools
 {
@@ -76,8 +76,8 @@ namespace ONI_United.DebugTools
 			}
 			else if (NetworkRuntime.IsSteam)
 			{
-				qualityL = SteamworksClient.GetLocalPacketQuality();
-				qualityR = SteamworksClient.GetRemotePacketQuality();
+				qualityL = SteamworksClientLegacy.GetLocalPacketQuality();
+				qualityR = SteamworksClientLegacy.GetRemotePacketQuality();
 			}
 
 			GUILayout.Label($"Ping: {ping}");

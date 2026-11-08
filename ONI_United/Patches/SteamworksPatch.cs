@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using ONI_United.DebugTools;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.Steamworks;
 using Shared.Profiling;
 
 namespace ONI_United.Patches

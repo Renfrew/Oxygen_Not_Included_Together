@@ -4,15 +4,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ClipperLib;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using Steamworks;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
     public class SteamworksPacketSender : TransportPacketSender
     {

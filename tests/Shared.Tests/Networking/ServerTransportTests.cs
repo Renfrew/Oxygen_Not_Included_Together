@@ -2,7 +2,7 @@
 using System.Reflection;
 using ONI_United.Core;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
 
@@ -27,7 +27,7 @@ public sealed class ServerTransportTests : IDisposable
 
         var handle = new object();
         Assert.True(server.ConnectionEstablished(20, " Remote Steam user ", handle));
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Same(handle, registered);
 
         var player = Assert.IsType<Player>(Session.Players[20]);
@@ -48,7 +48,7 @@ public sealed class ServerTransportTests : IDisposable
 
         Assert.False(server.ConnectionEstablished(id, name, new object()));
         Assert.Single(Session.Players);
-        Assert.False(server.TryGetConnection(id, out _));
+        Assert.False(server.TryGetTestConnection(id, out _));
     }
 
     [Fact]
@@ -61,10 +61,10 @@ public sealed class ServerTransportTests : IDisposable
         Assert.False(server.ConnectionEstablished(20, "Replacement", new object()));
         Assert.Same(original, Session.Players[20]);
 
-        NetworkRuntime.ServerCapacity = 2;
+        ONI_United.Configuration.Instance.Host.MaxLobbySize = 2;
         Assert.False(server.ConnectionEstablished(30, "Over capacity", new object()));
         Assert.False(Session.Players.ContainsKey(30));
-        Assert.False(server.TryGetConnection(30, out _));
+        Assert.False(server.TryGetTestConnection(30, out _));
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class ServerTransportTests : IDisposable
         Assert.True(server.Disconnected(20, handle));
         Assert.False(server.Disconnected(20, handle));
         Assert.False(server.Disconnected(Session.HostPlayerId, handle));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.False(Session.Players.ContainsKey(20));
         Assert.Single(Session.Players);
         Assert.True(Session.Players.ContainsKey(Session.HostPlayerId));
@@ -123,7 +123,7 @@ public sealed class ServerTransportTests : IDisposable
 
         Assert.Single(Session.Players);
         Assert.False(Session.Players.ContainsKey(20));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public sealed class ServerTransportTests : IDisposable
         Assert.False(server.Disconnected(20, duplicate));
         Assert.False(server.Disconnected(20, null));
 
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Same(handle, registered);
         Assert.Same(member, Session.Players[20]);
     }
@@ -157,13 +157,13 @@ public sealed class ServerTransportTests : IDisposable
         Assert.NotSame(old, current);
         Assert.True(server.ConnectionEstablished(20, "First", old));
         Assert.True(server.Disconnected(20, old));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.False(Session.Players.ContainsKey(20));
 
         Assert.True(server.ConnectionEstablished(20, "Reconnected", current));
         var member = Session.Players[20];
         Assert.False(server.Disconnected(20, old));
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Same(current, registered);
         Assert.Same(member, Session.Players[20]);
     }
@@ -179,10 +179,10 @@ public sealed class ServerTransportTests : IDisposable
         Assert.True(server.ConnectionEstablished(20, "Steam player", admitted));
 
         Assert.False(server.Disconnected(20, otherHandle));
-        Assert.True(server.TryGetConnection(20, out var current));
+        Assert.True(server.TryGetTestConnection(20, out var current));
         Assert.Same(admitted, current);
         Assert.True(server.Disconnected(20, sameHandle));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.False(Session.Players.ContainsKey(20));
         Assert.False(server.Disconnected(20, sameHandle));
     }
@@ -198,7 +198,7 @@ public sealed class ServerTransportTests : IDisposable
         var original = Session.Players[20];
         Assert.False(Session.TryAdmitPlayer(20, "Duplicate"));
         Assert.Same(original, Session.Players[20]);
-        NetworkRuntime.ServerCapacity = 2;
+        ONI_United.Configuration.Instance.Host.MaxLobbySize = 2;
         Assert.False(Session.TryAdmitPlayer(30, "Over capacity"));
         Assert.Equal(2, Session.Players.Count);
     }

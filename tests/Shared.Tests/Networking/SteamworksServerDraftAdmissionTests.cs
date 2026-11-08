@@ -3,7 +3,7 @@ using System.Collections;
 using System.Reflection;
 using ONI_United.Core;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.Steamworks;
 using Steamworks;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
@@ -14,8 +14,8 @@ namespace Shared.Tests.Networking;
 public sealed class SteamworksServerDraftAdmissionTests : IDisposable
 {
     private readonly Lifecycle machine = new();
-    private readonly SteamworksServerDraft server = new();
-    private IDictionary Connections => (IDictionary)typeof(SteamworksServerDraft)
+    private readonly SteamworksServer server = new();
+    private IDictionary Connections => (IDictionary)typeof(SteamworksServer)
         .GetField("physicalConnections", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(server);
     private void Invoke(string name) => typeof(Lifecycle)
         .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(machine, null);
@@ -24,7 +24,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
     {
         Reset();
         SteamManager.Initialized = true;
-        SteamLobby.InLobby = false;
+        SteamLobbyFixture.SetCurrentLobby(0);
         SteamNetworkingSockets.Connections.Clear();
         SteamNetworkingSockets.CloseFailures.Clear();
         SteamNetworkingSockets.Closed.Clear();
@@ -71,7 +71,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
     public void ConnectedAdmitsRemoteSteamIdentityAndPersonaName()
     {
         var handle = Connect();
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Equal(handle, Assert.IsType<HSteamNetConnection>(registered));
         var player = Assert.IsType<Player>(Session.Players[20]);
         Assert.Equal("Remote Steam user", player.UserName);
@@ -84,13 +84,13 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         var handle = Connect(complete: false);
         Assert.True(Connections.Contains(handle));
         Assert.False(Session.Players.ContainsKey(20));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
 
         Notify(handle, 20, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         var member = Session.Players[20];
         Notify(handle, 20, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected);
         Assert.Same(member, Session.Players[20]);
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Equal(handle, Assert.IsType<HSteamNetConnection>(registered));
     }
 
@@ -102,7 +102,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         var old = Connect(name: name);
         Assert.Single(Session.Players);
         Assert.Empty(Connections);
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.Equal(new CSteamID(20), SteamFriends.LastRequestedIdentity);
 
         SteamFriends.Names[new(20)] = "Cached remote name";
@@ -127,7 +127,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         Notify(rejected, 20, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
         Assert.Same(original, Session.Players[20]);
         Assert.False(Connections.Contains(rejected));
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Equal(originalHandle, Assert.IsType<HSteamNetConnection>(registered));
     }
 
@@ -142,7 +142,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         Notify(old, 20, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally);
         Assert.Same(player, Session.Players[20]);
         Assert.True(Connections.Contains(current));
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Equal(current, Assert.IsType<HSteamNetConnection>(registered));
     }
 
@@ -155,7 +155,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         Assert.Same(existing, Session.Players[20]);
         Assert.Empty(Connections);
         Assert.Contains(rejected, SteamNetworkingSockets.Closed);
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         SteamNetworkingSockets.CloseFailures.Add(handle);
         Notify(handle, 20, ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer);
         Assert.False(Session.Players.ContainsKey(20));
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.True(Connections.Contains(handle));
 
         Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
@@ -183,12 +183,12 @@ public sealed class SteamworksServerDraftAdmissionTests : IDisposable
         Lifecycle.Handle(Lifecycle.Event.ClearHostSession, server.Stop);
         Assert.Empty(Session.Players);
         Assert.Empty(Connections);
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
         Assert.Equal(0, Callback<SteamNetConnectionStatusChangedCallback_t>.Count);
         Lifecycle.Handle(Lifecycle.Event.StartHost, server.Start);
         var current = Connect(2);
         Assert.True(Session.Players.ContainsKey(20));
-        Assert.True(server.TryGetConnection(20, out var registered));
+        Assert.True(server.TryGetTestConnection(20, out var registered));
         Assert.Equal(current, Assert.IsType<HSteamNetConnection>(registered));
     }
 }

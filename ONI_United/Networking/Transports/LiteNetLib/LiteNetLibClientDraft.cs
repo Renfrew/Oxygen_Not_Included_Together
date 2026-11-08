@@ -1,21 +1,22 @@
-// INACTIVE MIGRATION DRAFT: never constructed or selected by production.
-// Lifecycle authorizes Connect, Disconnect and Poll before they reach this protocol.
 using System;
 using System.IO;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using ONI_United.Core;
+using ONI_United.DebugTools;
 using ONI_United.Misc;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Sessions;
+using Shared.Interfaces.Networking;
 
-namespace ONI_United.Networking.Transport.LiteNetLib
+namespace ONI_United.Networking.Transports.LiteNetLib
 {
     internal sealed class LiteNetLibClientDraft : ClientTransport
     {
         private NetManager client;
         private EventBasedNetListener listener;
         private bool connected;
+        private ulong hostId;
 
         protected override void InternalConnect()
         {
@@ -64,15 +65,28 @@ namespace ONI_United.Networking.Transport.LiteNetLib
         private void OnPeerConnected(NetPeer peer)
         {
             var hello = SessionHandshakePacket.CreateClientHello(NetworkRuntime.GetLocalID(), Utils.GetLocalPlayerName());
-            peer.Send(PacketSerialization.Serialize(hello), DeliveryMethod.ReliableOrdered);
+            if (Transport.Send(peer, PacketSerialization.Serialize(hello), PacketSendMode.ReliableImmediate))
+                return;
+
+            Cleanup();
+            OnConnectFail("The session hello could not be sent to the host.");
         }
 
         private void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod method)
         {
-            // Gameplay dispatch awaits integration: PacketHandler authorizes against the legacy
-            // NetworkRuntime.TransportClient, which cannot own this draft.
+            // After the Welcome, everything from the host goes through the shared inbound path.
             if (connected)
+            {
+                try
+                {
+                    Transport.Receive(hostId, peer, reader.GetRemainingBytes());
+                }
+                catch (Exception ex)
+                {
+                    DebugConsole.LogWarning($"[LiteNetLibClientDraft] Failed to handle incoming packet: {ex}");
+                }
                 return;
+            }
 
             var welcome = new SessionHandshakePacket();
             try
@@ -95,6 +109,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             }
 
             connected = true;
+            hostId = welcome.HostPlayerId;
             OnConnected(welcome.HostPlayerId, welcome.PlayerName);
         }
 
@@ -120,6 +135,7 @@ namespace ONI_United.Networking.Transport.LiteNetLib
             client = null;
             listener = null;
             connected = false;
+            hostId = 0;
         }
     }
 }

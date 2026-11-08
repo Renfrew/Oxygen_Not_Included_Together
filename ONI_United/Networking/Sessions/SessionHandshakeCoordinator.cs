@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using ONI_United.DebugTools;
 using ONI_United.Misc;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 using ONI_United.Networking.Runtime;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports.Steamworks;
 using Shared.Interfaces.Networking;
 using Shared;
 

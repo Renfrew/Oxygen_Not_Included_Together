@@ -2,7 +2,7 @@
 using System.Reflection;
 using ONI_United.Networking;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 using ONI_United.Core;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
@@ -23,7 +23,7 @@ public sealed class LifecycleTests : IDisposable
     public LifecycleTests()
     {
         Reset();
-        NetworkRuntime.TransportServer = server;
+        NetworkRuntime.UseTestServer(server);
         Invoke(machine, "Awake");
     }
     public void Dispose()
@@ -52,7 +52,7 @@ public sealed class LifecycleTests : IDisposable
         else if (role == 2) Assert.True(Session.AdmitClient(new Player(20, "Client"), new Player(10, "Host")));
         LoadedWorld = loadedWorld;
         var source = synchronize ? Lifecycle.Phase.Synchronizing : Lifecycle.Phase.PreparingSession;
-        var evt = synchronize ? Lifecycle.Event.CompleteSync : Lifecycle.Event.HostSessionReady;
+        var evt = synchronize ? Lifecycle.Event.CompleteSync : Lifecycle.Event.SessionReady;
         typeof(Lifecycle).GetField("current", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(machine, source);
         Trace.Clear();
         bool after = false;
@@ -87,7 +87,7 @@ public sealed class LifecycleTests : IDisposable
                 (Lifecycle.Phase.Idle, Lifecycle.Event.StartHost) when role == 0 => Lifecycle.Phase.StartingHost,
                 (Lifecycle.Phase.StartingHost, Lifecycle.Event.PrepareHostSession) => Lifecycle.Phase.InGameSession,
                 (Lifecycle.Phase.Joining, Lifecycle.Event.PrepareClientSession) => Lifecycle.Phase.PreparingSession,
-                (Lifecycle.Phase.PreparingSession, Lifecycle.Event.HostSessionReady) when role == 1 => Lifecycle.Phase.InGameSession,
+                (Lifecycle.Phase.PreparingSession, Lifecycle.Event.SessionReady) when role == 1 => Lifecycle.Phase.InGameSession,
                 (Lifecycle.Phase.StartingHost or Lifecycle.Phase.PreparingSession or Lifecycle.Phase.InGameSession or Lifecycle.Phase.ClearingSession,
                     Lifecycle.Event.ClearHostSession) => Lifecycle.Phase.ClearingSession,
                 (Lifecycle.Phase.Synchronizing, Lifecycle.Event.ClearHostSession) => Lifecycle.Phase.ClearingSession,
@@ -272,7 +272,7 @@ public sealed class LifecycleTests : IDisposable
         Initialize(); server.SynchronousReady = true;
         Assert.True(Start());
         server.Ready(); // Duplicate readiness must not repeat successful-host actions.
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.HostSessionReady, () => throw new Exception("duplicate completion")));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionReady, () => throw new Exception("duplicate completion")));
         Assert.Single(Trace, line => line == "color:InGameSession");
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         Assert.Single(Trace, line => line == "protocol:admitted");
@@ -303,7 +303,7 @@ public sealed class LifecycleTests : IDisposable
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));
         server.Ready();
         Assert.Equal(new[] { "[Lifecycle] Idle", "[Lifecycle] StartingHost", "identity:start", "color:start",
-            "tick:start", "protocol:start", "[Lifecycle] PreparingSession", "session:start",
+            "protocol:start", "[Lifecycle] PreparingSession", "session:start",
             "[Lifecycle] InGameSession", "color:InGameSession", "protocol:admitted" }, Trace);
         Assert.False(Lifecycle.Handle(Lifecycle.Event.PrepareHostSession, () => throw new Exception("rejected readiness callback")));
     }
@@ -331,7 +331,7 @@ public sealed class LifecycleTests : IDisposable
         server.Ready();
         Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
         Assert.False(Session.IsActive);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.HostSessionReady, () => throw new Exception()));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionReady, () => throw new Exception()));
         Assert.Equal(1, server.Cancellations);
         Assert.DoesNotContain("color:InGameSession", Trace);
         Assert.DoesNotContain(Trace, line => line.StartsWith("pause:"));

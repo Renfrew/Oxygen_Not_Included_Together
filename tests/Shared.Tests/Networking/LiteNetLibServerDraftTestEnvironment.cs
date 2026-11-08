@@ -8,7 +8,13 @@ namespace LiteNetLib
 {
     internal enum ConnectionState { Connected, ShutdownRequested, Disconnected }
     internal enum DeliveryMethod { Unreliable, ReliableOrdered }
-    internal struct DisconnectInfo { }
+    internal enum UnconnectedMessageType { BasicMessage, Broadcast }
+    internal enum DisconnectReason
+    {
+        Timeout, RemoteConnectionClose, DisconnectPeerCalled, ConnectionRejected,
+        ConnectionFailed, HostUnreachable, NetworkUnreachable, UnknownHost
+    }
+    internal struct DisconnectInfo { internal DisconnectReason Reason; }
     internal sealed class NetPacketReader
     {
         private readonly BinaryReader reader;
@@ -20,7 +26,7 @@ namespace LiteNetLib
         internal bool TryGetULong(out ulong value)
         { try { value = reader.ReadUInt64(); return true; } catch { value = 0; return false; } }
     }
-    internal sealed class NetPeer : System.Net.IPEndPoint
+    public sealed class NetPeer : System.Net.IPEndPoint
     {
         internal readonly int Id;
         internal ConnectionState ConnectionState = ConnectionState.Connected;
@@ -55,7 +61,7 @@ namespace LiteNetLib
         internal void Receive(NetPeer peer, byte[] bytes) =>
             NetworkReceiveEvent?.Invoke(peer, new(bytes), 0, DeliveryMethod.ReliableOrdered);
     }
-    internal sealed class NetManager
+    public sealed class NetManager
     {
         internal static NetManager Last;
         internal static bool StartSucceeds = true, StartThrows, StopThrows;
@@ -81,8 +87,19 @@ namespace LiteNetLib
         internal void PollEvents() { while (Events.TryDequeue(out var next)) next(); }
     }
 }
+namespace LiteNetLib.Utils
+{
+    internal sealed class NetDataWriter
+    {
+        private readonly BinaryWriter writer = new(new MemoryStream());
+        internal void Put(string value) => writer.Write(value);
+        internal void Put(ulong value) => writer.Write(value);
+        internal void Put(int value) => writer.Write(value);
+    }
+}
 namespace ONI_United
 {
+    public enum ServerTickRate { TPS_20, TPS_30, TPS_60, TPS_90, TPS_120, TPS_128 }
     internal sealed class Configuration
     {
         internal static readonly Configuration Instance = new();

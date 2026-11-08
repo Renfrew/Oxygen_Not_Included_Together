@@ -107,7 +107,7 @@ public sealed class LifecycleRefinementTests : IDisposable
         Registered = () => Assert.True(Lifecycle.Handle(Lifecycle.Event.ClearHostSession));
         Assert.True(Lifecycle.Handle(Lifecycle.Event.PrepareHostSession));
         Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
-        Assert.False(Lifecycle.Handle(Lifecycle.Event.HostSessionReady));
+        Assert.False(Lifecycle.Handle(Lifecycle.Event.SessionReady));
         Assert.DoesNotContain(Trace, x => x.StartsWith("client:prepare:"));
     }
 
@@ -143,7 +143,7 @@ public sealed class LifecycleRefinementTests : IDisposable
     public void PrepareSessionUnexpectedSourceThrowsInsteadOfSkippingPreparation(int source)
     {
         Assert.Throws<InvalidOperationException>(() =>
-            LifecycleEventActions.Execute(Lifecycle.Event.PrepareClientSession, (Lifecycle.Phase)source));
+            Lifecycle.Execute(Lifecycle.Event.PrepareClientSession, (Lifecycle.Phase)source));
         Assert.False(Session.IsActive);
         Assert.Empty(Trace);
     }

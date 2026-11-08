@@ -4,9 +4,9 @@ using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using System;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.LiteNetLib
+namespace ONI_United.Networking.Transports.LiteNetLib
 {
     public class LiteNetLibPacketSender : TransportPacketSender
     {

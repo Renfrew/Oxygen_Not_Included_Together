@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using ONI_United.Misc;
 using ONI_United.Networking.Sessions.States;
-using ONI_United.Networking.Transport;
-using ONI_United.Networking.Transport.LiteNetLib;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Transports;
+using ONI_United.Networking.Transports.LiteNetLib;
+using ONI_United.Networking.Transports.Steamworks;
 using ONI_United.Patches.ToolPatches;
 using ONI_United.DebugTools;
 using Shared.Profiling;
@@ -38,10 +38,10 @@ namespace ONI_United.Core
 
         public static NetworkRuntime Instance => instance;
 
-        private static NetworkTransport transport = NetworkTransport.LITENETLIB;
+        private static NetworkTransport transportType = NetworkTransport.LITENETLIB;
 
-        public static bool IsSteam => transport == NetworkTransport.STEAMWORKS;
-        public static bool IsLan => transport == NetworkTransport.LITENETLIB;
+        public static bool IsSteam => transportType == NetworkTransport.STEAMWORKS;
+        public static bool IsLan => transportType == NetworkTransport.LITENETLIB;
 
         private void Awake()
         {
@@ -156,10 +156,10 @@ namespace ONI_United.Core
         {
             newTransport = (NetworkTransport)TransportConfigurationMigration.NormalizeNetworkTransport((int)newTransport);
 
-            if (!Lifecycle.CanSelectTransport && !transport.Equals(newTransport))
+            if (!Lifecycle.CanSelectTransport && !transportType.Equals(newTransport))
                 throw new InvalidOperationException("Stop the owned multiplayer operation before changing transport.");
 
-            if (transport.Equals(newTransport))
+            if (transportType.Equals(newTransport))
                 return;
 
             // Construct a consistent replacement before publishing any new selection.
@@ -171,7 +171,7 @@ namespace ONI_United.Core
             var sender = driver.CreatePacketSender();
             if (IsLan) LiteNetLibClient.StopLanDiscovery();
             TransportPacketSender.ClearPending();
-            transport = newTransport;
+            transportType = newTransport;
             TransportServer = server;
             TransportClient = client;
             TransportPacketSender = sender;
@@ -180,7 +180,7 @@ namespace ONI_United.Core
 
         public static void SaveTransport()
         {
-            Configuration.Instance.Network.Transport = (int)transport;
+            Configuration.Instance.Network.Transport = (int)transportType;
             Configuration.Instance.Save();
         }
 
@@ -253,7 +253,7 @@ namespace ONI_United.Core
         {
             using var _ = Profiler.Scope();
 
-            switch (transport)
+            switch (transportType)
             {
                 case NetworkTransport.STEAMWORKS:
                     return SteamUser.GetSteamID().m_SteamID;
@@ -266,7 +266,7 @@ namespace ONI_United.Core
 
         public static int GetMaxServerCapacity()
         {
-            switch (transport)
+            switch (transportType)
             {
                 case NetworkTransport.STEAMWORKS:
                     if (SteamLobby.InLobby)
@@ -283,7 +283,7 @@ namespace ONI_United.Core
             using var _ = Profiler.Scope();
 
             List<ulong> clients = new List<ulong>();
-            switch(transport)
+            switch(transportType)
             {
                 case NetworkTransport.STEAMWORKS:
                     List<CSteamID> members = SteamLobby.GetAllLobbyMembers();
@@ -347,7 +347,7 @@ namespace ONI_United.Core
 
             scheduler.Tick();
 
-            if (transport.Equals(NetworkTransport.STEAMWORKS))
+            if (transportType.Equals(NetworkTransport.STEAMWORKS))
             {
                 if (!SteamManager.Initialized)
                     return;

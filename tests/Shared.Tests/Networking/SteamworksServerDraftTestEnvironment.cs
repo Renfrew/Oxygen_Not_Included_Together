@@ -14,8 +14,29 @@ namespace Steamworks
     { internal static HSteamNetPollGroup Invalid => default; }
     public readonly record struct HSteamNetConnection(uint m_HSteamNetConnection)
     { internal static HSteamNetConnection Invalid => default; }
+    internal struct GameLobbyJoinRequested_t { internal CSteamID m_steamIDFriend, m_steamIDLobby; }
+    internal struct LobbyChatUpdate_t { internal ulong m_ulSteamIDUserChanged; internal uint m_rgfChatMemberStateChange; }
+    internal struct LobbyCreated_t { internal ulong m_ulSteamIDLobby; internal EResult m_eResult; }
+    internal struct LobbyEnter_t { internal ulong m_ulSteamIDLobby; internal uint m_EChatRoomEnterResponse; }
+    internal struct LobbyMatchList_t { internal uint m_nLobbiesMatching; }
+    internal struct PersonaStateChange_t { internal ulong m_ulSteamID; internal int m_nChangeFlags; }
+    internal readonly record struct SteamAPICall_t(ulong Value)
+    {
+        internal static SteamAPICall_t Invalid => default;
+    }
+
+    internal sealed class CallResult<T> : IDisposable
+    {
+        internal static CallResult<T> Create(Action<T, bool> completed) => new();
+        internal void Set(SteamAPICall_t call) =>
+            throw new NotSupportedException("Steam lobby call results require a native callback fixture.");
+        public void Dispose() { }
+    }
     public readonly record struct CSteamID(ulong m_SteamID)
-    { internal bool IsValid() => m_SteamID != 0; }
+    {
+        internal static CSteamID Nil => default;
+        internal bool IsValid() => m_SteamID != 0;
+    }
     internal enum ESteamNetworkingConfigValue { k_ESteamNetworkingConfig_TimeoutInitial, k_ESteamNetworkingConfig_TimeoutConnected }
     internal enum ESteamNetworkingConfigDataType { k_ESteamNetworkingConfig_Int32 }
     internal struct SteamNetworkingConfigValue_t
@@ -167,15 +188,14 @@ namespace Steamworks
         internal static int ReceiveMessagesOnPollGroup(HSteamNetPollGroup group, IntPtr[] messages, int count) => 0;
     }
 }
-namespace ONI_United.Networking.Transport.Steamworks
+namespace Shared.Tests.Networking
 {
-    internal static class SteamLobby
+    internal static class SteamLobbyFixture
     {
-        internal static bool InLobby;
-        internal static bool HasPendingJoin => false;
-        internal static void CreateHostLobby(Action<string> done) { InLobby = true; done(null); }
-        internal static bool TryReleaseClientLobby(out string error, Action<bool, string> completed = null)
-        { error = null; return true; }
-        internal static void CancelHostLobby(Action<bool, string> done) { InLobby = false; done(true, null); }
+        // The native lobby-entry callback is outside the scope of these tests.
+        internal static void SetCurrentLobby(ulong id) =>
+            typeof(ONI_United.Networking.Transports.Steamworks.SteamLobby)
+                .GetProperty("CurrentLobby")!
+                .SetValue(null, new Steamworks.CSteamID(id));
     }
 }

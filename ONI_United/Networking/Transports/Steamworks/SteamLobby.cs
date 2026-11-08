@@ -17,7 +17,7 @@ using ONI_United.Networking;
 using ONI_United.Networking.Identity;
 using ONI_United.Networking.Runtime;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
 	public static class SteamLobby
 	{

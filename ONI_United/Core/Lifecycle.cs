@@ -1,14 +1,12 @@
+using System.Collections.Generic;
 using ONI_United.DebugTools;
 using ONI_United.Networking.Sessions;
-using System.Collections.Generic;
 using UnityEngine;
-
-using static ONI_United.Core.Lifecycle.Phase;
 
 namespace ONI_United.Core
 {
     // Persistent component on Multiplayer_Modules.
-    internal sealed class Lifecycle : MonoBehaviour
+    internal sealed partial class Lifecycle : MonoBehaviour
     {
         internal enum Phase
         {
@@ -22,48 +20,14 @@ namespace ONI_United.Core
             Synchronizing,
             ClearingSession
         }
-        internal enum Event
-        {
-            Initialize, StartHost, PrepareHostSession, PrepareClientSession, HostSessionReady, ClearHostSession,
-            Join, ClientAdmitted, StartHostSync, StartClientSync, CompleteSync, ClearClientSession, SessionCleared
-        }
 
-        // Get-only members avoid requiring an IsExternalInit shim in the netstandard target.
-        private readonly struct TransitionDefinition(Phase[] from, Phase to)
-        {
-            public Phase[] From { get; } = from;
-            public Phase To { get; } = to;
-        }
-
-        // Collection initializers use Add, so duplicate event declarations also fail fast.
-        private static readonly Dictionary<Event, TransitionDefinition[]> Transitions = new()
-        {
-            { Event.Initialize, [new([Uninitialized], Idle)] },
-            { Event.StartHost, [new([Idle], StartingHost)] },
-            { Event.PrepareHostSession, [new([StartingHost], PreparingSession)] },
-            { Event.PrepareClientSession, [new([Joining], PreparingSession)] },
-            { Event.HostSessionReady, [new([PreparingSession], InGameSession)] },
-            { Event.ClearHostSession, [
-                new([StartingHost, PreparingSession, InGameSession, Synchronizing, ClearingSession], ClearingSession)
-            ] },
-            { Event.Join, [new([Idle], Joining)] },
-            { Event.ClientAdmitted, [new([PreparingSession], Joined)] },
-            { Event.StartHostSync, [new([InGameSession], Synchronizing)] },
-            { Event.StartClientSync, [new([Joined, InGameSession], Synchronizing)] },
-            { Event.CompleteSync, [new([Synchronizing], InGameSession)] },
-            { Event.ClearClientSession, [
-                new([Joining, PreparingSession, Joined, InGameSession, Synchronizing, ClearingSession], ClearingSession)
-            ] },
-            { Event.SessionCleared, [new([ClearingSession], Idle)] },
-        };
-
-        private static readonly Dictionary<(Event, Phase), Phase> TransitionLookup = new();
+        private static readonly Dictionary<(Lifecycle.Event, Phase), Phase> TransitionLookup = new();
 
         static Lifecycle()
         {
-            foreach (var entry in Transitions)
+            foreach (var entry in Lifecycle.Transitions)
             {
-                if (!System.Enum.IsDefined(typeof(Event), entry.Key))
+                if (!System.Enum.IsDefined(typeof(Lifecycle.Event), entry.Key))
                     throw new System.InvalidOperationException("Undefined Lifecycle event in transition table.");
                 foreach (var transition in entry.Value)
                 {
@@ -115,9 +79,16 @@ namespace ONI_United.Core
             Handle(Event.Initialize);
         }
 
+        internal static bool CanHandle(Event evt) =>
+            TransitionLookup.ContainsKey((evt, instance.current));
+
+        private static readonly System.Action<System.Action> InvokeAction = static action => action?.Invoke();
+        internal static bool Handle(Event evt, System.Action afterAction = null) =>
+            Handle(evt, InvokeAction, afterAction);
+
         // No beforeAction is required: readiness/admission producers already own their
         // prerequisites before submitting an event. Preserve the existing callback-last API.
-        internal static bool Handle(Event evt, System.Action afterAction = null)
+        internal static bool Handle<T>(Event evt, System.Action<T> afterAction, T arg = default)
         {
             var owner = instance;
             var source = owner.current;
@@ -129,7 +100,7 @@ namespace ONI_United.Core
                 case Event.Join:
                     if (Session.IsActive || Session.Players.Count != 0) return false;
                     break;
-                case Event.HostSessionReady:
+                case Event.SessionReady:
                     if (!Session.IsHost) return false;
                     break;
                 case Event.ClientAdmitted:
@@ -151,8 +122,8 @@ namespace ONI_United.Core
 
             try
             {
-                LifecycleEventActions.Execute(evt, source);
-                afterAction?.Invoke();
+                Execute(evt, source);
+                afterAction?.Invoke(arg);
                 return true;
             }
             catch (System.Exception ex)

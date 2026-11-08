@@ -1,9 +1,9 @@
 using ONI_United.DebugTools;
-using ONI_United.Networking.Transport.Drivers;
+using ONI_United.Networking.Transports.Drivers;
 using System;
 using System.Collections.Generic;
 
-namespace ONI_United.Networking.Transport
+namespace ONI_United.Networking.Transports
 {
     /// <summary>
     /// Central registry managing available network transport drivers.

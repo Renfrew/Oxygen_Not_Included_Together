@@ -1,12 +1,11 @@
-// INACTIVE MIGRATION DRAFT: never constructed or selected by production.
-// Lifecycle authorizes Connect, Disconnect and Poll before they reach this protocol.
 using System;
+using ONI_United.DebugTools;
 using ONI_United.Networking.Sessions;
 using Steamworks;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
-    internal sealed class SteamworksClientDraft : ClientTransport
+    internal sealed class SteamworksClient : ClientTransport
     {
         private HSteamNetConnection connection = HSteamNetConnection.Invalid;
         private Callback<SteamNetConnectionStatusChangedCallback_t> connectionStatusChanged;
@@ -47,7 +46,12 @@ namespace ONI_United.Networking.Transport.Steamworks
                 throw new InvalidOperationException("Poll was invoked without an owned Steam connection callback.");
 
             SteamAPI.RunCallbacks();
+            // A status callback may have ended the connection.
+            if (connection != HSteamNetConnection.Invalid)
+                ModLog.Info("Polling Steam connection.");
         }
+
+
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t data)
         {

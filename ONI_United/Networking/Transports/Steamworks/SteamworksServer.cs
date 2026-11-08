@@ -1,14 +1,13 @@
-// INACTIVE MIGRATION DRAFT: never constructed or selected by production.
-// Start/Stop require Lifecycle admission through the caller.
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ONI_United.DebugTools;
 using Steamworks;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
-    internal class SteamworksServerDraft : ServerTransport
+    internal class SteamworksServer : ServerTransport
     {
         private const int ReceiveBatchSize = 128;
         private HSteamListenSocket listenSocket = HSteamListenSocket.Invalid;
@@ -17,7 +16,7 @@ namespace ONI_United.Networking.Transport.Steamworks
         private bool lobbyCancellationPending;
         // Includes incoming handles whose rejection/retirement is not yet confirmed.
         // Physical ownership does not imply logical player admission.
-        private readonly Dictionary<HSteamNetConnection, CSteamID> physicalConnections = new();
+        private readonly Dictionary<HSteamNetConnection, CSteamID> physicalConnections = [];
 
         protected override void InternalStart()
         {
@@ -27,8 +26,8 @@ namespace ONI_United.Networking.Transport.Steamworks
                 return;
             }
 
-            listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(
-                0, 0, Array.Empty<SteamNetworkingConfigValue_t>());
+            // TODO: Check configuration options for the listen socket before creating it.
+            listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(0, 0, []);
             if (listenSocket == HSteamListenSocket.Invalid)
             {
                 OnStartFailed("Steam failed to create its listen socket.");
@@ -42,7 +41,7 @@ namespace ONI_United.Networking.Transport.Steamworks
                 return;
             }
 
-            connectionStatusChanged = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
+            connectionStatusChanged ??= Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
             SteamLobby.CreateHostLobby(error =>
             {
                 if (error != null) OnStartFailed(error);
@@ -57,13 +56,13 @@ namespace ONI_United.Networking.Transport.Steamworks
             if (lobbyCancellationPending) return;
             lobbyCancellationPending = true;
 
-            string failure = ReleaseNativeResources();
+            Reset();
 
             SteamLobby.CancelHostLobby((success, error) =>
             {
                 lobbyCancellationPending = false;
-                if (success && failure == null) OnStopped();
-                else OnStopFailed(failure ?? error);
+                if (success) OnStopped();
+                else OnStopFailed(error);
             });
         }
 
@@ -252,45 +251,50 @@ namespace ONI_United.Networking.Transport.Steamworks
             }
         }
 
-        private string ReleaseNativeResources()
+        protected override void Reset()
         {
-            string failure = null;
             foreach (var connection in new List<HSteamNetConnection>(physicalConnections.Keys))
             {
                 if (!RetireConnection(connection, "Host shutdown"))
-                    failure += " Steam did not confirm connection release: " + connection.m_HSteamNetConnection + ".";
+                    ModLog.Warning($"[SteamworksServer] Failed to close client connection: {connection.m_HSteamNetConnection}.");
             }
 
-            // Retain any unconfirmed handle so an explicit Stop can retry release.
             try
             {
                 if (listenSocket != HSteamListenSocket.Invalid)
                 {
-                    if (SteamNetworkingSockets.CloseListenSocket(listenSocket))
-                        listenSocket = HSteamListenSocket.Invalid;
-                    else failure += " Steam did not confirm listener release.";
+                    if (!SteamNetworkingSockets.CloseListenSocket(listenSocket))
+                       throw new Exception("Steam did not confirm listener release.");
+
+                    listenSocket = HSteamListenSocket.Invalid;
                 }
             }
-            catch (Exception ex) { failure += " " + ex; }
+            catch (Exception ex) {
+                ModLog.Warning($"[SteamworksServer] Failed to close listen socket: {ex}");
+            }
 
             try
             {
                 if (pollGroup != HSteamNetPollGroup.Invalid)
                 {
-                    if (SteamNetworkingSockets.DestroyPollGroup(pollGroup))
-                        pollGroup = HSteamNetPollGroup.Invalid;
-                    else failure += " Steam did not confirm poll-group release.";
+                    if (!SteamNetworkingSockets.DestroyPollGroup(pollGroup))
+                        throw new Exception("Steam did not confirm poll-group release.");
+
+                    pollGroup = HSteamNetPollGroup.Invalid;
                 }
             }
-            catch (Exception ex) { failure += " " + ex; }
+            catch (Exception ex) {
+                ModLog.Warning($"[SteamworksServer] Failed to destroy poll group: {ex}");
+            }
 
             try
             {
                 connectionStatusChanged?.Dispose();
                 connectionStatusChanged = null;
             }
-            catch (Exception ex) { failure += " " + ex; }
-            return failure;
+            catch (Exception ex) {
+                ModLog.Warning($"[SteamworksServer] Failed to dispose connection status changed: {ex}");
+            }
         }
     }
 }

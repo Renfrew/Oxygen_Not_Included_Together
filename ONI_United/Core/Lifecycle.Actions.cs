@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Generic;
-using ONI_United.Networking.Runtime;
+using ONI_United.Misc;
 using ONI_United.Networking.Identity;
+using ONI_United.Networking.Presentation;
+using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
 using ONI_United.Patches.ToolPatches;
-using ONI_United.Misc;
-using ONI_United.Networking.Presentation;
 
 namespace ONI_United.Core
 {
-    internal static class LifecycleEventActions
+    internal sealed partial class Lifecycle
     {
         private static readonly Dictionary<Lifecycle.Event, Action<Lifecycle.Phase>> actions = new()
         {
-            [Lifecycle.Event.StartHost] = StartHost,
-            [Lifecycle.Event.PrepareHostSession] = PrepareHostSession,
-            [Lifecycle.Event.PrepareClientSession] = PrepareClientSession,
-            [Lifecycle.Event.HostSessionReady] = HostSessionReady,
-            [Lifecycle.Event.Join] = Join,
-            [Lifecycle.Event.ClearHostSession] = ClearHostSession,
-            [Lifecycle.Event.ClearClientSession] = ClearClientSession,
-            [Lifecycle.Event.SessionCleared] = SessionCleared
+            [Event.StartHost] = StartHost,
+            [Event.PrepareHostSession] = PrepareHostSession,
+            [Event.PrepareClientSession] = PrepareClientSession,
+            [Event.SessionReady] = HostSessionReady,
+            [Event.Join] = Join,
+            [Event.ClearHostSession] = ClearHostSession,
+            [Event.ClearClientSession] = ClearClientSession,
+            [Event.SessionCleared] = SessionCleared
         };
 
         internal static void Execute(Lifecycle.Event evt, Lifecycle.Phase source)
@@ -46,7 +46,7 @@ namespace ONI_United.Core
             if (!MultiplayerSession.RegisterAsHost())
                 throw new InvalidOperationException("The local host Session could not be registered.");
 
-            Lifecycle.Handle(Lifecycle.Event.HostSessionReady);
+            Lifecycle.Handle(Lifecycle.Event.SessionReady);
         }
 
         private static void PrepareClientSession(Lifecycle.Phase source)

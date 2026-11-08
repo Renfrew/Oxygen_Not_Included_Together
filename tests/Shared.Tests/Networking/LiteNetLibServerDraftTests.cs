@@ -7,7 +7,7 @@ using ModConfiguration = ONI_United.Configuration;
 using ONI_United.Core;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport.LiteNetLib;
+using ONI_United.Networking.Transports.LiteNetLib;
 using Xunit;
 using static Shared.Tests.Networking.LifecycleTestEnvironment;
 
@@ -78,7 +78,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         var peer = Connect(); Hello(peer);
         Stop();
         Assert.False(native.IsRunning); Assert.Equal(1, native.StopCalls);
-        Assert.Empty(Peers); Assert.False(server.TryGetConnection(20, out _));
+        Assert.Empty(Peers); Assert.False(server.TryGetTestConnection(20, out _));
         Assert.Empty(Session.Players); Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
         // Old callbacks are detached even if a caller retains the old listener.
         Start();
@@ -86,7 +86,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         native.Listener.Request(request);
         Assert.Empty(Peers);
         var current = Connect(); Hello(current);
-        Assert.True(server.TryGetConnection(20, out var registered)); Assert.Same(current, registered);
+        Assert.True(server.TryGetTestConnection(20, out var registered)); Assert.Same(current, registered);
     }
 
     [Theory]
@@ -114,9 +114,9 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     public void PeerIsPhysicalOnlyUntilMatchingHelloAndWelcomeUsesExistingFormat()
     {
         Start(); var peer = Connect();
-        Assert.False(server.TryGetConnection(20, out _)); Assert.Single(Session.Players);
+        Assert.False(server.TryGetTestConnection(20, out _)); Assert.Single(Session.Players);
         Hello(peer);
-        Assert.True(server.TryGetConnection(20, out var registered)); Assert.Same(peer, registered);
+        Assert.True(server.TryGetTestConnection(20, out var registered)); Assert.Same(peer, registered);
         Assert.Equal("LAN player", Session.Players[20].UserName);
         using var reader = new BinaryReader(new MemoryStream(Assert.Single(peer.Sent)));
         Assert.Equal(PacketRegistry.GetPacketId(new SessionHandshakePacket()), reader.ReadInt32());
@@ -136,7 +136,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     {
         Start(); var peer = Connect(); Hello(peer, id, name);
         Assert.Equal(ConnectionState.ShutdownRequested, peer.ConnectionState);
-        Assert.Single(Session.Players); Assert.False(server.TryGetConnection(20, out _));
+        Assert.Single(Session.Players); Assert.False(server.TryGetTestConnection(20, out _));
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         BitConverter.GetBytes(999).CopyTo(bytes, 0);
         Receive(peer, bytes);
         Assert.Equal(ConnectionState.ShutdownRequested, peer.ConnectionState);
-        Assert.False(server.TryGetConnection(20, out _)); Assert.Single(Session.Players);
+        Assert.False(server.TryGetTestConnection(20, out _)); Assert.Single(Session.Players);
     }
 
     [Fact]
@@ -175,16 +175,16 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         Assert.Equal(ConnectionState.ShutdownRequested, duplicate.ConnectionState);
         NetManager.Last.Listener.Disconnect(duplicate);
         Assert.Same(member, Session.Players[20]);
-        Assert.True(server.TryGetConnection(20, out var current)); Assert.Same(original, current);
+        Assert.True(server.TryGetTestConnection(20, out var current)); Assert.Same(original, current);
         Assert.True(Peers.Contains(original)); Assert.False(Peers.Contains(duplicate));
         NetManager.Last.Listener.Disconnect(original);
-        Assert.False(server.TryGetConnection(20, out _)); Assert.False(Session.Players.ContainsKey(20));
+        Assert.False(server.TryGetTestConnection(20, out _)); Assert.False(Session.Players.ContainsKey(20));
         var replacement = Connect(peerId: 1); Hello(replacement);
         Assert.True(original.Equals(replacement)); Assert.NotSame(original, replacement);
         var replacementMember = Session.Players[20];
         NetManager.Last.Listener.Disconnect(original);
         Hello(original); // A stale receive callback cannot affect the replacement.
-        Assert.True(server.TryGetConnection(20, out current)); Assert.Same(replacement, current);
+        Assert.True(server.TryGetTestConnection(20, out current)); Assert.Same(replacement, current);
         Assert.True(Peers.Contains(replacement)); Assert.Single(Peers);
         Assert.Same(replacementMember, Session.Players[20]);
     }
@@ -204,7 +204,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         Hello(second, id: 30);
         var member = Session.Players[30];
         NetManager.Last.Listener.Disconnect(first);
-        Assert.True(server.TryGetConnection(30, out var current)); Assert.Same(second, current);
+        Assert.True(server.TryGetTestConnection(30, out var current)); Assert.Same(second, current);
         Assert.Same(member, Session.Players[30]); Assert.Single(Peers);
     }
 
@@ -215,7 +215,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         NetManager.Last.Listener.Disconnect(peer);
         Assert.Empty(Peers); Assert.Single(Session.Players);
         Hello(peer);
-        Assert.False(server.TryGetConnection(20, out _));
+        Assert.False(server.TryGetTestConnection(20, out _));
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
         Start(); var peer = Connect(); Hello(peer);
         NetManager.StopThrows = true; Stop();
         Assert.Equal(Lifecycle.Phase.ClearingSession, Lifecycle.Current);
-        Assert.True(Peers.Contains(peer)); Assert.False(server.TryGetConnection(20, out _));
+        Assert.True(Peers.Contains(peer)); Assert.False(server.TryGetTestConnection(20, out _));
         NetManager.StopThrows = false; Stop();
         Assert.Empty(Peers); Assert.Equal(Lifecycle.Phase.Idle, Lifecycle.Current);
     }
@@ -233,7 +233,7 @@ public sealed class LiteNetLibServerDraftTests : IDisposable
     public void WelcomeSendFailureRemovesAdmissionAndDisconnectsPeer()
     {
         Start(); var peer = Connect(); peer.SendFails = true; Hello(peer);
-        Assert.False(server.TryGetConnection(20, out _)); Assert.False(Session.Players.ContainsKey(20));
+        Assert.False(server.TryGetTestConnection(20, out _)); Assert.False(Session.Players.ContainsKey(20));
         Assert.Equal(ConnectionState.ShutdownRequested, peer.ConnectionState);
     }
 

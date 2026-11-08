@@ -5,7 +5,7 @@
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <DoNotBuildAsMod>true</DoNotBuildAsMod>
     <IsMod>false</IsMod>
     <IsPacked>false</IsPacked>
@@ -28,18 +28,19 @@
   <ItemGroup>
     <Compile Include="../../Shared/Replication/SnapshotTimeline.cs" Link="Replication/SnapshotTimeline.cs" />
     <Compile Include="../../Shared/Networking/TransportConfigurationMigration.cs" Link="Networking/TransportConfigurationMigration.cs" />
-    <Compile Include="../../ONI_United/Core/Lifecycle.cs" Link="Core/Lifecycle.cs" />
+    <Compile Include="../../ONI_United/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../ONI_United/Networking/Transports/**/*.cs" Link="Networking/Transports/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="../../ONI_United/Networking/Runtime/GameClient.Synchronization.cs" Link="Networking/GameClient.Synchronization.cs" />
-    <Compile Include="../../ONI_United/Core/LifecycleEventActions.cs" Link="Core/LifecycleEventActions.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/TransportServer.cs" Link="Networking/TransportServer.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/ServerTransport.cs" Link="Networking/ServerTransport.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/TransportClient.cs" Link="Networking/TransportClient.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksClient.cs" Link="Networking/SteamworksClient.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/Steamworks/SteamworksServerDraft.cs" Link="Networking/SteamworksServerDraft.cs" />
-    <Compile Include="../../ONI_United/Networking/Transport/LiteNetLib/LiteNetLibServerDraft.cs" Link="LAN/LiteNetLibServerDraft.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakePacket.cs" Link="LAN/SessionHandshakePacket.cs" />
     <Compile Include="../../ONI_United/Networking/Packets/Architecture/PacketSerialization.cs" Link="LAN/PacketSerialization.cs" />
     <Compile Include="../../Shared/Interfaces/Networking/IPacket.cs" Link="LAN/IPacket.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/ILatencySensitivePacket.cs" Link="Networking/ILatencySensitivePacket.cs" />
+    <Compile Include="../../ONI_United/Misc/PasswordHelper.cs" Link="Misc/PasswordHelper.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/PacketSendMode.cs" Link="Networking/PacketSendMode.cs" />
+    <Compile Include="../../ONI_United/Networking/Runtime/UnityTaskScheduler.cs" Link="Networking/Runtime/UnityTaskScheduler.cs" />
+    <Compile Include="../../ONI_United/Networking/Packets/Core/ChunkedPacket.cs" Link="Networking/Packets/Core/ChunkedPacket.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Lobbies/LobbyCodeHelper.cs" Link="Networking/Sessions/Lobbies/LobbyCodeHelper.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Lobbies/LobbyListEntry.cs" Link="Networking/Sessions/Lobbies/LobbyListEntry.cs" />
     <Compile Include="../../Shared/Interfaces/Networking/IAllowedWithoutWorldPacket.cs" Link="LAN/IAllowedWithoutWorldPacket.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/States/ClientState.cs" Link="Networking/ClientState.cs" />
     <Compile Include="../../ONI_United/Networking/Sessions/Player.cs" Link="Networking/Sessions/Player.cs" />

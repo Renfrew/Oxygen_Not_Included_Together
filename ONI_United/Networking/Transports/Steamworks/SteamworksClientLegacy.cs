@@ -15,11 +15,11 @@ using ONI_United;
 using ONI_United.Networking;
 using ONI_United.Networking.Runtime;
 using ONI_United.Networking.Sessions;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.Steamworks
+namespace ONI_United.Networking.Transports.Steamworks
 {
-    public class SteamworksClient : TransportClient
+    public class SteamworksClientLegacy : TransportClient
     {
         private Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
         public static HSteamNetConnection? Connection { get; private set; }

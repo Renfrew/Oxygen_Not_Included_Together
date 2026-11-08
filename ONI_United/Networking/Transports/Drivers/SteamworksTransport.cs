@@ -1,7 +1,7 @@
-using ONI_United.Networking.Transport.Steamworks;
-using ONI_United.Networking.Transport;
+using ONI_United.Networking.Transports.Steamworks;
+using ONI_United.Networking.Transports;
 
-namespace ONI_United.Networking.Transport.Drivers
+namespace ONI_United.Networking.Transports.Drivers
 {
     public class SteamworksTransport : ITransport
     {
@@ -10,8 +10,8 @@ namespace ONI_United.Networking.Transport.Drivers
         public bool SupportsNativeFragmentation => true;
         public bool SupportsNatTraversal => true;
 
-        public TransportServer CreateServer() => new SteamworksServer();
-        public TransportClient CreateClient() => new SteamworksClient();
+        public TransportServer CreateServer() => new SteamworksServerLegacy();
+        public TransportClient CreateClient() => new SteamworksClientLegacy();
         public TransportPacketSender CreatePacketSender() => new SteamworksPacketSender();
 
         public void Initialize() { }
