@@ -73,7 +73,7 @@ namespace ONI_United
 			versionChecker.Register(this, new SteamVersionChecker());
 
 			base.OnLoad(harmony);
-			SteamLobby.Initialize();
+			SteamLobbyLegacy.Initialize();
         }
 
 		private static void RegisterDevTools()

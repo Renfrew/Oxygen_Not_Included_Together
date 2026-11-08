@@ -14,7 +14,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Steamworks
 {
-    public class SteamworksPacketSender : TransportPacketSender
+    public class SteamworksPacketSenderLegacy : TransportPacketSender
     {
         public override bool SendPacket(object conn, IPacket packet, PacketSendMode sendType = PacketSendMode.ReliableImmediate)
         {

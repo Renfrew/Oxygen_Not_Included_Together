@@ -89,7 +89,7 @@ namespace ONI_United.Networking.Packets.World
 			TransferRuns[requester] = run;
 			try
 			{
-				if (!forceGeneric && NetworkConfig.IsLanConfig() && NetworkConfig.TransportServer is LiteNetLibServer lnlServer && lnlServer.TcpTransfer != null)
+				if (!forceGeneric && NetworkConfig.IsLanConfig() && NetworkConfig.TransportServer is LiteNetLibServerLegacy lnlServer && lnlServer.TcpTransfer != null)
 				{
 					int tcpPort = Configuration.Instance.Host.LanSettings.Port + 1;
 					lnlServer.TcpTransfer.QueueTransfer(requester, synchronizationId, fileName, snapshot);
@@ -120,9 +120,9 @@ namespace ONI_United.Networking.Packets.World
 		{
 			TransferRuns.Remove(requester);
 			SaveFileTransferManager.CancelClient(requester);
-			if (NetworkConfig.TransportServer is LiteNetLibServer server)
+			if (NetworkConfig.TransportServer is LiteNetLibServerLegacy server)
 				server.TcpTransfer?.CancelClient(requester);
-			else if (NetworkConfig.TransportServer is RiptideServer riptide)
+			else if (NetworkConfig.TransportServer is RiptideServerLegacy riptide)
 				riptide.TcpTransfer?.CancelClient(requester);
 		}
 
@@ -130,9 +130,9 @@ namespace ONI_United.Networking.Packets.World
 		{
 			SaveFileTransferManager.ClearTransfers();
 			TransferRuns.Clear();
-			if (NetworkConfig.TransportServer is LiteNetLibServer server)
+			if (NetworkConfig.TransportServer is LiteNetLibServerLegacy server)
 				server.TcpTransfer?.ClearPendingTransfers();
-			else if (NetworkConfig.TransportServer is RiptideServer riptide)
+			else if (NetworkConfig.TransportServer is RiptideServerLegacy riptide)
 				riptide.TcpTransfer?.ClearPendingTransfers();
 		}
 

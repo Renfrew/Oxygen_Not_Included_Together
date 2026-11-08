@@ -38,9 +38,9 @@ namespace ONI_United.Networking
         }
         public static NetworkTransport transport { get; private set; } = NetworkTransport.LITENETLIB;
 
-        public static TransportServer TransportServer { get; set; } = new LiteNetLibServer();
-        public static TransportClient TransportClient { get; set; } = new LiteNetLibClient();
-        public static TransportPacketSender TransportPacketSender { get; set; } = new LiteNetLibPacketSender();
+        public static TransportServer TransportServer { get; set; } = new LiteNetLibServerLegacy();
+        public static TransportClient TransportClient { get; set; } = new LiteNetLibClientLegacy();
+        public static TransportPacketSender TransportPacketSender { get; set; } = new LiteNetLibPacketSenderLegacy();
 
         public static readonly int LOBBY_SIZE_MIN = 2;
         public static readonly int LOBBY_SIZE_DEFAULT = 4;
@@ -67,7 +67,7 @@ namespace ONI_United.Networking
 
         private static void StartSteamServer()
         {
-            SteamLobby.CreateLobby(onSuccess: () =>
+            SteamLobbyLegacy.CreateLobby(onSuccess: () =>
             {
                 //SpeedControlScreen.Instance?.Unpause(false);
                 SpeedControlScreen.Instance.Pause(true);
@@ -117,7 +117,7 @@ namespace ONI_United.Networking
 
         private static void StopSteamworks()
         {
-            SteamLobby.LeaveLobby();
+            SteamLobbyLegacy.LeaveLobby();
         }
 
         private static void StopRaw()
@@ -184,7 +184,7 @@ namespace ONI_United.Networking
                 case NetworkTransport.LITENETLIB:
                     return Configuration.Instance.Network.PersistentUserId;
                 case NetworkTransport.RIPTIDE:
-                    return MultiplayerSession.IsClient ? RiptideClient.CLIENT_ID : RiptideServer.CLIENT_ID;
+                    return MultiplayerSession.IsClient ? RiptideClientLegacy.CLIENT_ID : RiptideServerLegacy.CLIENT_ID;
                 default:
                     return Utils.NilUlong();
             }
@@ -209,8 +209,8 @@ namespace ONI_United.Networking
             switch (transport)
             {
                 case NetworkTransport.STEAMWORKS:
-                    if (SteamLobby.InLobby)
-                        return SteamMatchmaking.GetLobbyMemberLimit(SteamLobby.CurrentLobby);
+                    if (SteamLobbyLegacy.InLobby)
+                        return SteamMatchmaking.GetLobbyMemberLimit(SteamLobbyLegacy.CurrentLobby);
                     break;
                 case NetworkTransport.LITENETLIB:
                 case NetworkTransport.RIPTIDE:
@@ -227,7 +227,7 @@ namespace ONI_United.Networking
             switch(transport)
             {
                 case NetworkTransport.STEAMWORKS:
-                    List<CSteamID> members = SteamLobby.GetAllLobbyMembers();
+                    List<CSteamID> members = SteamLobbyLegacy.GetAllLobbyMembers();
                     foreach(CSteamID member in members)
                     {
                         clients.Add(member.m_SteamID);
@@ -240,7 +240,7 @@ namespace ONI_United.Networking
                     }
                     else
                     {
-                        LiteNetLibServer server = TransportServer as LiteNetLibServer;
+                        LiteNetLibServerLegacy server = TransportServer as LiteNetLibServerLegacy;
                         return server?.ClientList ?? clients;
                     }
             }

@@ -19,7 +19,7 @@ using ONI_United.Networking.Lifecycle;
 
 namespace ONI_United.Networking.Transports.Steamworks
 {
-	public static class SteamLobby
+	public static class SteamLobbyLegacy
 	{
 		private static Callback<LobbyCreated_t> _lobbyCreated;
 		private static Callback<GameLobbyJoinRequested_t> _lobbyJoinRequested;
@@ -139,7 +139,7 @@ namespace ONI_United.Networking.Transports.Steamworks
 				MultiplayerSession.Clear();
 				CurrentLobby = CSteamID.Nil;
 				MaxLobbySize = 0;
-				SteamRichPresence.Clear();
+				SteamRichPresenceLegacy.Clear();
 
                 SelectToolPatch.UpdateColor();
             }
@@ -185,7 +185,7 @@ namespace ONI_United.Networking.Transports.Steamworks
 				MultiplayerSession.Clear();
 
 				GameServer.Start();
-				SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – Hosting Lobby");
+				SteamRichPresenceLegacy.SetLobbyInfo(CurrentLobby, "Multiplayer – Hosting Lobby");
 				_onLobbyCreatedSuccess?.Invoke();
 				_onLobbyCreatedSuccess = null;
 
@@ -251,7 +251,7 @@ namespace ONI_United.Networking.Transports.Steamworks
 				MultiplayerSession.SetHost(hostId);
 			}
 
-			SteamRichPresence.SetLobbyInfo(CurrentLobby, "Multiplayer – In Lobby");
+			SteamRichPresenceLegacy.SetLobbyInfo(CurrentLobby, "Multiplayer – In Lobby");
 			_onLobbyJoined?.Invoke(CurrentLobby);
 			RefreshLobbyMembers();
 

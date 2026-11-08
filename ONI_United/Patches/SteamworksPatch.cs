@@ -18,8 +18,8 @@ namespace ONI_United.Patches
 			if (SteamManager.Initialized)
 			{
 				DebugConsole.Log("Steam initialized – setting rich presence.");
-				SteamLobby.Initialize();
-				SteamRichPresence.SetStatus("Multiplayer – In Main Menu");
+				SteamLobbyLegacy.Initialize();
+				SteamRichPresenceLegacy.SetStatus("Multiplayer – In Main Menu");
 			}
 			else
 			{
@@ -37,7 +37,7 @@ namespace ONI_United.Patches
 			if (SteamManager.Initialized)
 			{
 				DebugConsole.Log("SteamManager shutting down – clearing rich presence.");
-				SteamRichPresence.Clear();
+				SteamRichPresenceLegacy.Clear();
 			}
 		}
 	}

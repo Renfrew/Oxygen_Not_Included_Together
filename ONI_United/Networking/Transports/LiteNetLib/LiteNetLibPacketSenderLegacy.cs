@@ -8,7 +8,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.LiteNetLib
 {
-    public class LiteNetLibPacketSender : TransportPacketSender
+    public class LiteNetLibPacketSenderLegacy : TransportPacketSender
     {
         public override bool SendPacket(object conn, IPacket packet, PacketSendMode sendType = PacketSendMode.ReliableImmediate)
         {

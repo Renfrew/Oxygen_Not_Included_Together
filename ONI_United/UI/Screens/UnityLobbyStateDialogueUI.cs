@@ -76,7 +76,7 @@ namespace ONI_United.UI.Screens
 			CopyLobbyCode.OnClick += CopyLobbyCodeToClipboard;
 			PlayerCountInfo = transform.Find("ConnectedPlayersState").gameObject.GetComponent<LocText>();
 			InviteFriends = transform.Find("InviteFriends").gameObject.AddOrGet<FButton>();
-			InviteFriends.OnClick += () => Steamworks.SteamFriends.ActivateGameOverlayInviteDialog(SteamLobby.CurrentLobby);
+			InviteFriends.OnClick += () => Steamworks.SteamFriends.ActivateGameOverlayInviteDialog(SteamLobbyLegacy.CurrentLobby);
 			PerformHardSync = transform.Find("PerformSync").gameObject.AddOrGet<FButton>();
 			PerformHardSync.OnClick += DoHardSync;
 			HardSyncText = transform.Find("PerformSync/Text").gameObject.GetComponent<LocText>();
@@ -98,7 +98,7 @@ namespace ONI_United.UI.Screens
 		{
 			using var _ = Profiler.Scope();
 
-			GUIUtility.systemCopyBuffer = SteamLobby.CurrentLobbyCode;
+			GUIUtility.systemCopyBuffer = SteamLobbyLegacy.CurrentLobbyCode;
 			SetLobbyCodeConfirmationIcon(true);
 		}
 		void DoHardSync()
@@ -156,7 +156,7 @@ namespace ONI_United.UI.Screens
 		{
 			using var _ = Profiler.Scope();
 
-			bool inSteamLobby = SteamLobby.InLobby;
+			bool inSteamLobby = SteamLobbyLegacy.InLobby;
 
 			LobbyCodeTitle.SetActive(inSteamLobby);
 			LobbyCodeContainer.SetActive(inSteamLobby);
@@ -164,7 +164,7 @@ namespace ONI_United.UI.Screens
 
 			if (inSteamLobby)
 			{
-				LobbyCode.SetTextFromData((SteamLobby.CurrentLobbyCode));
+				LobbyCode.SetTextFromData((SteamLobbyLegacy.CurrentLobbyCode));
 				SetLobbyCodeConfirmationIcon(false);
 			}
 

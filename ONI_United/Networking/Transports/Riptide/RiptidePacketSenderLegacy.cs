@@ -9,7 +9,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Riptide
 {
-    public class RiptidePacketSender : TransportPacketSender
+    public class RiptidePacketSenderLegacy : TransportPacketSender
     {
         public override bool SendPacket(object conn, IPacket packet, PacketSendMode sendType = PacketSendMode.ReliableImmediate)
         {
@@ -35,7 +35,7 @@ namespace ONI_United.Networking.Transports.Riptide
 
             if (MultiplayerSession.IsHost)
             {
-                var server = RiptideServer.ServerInstance;
+                var server = RiptideServerLegacy.ServerInstance;
                 if (server == null)
                     return false;
 
@@ -43,7 +43,7 @@ namespace ONI_United.Networking.Transports.Riptide
             }
             else
             {
-                var client = RiptideClient.Client;
+                var client = RiptideClientLegacy.Client;
                 if (client == null)
                     return false;
 

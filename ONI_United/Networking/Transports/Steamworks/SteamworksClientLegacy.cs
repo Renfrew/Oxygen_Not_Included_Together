@@ -18,7 +18,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Steamworks
 {
-    public class SteamworksClient : TransportClient
+    public class SteamworksClientLegacy : TransportClient
     {
         private static Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
         public static HSteamNetConnection? Connection { get; private set; }

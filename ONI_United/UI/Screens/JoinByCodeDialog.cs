@@ -247,7 +247,7 @@ namespace ONI_United.UI.Screens
             _statusText.text = ONI_United.STRINGS.UI.JOINBYDIALOGMENU.JOINING;
             _errorText.text = "";
 
-            SteamLobby.JoinLobby(lobbyId.AsCSteamID(), (joinedId) =>
+            SteamLobbyLegacy.JoinLobby(lobbyId.AsCSteamID(), (joinedId) =>
             {
                 DebugConsole.Log($"[JoinByCodeDialog] Successfully joined lobby: {joinedId}");
                 Close();

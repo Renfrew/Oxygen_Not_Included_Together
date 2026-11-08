@@ -10,9 +10,9 @@ namespace ONI_United.Networking.Transports.Drivers
         public bool SupportsNativeFragmentation => false;
         public bool SupportsNatTraversal => false;
 
-        public TransportServer CreateServer() => new RiptideServer();
-        public TransportClient CreateClient() => new RiptideClient();
-        public TransportPacketSender CreatePacketSender() => new RiptidePacketSender();
+        public TransportServer CreateServer() => new RiptideServerLegacy();
+        public TransportClient CreateClient() => new RiptideClientLegacy();
+        public TransportPacketSender CreatePacketSender() => new RiptidePacketSenderLegacy();
 
         public void Initialize() { }
         public void Shutdown() { }

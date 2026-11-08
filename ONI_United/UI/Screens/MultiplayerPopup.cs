@@ -47,7 +47,7 @@ public static class MultiplayerPopup
 			//MainMenuPatch.Instance.Button_ResumeGame.SignalClick(KKeyCode.Mouse0);
 			//HostLastSave();
 			/*
-			SteamLobby.CreateLobby(onSuccess: () =>
+			SteamLobbyLegacy.CreateLobby(onSuccess: () =>
 			{
 
 			});

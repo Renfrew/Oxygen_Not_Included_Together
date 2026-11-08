@@ -21,7 +21,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.LiteNetLib
 {
-    public class LiteNetLibClient : TransportClient
+    public class LiteNetLibClientLegacy : TransportClient
     {
         private static NetManager _client;
         private static EventBasedNetListener _listener;
@@ -45,7 +45,7 @@ namespace ONI_United.Networking.Transports.LiteNetLib
         // LAN Discovery
         private static NetManager _discoveryClient;
         private static EventBasedNetListener _discoveryListener;
-        public static readonly Dictionary<string, LanDiscoveredHost> DiscoveredHosts = new Dictionary<string, LanDiscoveredHost>();
+        public static readonly Dictionary<string, LanDiscoveredHostLegacy> DiscoveredHosts = new Dictionary<string, LanDiscoveredHostLegacy>();
 
         public static NetManager Client => _client;
         public static NetPeer ServerPeer => _serverPeer;
@@ -120,7 +120,7 @@ namespace ONI_United.Networking.Transports.LiteNetLib
                 string resp = reader.GetString();
                 if (resp == "ONI_DISCOVERY_RESP")
                 {
-                    var host = new LanDiscoveredHost
+                    var host = new LanDiscoveredHostLegacy
                     {
                         EndPoint = remoteEndPoint,
                         HostName = reader.GetString(),

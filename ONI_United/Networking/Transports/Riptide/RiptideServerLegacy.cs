@@ -21,7 +21,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Riptide
 {
-    public class RiptideServer : TransportServer
+    public class RiptideServerLegacy : TransportServer
     {
         private static Server _server;
         private static Client _client; // Server client (Other users will use GameClient)
@@ -68,7 +68,7 @@ namespace ONI_United.Networking.Transports.Riptide
             string ip = Configuration.Instance.Host.LanSettings.Ip;
             int port = Configuration.Instance.Host.LanSettings.Port;
             int maxClients = Configuration.Instance.Host.MaxLobbySize;
-            RiptideClient.MaxServerCapacity = maxClients;
+            RiptideClientLegacy.MaxServerCapacity = maxClients;
 
             _server = new Server("Lan/Riptide");
             _server.TimeoutTime = Configuration.Instance.Host.TimeoutSeconds * 1000;

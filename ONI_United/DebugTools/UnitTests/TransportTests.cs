@@ -24,18 +24,18 @@ namespace ONI_United.DebugTools.UnitTests
 			switch (transport)
 			{
 				case NetworkConfig.NetworkTransport.STEAMWORKS:
-					if (server is not SteamworksServer)
+					if (server is not SteamworksServerLegacy)
 						return UnitTestResult.Fail($"transport=STEAMWORKS but server is {server.GetType().Name}");
-					if (client is not SteamworksClient)
+					if (client is not SteamworksClientLegacy)
 						return UnitTestResult.Fail($"transport=STEAMWORKS but client is {client.GetType().Name}");
-					return UnitTestResult.Pass("STEAMWORKS config matches SteamworksServer/SteamworksClient");
+					return UnitTestResult.Pass("STEAMWORKS config matches SteamworksServerLegacy/SteamworksClientLegacy");
 
 				case NetworkConfig.NetworkTransport.LITENETLIB:
-					if (server is not LiteNetLibServer)
+					if (server is not LiteNetLibServerLegacy)
 						return UnitTestResult.Fail($"transport={transport} but server is {server.GetType().Name}");
-					if (client is not LiteNetLibClient)
+					if (client is not LiteNetLibClientLegacy)
 						return UnitTestResult.Fail($"transport={transport} but client is {client.GetType().Name}");
-					return UnitTestResult.Pass($"{transport} config matches LiteNetLibServer/LiteNetLibClient");
+					return UnitTestResult.Pass($"{transport} config matches LiteNetLibServerLegacy/LiteNetLibClientLegacy");
 
 				default:
 					return UnitTestResult.Fail($"Unknown transport: {transport}");
@@ -53,7 +53,7 @@ namespace ONI_United.DebugTools.UnitTests
 
 			if (MultiplayerSession.IsHost)
 			{
-				var server = NetworkConfig.TransportServer as LiteNetLibServer;
+				var server = NetworkConfig.TransportServer as LiteNetLibServerLegacy;
 				if (server == null || !server.IsRunning)
 					return UnitTestResult.Fail("LiteNetLib Server is not running");
 
@@ -64,7 +64,7 @@ namespace ONI_United.DebugTools.UnitTests
 				return UnitTestResult.Pass($"Server running with {connected} active connection(s)");
 			}
 
-			var client = NetworkConfig.TransportClient as LiteNetLibClient;
+			var client = NetworkConfig.TransportClient as LiteNetLibClientLegacy;
 			if (client == null)
 				return UnitTestResult.Fail("LiteNetLib Client instance is null");
 			if (!client.IsConnected)

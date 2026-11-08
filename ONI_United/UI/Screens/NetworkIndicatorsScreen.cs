@@ -11,7 +11,7 @@ using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Transports.Steamworks;
 using Shared.Profiling;
 using Steamworks;
-using SteamClient = ONI_United.Networking.Transports.Steamworks.SteamworksClient;
+using SteamClient = ONI_United.Networking.Transports.Steamworks.SteamworksClientLegacy;
 using UnityEngine;
 namespace ONI_United.UI.Screens
 {
