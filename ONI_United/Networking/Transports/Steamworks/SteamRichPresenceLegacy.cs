@@ -4,7 +4,7 @@ using Steamworks;
 
 namespace ONI_United.Networking.Transports.Steamworks
 {
-	public static class SteamRichPresence
+	public static class SteamRichPresenceLegacy
 	{
 		public static void SetStatus(string status)
 		{
@@ -42,8 +42,8 @@ namespace ONI_United.Networking.Transports.Steamworks
 
 			SteamFriends.SetRichPresence("gamestatus", "In Multiplayer Lobby");
 			SteamFriends.SetRichPresence("steam_display", "Lobby");
-			SteamFriends.SetRichPresence("steam_player_group", SteamLobby.CurrentLobby.ToString());
-			int group_size = SteamMatchmaking.GetNumLobbyMembers(SteamLobby.CurrentLobby);
+			SteamFriends.SetRichPresence("steam_player_group", SteamLobbyLegacy.CurrentLobby.ToString());
+			int group_size = SteamMatchmaking.GetNumLobbyMembers(SteamLobbyLegacy.CurrentLobby);
 			SteamFriends.SetRichPresence("steam_player_group_size", $"{group_size}");
 
 		}

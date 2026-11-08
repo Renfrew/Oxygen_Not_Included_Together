@@ -11,7 +11,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Steamworks
 {
-    public class SteamworksServer : TransportServer
+    public class SteamworksServerLegacy : TransportServer
     {
         public static HSteamListenSocket ListenSocket { get; private set; }
         public static HSteamNetPollGroup PollGroup { get; private set; }

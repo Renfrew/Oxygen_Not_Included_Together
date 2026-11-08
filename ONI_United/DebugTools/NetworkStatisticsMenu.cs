@@ -9,7 +9,7 @@ using Steamworks;
 using System;
 using Shared.Profiling;
 using UnityEngine;
-using SteamworksClient = ONI_United.Networking.Transports.Steamworks.SteamworksClient;
+using SteamworksClientLegacy = ONI_United.Networking.Transports.Steamworks.SteamworksClientLegacy;
 
 namespace ONI_United.DebugTools
 {
@@ -72,8 +72,8 @@ namespace ONI_United.DebugTools
 			switch (NetworkConfig.transport)
 			{
 				case NetworkConfig.NetworkTransport.STEAMWORKS:
-					qualityL = SteamworksClient.GetLocalPacketQuality();
-					qualityR = SteamworksClient.GetRemotePacketQuality();
+					qualityL = SteamworksClientLegacy.GetLocalPacketQuality();
+					qualityR = SteamworksClientLegacy.GetRemotePacketQuality();
 					break;
 				case NetworkConfig.NetworkTransport.LITENETLIB:
 					qualityL = 1.0f;

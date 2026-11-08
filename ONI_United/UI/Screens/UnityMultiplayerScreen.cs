@@ -537,7 +537,7 @@ namespace ONI_United.UI.Screens
 			using var _ = Profiler.Scope();
 			NetworkConfig.UpdateTransport(NetworkConfig.NetworkTransport.STEAMWORKS);
 
-			SteamLobby.JoinLobby(lobbyId.AsCSteamID(), (lobbyId) =>
+			SteamLobbyLegacy.JoinLobby(lobbyId.AsCSteamID(), (lobbyId) =>
 			{
 				DebugConsole.Log($"[LobbyBrowser] Successfully joined lobby: {lobbyId}");
 				this.Show(false);
@@ -641,10 +641,10 @@ namespace ONI_United.UI.Screens
 
 			if (SteamManager.Initialized)
 			{
-				SteamLobby.RequestLobbyList(OnLobbyListReceived);
+				SteamLobbyLegacy.RequestLobbyList(OnLobbyListReceived);
 			}
 
-			LiteNetLibClient.StartLanDiscovery(Configuration.Instance.Host.LanSettings.Port);
+			LiteNetLibClientLegacy.StartLanDiscovery(Configuration.Instance.Host.LanSettings.Port);
 		}
 		private void OnLobbyListReceived(List<LobbyListEntry> lobbies)
 		{

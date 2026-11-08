@@ -90,10 +90,10 @@ namespace ONI_United.UI.Screens
 			using var _ = Profiler.Scope();
 
 			string password = PasswortInput.Text;
-			if (SteamLobby.ValidateLobbyPassword(LobbyId, password))
+			if (SteamLobbyLegacy.ValidateLobbyPassword(LobbyId, password))
 			{
 				SetRegularStatus();
-				SteamLobby.JoinLobby(LobbyId.AsCSteamID(), (lobbyId) =>
+				SteamLobbyLegacy.JoinLobby(LobbyId.AsCSteamID(), (lobbyId) =>
 				{
 					DebugConsole.Log($"[LobbyBrowser] Successfully joined lobby: {lobbyId}");
 

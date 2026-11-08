@@ -10,9 +10,9 @@ namespace ONI_United.Networking.Transports.Drivers
         public bool SupportsNativeFragmentation => true;
         public bool SupportsNatTraversal => true;
 
-        public TransportServer CreateServer() => new SteamworksServer();
-        public TransportClient CreateClient() => new SteamworksClient();
-        public TransportPacketSender CreatePacketSender() => new SteamworksPacketSender();
+        public TransportServer CreateServer() => new SteamworksServerLegacy();
+        public TransportClient CreateClient() => new SteamworksClientLegacy();
+        public TransportPacketSender CreatePacketSender() => new SteamworksPacketSenderLegacy();
 
         public void Initialize() { }
         public void Shutdown() { }

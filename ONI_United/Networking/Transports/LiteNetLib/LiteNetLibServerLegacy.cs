@@ -21,7 +21,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.LiteNetLib
 {
-    public class LiteNetLibServer : TransportServer
+    public class LiteNetLibServerLegacy : TransportServer
     {
         private const string ClientIdentityHandshake = "ONI_TOGETHER";
         private const string HostIdentityHandshake = "ONI_TOGETHER_HOST";

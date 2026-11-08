@@ -2,7 +2,7 @@ using System.Net;
 
 namespace ONI_United.Networking.Transports.LiteNetLib
 {
-    public struct LanDiscoveredHost
+    public struct LanDiscoveredHostLegacy
     {
         public IPEndPoint EndPoint;
         public string HostName;

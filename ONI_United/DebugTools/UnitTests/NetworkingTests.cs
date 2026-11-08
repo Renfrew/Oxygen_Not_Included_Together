@@ -68,8 +68,8 @@ namespace ONI_United.DebugTools.UnitTests
             if (!NetworkConfig.IsLanConfig())
                 return UnitTestResult.Fail("Not on LiteNetLib/LAN transport");
 
-            if (NetworkConfig.TransportServer is not LiteNetLibServer server)
-                return UnitTestResult.Fail("TransportServer is not a LiteNetLibServer");
+            if (NetworkConfig.TransportServer is not LiteNetLibServerLegacy server)
+                return UnitTestResult.Fail("TransportServer is not a LiteNetLibServerLegacy");
 
             if (server.TcpTransfer == null)
                 return UnitTestResult.Fail("TcpFileTransfer is null (listener failed to start, UDP fallback in use)");

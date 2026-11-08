@@ -173,16 +173,16 @@ namespace ONI_United
                 string party_id = "oni_together_session";
                 bool isPublic = false;
                 
-                if (_client.HasRegisteredUriScheme && NetworkConfig.IsSteamConfig() && SteamLobby.InLobby)
+                if (_client.HasRegisteredUriScheme && NetworkConfig.IsSteamConfig() && SteamLobbyLegacy.InLobby)
                 {
-                    party_id = $"{SteamLobby.CurrentLobby.m_SteamID}";
-                    string visibility = SteamMatchmaking.GetLobbyData(SteamLobby.CurrentLobby, "visibility");
+                    party_id = $"{SteamLobbyLegacy.CurrentLobby.m_SteamID}";
+                    string visibility = SteamMatchmaking.GetLobbyData(SteamLobbyLegacy.CurrentLobby, "visibility");
                     isPublic = visibility != "private";
                     if (isPublic)
                     {
                         presence.Secrets = new DiscordRPC.Secrets
                         {
-                            JoinSecret = $"{SteamLobby.CurrentLobbyCode}"
+                            JoinSecret = $"{SteamLobbyLegacy.CurrentLobbyCode}"
                         };
                     }
                 }
@@ -254,7 +254,7 @@ namespace ONI_United
             }
             else
             {
-                SteamLobby.JoinLobby(lobbyId);
+                SteamLobbyLegacy.JoinLobby(lobbyId);
             }
         }
 

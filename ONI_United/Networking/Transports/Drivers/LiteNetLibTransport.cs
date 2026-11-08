@@ -10,9 +10,9 @@ namespace ONI_United.Networking.Transports.Drivers
         public bool SupportsNativeFragmentation => true;
         public bool SupportsNatTraversal => false;
 
-        public TransportServer CreateServer() => new LiteNetLibServer();
-        public TransportClient CreateClient() => new LiteNetLibClient();
-        public TransportPacketSender CreatePacketSender() => new LiteNetLibPacketSender();
+        public TransportServer CreateServer() => new LiteNetLibServerLegacy();
+        public TransportClient CreateClient() => new LiteNetLibClientLegacy();
+        public TransportPacketSender CreatePacketSender() => new LiteNetLibPacketSenderLegacy();
 
         public void Initialize() { }
         public void Shutdown() { }

@@ -144,7 +144,7 @@ namespace ONI_United.Networking.Lifecycle
 		{
 			using var _ = Profiler.Scope();
 
-			SteamLobby.OnLobbyMembersRefreshed += UpdateReadyStateTracking;
+			SteamLobbyLegacy.OnLobbyMembersRefreshed += UpdateReadyStateTracking;
 		}
 
 		public static void SendAllReadyPacket()

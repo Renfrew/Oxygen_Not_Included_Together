@@ -285,11 +285,11 @@ namespace ONI_United.DebugTools
             {
                 case NetworkConfig.NetworkTransport.STEAMWORKS:
                     if (ImGui.Button("Create Lobby"))
-                        SteamLobby.CreateLobby();
+                        SteamLobbyLegacy.CreateLobby();
 
                     ImGui.SameLine();
                     if (ImGui.Button("Leave Lobby"))
-                        SteamLobby.LeaveLobby();
+                        SteamLobbyLegacy.LeaveLobby();
                     break;
                 case NetworkConfig.NetworkTransport.LITENETLIB:
                     if (ImGui.Button("Start Lan"))
@@ -594,7 +594,7 @@ namespace ONI_United.DebugTools
         {
             using var _ = Profiler.Scope();
 
-            var players = SteamLobby.GetAllLobbyMembers();
+            var players = SteamLobbyLegacy.GetAllLobbyMembers();
             string self = $"[You] {SteamFriends.GetPersonaName()} | {MultiplayerSession.LocalUserID}";
 
             TransportServer server = null;
@@ -648,7 +648,7 @@ namespace ONI_United.DebugTools
             if(MultiplayerSession.IsHost)
             {
                 var players = MultiplayerSession.ConnectedPlayers;
-                var server = NetworkConfig.GetTransportServer() as LiteNetLibServer;
+                var server = NetworkConfig.GetTransportServer() as LiteNetLibServerLegacy;
 
                 foreach (var player in players)
                 {

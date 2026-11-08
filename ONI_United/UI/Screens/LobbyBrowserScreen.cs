@@ -365,7 +365,7 @@ namespace ONI_United.UI.Screens
             _statusText.text = ONI_United.STRINGS.UI.SERVERBROWSER.LOADING_LOBBIES;
             ClearLobbyRows();
 
-            SteamLobby.RequestLobbyList(OnLobbyListReceived);
+            SteamLobbyLegacy.RequestLobbyList(OnLobbyListReceived);
         }
 
         private void OnLobbyListReceived(List<LobbyListEntry> lobbies)
@@ -543,7 +543,7 @@ namespace ONI_United.UI.Screens
             else
             {
                 // Direct join
-                SteamLobby.JoinLobby(lobby.LobbyId.AsCSteamID(), (lobbyId) =>
+                SteamLobbyLegacy.JoinLobby(lobby.LobbyId.AsCSteamID(), (lobbyId) =>
                 {
                     DebugConsole.Log($"[LobbyBrowser] Successfully joined lobby: {lobbyId}");
                     Close();
@@ -657,10 +657,10 @@ namespace ONI_United.UI.Screens
             CreateButton(btnContainer.transform, ONI_United.STRINGS.UI.SERVERBROWSER.JOIN_BUTTON, () =>
             {
                 string password = inputField.text;
-                if (SteamLobby.ValidateLobbyPassword(lobbyID, password))
+                if (SteamLobbyLegacy.ValidateLobbyPassword(lobbyID, password))
                 {
                     Destroy(dialogGO);
-                    SteamLobby.JoinLobby(lobbyID.AsCSteamID(), (lobbyId) =>
+                    SteamLobbyLegacy.JoinLobby(lobbyID.AsCSteamID(), (lobbyId) =>
                     {
                         DebugConsole.Log($"[LobbyBrowser] Successfully joined lobby: {lobbyId}");
                         Close();

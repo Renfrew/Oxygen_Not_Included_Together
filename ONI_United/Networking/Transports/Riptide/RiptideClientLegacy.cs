@@ -22,7 +22,7 @@ using ONI_United.Networking.Transports;
 
 namespace ONI_United.Networking.Transports.Riptide
 {
-    public class RiptideClient : TransportClient
+    public class RiptideClientLegacy : TransportClient
     {
         private static Client _client;
         private static bool _connectAttemptInFlight;

@@ -216,7 +216,7 @@ namespace ONI_United.UI.Screens
             codeTextRT.anchorMax = Vector2.one;
             codeTextRT.sizeDelta = Vector2.zero;
             var codeTMP = codeTextGO.GetComponent<TextMeshProUGUI>();
-            string formattedCode = LobbyCodeHelper.FormatCodeForDisplay(SteamLobby.CurrentLobbyCode);
+            string formattedCode = LobbyCodeHelper.FormatCodeForDisplay(SteamLobbyLegacy.CurrentLobbyCode);
             codeTMP.text = formattedCode;
             codeTMP.fontSize = 20;
             codeTMP.alignment = TextAlignmentOptions.Center;
@@ -224,7 +224,7 @@ namespace ONI_United.UI.Screens
             codeTMP.fontStyle = FontStyles.Bold;
 
             // Copy button
-            CreateCopyButton(container.transform, SteamLobby.CurrentLobbyCode);
+            CreateCopyButton(container.transform, SteamLobbyLegacy.CurrentLobbyCode);
         }
 
         private void CreateCopyButton(Transform parent, string textToCopy)
@@ -316,7 +316,7 @@ namespace ONI_United.UI.Screens
                 // Invite button
                 CreateActionButton(container.transform, ONI_United.STRINGS.UI.PAUSESCREEN.INVITE.LABEL, () =>
                 {
-                    Steamworks.SteamFriends.ActivateGameOverlayInviteDialog(SteamLobby.CurrentLobby);
+                    Steamworks.SteamFriends.ActivateGameOverlayInviteDialog(SteamLobbyLegacy.CurrentLobby);
                 });
 
                 // Hard Sync button

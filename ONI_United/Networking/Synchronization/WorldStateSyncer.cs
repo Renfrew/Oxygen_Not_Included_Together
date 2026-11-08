@@ -218,7 +218,7 @@ namespace ONI_United.Networking.Synchronization
 			if (Time.unscaledTime - _lastGameInfoTime > GAME_INFO_INTERVAL)
 			{
 				_lastGameInfoTime = Time.unscaledTime;
-				SteamLobby.UpdateGameInfo();
+				SteamLobbyLegacy.UpdateGameInfo();
 			}
 
 			// Skip other syncs if no clients connected
@@ -257,7 +257,7 @@ namespace ONI_United.Networking.Synchronization
 						case 0: SyncDigging(); break;
 						case 1: SyncChores(); break;
 						case 2: SyncResearchProgress(); break;
-						case 3: SteamLobby.UpdateGameInfo(); break; // Update lobby metadata
+						case 3: SteamLobbyLegacy.UpdateGameInfo(); break; // Update lobby metadata
 					}
 				}
 			}
