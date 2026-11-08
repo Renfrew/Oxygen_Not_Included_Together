@@ -13,7 +13,9 @@ namespace ONI_United.DebugTools
 
     public static class ModLog
     {
-#if DEBUG
+#if ONI_TRACE
+        private const LogLevel MinimumLevel = LogLevel.Trace;
+#elif DEBUG
         private const LogLevel MinimumLevel = LogLevel.Debug;
 #else
         private const LogLevel MinimumLevel = LogLevel.Warning;
@@ -34,44 +36,26 @@ namespace ONI_United.DebugTools
             Write(LogLevel.Error, exception?.ToString() ?? "Unknown exception");
         }
 
-        public static void Error(string message, bool triggerErrorScreen = false)
+        public static void Error(string message, bool triggerErrorScreen = false) =>
+            Write(LogLevel.Error, message, triggerErrorScreen);
+
+        private static void Write(LogLevel level, string message, bool triggerErrorScreen = false)
         {
-            message ??= string.Empty;
-
-            if (triggerErrorScreen)
-            {
-                UnityEngine.Debug.LogError(Format(LogLevel.Error, message));
-            }
-            else
-            {
-                Write(LogLevel.Error, message);
-            }
-        }
-
-        private static void Write(LogLevel level, string message)
-        {
-            message ??= string.Empty;
-
-            if (!IsEnabled(level))
+            if (!IsEnabled(level) || global::Debug.s_loggingDisabled)
                 return;
 
             string formatted = Format(level, message);
-            switch (level)
+            if (triggerErrorScreen)
             {
-                case LogLevel.Trace:
-                case LogLevel.Debug:
-                case LogLevel.Info:
-                    UnityEngine.Debug.Log(formatted);
-                    break;
-                case LogLevel.Warning:
-                case LogLevel.Error:
-                default:
-                    UnityEngine.Debug.LogWarning(formatted);
-                    break;
+                // Use Unity's error channel once so ONI's crash reporter receives the error.
+                UnityEngine.Debug.LogError(global::Debug.TimeStamp() + formatted);
+                return;
             }
+
+            global::Debug.WriteTimeStamped(formatted);
         }
 
         private static string Format(LogLevel level, string message) =>
-            $"[ONI_United][{level}] {message}";
+            $"[{level.ToString().ToUpperInvariant()}] [ONI_United] {message}";
     }
 }
