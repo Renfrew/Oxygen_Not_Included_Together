@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Presentation
 {

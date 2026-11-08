@@ -1,7 +1,7 @@
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session.States;
-using ONI_United.Networking.Transport.Steamworks;
+using ONI_United.Networking.Sessions.States;
+using ONI_United.Networking.Transports.Steamworks;
 using Steamworks;
 using ONI_United.Patches.ToolPatches;
 using System;

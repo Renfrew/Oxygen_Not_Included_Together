@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Packets.Tools;
 using ONI_United.Networking.Packets.Tools.Cancel;
 using Shared.Profiling;

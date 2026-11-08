@@ -4,7 +4,7 @@ using ONI_United.Networking.Packets.Architecture;
 using Shared.Profiling;
 using UnityEngine;
 using Shared.Interfaces.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.Tools.Sandbox
 {

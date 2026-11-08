@@ -1,6 +1,6 @@
 ﻿using ONI_United.DebugTools;
 using ONI_United.Misc;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Steamworks;
 using System.Collections.Generic;
 using ONI_United.Networking.Replication;
@@ -9,7 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Presentation
 {

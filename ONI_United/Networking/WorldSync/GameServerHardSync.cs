@@ -8,7 +8,7 @@ using ONI_United.Networking.Packets.Architecture;
 using ONI_United.Misc.World;
 using ONI_United.Networking.Lifecycle;
 using ONI_United.Networking.Presentation;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.WorldSync
 {

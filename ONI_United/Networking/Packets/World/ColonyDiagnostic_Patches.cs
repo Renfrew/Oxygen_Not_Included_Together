@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Shared.Profiling;
 using static ColonyDiagnostic;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {

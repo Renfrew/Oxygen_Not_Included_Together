@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using Klei.AI;
 using ONI_United.DebugTools;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Identity;
 using Shared.Replication;
 using Shared.Replication.Attributes;

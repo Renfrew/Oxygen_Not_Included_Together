@@ -1,9 +1,9 @@
 using System;
 using ONI_United.Misc;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Replication;
-using ONI_United.Networking.Session.States;
+using ONI_United.Networking.Sessions.States;
 using Shared;
 using ONI_United.DebugTools;
 using ONI_United.Networking;

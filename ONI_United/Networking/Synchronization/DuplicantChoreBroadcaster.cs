@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using ONI_United.Networking.Packets.Architecture;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Synchronization

@@ -8,7 +8,7 @@ using System.Collections;
 using Shared.Helpers;
 using UnityEngine;
 
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.WorldSync;
 using Shared.Interfaces.Networking;
 

@@ -12,7 +12,7 @@ using ONI_United.Misc;
 using ONI_United.Networking.Runtime;
 using Shared.Interfaces.Networking;
 using ONI_United.Networking;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 
 namespace ONI_United.Networking.Packets.World
 {

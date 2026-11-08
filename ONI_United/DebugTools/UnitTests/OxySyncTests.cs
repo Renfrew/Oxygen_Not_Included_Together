@@ -211,11 +211,11 @@ namespace ONI_United.DebugTools.UnitTests
 		[UnitTest(name: "Realtime snapshots bypass the optional packet queue", category: "OxySync")]
 		public static UnitTestResult RealtimeSnapshotsBypassPacketQueue()
 		{
-			if (!ONI_United.Networking.Transport.TransportPacketSender.IsLatencySensitive(PacketSendMode.UnreliableNoDelay))
+			if (!ONI_United.Networking.Transports.TransportPacketSender.IsLatencySensitive(PacketSendMode.UnreliableNoDelay))
 				return UnitTestResult.Fail("UnreliableNoDelay should bypass the queue");
-			if (ONI_United.Networking.Transport.TransportPacketSender.IsLatencySensitive(PacketSendMode.Unreliable))
+			if (ONI_United.Networking.Transports.TransportPacketSender.IsLatencySensitive(PacketSendMode.Unreliable))
 				return UnitTestResult.Fail("Regular unreliable traffic should retain configured queue behavior");
-			if (ONI_United.Networking.Transport.TransportPacketSender.IsLatencySensitive(PacketSendMode.ReliableImmediate))
+			if (ONI_United.Networking.Transports.TransportPacketSender.IsLatencySensitive(PacketSendMode.ReliableImmediate))
 				return UnitTestResult.Fail("Reliable traffic must retain ordering through the queue");
 
 			return UnitTestResult.Pass("Only latency-sensitive unreliable snapshots bypass the queue");

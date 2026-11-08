@@ -12,10 +12,10 @@ using UnityEngine;
 using ONI_United.Networking.Synchronization;
 using ONI_United.Networking;
 using ONI_United.Networking.Lifecycle;
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using ONI_United.Networking.Replication;
 using ONI_United.Networking.Overlay;
-using States = ONI_United.Networking.Session.States;
+using States = ONI_United.Networking.Sessions.States;
 
 namespace ONI_United.Networking.Packets.Architecture
 {

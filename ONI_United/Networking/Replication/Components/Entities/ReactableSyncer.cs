@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using ONI_United.Networking.Identity;
 
-using ONI_United.Networking.Session;
+using ONI_United.Networking.Sessions;
 using Shared.Interfaces.Networking;
 
 namespace ONI_United.Networking.Replication.Components.Entities
