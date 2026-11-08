@@ -1,16 +1,150 @@
-# Oxygen Not Included Together — Development Status
+# Multiplayer: ONI United — Development Status
 
-**Last updated:** 2026-10-15  
-**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and point-in-time GitHub/Git evidence through 2026-10-15. Historical runtime/build evidence remains tied to the exact scope in which it was obtained.
+## 2026-10-30 — Common host implementation checkpoint; native runtime gates open
+
+**Verified baseline:** Renfrews-Studio.local, branch `feature/transport`, HEAD `f2ca18c1c6b646b169b34a557ccd82ba7c8a29a3`. The implementation is in **22 staged paths**, not a new committed HEAD or clean release checkpoint. At documentation entry the working tree was clean and no files were untracked. The one-line LAN diagnostic Kick correction in DevToolMultiplayer.cs is now staged: it uses the selected live LiteNetLibServer rather than a factory-created server. Index diff: +1321/-593; SHA-1 `dee1183ea1ed0c5cd25e58783ac7f27da68013ab`. This documentation pass changes only the four maintained references, unstaged; source and index are preserved.
+
+**Implemented and source-reviewed:** GameServer and obsolete ServerState are removed. Lifecycle owns permission/transitions and inline essential EventActions, then caller callback last. Both native server implementations use common instance-level TransportServer host operations. Start → StartingHost → TransportStarted → PrepareSession → SessionPrepared → Hosting prepares logical host membership before Hosting, using existing MultiplayerSession.RegisterAsHost integration. Stop clears Session, identity and selection presentation before protocol cancellation; Stopped requires confirmed essential and protocol cleanup. Repeated Stop retains pending completion/continuation; expected cleanup failure remains Stopping for explicit retry. Unexpected accepted-action exceptions log/rethrow without automatic rollback; an essential cleanup exception skips normal protocol cancellation and invalidates older completion. See ARCHITECTURE and D-049 for ownership, not D-048's superseded coordinator/order wording.
+
+Steam retains correlated pending creation through Stop and owns late-result release/local cleanup evidence; creator LobbyEnter is not a readiness prerequisite. Protocol resources remain independent of Session after logical clear. Host tick ownership is now NetworkingComponent; the original host/capacity admission predicate is in SessionHandshakeCoordinator. Save-load retains its original filename through pending Stop, resumes only after Idle, and is discarded on failure/disposal. Lifetime release initiates without another frame. These are source findings, not native/runtime results.
+
+**Saved verification evidence (not rerun by this documentation task):**
+
+```text
+/usr/local/share/dotnet/dotnet build ONI_United/ONI_United.csproj --no-restore -c Debug -p:DoNotBuildAsMod=true -p:IsPacked=false
+/usr/local/share/dotnet/dotnet test tests/Shared.Tests/Shared.Tests.csproj --no-restore -c Debug -p:DoNotBuildAsMod=true -p:IsPacked=false
+```
+
+The saved `/tmp/oni-checkpoint-verify-build.log` records **192 warnings, 0 errors**; `/tmp/oni-checkpoint-verify-tests.log` records **95 passed, 0 failed, 0 skipped**, with 24 nullable warnings during test compilation. Deployment guards were inspected for that run: DoNotBuildAsMod=true excludes mod metadata/copy/publicization targets; IsPacked=false excludes ILRepack. This is non-deploying Debug compilation/test evidence, not packaging, a release build, deployment or gameplay verification.
+
+**Test scope:** 44 focused cases were added: 30 transition-table cases and 14 scenarios. The project source-links real Lifecycle, common TransportServer and Session with Unity/domain/protocol substitutes. It exercises event rejection/order/nesting, common completion/retry, retained continuation and disposal behavior; it does not execute LiteNetLib/Steam native resources, real Unity callbacks or host/client gameplay. The older 51-test Session checkpoint and five-test N15-B history below retain their own provenance.
+
+**Runtime-unverified:** LAN listener startup, optional TCP/fallback and worker termination; Steam creation, pending cancellation, late callbacks and confirmed local cleanup; actual-game cleanup failure/explicit retry; original-filename save-load continuation; frontend/pause and normal client world replacement; quit/destruction ordering; multiplayer synchronization/gameplay. No exact-artifact or release gate is closed.
+
+**Approved but deferred:** NetworkConfig → NetworkRuntime refinement, stateless LifecycleEventActions extraction, Lifecycle host/client mutual exclusion and selection permission, safe selected-instance replacement/pending-client cancellation, and direct Session.BeginHosting integration preserving RegisterAsHost notification/name/readiness/metadata side effects. Exact client phases/events/transitions remain undecided and unapproved. NetworkConfig still has mutable selected references and factory-style Get methods; existing host/pending-Steam checks do not protect all pending client paths. Generic Stop can miss a pre-admission LAN connection. Current GameClient checks must not be removed before equivalent central permission exists. No Player/ReadyManager/synchronization redesign or new UI support is implied.
+
+**Next gates:** Source checkpoint review, then separately authorized LAN native verification and Steam callback/cancellation verification, including failure/retry, save replacement and lifetime scenarios. Deferred facade/client/Session integration requires its own bounded implementation scope. Existing compliance, exact-artifact and gameplay regression gates remain open.
+
+## Historical 2026-10-30 — Common host architecture agreed; implementation pending
+
+This entry records the earlier D-048 agreement/baseline; its coordinator and startup-order wording is superseded by D-049 and the checkpoint above.
+
+**Documentation baseline:** Studio Renfrews-Studio.local, feature/transport, HEAD `8ecb199fafdc40607eea209d84d7e5ebfed08b7d`; index, working tree and untracked-file status were clean before this update. Source remains unchanged by this documentation task.
+
+**Discussion completed:** D-048 records the agreed Server event-action architecture. Lifecycle retains permission/transitions; Server coordinates shared actions; protocols own native execution, pending operations, cancellation and resource completion; static Session retains logical data/invariants. This agreement is not an implemented common protocol.
+
+**Important ordering differences:** Current LAN registers/confirms host membership before submitting Started; the approved target instead enters Hosting and activates Session inside startedAction. Current LAN performs shared domain cleanup after the networking result; the target Stop action deactivates Session and performs shared cleanup before Protocol.Cancel. Essential cleanup must be finished before Stopped, rather than hidden in stoppedAction. Existing Steam callback startup/Session mutation bypasses, ignored registration/release results and legacy server state still require migration. D-044 repeatable Stop, unresolved completion retention, explicit retry and continuation rules remain in force.
+
+**Pending:** Final concrete contracts for existing transport abstractions, callback/error/completion wiring and inheritance/composition; ownership review; bounded common-host implementation; source review and separately authorized build/existing tests; then LAN/Steam runtime/cancellation verification. Client coordination/event design is separate and not finalized. The Session checkpoint, Player/roster work and D-047 synchronization status below are unchanged.
+
+**Evidence limit:** No new build, tests, deployment or runtime verification was performed. Prior source/binary/API investigations inform design but do not prove the future implementation or deployed-game behavior. Earlier checkpoint results retain their original provenance.
+
+## 2026-10-30 — Session simplification committed; runtime verification pending
+
+This entry records the committed Session change and its original owners/test counts. Subsequent host-owner relocation and common hosting are recorded above; the original GameServer references are historical.
+
+**Verified repository baseline:** `Renfrews-Studio.local` (Darwin arm64), branch `feature/transport`, HEAD `53240ca425768962b345e8eee4a4d140d5be5223` (`refactor(session): consolidate session ownership and remove redundant state`). Initial index, working tree and untracked-file status were clean. The previous LAN checkpoint is committed as `37c7d74adb9475a79f18e6c099e9fc866c0388ec`; the older staged/index reports below are historical checkpoints.
+
+**Committed scope:** Nine files, +300/-194: Session.cs; deleted SessionController.cs; MultiplayerSession.cs; SessionHandshakeCoordinator.cs; Runtime/GameServer.cs; Transport/Steamworks/SteamLobby.cs; the multiplayer-session diagnostic regression tests; SessionMvpTests.cs; and the Shared.Tests project source-link list. Player.cs and MultiplayerPlayer.cs were inspected but are unchanged by this commit.
+
+**Source-inspected result:** Session remains static, with complete host or distinct local/host initialization, valid unique identity checks, host-removal protection, metadata mutation and derived IsActive/IsHost/IsClient properties. SessionController and SessionActiveChanged are absent. GameServer retains the host/capacity admission predicate. Networking operations now explicitly own game activation/deactivation notifications and pending-target cleanup; Steam identity checks still precede Session reset. Handshake authorization remains before admission. This is not the deferred Player redesign, complete client roster replication or common LAN/Steam startup migration. See D-046 and ARCHITECTURE for ownership.
+
+**Validation provenance:** The latest pre-commit implementation report records a successful Debug build with **192 warnings, 0 errors**, **Shared.Tests: 51 passed, 0 failed, 0 skipped**, and passing staged/unstaged whitespace checks. These are historical reported results, not an independently reproduced build/test of the clean commit. The inspected saved `/private/tmp/oni-session-controller-debug.log` and `oni-session-controller-tests.log` instead describe an earlier 225-warning/0-error and 42-test pass; they do not attest the latest counts or final commit inputs. No compiler, tests, deployment or ONI runtime multiplayer execution was performed in this documentation pass.
+
+**Review boundary:** Independent source inspection of the committed scope confirms the consolidation and explicit notification ordering. Shared.Tests cover invalid/complete initialization, identity uniqueness, read-only membership, host-removal protection, reset, derived roles and diagnostic identity invariants; game-dependent notification checks remain diagnostics, not evidence that the standalone suite exercised ONI callbacks. Earlier review of an intermediate unstaged implementation is not a separate endorsement of this final commit. Runtime LAN/Steam admission, callback reentrancy, disconnect and world replacement remain unverified for it.
+
+**Synchronization direction versus implementation:** D-047 records approved global-round/stage-dependent joining and snapshot reuse while relevant state is unchanged. Current GameStateRequestPacket rejects requests during active synchronization, ReadyManager rejects a nonparticipant in an existing round, and GameServerHardSync clears its snapshot on completion/reset. The refinements are not implemented by the Session commit. Player/readiness consolidation and possible ReadyManager removal remain pending; no automatic unpause is authorized.
+
+**Historical next step at that checkpoint:** Read-only common LAN/Steam host-start investigation/design, then a separately bounded implementation. Earlier bug reports, exact-artifact runtime/release gates and historical validation below remain in force.
+
+## Historical 2026-10-29 — Incremental LAN host lifecycle checkpoint
+
+This is the earlier LAN-only implementation/staging record, superseded by the common host checkpoint above. Its named owners, transition table, validation limits and staging instructions apply only to that baseline.
+
+**Review baseline:** Authoritative `Renfrews-Studio.local` (Darwin arm64), `feature/transport`, HEAD `e15e4cdfd34b65b83d2d5ea44332858c6dd60b85`. At documentation-review entry, 51 source paths were staged, with no unstaged changes or untracked files. The source index diff SHA-256 was `a941d42a66df3eae20b05a680c7e7e6e8be66a1dccd7a2ae4dceedfa62536f92`; this identifies the reviewed index, not the reported build inputs. Documentation changes are left unstaged for user review/commit; no source or index edits are part of this documentation pass.
+
+**Implemented, source-inspected:** `ONI_United/StateMachines/Lifecycle.cs` (`ONI_United.StateMachines.Lifecycle`) is the persistent Multiplayer_Modules singleton, attached during OnLoad and initialized once after PacketRegistry.RegisterDefaults in OnAllModsLoaded. GameServer, GameClient and ReadyManager now reside in `ONI_United/Networking/Runtime/`. The five phases are Uninitialized/Idle/StartingHost/Hosting/Stopping and four events are Start/Started/Stop/Stopped. Handle changes state before synchronous action invocation, returning admission/invocation only. Action owners retain execution, failure interpretation and recovery. There are no StopFailed/Disposed phases, Dispose event, extra lifecycle flags or callback/operation framework. See ARCHITECTURE and D-043 through D-045 for the complete permission/ownership contracts.
+
+The LAN action validates a loaded colony, selects and captures the transport, rebuilds identity, retains Prepare, initializes ticking, confirms its listener and local host membership, then submits Started. Hosting establishes host readiness for remote Session admission, not remote presence or synchronization/gameplay readiness. UI, developer and post-load LAN startup use the machine; the old frame-spread startup sequence is gone, and further cancellation design is deferred. Prepare remains. Pre-game ready-up rooms are deferred; existing Steam lobby discovery/membership remains.
+
+**Stop and lifetime:** Lifecycle admits repeated Stop in Stopping. LiteNetLibServer retains the original completion during an in-flight shutdown; NetworkingComponent observes completion before network servicing even outside Started. TcpFileTransferServer tracks and closes its sockets, then exposes worker termination without main-thread TCP joins. GameServer interprets the network result, invokes Session/identity/selection cleanup in order, confirms membership cleared and submits Stopped only on success. Failure remains Stopping with LanError for existing Session presentation; Start is blocked and explicit Stop retries, with no automatic retry. Captured owner checks and clearing observation before delivery protect against stale work. Quit/destruction directly initiate repeat-safe release and discard pending observation; no extra frame is required, no terminal state is added, and universal event rejection before destruction is intentionally not promised. Calls after singleton destruction violate the lifetime contract. Legacy client/Steam quit paths remain.
+
+**Save replacement:** DoLoad is held until successful cleanup; the operation continuation captures the original filename and resumes after Idle, retaining the existing OnSaveLoaded host-start path. Ordinary repeated Stop does not replace that continuation. Cleanup failure discards it; ordinary retry does not resume that load. Application disposal also discards it. None of these paths has runtime verification for this snapshot.
+
+**Presentation:** Current selection is `Session.IsActive || Lifecycle.HasHostOperation`, so unfinished LAN startup/cleanup and failures remain visible through Session even when domain membership is absent. Host layout/status scope is unchanged; closing UI does not disconnect and no automatic unpause was added. Connecting-client progress/Cancel Connection can still be unreachable when neither selection condition is true. Session composition and the separate startup-error presentation issue remain deferred.
+
+**Build provenance:** The user reports that the current working tree passed a non-deploying Debug build. No successful-build output, exact executed command, warning/error totals, exit status or immutable input/artifact manifest for that reported pass was available in the inspected repository/build-log locations. The pass is therefore **user-reported compilation evidence**, not an independently reproduced result or exact-index attestation. The reviewed non-deploying command is below; it is an intended command, not a recovered invocation:
+
+```sh
+/usr/local/share/dotnet/dotnet build ONI_United/ONI_United.csproj --no-restore -c Debug -p:DoNotBuildAsMod=true -p:IsPacked=false
+```
+
+Inspected deployment guards disable mod-copy/metadata/publicizing when DoNotBuildAsMod=true and repacking when IsPacked=false. The available temporary `oni-lifecycle-review-build-20261029.log` instead records an earlier **failed** build against removed Networking/Lifecycle/MultiplayerLifecycle.cs: 193 warnings, 9 errors, 1.29 seconds (log SHA-256 `b0d67df7ea7e5e581f7154932ed9ef93b86adb897ed35a6cc1b438622c63c111`). It contains no recovered invocation and does not describe the current relocated source. Do not reuse its counts for the reported pass. No build, tests, deployment or game launch was performed for this documentation update.
+
+**Final source review:** Complete staged source changes were inspected, including import/namespace-only consumers. The Runtime import in Lifecycle and removal of whitespace at GameServer.cs:281 are present in both working tree and index; no intended source correction is missing from the index. Final `git diff --check` and `git diff --cached --check` both passed, including the documentation diff. No staged whitespace finding remains. Earlier N14/UI/transport/gameplay results below retain their historical artifact/scenario limits and do not verify this checkpoint.
+
+**Open gates:** Frontend/pause processing, normal world replacement, startup reentrancy/cancellation, repeated Stop and explicit failure retry, TCP termination, save-load continuation success/failure, and quit/destruction need exact-artifact runtime evidence. LiteNetLib's internal UDP Stop may block while joining its threads; no runtime hang was established, and TCP worker termination has no verified deadline. Legacy Steam Start/Shutdown and asynchronous lobby callbacks still bypass the new host machine; cancellation, late-result/callback ownership and local membership confirmation remain deferred. Networking/UI/Session rework and client/synchronization conformance remain separate work. This is an incremental source checkpoint, not transport parity, feature-complete or release-ready status.
+
+## Earlier 2026-10-29 — Incomplete Windows Multiplayer UI checkpoint (historical baseline)
+
+The entry below records its earlier UI/source baseline; its unstaged-file instructions and evidence do not describe the current LAN index.
+
+**Baseline:** Authoritative Mac review on `feature/transport`, HEAD `2cf94cbd808686ad9c39c59fcb5d1b7c31d90c55`. Before this documentation/key correction, 62 paths were staged and only MainMenuPatch.cs had an unstaged one-line lookup edit. This is a development checkpoint, not a release or evidence of a successful build of the exact final index. Earlier dated entries retain their own build counts, geometry and runtime limits; they do not describe the current tree automatically.
+
+**Current source:** The authored MultiplayerDialogScreen KModalScreen shell and MultiplayerScreen coordinator retain stacked Join/Host navigation. Join and Host use reusable TabMenu composition. Host has common Maximum Players above the menu and two existing authored Settings rows per transport: Steam password / Friends Only plus Settings; LAN Player Name / port plus Settings. Host has no status/validation display, reserved feedback space or version label. Domain validation remains; unsupported Steam hosting and Settings actions stay disabled. No HostSettingsRow binding remains. Session retains its existing content implementation and awaits its separate refactor.
+
+**Main-menu correction (unstaged pending user review):** The initially supplied fix still uppercased displayed text while comparing against mixed-case MULTIPLAYER_BUTTONS.TITLE, leaving a null lookup/dereference possible even in English. The working-tree correction uses exact ordinal equality with the same resolved caption key used for creation; inspected vanilla MainMenu.MakeButton assigns that caption directly. The five de/ko/pl/ru/zh catalogs now map the existing translations to MULTIPLAYER_BUTTONS.TITLE instead of the unused MULTIPLAYER_MENU.TITLE key. No build or localized in-game test was run for this correction. The user must include these unstaged edits before treating this blocker as corrected in the commit.
+
+**Packaging evidence:** The prior deployed artifact `a78c79c72521a62ccb442e1d730335fa903c5f29b5f121bf3cd313d95d1ef2c0` carried authoring-only Shared UI script identities. The log recorded missing scripts and configuration-load failure at internal timestamp [04:11:40.569], followed by a null configuration crash on Multiplayer click. This is historical failure evidence, not a Host-layout defect.
+
+The indexed Mac bundle, current Windows build output and deployed Windows bundle were independently hash-checked during this update and match SHA-256 `8de3b22ce9be804e1bcb2ba46d48370eb69a6b49cf82559370ebf932e2a81f67`. The supplied independent checkpoint review reports 12 prefab entries, no external bundle dependencies, correct native identities and all 11 Shared UI script records referencing ONI_United.dll. That artifact-inspection result is attributed to that review, not rerun here. The existing Unity result file reads PASS 2026-10-29T04:24:20.1465206Z. The resolved host Player.log independently records prepared UI assets loaded at internal timestamp [05:28:23.152]. Neither result identifies a successful build/test of the exact final staged source tree.
+
+**Runtime scope:** User-provided screenshots show the Host Steam and LAN forms rendered with the approved row arrangement. They do not establish equal tab height, field functionality, successful hosting/joining, synchronization, cancellation or lifecycle correctness. No new builds, tests, Editor execution, packaging, deployment or game launches were performed in this documentation/key-correction session.
+
+**Open work at that UI checkpoint:** Session selection then used only Session.IsActive, leaving connecting-state progress and Cancel Connection unreachable before admission. The current LAN checkpoint above also selects unfinished host operations, but still does not solve the connecting-client presentation gap. Closing UI intentionally does not cancel. Record this as incomplete, not working cancellation. The Maximum Players caption remains 1-4 while accepted limits remain 2-16. Full runtime gates are in DEVELOPMENT_ROADMAP.md. The new UI bundle is Windows-only; the index has no corresponding new macOS/Linux bundle. The corrected packaging builder/request bridge lives in the separate Windows Unity project and is not captured by the Mac bundle commit; preserve its source in that project's intended versioned location. Existing legacy Host assets remain for authoring references. No feature-complete or release-ready claim is made.
+
+## 2026-10-26 — Join visual refinement and local form validation (runtime pending)
+
+The existing dedicated modal now has an edge-to-edge header outside body padding, a title centered with symmetric Close clearance, and an authored footer version slot. Version comes from packaged mod metadata, falling back to the build's AssemblyInformationalVersion; it is displayed as v[version]. Join restores Public Lobbies Refresh through the existing discovery callback, uses JOIN BY CODE with the existing SteamJoiningVerified gate, retains neutral Host Game, adds a Player Name label/group and 24-unit Configure separation, and centers cloned input text/placeholder without changing native font size. Corresponding Join sections are 496 x 104 (previously 496 x 120), with bounded 18-unit feedback; matching transport pages remain stable. The reusable Section template keeps its existing action height; only Public Lobbies authors a compact 32-unit action override.
+
+One offline domain form validator now serves both final LAN Join and live Shared availability, accepting IPAddress.TryParse literals (including IPv6) and syntactically valid hostnames without resolving DNS. Empty/malformed addresses, invalid hostname labels, ports outside 1-65535, and invalid player names disable Join. All address/port/name changes refresh availability; the final domain guards remain authoritative. LiteNetLib transport/address resolution and all session/coordinator lifecycle behavior are unchanged.
+
+Verified: authoritative non-deploying Mac Debug/Release builds passed, zero errors (224/217 warnings); authoring reference compile passed with two assembly-version warnings; 22 compiled lifecycle/ownership checks passed per configuration; actual production validator passed 39 offline cases; complete production Shared Join content plus validator passed 34 availability/listener checks with native presentation/event doubles. Editor header/title/footer and geometry checks passed across scales 0.75/1/1.25/1.5; Join measured 520 x 554, stable across Steam/LAN. The self-contained Windows bundle and its serialized bindings, version slot, header geometry, compact feedback, Player Name group and native flags passed inspection. Host/Session and unrelated prefab files/metadata were preserved.
+
+Native tab artwork showed exactly one selected tab through switching, late Awake/OnSpawn restoration and cached hide/show using actual template/selection methods; no tab production change was made. This Editor check prepopulates pages/template instances to avoid the game-only tooltip service. The actual Shared text-alignment helper passed against TMP text components. Full KInputTextField construction in the stock Editor requires ONI's modified TMP_InputField.onFocus member and cannot verify game typing/focus; the separate test-double checks establish listener/availability logic only.
+
+No ONI runtime test or deployment was performed. Visual appearance, pointer hover/tab behavior, actual placeholder/entered text, X/right-click/Escape, form interaction, discovery, stacking, Session transitions, camera/Pause restoration and scene cleanup remain in-game acceptance checks. Build, Editor and test-double evidence are not gameplay verification. No enduring architecture rule changed; historical entries below retain their original scope.
+
+
+## 2026-10-26 — Dedicated modal implemented; in-game gate outstanding
+
+The dedicated Shared KModalScreen shell, typed prefab loading, footer ownership, native right-click flag and pre-native editing guard are implemented. Join uses matching compact Steam/LAN constraints. Existing coordinator navigation, network/domain behavior, camera/Pause ownership and scene fallback are retained. Authoritative Mac Debug and Release non-deploying builds passed with zero errors (224 and 217 warnings respectively). Compiled inspection passed 22 checks per configuration. Windows authoring-reference compilation passed with two assembly-version warnings. Unity Editor geometry/callback checks and the self-contained 12-prefab Windows bundle passed. Packaged inspection verified the dialog's eight bindings, one modal owner, inactive full-canvas root, native flags and footer constraints, existing content bindings and absence of authoring aliases in the inspected trees.
+
+Editor Join measured 520 x 580, stable across both transports and scale factors 0.75/1/1.25/1.5. Host measured 520 x 458 (Steam) and 520 x 424 (LAN); Session measured 520 x 434. These use synthetic native-button donors and authored content, not an ONI runtime. A stale imported gallery-reference failure was resolved by reimporting unchanged prefabs; packaging refreshes references before validation. macOS/Linux build support is absent in this Unity installation, so those bundles were not rebuilt.
+
+No ONI runtime tests or deployment occurred. Main/Pause opening, native appearance, focused/end-edit input, right-drag dismissal, Host Back, both Session transitions, nondisconnecting close, camera/Pause restoration, scene transitions and repeated open/close remain required in-game checks. Builds and synthetic Editor checks are not gameplay verification. Earlier entries retain their historical scope.
+
+
+## 2026-10-25 — Stacked native Multiplayer UI (runtime verification pending)
+
+The current feature/transport workspace implements native Join/Host dialog stacking and in-place Session content, fixed native footer options, cached authored content, a scoped text-editing guard, and explicit scene-loading ownership cleanup. The adapter/footer classes have been removed. Steam joining and hosting remain unavailable as before; this task adds no networking functionality. Non-deploying Debug and Release builds passed with zero errors. An isolated harness compiled the actual coordinator/input sources and passed 35 assertions against native-contract test doubles; production assembly inspection passed 13 structural checks. These are not ONI runtime tests. No in-game stacking, focus, camera/Pause restoration or connection scenario is claimed verified. Historical release and transport results below retain their original scope.
+
+
+**Last updated:** 2026-10-30
+
+**Scope:** Latest status recoverable from the `game mod` ChatGPT Project, the local reference documents, Local game mod implementation/build/log reports, and authoritative Studio source/Git inspection through 2026-10-30. Earlier GitHub evidence remains point-in-time; historical runtime/build evidence remains tied to the exact scope in which it was obtained.
 
 ## Executive summary
 
-- **Current checked `develop` baseline:** `d5a1326d7e5cfc816794644a2d1e597949b84f66`. PR #63 (`Develop/0.8.0.5`) is open from `develop` into `experiment` `64a4dd6fa2870877868d13be034a3d8cf13f1f19`; GitHub reported it cleanly mergeable on 2026-10-15. `develop` is 30 commits ahead and zero behind `experiment`.
+- **Current transition baseline:** The authoritative checkout was clean on `develop` at `c7e876174e0a28bd2d6bfd889a83405d07dc3220` before the unstaged `0.9.0` transition changes. `develop` matched `origin/develop` at that point.
 - **Final upstream-tracking release:** PR #63 / 0.8.0.5 is the final release intended to track upstream. Its last imported upstream parent is `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`, imported through `88e7f06c...` on 2026-10-05 while upstream was MIT-licensed. The upstream restrictive-license change from 2026-10-11 is not an ancestor of `develop`. Future releases are intended to form an independent community-maintained project line and must not automatically import post-transition upstream code.
-- **Legal preparation remains open:** current packaging must carry `LICENSE.md` and third-party notices; copied-source provenance remains unresolved; and historical committed ONI/Unity/Steam binaries require a separately approved repository-history remediation plan. Every currently tracked image and asset bundle was verified byte-for-byte against the last imported MIT upstream commit and is recorded as inherited MIT-covered material in `ASSET_PROVENANCE.md`. Current `develop` does not track those proprietary DLLs and does not copy development/publicized ONI assemblies into the mod output.
+- **Published release commits:** `c7e876174e0a28bd2d6bfd889a83405d07dc3220` is the `develop` commit that set `0.8.0.5`; `2384d2bc8da37a69965b9409d047acc65af33f3e` is the PR #63 merge on `origin/experiment`. GitHub tag `v0.8.0.5` points to `2384d2bc8da37a69965b9409d047acc65af33f3e`, establishing the release merge as the tagged boundary.
+- **Independent development:** Version metadata now targets `0.9.0`. The permanent public name is **Multiplayer: ONI United**. Compatibility-sensitive inherited identifiers remain unchanged pending the migration work in `INDEPENDENT_DEVELOPMENT.md`.
+- **Identifier-migration cleanup:** The October 16 N9, N10, and N11 cleanup commits were completed. The returned development report records the associated identifier audit and source build as passing. The bounded Project evidence available for this replacement does not expose the three exact commit hashes, audit command/output, or build warning count, so none is invented here.
+- **Runtime evidence after N9–N11:** The user reported that the running test passed, then clarified that it was **connection only**. This verifies only the exercised connection/startup path. It does not verify world loading, synchronization, gameplay, disconnect/reconnect, transport parity, or the exact final release artifact.
+- **Legal preparation remains open:** current packaging must carry `LICENSE.md`, `THIRD_PARTY_NOTICES.md`, and `ASSET_PROVENANCE.md`; copied-source provenance remains unresolved; and historical committed ONI/Unity/Steam binaries require a separately approved repository-history remediation plan. The inherited images and nine platform AssetBundles are documented separately from the newly supplied ONI United artwork and five translation catalogs. The new artwork's creator, source, license, and permission terms still require user confirmation; see `ASSET_PROVENANCE.md`. Current `develop` does not track those proprietary DLLs and does not copy development/publicized ONI assemblies into the mod output.
 - **Lifecycle/speed simplification:** `ReadyManager` is speed-agnostic; `IsSimulationLocked`, `GameSpeedSyncer.RequestReSync`, and load-time lifecycle guards were rejected/removed. Pause ownership is at `GameServerHardSync.PerformHardSync` after accepted `BeginSynchronization` and at `GameClient.BeginSynchronization`, with no automatic unpause. The source build succeeded with 0 errors and 203 warnings; no runtime test or exact release-artifact verification was established.
-- **Session centralization:** the work previously tracked through PR #86 was superseded by the corrected integration and merged through PR #87 at `d5a1326d...`. PR #63 is the release integration into `experiment`. No exact PR #63 release artifact has yet been build- or runtime-verified.
-- **Release preparation:** the Git/license boundary is verified, but legal remediation, exact final baseline selection, packaging inspection, build, and runtime verification remain required before release.
+- **Session centralization:** the work previously tracked through PR #86 was superseded by the corrected integration and merged through PR #87 at `d5a1326d...` before the final `0.8.0.5` version commit.
 - **0.8.0.4 has been released.** The user confirmed the release completed successfully. The exact final release commit, tag, and hash were not independently captured in this Project evidence and must not be invented.
 - The October 3 merged `experiment` audit baseline remains useful historical provenance: clean HEAD was `0bec442e13893b4da113b363a379f9fe2b74be3a` (`0.8.0.3`) while the then-staged test state reported `0.8.0.4`. That audit is not being retroactively promoted to the final released hash.
 - Historical verified results remain valid for their tested builds: ordinary StandardWorker multitool targeting (**65/65**), Navigator arrival ordering (**33/33** StartWork correspondence), and prior AnimSyncer reliable symbol delivery for already-registered entities (**136/136** synchronized applications with no reorder/duplicate/value mismatch).
@@ -25,7 +159,55 @@
 - **Current client lifecycle is the later transport-preserving rebuild.** Git/source ancestry shows the old pending-join/loading-cache/cached-reconnect mechanisms were removed and normal synchronization/world replacement now preserves the transport connection. Exact conformance to every October 7 generation/reset/admission proposal and the complete cross-transport runtime matrix remain unverified.
 - **Synchronization pause ownership is known, full-interval coverage is not.** The host pauses after accepted `BeginSynchronization` in `GameServerHardSync.PerformHardSync`, the client pauses in `GameClient.BeginSynchronization`, and there is no automatic unpause. The source build passed with 0 errors / 203 warnings, but this does not by itself prove that host advancement is blocked for the entire snapshot/load/admission interval.
 - The PR #83 disconnect/reconnect and pending-join behavior remains verified historical implementation evidence; it is not the current normal-load architecture.
-- **Active next work:** complete the PR #63 legal/compliance remediation, resolve copied-source provenance and repository-history exposure, settle the exact intended release commit, and only then proceed to exact-artifact build/runtime verification and release gating. Re-review provenance for assets first added or changed after the verified MIT baseline.
+- **N14 closure:** the startup/configuration/framework cleanup is implemented and committed on `refactor/mod-lifecycle` through `810e0fde0e62900e6ecc240d8d335e94e80b66ca`. The checkout then had no outstanding N14 source changes. Debug/Release builds succeeded; no ONI runtime test was run. Synchronization integration testing remained required Level 3 work; the later N15 plan now makes N15-C the next test-infrastructure increment after N15-B merges.
+- **N15-B standalone test foundation:** Independently verified and ready for user commit, but still uncommitted at the verified point. On `refactor/mod-lifecycle` at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`, the working tree adds Option 3's first `Shared.Tests` project and workflow. Five `SnapshotTimeline` tests passed in both Debug and Release. The workflow was locally validated only; no GitHub Actions run and no ONI runtime test are claimed. After N15-B is committed and merged, N15-C is the next planned test-infrastructure increment.
+
+## N15-B standalone unit-test foundation
+
+**Verdict:** PASS — ready for user commit. This is independent verification of an uncommitted working tree, not evidence of a commit, PR merge, or GitHub-hosted CI run.
+
+**Git/environment evidence:** Verification ran on `Renfrews-Studio.renfrewworld.com` in `/Users/renfrew/Projects/ONI_mods/Oxygen_Not_Included_Together`, branch `refactor/mod-lifecycle`, with HEAD unchanged at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. There were no staged changes. `ONI_United.sln` and `README.md` were modified; `.github/workflows/unit-tests.yml`, `tests/Shared.Tests/Shared.Tests.csproj`, and `tests/Shared.Tests/Replication/SnapshotTimelineTests.cs` were untracked. Test execution affected only ignored `bin`/`obj` outputs.
+
+**Agreed test architecture:** Level 1 is standalone unit testing; Level 2 is standalone integration testing; Level 3 is ONI in-game testing. The existing 92 diagnostics will be migrated incrementally where their behavior can be represented faithfully outside the game; ONI-dependent diagnostics remain Level 3.
+
+**Implemented scope:** Option 3 is in place for the first project: a separate xUnit `Shared.Tests` project targeting `net10.0`, registered under a `tests` solution folder, source-linking `Shared/Replication/SnapshotTimeline.cs`, and carrying no project references. It does not duplicate or modify production source. Evaluated MSBuild confirmed removal of inherited game-specific references and mod build/packaging behaviors. No changes were made to `UnitTestRegistry`, existing diagnostics, networking, transports, players, sessions, or other N15-C/D/E scope.
+
+**Test evidence:** All five `SnapshotTimeline` tests passed in both Debug and Release. This verifies the covered standalone timeline behavior and the tested project configuration; it does not verify ONI integration, multiplayer runtime behavior, packaging, or a release artifact.
+
+**CI evidence:** `.github/workflows/unit-tests.yml` was structurally reviewed and locally validated as clean-runner compatible. It has not run on GitHub, so CI success is not claimed.
+
+**Next step:** The user may commit and open the N15-B PR. Once N15-B is merged, advance the roadmap to N15-C without folding N15-C/D/E work into this change.
+
+## N14 startup/framework and lifecycle closeout
+
+**Repository evidence:** `refactor/mod-lifecycle` at `810e0fde0e62900e6ecc240d8d335e94e80b66ca` contains the N14 implementation commit series:
+
+| Commit | Change |
+| --- | --- |
+| `ec2fcc9b` | Correct mod startup initialization order |
+| `e6748619` | Make Steam lobby callback initialization idempotent |
+| `91d664ef` | Clean up mod startup and debug initialization |
+| `955fee1d` | Migrate Door patches to standard Harmony registration |
+| `27cb71df` | Remove obsolete mod startup code |
+| `626c2d57` | Move startup responsibilities to subsystem owners |
+| `5cdcf2f6` | Simplify mod startup and diagnostic initialization |
+| `810e0fde` | Respect the Discord Rich Presence setting during initialization |
+
+N14-A5 through N14-A9 were completed without additional source changes where review found no justified implementation change. The final current source has Harmony activation after PLib/options, required UI assets, persistent identity, and persistent component setup. Packet defaults are registered from `OnAllModsLoaded`; individual packet registration exceptions are logged and swallowed by design, so a failure can leave the registry incomplete. The earlier proposed A6 rethrow is absent.
+
+**Build evidence:** Repeated non-deploying Debug and Release builds succeeded during N14. The final A9 Debug and Release builds each reported 0 errors and 4 `MSB3277` assembly-version conflict warnings in `Shared`. These builds verify compilation only; they do not establish runtime startup, synchronization, transport behavior, or release-artifact correctness. Static review and `git diff --check` were used where recorded.
+
+**Deferred / outstanding:** No generic startup rollback was added. No ONI process was launched and no gameplay, synchronization, multiplayer transport, or in-game configuration behavior was runtime-tested during N14. Runtime verification is deferred to the synchronization/integration phase. Best-effort packet registration may continue after a packet registration failure and therefore remains an explicit partial-registry risk.
+
+## October 16 identifier-migration closeout
+
+**Implementation/Git evidence:** N9, N10, and N11 are recorded as completed cleanup commits in the returned session evidence. Their exact hashes are not present in the uploaded Project references or the bounded linked-conversation preview, so the labels are preserved without fabricated hashes.
+
+**Audit/build evidence:** The returned report records the identifier audit and source build as passing after the cleanup sequence. This establishes the reported cleanup/build result for that working state, but it is not promoted to exact-release-artifact verification because the exact commit, full command output, and packaged artifact are not available here.
+
+**Runtime evidence:** The user reported a passing running test and immediately bounded it to **connection only**. Treat this as a successful connection-path smoke test, not as verification of the complete mod lifecycle or multiplayer synchronization.
+
+**Historical next-session priority (2026-10-16):** Start at development-environment setup, including ESLint and default project settings. This recommendation predates N14 and is not the current next task; N14 is complete, and synchronization integration testing is now the next focus.
 
 ## Current rebuilt transport-preserving client lifecycle
 
@@ -188,7 +370,7 @@ The later lifecycle/speed simplification rejected and removed `RequestReSync` an
 
 ### Session centralization and PR #86
 
-The intended ownership boundary is shared session state in `MultiplayerSession`/common networking, while `GameClient` retains the current client lifecycle, `ReadyManager`/`GameServerHardSync` retain synchronization ownership, and each transport retains its mechanics and identity rules.
+**Historical PR #86 record:** The then-proposed boundary assigned shared session state to MultiplayerSession/common networking. D-046 and the October 30 checkpoint above now place logical data in static Session, with network integration remaining outside it; client lifecycle, synchronization and transport separation is retained.
 
 At the time checked, PR #86 targeted `develop` `3ddad5ad7fcaace77292c3f4b4a2218c0aa5db1f` from head `a32139b48031202ee41f6bd77bd16701b4b51c35`. GitHub metadata reported mergeable, 2 commits, 12 changed files, and +216/-149. The changed scope was session centralization and transport integration.
 
@@ -206,6 +388,7 @@ For the released 0.8.0.4 work, the user reports that their custom Operational/po
 
 | Area | State | Confidence |
 | --- | --- | --- |
+| Common host Lifecycle / TransportServer | Staged common LAN/Steam integration; GameServer removed | Source-reviewed, Debug compiled and standalone-tested; native/runtime gates open |
 | Host authority / client replay | Established core architecture | High |
 | Stable entity identity / registry | Present | High |
 | Save transfer / hard sync | Existing mod feature | Reported/repository status; not retested here |
@@ -253,7 +436,7 @@ For the released 0.8.0.4 work, the user reports that their custom Operational/po
 
 - Current code has not yet been inventoried against the primary architecture’s ownership/coverage ledger.
 - Session ID, baseline epoch, per-stream sequence/version, and old-epoch rejection need an implementation audit.
-- Join/hard-sync lifecycle/readiness behavior was first verified in the PR #83 disconnect/reconnect implementation and was later rebuilt into the current transport-preserving client lifecycle. The active priority is PR #86 regression review, exact release-baseline selection, legal/compliance audit, and exact-artifact verification; broader comparison with the proposed `T/J` consistent-cut and catch-up-journal design remains future architecture work.
+- Join/hard-sync lifecycle/readiness behavior was first verified in the PR #83 disconnect/reconnect implementation and was later rebuilt into the current transport-preserving client lifecycle. The current host runtime priorities are recorded above; earlier PR #86 planning is historical, while exact release-baseline selection, legal/compliance audit and exact-artifact verification remain gates; broader comparison with the proposed `T/J` consistent-cut and catch-up-journal design remains future architecture work.
 - Entity identity persistence/baseline mapping for existing and nested items remains a gating design spike.
 - Command IDs, host deduplication, explicit rejection reasons, and reconnect boundaries need a domain-by-domain audit.
 - Region/entity hashes and targeted refresh behavior are target architecture, not confirmed universal implementation.
@@ -321,7 +504,7 @@ This establishes that the later lifecycle replaced the PR #83 normal-load implem
 
 Historical source findings from the earlier transport audits—Riptide duplicate disconnect notification, Steam stale state/handle paths, LiteNet explicit-disconnect callback dependence, and direct reconnect paths that can skip `Connecting`—remain useful bug history, but they must be rechecked against the rebuilt current source before being treated as current defects.
 
-PR #86 session-centralization review remains the active integration gate. Its changes must not reintroduce superseded disconnect/reconnect lifecycle ownership while centralizing shared session state.
+The earlier PR #86 integration gate is historical; the current Session implementation checkpoint is recorded above at commit 53240ca4. Transport-preserving world loading remains the required boundary, and current runtime/release verification is still outstanding. No PR merge status is inferred from this local commit.
 
 ## Recommended next tests
 
@@ -428,6 +611,7 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 | Join-overlay/readiness implementation and PR review | `game mod` Project conversation; GitHub issues #78–#82 and PR #83 | PR head `cd14ac71bccb1a960f59ba92df0a4abf8cdb1c27`; GitHub merge commit `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f` | 2026-10-07 | LiteNetLib single-join runtime result; source-reviewed readiness/pending-join and cancellation paths; Steam source-only; Riptide exclusion; GitHub issue/merge states |
 | `Reactable Step One` and `Patch Reactable Synchronization` | `game mod` Project conversations | Not applicable | 2026-09-27 | Previous vanilla lifecycle observation and design discussion; not complete authorization verification |
 | `REACTABLE_SYNC_ARCHITECTURE_STATUS.md` | Recorded as `ren/test-0.8.0` | `2bb0b6b938a7e1b54ae0b7426b1a4879b6af7b07` reported in conversation; Git object not verified | 2026-09-27 | Provisional Reactable architecture/status |
+| N15-B independent verification report | `game mod` Project conversation | Uncommitted working tree at `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle` | 2026-10-17 | `Shared.Tests` isolation, five Debug/Release tests, local-only workflow validation, and explicit no-runtime/no-GitHub-run limits |
 
 ## Contradictions and missing evidence requiring attention
 
@@ -441,6 +625,16 @@ Do not upload vanilla/decompiled source or assemblies. For large logs, analyze l
 
 ## Revision history
 
+- **2026-10-30 (common host checkpoint):** Recorded HEAD f2ca18c1 plus 22 staged paths, staged LAN Kick correction, current EventAction/common transport ownership, saved 192-warning/0-error Debug and 95-pass evidence, 44-case scope, deferred refinements and explicit native/runtime limits. Marked superseded host plans as historical.
+
+- **2026-10-30 (host target agreement):** Recorded architecture discussion complete and D-048 unimplemented, identified current LAN/Steam differences and new Session ordering, and retained interface/client design and all compilation/runtime gates.
+
+- **2026-10-30:** Recorded the committed nine-file Session consolidation, derived flags and explicit notification ownership, distinguished reported 192-warning/51-test validation from older saved logs, and retained runtime/protocol/Player/readiness gates. Reconciled historical PR #86 ownership wording.
+
+- **2026-10-29 (LAN lifecycle):** Recorded the source-inspected LAN checkpoint and current paths, corrected Session selection, separated user-reported build success from the saved historical failure log, and retained explicit runtime/Steam/load-continuation limitations. Both source cleanup corrections are now indexed; documentation remains for user staging.
+
+- **2026-10-17:** Recorded N15-B as independently verified and ready for user commit while explicitly uncommitted at HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. Added the Level 1/2/3 model, Option 3 `Shared.Tests` scope, incremental migration policy for 92 diagnostics, five Debug/Release `SnapshotTimeline` passes, and local-only GitHub Actions validation. No runtime, commit, merge, or GitHub CI success is claimed.
+- **2026-10-16:** Recorded completion of the N9–N11 identifier-migration cleanup sequence, the reported passing audit/build evidence, and the user-confirmed connection-only runtime result. Limited the runtime claim to the connection path and changed the active next-session priority to development-environment setup (ESLint, default settings, and baseline tooling) followed by a lifecycle walkthrough with testing at each stage. Exact N9–N11 hashes and full audit/build output were not available in the uploaded references and were not invented.
 - **2026-10-15 (reconciliation):** Reclassified the PR #83 intentional disconnect/reconnect and pending-join lifecycle as historical verified evidence; documented the later transport-preserving `develop` rebuild as the current implementation lineage; removed the stale claim that transport-preserving loading is unimplemented; and preserved uncertainty about exact October 7 design conformance and full-interval pause coverage.
 - **2026-10-15:** Recorded the verified `develop` ancestry and point-in-time SHAs; lifecycle/speed simplification build result and runtime limits; PR #86 metadata and pending regression review; session-centralization ownership boundary; and the legal/licensing/compliance audit as a pre-release gate. No merge, runtime result, or release artifact was inferred.
 - **2026-10-07:** Recorded transport-preserving normal loading as approved source-reviewed design only, with no implementation/build/runtime claim. Added the generation/admission/reset/gate/reconstruction/`WorldLoadCompleted`/final-`Ready` contract, retained reconnect as transport-loss fallback, and made host advancement versus pause/catch-up a blocking prerequisite.

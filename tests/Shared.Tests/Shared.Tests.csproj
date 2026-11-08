@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DoNotBuildAsMod>true</DoNotBuildAsMod>
+    <IsMod>false</IsMod>
+    <IsPacked>false</IsPacked>
+    <GenerateMetadata>false</GenerateMetadata>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Remove="@(Reference)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Shared/Replication/SnapshotTimeline.cs" Link="Replication/SnapshotTimeline.cs" />
+    <Compile Include="../../Shared/Networking/TransportConfigurationMigration.cs" Link="Networking/TransportConfigurationMigration.cs" />
+    <Compile Include="../../ONI_United/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../ONI_United/Networking/Transports/**/*.cs" Link="Networking/Transports/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../ONI_United/Networking/Runtime/GameClient.Synchronization.cs" Link="Networking/GameClient.Synchronization.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakePacket.cs" Link="LAN/SessionHandshakePacket.cs" />
+    <Compile Include="../../ONI_United/Networking/Packets/Architecture/PacketSerialization.cs" Link="LAN/PacketSerialization.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/IPacket.cs" Link="LAN/IPacket.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/ILatencySensitivePacket.cs" Link="Networking/ILatencySensitivePacket.cs" />
+    <Compile Include="../../ONI_United/Misc/PasswordHelper.cs" Link="Misc/PasswordHelper.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/PacketSendMode.cs" Link="Networking/PacketSendMode.cs" />
+    <Compile Include="../../ONI_United/Networking/Runtime/UnityTaskScheduler.cs" Link="Networking/Runtime/UnityTaskScheduler.cs" />
+    <Compile Include="../../ONI_United/Networking/Packets/Core/ChunkedPacket.cs" Link="Networking/Packets/Core/ChunkedPacket.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Lobbies/LobbyCodeHelper.cs" Link="Networking/Sessions/Lobbies/LobbyCodeHelper.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Lobbies/LobbyListEntry.cs" Link="Networking/Sessions/Lobbies/LobbyListEntry.cs" />
+    <Compile Include="../../Shared/Interfaces/Networking/IAllowedWithoutWorldPacket.cs" Link="LAN/IAllowedWithoutWorldPacket.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/States/ClientState.cs" Link="Networking/ClientState.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Player.cs" Link="Networking/Sessions/Player.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/Session.cs" Link="Networking/Sessions/Session.cs" />
+    <Compile Include="../../ONI_United/Networking/Sessions/SessionHandshakeRules.cs" Link="Networking/Sessions/SessionHandshakeRules.cs" />
+  </ItemGroup>
+
+</Project>

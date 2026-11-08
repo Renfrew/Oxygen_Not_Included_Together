@@ -1,9 +1,142 @@
-# Oxygen Not Included Together — Development Roadmap
+# Multiplayer: ONI United — Development Roadmap
+
+## 2026-10-30 — Common host source checkpoint; verification before release
+
+The current host integration removes GameServer/ServerState and implements Lifecycle-owned EventActions with common instance-level TransportServer operations for LiteNetLib and Steam. TransportStarted → PrepareSession prepares logical membership before SessionPrepared → Hosting; essential Stop cleanup precedes protocol cancellation and confirmed Stopped. D-049 and the standalone target supersede the earlier D-048 coordinator/order descriptions below. This is a staged source checkpoint at HEAD `f2ca18c1c6b646b169b34a557ccd82ba7c8a29a3`, not a new committed release baseline.
+
+Saved non-deploying Debug evidence is 192 warnings/0 errors; standalone tests are 95 passed/0 failed/0 skipped, including 44 added transition/scenario cases using substitutes. These results close no native runtime, packaging or release gate. STATUS records exact commands and provenance; the LAN live-server Kick correction is already staged.
+
+Next bounded acceptance gates, with separate execution authorization:
+
+1. **LAN runtime:** Identify the exact artifact/source checkpoint; verify listener and logical host readiness before Hosting, UDP plus optional TCP/fallback, remote admission, frontend/pause behavior and actual worker termination. Do not infer synchronization/gameplay readiness from Hosting.
+2. **Steam native results:** Verify correlated creation/local ownership, creator-entry behavior, Stop while creation is pending, late/duplicate results, native terminal failure/Timeout, missing-result unresolved Stopping, local release evidence and explicit retry after failure. A local timeout cannot establish cleanup or Idle.
+3. **Recovery and lifetime:** Exercise repeated pending Stop, original filename retention, successful load only after Idle, failure/disposal discard without retry-resume, normal client world replacement, and duplicate quit/destruction release without another frame. Preserve client shutdown, no automatic retry/unpause and no disconnect on UI close.
+4. **Deferred architecture:** Separately scope NetworkConfig → NetworkRuntime, selected-live-instance ownership/safe replacement, stateless LifecycleEventActions extraction and central host/client/selection permission. Decide exact client phases/events before implementing them; they are not approved by the host table. Address pending-client cancellation and generic Stop's pre-admission LAN gap without redesigning synchronization/UI.
+5. **Session integration:** Migrate direct Session.BeginHosting only after preserving RegisterAsHost activation notifications, host name/readiness and metadata ordering through appropriate existing owners. Keep Player/roster and ReadyManager/synchronization work separately scoped.
+
+Existing compliance, platform, exact-artifact and gameplay regression gates remain. The earlier N14/N15 and release records below retain their original dates/evidence; their next-session/staging instructions are historical, not authorization to execute them now.
+
+## Historical 2026-10-30 — Agreed host architecture: finalize contracts before implementation
+
+This earlier D-048 plan is superseded by the source checkpoint and D-049 above; its named coordinator, activation order and unimplemented status describe that earlier point.
+
+The shared Server event-action design is agreed in D-048; it is not implemented. Server is the target coordinator role currently represented by GameServer. Lifecycle owns permission/transitions; backend protocols own asynchronous execution and repeated cancellation. This supersedes the earlier immediate-priority wording below, not its historical evidence or remaining acceptance gates.
+
+Next sequence:
+
+1. Finalize the concrete common transport contract using existing ITransport, TransportServer and TransportClient where appropriate. Decide signatures and inheritance/composition; do not assume a new umbrella abstraction.
+2. Review architecture/ownership against D-048, including Session activation inside Started's action after Hosting, deactivation/shared cleanup in Stop, and protocol-owned pending results/retry. Essential cleanup precedes Stopped.
+3. Implement the agreed common host protocol in a separately authorized bounded change, preserving D-044, optional LAN TCP, existing discovery, identity distinctions and save-load continuation.
+4. Review complete unstaged changes and affected callers; leave staging/commit to the user.
+5. With separate authorization, build and run existing relevant tests. Compilation does not establish runtime behavior.
+6. Perform separately authorized LAN/Steam runtime verification: startup readiness, rejected/duplicate events, Stop while pending, late results, missing-result behavior, cleanup failure/explicit retry, disposal and save replacement. A local timeout cannot authorize Idle for unresolved resources.
+7. Review Client protocol boundaries separately. Its coordinator and event/Lifecycle design are not finalized and need not mirror hosting; do not redesign client synchronization in the host increment.
+
+No new Lifecycle phases/events, Server cleanup state machine, automatic retry/unpause or disconnect on UI close is authorized. Player/roster and synchronization consolidation remain separate pending work. Existing release/compliance gates remain open.
+
+## Historical 2026-10-30 — Session consolidation complete; common host startup next
+
+Preserved planning history after the Session commit. Common hosting has since reached the source checkpoint above; client/roster/Player/synchronization work and runtime gates remain pending.
+
+**Implementation checkpoint complete:** Static Session consolidation is committed as `53240ca425768962b345e8eee4a4d140d5be5223` on feature/transport. SessionController, SessionActiveChanged and redundant mutable activity/role state are removed. Source inspection confirms the checkpoint; STATUS records reported pre-commit compilation/unit-test results and their provenance. No runtime gate is closed.
+
+**Immediate next priority:** Read-only investigation and design of common LAN/Steam host startup through GameServer and Lifecycle, followed by a separately bounded implementation. Establish required preparation, asynchronous lobby/listener confirmation, local host membership, cancellation/late-result handling and the StartingHost → Hosting boundary. Preserve Prepare pending that investigation; do not assume current Steam callbacks already follow Lifecycle.
+
+Pending development, in bounded scopes:
+
+1. Common LAN/Steam host startup coordination, retaining Lifecycle permission/transition ownership and action-owned execution/recovery.
+2. Client connection, handshake and host-authorized Session admission; preserve transport/Session across normal world replacement.
+3. Complete host-authorized logical player roster replication to clients.
+4. Player redesign only as required by the agreed protocol; exact fields/ownership remain undecided.
+5. Consolidate synchronization ownership and evaluate ReadyManager removal without losing the collective readiness barrier. Design D-047's stage-dependent joins, stale-ID protection and snapshot-validity rules before implementation; do not mistake current late-join rejection for the final policy. No automatic unpause.
+6. Exact-artifact LAN/Steam runtime testing and release verification, retaining existing compliance and regression gates.
+
+The October 29 staging instructions below describe the earlier LAN checkpoint, now committed as 37c7d74a; they are not current workspace instructions. Older N14/N15, UI and release evidence is preserved. This priority does not claim a completed protocol redesign or authorize a broader refactor.
+
+## Historical 2026-10-29 — LAN host lifecycle checkpoint and remaining gates
+
+The following implementation/staging instructions describe the earlier LAN slice. Current ownership and verification priority are above; applicable runtime/release gates remain open.
+
+The current incremental slice is `ONI_United.StateMachines.Lifecycle`, with host/client/readiness coordinators in Networking.Runtime. It covers hosting an already-loaded colony over LAN, not a Steam migration or client/world-synchronization redesign. Source review confirms the event/action boundary, repeated Stop in Stopping, explicit retry, component-lifetime release and operation-owned save-load continuation. The current non-deploying Debug pass is user-reported; exact command/output/counts and build-input provenance remain unavailable for that pass. Historical test evidence is not evidence for this snapshot.
+
+Before the user commits, review the existing 51 staged source paths together with these four maintained documentation updates and run both staged/unstaged whitespace checks. The two source cleanup corrections are already staged in the reviewed baseline. Do not stage or commit automatically. Keep this checkpoint explicitly incremental; no runtime gate is closed by this documentation pass.
+
+Next bounded decisions/work, each requiring its own scope:
+
+1. Review the shared LAN/Steam host sequence while retaining Prepare and one StartingHost phase. Define how Steam asynchronous lobby/listener callbacks, cancellation/late results, callback ownership and confirmed local host membership submit events; do not enable unsupported Steam UI or infer parity from existing bypasses. Preserve lobby discovery/membership; pre-game ready-up rooms remain deferred.
+2. Design startup cancellation later, as agreed; do not recreate the removed frame-spread UI windows solely to match old implementation. Continue reviewing networking ownership without turning Lifecycle into a transport/error owner or introducing a generic operation framework.
+3. Rework UI/Session separately: preserve Host layout, use existing Session presentation for unfinished LAN work, address unreachable connecting-client progress/cancel, and handle the separate startup-error presentation issue under its own scope. Preserve no disconnect on UI close and no automatic unpause. Keep client synchronization/readiness independent of host Hosting.
+4. Resolve or explicitly retain the dependency limitations before release: LiteNetLib's internal UDP Stop joins may block, and TCP termination timing/deadlines are not runtime verified. No observed hang is claimed and no cleanup redesign is authorized here.
+
+**Runtime verification gate:** On an identified build/DLL/bundle, exercise loaded-colony LAN start with listener/local membership confirmation; frontend/pause processing; normal client world replacement; rejected/nested Start/Started/Stop events; repeated Stop during in-flight cleanup; cleanup failure and explicit retry while Start remains blocked; TCP accept/handler shutdown without a TCP join; save-load success, original filename retention and failure-discard/no-retry-resume; duplicate quit/destruction; and retained client/Steam shutdown. Observe rather than assume worker termination and callback ordering. Steam creation/entry/cancel/late-result and membership/admission flows require their own evidence after migration. Do not infer gameplay readiness from Hosting or a successful connection.
+
+The older UI acceptance matrix and existing N15/test-infrastructure plan remain outstanding in their own scope. This checkpoint changes neither their historical evidence nor the independent release/legal gates.
+
+## Earlier 2026-10-29 — Windows UI checkpoint and remaining gates
+
+This is an incomplete development checkpoint on `feature/transport`, not a release. The current shell is the authored `Shared.UI.MultiplayerDialogScreen : KModalScreen`, coordinated by `MultiplayerScreen`; it is not an intact InfoDialogScreen. Join/Host use reusable TabMenu composition. The historical plan below retains its navigation scenarios, but its concrete shell description is superseded.
+
+The earlier UI checkpoint required the reviewed main-menu caption lookup correction and matching catalog keys before its commit. Those staging instructions apply to that historical baseline; use the LAN checkpoint above for current review/staging requirements. Preserve the corrected builder/request bridge in the Windows Unity project's intended versioned location; the Mac bundle alone does not capture its packaging implementation.
+
+Next implementation work: make connecting-state progress/Cancel Connection reachable through the existing presentation selection and polling flow, then refactor Session separately under an approved scope. Correct the known Maximum Players 1-4 caption versus 2-16 validation mismatch separately. Do not enable unsupported Steam operations merely for UI parity.
+
+Acceptance gates: build the exact selected source tree; verify and identify the matching DLL/bundle; check localized main-menu startup; test Steam/LAN tab selection and equal page height, inputs and validation, Host start, Join connection/admission, cancellation, stop, repeat open/close, focused Escape, Host Cancel/Close, Session transitions, camera/Pause restoration and scene cleanup. Screenshots and successful asset loading cover only exercised presentation/loading. Keep source compilation, Editor checks, packaging, runtime UI and gameplay evidence separate.
+
+The new UI is packaged only for Windows in this checkpoint. New macOS/Linux bundles and their separate verification are required before claiming support on those platforms. Historical transport/release milestones and tested commits below are not reverified by this UI work.
+
+## Historical 2026-10-25 — Native Multiplayer UI runtime-verification plan (shell superseded)
+
+The staged Join/Host/Session simplification uses native stacked InfoDialogScreen instances and cached authored content. Next verify the exact built artifact in-game: Host Cancel/Escape preserves Join fields and tab state; Host/Join connection switches the existing dialog to Session; closing Session preserves the network session and reveals accurate base content; stopping/cancelling restores appropriate setup actions; focused Escape ends editing without closing; Host dismissal retains Pause ownership and camera lock; overall Close and scene transitions release both. Source/build/compiled checks do not close these runtime gates. No broader roadmap milestone or historical test result is superseded.
+
 
 **Created:** 2026-09-27  
-**Last updated:** 2026-10-15  
+**Last updated:** 2026-10-30
+
 **Status:** Planning and progress guide; verified results retain the evidence limits stated here and in `STATUS.md`  
 **References:** `ARCHITECTURE.md`, `DECISIONS.md`, `STATUS.md`
+
+## N14 closure — startup and lifecycle implementation complete
+
+**Status:** Complete in the current `refactor/mod-lifecycle` history through `810e0fde0e62900e6ecc240d8d335e94e80b66ca`.
+
+**Scope:** Startup ordering and diagnostics; configuration/persistent identity and asset ownership; PLib integration; Harmony patch ownership; packet-registration lifecycle; persistent component and event-subscription checks; Discord Rich Presence enablement.
+
+The N14 implementation commits are `ec2fcc9b`, `e6748619`, `91d664ef`, `955fee1d`, `27cb71df`, `626c2d57`, `5cdcf2f6`, and `810e0fde`. N14-A5 through A9 produced no further source changes where no justified fix was found. The current worktree had no outstanding N14 source changes at closure.
+
+Non-deploying Debug and Release builds succeeded during N14. The final A9 builds each had 0 errors and 4 `MSB3277` assembly-version conflict warnings. No ONI runtime/gameplay testing was performed; these builds and source reviews are not evidence of synchronization or release readiness. Default packet registration remains best-effort and logs individual failures without rethrowing. Generic startup rollback remains deferred.
+
+## N15-B — standalone unit-test foundation
+
+**Status:** Implementation independently verified and ready for user commit; uncommitted at the verified point and not yet merged.
+
+**Objective:** Establish Option 3's first isolated Level 1 test project without importing game dependencies or changing production behavior.
+
+The agreed verification model is Level 1 standalone unit tests, Level 2 standalone integration tests, and Level 3 in-game tests. Existing 92 in-game diagnostics migrate incrementally only when their subject can be represented faithfully outside ONI.
+
+Implemented N15-B scope:
+
+- `tests/Shared.Tests` is a separate `net10.0` xUnit project under the solution's `tests` folder.
+- It source-links the real `Shared/Replication/SnapshotTimeline.cs`, has no project references, and removes inherited game/mod references and build behavior.
+- Five `SnapshotTimeline` tests passed in Debug and Release.
+- The GitHub Actions workflow was structurally reviewed and locally validated for a clean runner, but it has not run on GitHub.
+- Production boundaries remain clean; no existing diagnostics or N15-C/D/E runtime/networking scope changed.
+
+Verification was performed on `refactor/mod-lifecycle` at unchanged HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f`. The implementation was unstaged/uncommitted. N15-B is not recorded as committed, merged, or CI-successful.
+
+## Current priority after N15-B integration — N15-C
+
+**Status:** Next planned test-infrastructure increment after the user commits and merges N15-B; do not begin it inside the N15-B documentation/PR.
+
+**Objective:** Continue the approved incremental test-infrastructure plan from the isolated Level 1 foundation. Preserve the three-level model, clean production boundaries, and incremental treatment of the existing 92 diagnostics. Define N15-C's exact test candidates and acceptance evidence from the authoritative repository before implementation; do not infer runtime coverage from N15-B.
+
+The previously listed synchronization integration testing remains necessary Level 3 work, but it is no longer the immediate roadmap priority after N15-B. When resumed, begin with a controlled run covering mod startup, configured transport, session entry, world load, and synchronization completion; record the exact build/commit and do not infer synchronization success from connection-only evidence.
+
+**Remaining integration/release gates:**
+
+- Complete the runtime synchronization and transport scenarios applicable to the supported feature set; preserve unsupported/deferred domains such as Sweepy and incomplete special-workable coverage as explicit limits.
+- Resolve remaining legal/compliance and copied-source provenance questions, and complete any approved repository-history remediation before release.
+- Select a clean release commit, build that exact commit, construct and inspect the actual distribution artifact, and verify required notices and excluded files.
+- Run the agreed regression suite on that exact artifact; document platform/scenario coverage and do not claim release readiness before these gates pass.
 
 ## Baseline to preserve
 
@@ -29,6 +162,20 @@ Release-scope outcomes:
 
 The completed release does not imply that all deferred synchronization features are solved.
 
+## Deferred — development-environment walkthrough
+
+**Status:** Not part of N14 and not the next development focus. Reassess separately if the tooling/configuration foundation still needs a dedicated walkthrough.
+
+**Objective:** Review the project from its development-environment foundation, then proceed through the mod lifecycle while testing each stage.
+
+Start with project setup and baseline developer experience, including ESLint, default settings, and related tooling/configuration. Record which settings are authoritative, inherited, generated, or local-only before changing them. After the environment baseline is understood, walk through initialization, connection, loading/synchronization, gameplay admission, ordinary runtime behavior, and shutdown/disconnection in order.
+
+The October 16 N9–N11 cleanup sequence is recorded as committed, with the associated identifier audit and source build reported as passing. Exact hashes and full command output are not present in the uploaded Project evidence, so they remain evidence details to capture from the authoritative repository rather than values to infer.
+
+The reported runtime result was **connection only**. It passed for that scope, but it does not satisfy later lifecycle stages. No additional standalone connection test is currently required; connection can be re-exercised naturally during the lifecycle walkthrough.
+
+**Acceptance:** For each reviewed stage, record the exact source/Git state, configuration findings, build result, runtime scenario, and evidence limits. Do not promote a connection-only result to loading, synchronization, gameplay, reconnect, or release-artifact verification.
+
 ## Historical completed track — PR #83 lifecycle/readiness and join overlay
 
 **Status:** Historical implementation merged and LiteNetLib single-join runtime verified; later superseded as the normal-load mechanism by the rebuilt transport-preserving lifecycle.  
@@ -40,9 +187,9 @@ Preserve this evidence for regression history, especially the final-Ready/readin
 
 GitHub verified PR #83 merged into `develop` on 2026-10-07 at merge commit `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f`. That merge remains historical provenance, not the current release baseline.
 
-## Active release-preparation sequence — final upstream-tracking release
+## Historical release-preparation sequence — final upstream-tracking release
 
-**Status:** In progress; PR #63 is open from `develop` `d5a1326d7e5cfc816794644a2d1e597949b84f66` into `experiment` `64a4dd6fa2870877868d13be034a3d8cf13f1f19`. No final release artifact has been established.
+**Status:** Preserved point-in-time plan for PR #63 / 0.8.0.5. Its branch and PR disposition are not current-state evidence; revalidate GitHub and the authoritative repository before using it as an active release plan. No final artifact should be inferred from this historical section.
 **Objective:** Complete the final upstream-tracking release under the verified MIT boundary, resolve the remaining compliance blockers, and verify the exact artifact before release. Future releases form an independent project line.
 
 ### Verified upstream license boundary
@@ -181,10 +328,21 @@ The current lifecycle/speed and session-centralization decisions may also affect
 
 ## Next-session starter prompt
 
-> In the authoritative repository, first verify current Git state and review PR #86 for regressions against current `develop`, preserving current lifecycle, synchronization, identity, and transport behavior. If the review passes, establish the exact intended release baseline. Then perform a read-only legal/licensing/compliance and release-content audit before modifying licenses, notices, version/tag metadata, or packaging. After approved remediation, build and runtime-test the exact clean release commit; do not promote historical tests or the earlier 0-error/203-warning lifecycle-speed build to verification of that artifact.
+> After N15-B is committed and merged, begin N15-C from the authoritative repository. First record the exact branch, HEAD, and clean/dirty state and confirm the merged N15-B baseline. Preserve the Level 1 standalone unit / Level 2 standalone integration / Level 3 in-game model, Option 3 separate test-project structure, clean production boundaries, and incremental migration of the existing 92 diagnostics. Define N15-C's exact scope and acceptance evidence before implementation. Do not treat the five N15-B `SnapshotTimeline` tests or local workflow validation as ONI runtime, GitHub Actions, or release-artifact verification.
 
 ## Revision history
 
+- **2026-10-30 (common host checkpoint):** Recorded common host source integration and build/standalone evidence without closing runtime gates; prioritized LAN/Steam native, recovery/load/lifetime verification and separately scoped deferred runtime/client/Session refinements. Preserved milestone/release history.
+
+- **2026-10-30 (host target agreement):** Set concrete shared-contract design and ownership review ahead of implementation, followed by unstaged review, authorized build/tests, runtime cancellation verification and separate Client design. No implementation or verification gate marked complete.
+
+- **2026-10-30:** Marked static Session consolidation implemented, made common LAN/Steam startup design the immediate next priority, and retained client admission, roster, Player, synchronization and runtime/release work as pending. Earlier staging/test plans remain historical evidence.
+
+- **2026-10-29 (LAN lifecycle):** Added the incremental LAN host checkpoint gates and separately scoped Steam/networking/UI/Session follow-up. Preserved prior N14/N15 and UI evidence, deferred startup cancellation design, and distinguished reported compilation from unverified runtime behavior.
+
+- **2026-10-17:** Added the independently verified but uncommitted N15-B Option 3 foundation, its five Debug/Release `SnapshotTimeline` passes and local-only workflow validation, and changed the post-merge next priority to N15-C. Preserved synchronization integration as required Level 3 work rather than claiming it complete.
+- **2026-10-17:** Closed N14 implementation with the verified startup/framework commit series and build-only evidence; made synchronization integration testing the next development focus; recorded runtime, compliance, and exact-artifact release gates without claiming runtime verification or release readiness.
+- **2026-10-16:** Recorded the completed N9–N11 identifier-migration cleanup sequence, reported passing audit/build evidence, and the passing connection-only runtime result with strict scope limits. Replaced the immediate next-session release-preparation prompt with a development-environment-first walkthrough beginning with ESLint, default settings, and baseline tooling, followed by lifecycle-stage testing. Exact cleanup hashes and full audit/build output remain to be captured from the authoritative repository.
 - **2026-10-15 (reconciliation):** Reclassified PR #83 lifecycle/readiness as historical verified evidence, recognized the later transport-preserving lifecycle rebuild in current `develop`, converted the old unimplemented transport-preserving milestone into a deferred conformance/runtime audit, and kept PR #86 review plus legal/compliance and exact-artifact verification as the active release path.
 - **2026-10-15:** Replaced the stale next-session transport-preserving-loading priority with the current release sequence: PR #86 regression review, exact baseline selection, legal/licensing/compliance audit, approved remediation, exact-artifact build/runtime verification, then release. Retained the transport-preserving design as deferred and preserved the older `develop`→`experiment` plan as superseded historical context.
 - **2026-10-07:** Made transport-preserving normal world loading the active milestone. Added the host pause-or-catch-up prerequisite, ordered implementation plan, diagnostics, incremental build/test expectations, LiteNetLib plus Steam completion gate, and scope controls; deferred `develop` → `experiment` release integration behind this work.

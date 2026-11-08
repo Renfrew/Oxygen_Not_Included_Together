@@ -1,6 +1,25 @@
-# Oxygen Not Included Together — Architecture
+# Multiplayer: ONI United — Architecture
 
-**Last updated:** 2026-10-15  
+## Current UI checkpoint — 2026-10-29
+
+The `feature/transport` checkpoint uses `ONI_United.UI.Multiplayer.MultiplayerScreen` with one authored `Shared.UI.MultiplayerDialogScreen : KModalScreen` per dialog layer. Join and Host compose prepared sections/rows through Shared APIs and use the reusable `Shared.UI.TabMenu`; native registration, selection and visibility remain inherited. Each instance exposes its inactive `Layouts/Vertical` KScreen template through `GetContentPrefab()`, outside the live Body. Session retains its existing separate content component; its equivalent composition refactor is pending.
+
+Host has one shared Maximum Players section above the transport menu. Steam Settings has password, then Friends Only plus Settings; LAN Settings has Player Name, then port plus Settings. Both use two existing authored rows, with no `HostSettingsRow` constraint. Host has no status/validation-message area or footer version; Start Hosting is left and Cancel right. Domain validation remains authoritative. Unsupported Steam hosting and Settings actions remain unavailable. The retained legacy Host component/prefab exists for authoring references, not the current Host runtime loading path.
+
+The shell/navigation ownership described below remains: Host overlays cached Join, Session replaces content in the originating layer, and closing UI does not disconnect. Current source selects Session when `Session.IsActive || Lifecycle.HasHostOperation`, so StartingHost/PrepareSession/Hosting/Stopping for either host protocol and cleanup failures can use existing Session presentation. A connecting client with neither condition true still has no reachable progress/cancellation presentation; this remains an implementation gap. Windows packaging and partial rendering evidence do not verify gameplay or the full lifecycle. This checkpoint adds no new macOS/Linux UI bundle. See STATUS.md and DEVELOPMENT_ROADMAP.md for evidence and gates. Earlier shell/geometry entries retain their historical scope.
+
+## Dedicated Multiplayer presentation shell — 2026-10-26
+
+The current implementation replaces the InfoDialogScreen shell with one Unity-authored Shared.UI.MultiplayerDialogScreen : KModalScreen per layer. The inactive full-canvas root owns a centered content-sized panel, private header/Close/content/footer bindings and authored 10-unit action spacing with 100 x 32 minimum buttons. Native modal code owns the backdrop, stack and ordinary dismissal. The ordinary MultiplayerScreen coordinator retains Join-under-Host logical ownership (Transform siblings), cached content, Session in the layer that connected, polling, base-only Pause ownership, captured camera restoration and explicit scene/failure cleanup. Dismissing supplies early unlinking; native Close supplies final disposal. Shared editing protection runs before native input, and canBackoutWithRightClick is explicitly true. Closing Session does not disconnect. The prior InfoDialog-specific header/escape access and Harmony prefix are removed; shared native control donors remain. This supersedes the shell choice in the historical entry below, not its navigation decision. Build/Editor/package evidence is separate from the outstanding in-game gate.
+
+
+## Historical native Multiplayer dialog presentation — 2026-10-25 (shell superseded)
+
+The staged UI uses an ordinary game-side coordinator and intact native InfoDialogScreen dialogs: Join is the base, Host stacks above Join, and Session replaces the content of the dialog where connection began. Native dismissal destroys that dialog; cached underlying Join and authored content remain until their owning dialog closes. Shared content owns native options, tabs, inputs and rows. There is no custom dialog adapter or footer hierarchy. One Global coroutine polls domain state; a narrowly scoped input prefix guards focused editing before native Escape handling. Only the base dialog owns Pause; native Close and an explicit scene-loading fallback release camera/Pause ownership. UI closure never disconnects a session. See UI_DESIGN_PRINCIPLES.md. Runtime verification remains outstanding.
+
+
+**Last updated:** 2026-10-30
+
 **Document status:** Recovered and consolidated reference. This document preserves the existing architecture recorded in the `game mod` ChatGPT Project and the local repository; it is not a redesign.
 
 ## 1. Purpose and source of truth
@@ -14,6 +33,8 @@ This document reconciles these recovered sources, in priority order:
 - `REACTABLE_SYNC_ARCHITECTURE_STATUS.md` (2026-09-23), the living Reactable design/status record. The recovered conversation reports commit `2bb0b6b938a7e1b54ae0b7426b1a4879b6af7b07` on the then-current `ren/test-0.8.0` branch, but that Git object could not be verified in the currently fetched repository.
 - Prior `game mod` Project conversations on Reactables, game speed, worker animations, Navigator ownership, and crash fixes.
 - Current local source inspection on 2026-09-27.
+
+`ONI_United_Network_Lifecycle_Protocol_Design.md` is the authoritative approved detailed networking target. D-049 records its supersession of earlier host ownership/order descriptions. The current implementation checkpoint and deferred refinements are distinguished below.
 
 `animation_sync_spec.md` is obsolete and is intentionally excluded as a source.
 
@@ -90,6 +111,83 @@ Every synchronized domain must record:
 - known unsupported cases.
 
 An unlisted domain is not considered synchronized. The host owns grid simulation, buildings, construction, duplicants, creatures, chores, inventories, equipment, simulation networks, research, priorities, schedules, policies, effective speed, and canonical saves. Each player owns local camera, cursor, hover, menus, and selection.
+
+### Current mod initialization and lifecycle ownership
+
+`MultiplayerMod.OnLoad` is the bootstrap coordinator; subsystem owners retain their configuration, asset, transport, and component behavior:
+
+1. Initialize PLib and register `Configuration` options.
+2. Load the required external UI bundle and prefabs through `ModAssets` before patch activation.
+3. Ensure and persist a nonzero `Configuration.Network.PersistentUserId` only when one is not already present.
+4. Create the persistent `Multiplayer_Modules` root with `DontDestroyOnLoad`, attach the singleton `ONI_United.StateMachines.Lifecycle` and add the networking, presentation, synchronization, identity, and Discord components once, and parent `PlantLifecycleSyncer` beneath that root. `ReadyManager.SetupListeners` is called during this startup.
+5. Load the separately embedded cursor/network-indicator bundles, register Debug developer tools where applicable, apply the configured initial transport, and register the PLib version checker.
+6. Treat `base.OnLoad(harmony)` as the Harmony activation boundary; initialize Steam lobby callbacks afterward.
+
+Harmony patches use normal attribute-based registration; the Door patches are not separately registered by startup code. Default packet discovery/registration occurs later in `OnAllModsLoaded`, after its base callback. Bootstrap then calls `Lifecycle.Initialize()` exactly once, entering Idle from Uninitialized after packet registration. `Awake` registers singleton ownership; it does not initialize the machine. `PacketRegistry.TryRegister` logs individual registration failures without rethrowing, so startup continues best-effort and a failed registration can leave the effective registry incomplete. The registered packet-ID fingerprint is derived from registered IDs.
+
+Fatal `OnLoad` exceptions are logged and rethrown. No generic rollback of already-created objects, subscriptions, or loaded assets is implemented; startup rollback remains deferred rather than introducing a second lifecycle framework.
+
+### Static logical Session and networking operations
+
+`Networking.Sessions.Session` is the single static logical data owner (D-046). `SessionController` and `SessionActiveChanged` have been removed. Session stores local/host identities and admitted `Player` records, enforces basic data invariants, and updates admitted-player names. Host initialization inserts the host record; client initialization inserts distinct local and host records. Invalid inputs or an already-established Session are rejected before mutation. Ordinary membership removal cannot remove the host; Reset clears membership and both identities together.
+
+Activity and role are derived, not independently mutable: `IsActive => HostPlayerId != 0`, `IsHost => IsActive && LocalPlayerId == HostPlayerId`, and `IsClient => IsActive && !IsHost`. A selected connection target is not admitted membership. Membership, physical connectivity, and gameplay readiness remain separate concepts. `Session.Players` represents logically admitted participants on host and clients; complete authoritative roster replication to clients is still pending, not established by the current local/host initialization alone.
+
+Session does not authorize network admission, run transport/synchronization operations, change Lifecycle, or emit game notifications. `SessionHandshakeCoordinator` owns the host/capacity admission predicate; handshake processing binds transport identity and validates compatibility before admission mutations. Client roster application may mutate logical data only after authorization by the host protocol; Session's insertion method is not that authorization boundary.
+
+Existing networking operations explicitly emit `MP_HASHES.OnInSessionChanged`: host registration and successful client admission report activation after complete logical initialization; clear/disconnect reports deactivation after Session reset and pending-target clearing, before per-player disconnection notifications and transport closes. `MultiplayerSession` retains those integration operations, pending-target identity, presentation metadata, and existing callbacks; it is no longer a second logical Session data owner. Steam disconnect paths retain their host-identity comparison before the operation that clears Session/target identity. These source-ordering facts do not establish runtime callback safety.
+
+Lifecycle dispatches essential host EventActions; common instance-level `TransportServer` operations coordinate host completion and continuations, while LAN and Steam retain native mechanics. `GameClient` retains client protocol coordination. `GameServer` and obsolete `ServerState` are removed in the current staged host checkpoint. `GameServerHardSync` owns the host synchronization operation and snapshot; current readiness/barrier bookkeeping remains in `ReadyManager`. Consolidating that bookkeeping, possibly removing ReadyManager, is future work. `Player`/`MultiplayerPlayer` have not undergone the deferred redesign: connection, protocol-verification and readiness fields remain on MultiplayerPlayer.
+
+### Current common host Lifecycle checkpoint
+
+**Implemented and source-reviewed; native runtime unverified.** The staged host checkpoint uses `ONI_United.StateMachines.Lifecycle`, one persistent singleton Unity component on `Multiplayer_Modules`, initialized once after packet registration. It has no Update loop or native resource ownership. GameClient and ReadyManager remain in Networking.Runtime; removal of GameServer does not reorganize their responsibilities.
+
+| Event | Allowed phase | Destination before EventAction/callback |
+| --- | --- | --- |
+| Start | Idle | StartingHost |
+| TransportStarted | StartingHost | PrepareSession |
+| SessionPrepared | PrepareSession | Hosting |
+| Stop | StartingHost, PrepareSession, Hosting | Stopping |
+| Stop | Stopping | Stopping, without another transition |
+| Stopped | Stopping | Idle |
+
+Uninitialized rejects operational events. `bool Lifecycle.Handle(Event evt, System.Action callback = null)` rejects with false and invokes neither action. Accepted execution is transition, internally resolved essential EventAction if present, then caller callback last. True means that synchronous sequence returned normally, not asynchronous operation success. Nested events use the current phase; a nested Stop can reject a later SessionPrepared without undoing already executing C# work. Unexpected accepted-action exceptions are logged and rethrown, skipping any later callback; there is no automatic rollback, Idle reset or recovery framework. Propagation does not guarantee that an outer Unity/native callback handler terminates the game. Expected protocol failures instead follow normal cancellation; reported cleanup failure remains Stopping for explicit retry.
+
+Both LiteNetLib and Steam now use selected-instance `TransportServer.Start/Stop`, protocol readiness reporting and confirmed cancellation. The current route is:
+
+```text
+NetworkConfig host operation → selected TransportServer.Start → Start → StartingHost
+  → Lifecycle Start EventAction → configure/protocol callback
+  → native listener/lobby readiness → TransportStarted → PrepareSession
+  → Lifecycle Session-preparation EventAction → SessionPrepared → Hosting
+  → protocol admission notification → retained onStarted callback
+```
+
+The Start EventAction validates inactive Session/disconnected GameClient, delegates scene identity rebuild when in-game, assigns cursor color and initializes host ticking. These are current shared-action dependencies, not central host/client permission coverage. TransportStarted still calls `MultiplayerSession.RegisterAsHost()`: that networking integration invokes logical `Session.BeginHosting`, preserves activation notification after initialization, and initializes host name/readiness and name/presentation metadata. It is not yet replaced by the target direct Session integration. SessionPrepared grants Hosting only after the preparation action returns normally. Hosting means transport and logical host Session readiness, not remote-player presence or synchronization/gameplay readiness.
+
+LiteNetLib owns UDP startup, optional TCP transfer and generic-transfer fallback. SteamworksServer owns listener/poll-group resources; SteamLobby owns the correlated CreateLobby call/result and lobby membership. A successful correlated creation plus local-owner confirmation establishes lobby readiness; creator LobbyEnter is not awaited and must not reset an already prepared host Session. Native callback correctness remains runtime-unverified. Existing discovery/membership remains; unsupported Steam Host UI is not enabled and pre-game ready-up rooms remain deferred.
+
+Stop enters/remains Stopping, then its essential EventAction calls `MultiplayerSession.Clear`, `NetworkIdentityRegistry.Clear` and `SelectToolPatch.UpdateColor` in that order, confirming logical membership is empty before the protocol callback requests cancellation. These domain operations retain their established owners; protocol release uses owned resources independently of the cleared Session. Unexpected essential cleanup exceptions skip the protocol callback and propagate; TransportServer invalidates older pending completion so later native success cannot imply complete cleanup. This is distinct from an expected protocol-reported failure.
+
+Concrete protocols own native cancellation and completion observation. Common TransportServer retains the original unresolved completion/application continuation; repeated Stop does not replace it or duplicate in-flight protocol cleanup. A reported failure discards the continuation, remains Stopping and permits explicit Stop retry of unfinished cleanup, with no automatic retry. Only confirmed essential and protocol cleanup permits Stopped and Idle. NetworkingComponent pumps `PollCancellation` before network servicing, including outside Hosting. TCP resource owners close sockets and observe worker termination without main-thread TCP joins; LiteNetLib's existing internal UDP Stop joins remain a dependency limitation, with no established hang or independently verified TCP termination deadline.
+
+Host save replacement retains the original filename continuation through ordinary repeated Stop, resumes DoLoad only after confirmed cleanup and Idle, and retains the existing post-load hosting path. Failure or disposal discards the continuation; ordinary retry cannot resume a failed load. Application quit/owning destruction initiates shared cleanup and invokes selected-server lifetime release in finally without another frame. Resource owners retain repeat-safe release; only the owning component clears the singleton in finally, and duplicates cannot replace/dispose it. There is no operational Disposed phase or universal event rejection between quit and destruction; access after singleton destruction violates the lifetime contract. NetworkingComponent retains client quit cleanup.
+
+NetworkingComponent now owns host tick initialization/accumulation previously in GameServer. SessionHandshakeCoordinator retains the original host/capacity admission predicate, with transport identity/compatibility authorization before membership mutation. No wire/save, Player, readiness, synchronization or host-authority redesign is implied. Closing UI does not disconnect; no automatic unpause is added.
+
+### Current facade versus approved deferred refinements
+
+`NetworkConfig` currently selects mutable server/client/packet-sender references, routes host/client operations and answers runtime queries; persistent settings remain in Configuration. Its factory-style Get methods are not live-instance getters. The LAN diagnostic Kick path now uses the selected live server. Existing host-operation/pending-Steam-join selection checks do not establish complete ownership protection for all pending clients; generic Stop can miss a pre-admission LAN client. These are limitations, not approved final behavior.
+
+The standalone design and D-049 approve, but this checkpoint does not implement:
+
+- Rename/refine NetworkConfig into **NetworkRuntime**, the sole public routing/selected-live-transport owner; TransportRegistry stays a catalog/factory, with safe selection/replacement and explicit host/client operations.
+- Extract stateless **LifecycleEventActions.cs**, retaining Lifecycle's internal mapping and callback-last dispatch, with no new coordinator or phase authority.
+- Central Lifecycle host/client/selection exclusion, including pending-client cancellation; exact client phases/events/transitions remain undecided and unapproved.
+- Direct **Session.BeginHosting(host)** integration replacing mandatory RegisterAsHost, preserving required notifications, host name/readiness and metadata side effects through appropriate existing owners.
+
+These refinements do not authorize a client/synchronization/UI redesign. The detailed target is not proof that its facade, extraction, client permissions or presentation selection policy already exists.
 
 ## 4. Protocol, transport, and identity
 
@@ -176,6 +274,10 @@ Final gameplay admission remains tied to the synchronized lifecycle, not merely 
 Synchronization pause ownership is now source-defined separately from readiness and overlay presentation. The host pauses once in `GameServerHardSync.PerformHardSync` after `BeginSynchronization` is accepted, and the client pauses once in `GameClient.BeginSynchronization`. `ReadyManager` remains speed-agnostic and generic `MultiplayerOverlay.Show()` calls do not own simulation speed. Synchronization completion does not automatically unpause.
 
 The host pause-acquisition point is therefore no longer unknown. What remains to verify is whether that acquired paused state, together with the current synchronization flow, fully prevents authoritative advancement for the entire baseline/load interval in every relevant path. If host simulation can still advance after snapshot capture and before final admission, a complete catch-up mechanism or a stronger barrier is still required. The existence of a pause call must not be promoted to proof of full interval coverage without source/runtime evidence.
+
+### Approved synchronization direction, not a completed protocol
+
+D-047 records the accepted global-round, stage-dependent join and snapshot-validity behavior. The current implementation uses synchronization IDs and waits for the participant barrier, but rejects some new requests during an active round and clears its snapshot on completion. Admission of additional eligible players into an open round and reuse of a still-valid snapshot beyond that round require further protocol work. This direction does not restore PR #83 intentional reconnect or pending-join machinery. No automatic unpause is permitted.
 
 ### Historical PR #83 readiness / intentional reconnect implementation
 
@@ -371,6 +473,22 @@ Failure recovery follows the smallest safe scope: newer state supersedes replace
 
 For every domain compare host/client state after a known command, after a short idle interval, and after reconnect/hard sync. Paired logs include session, epoch, sequence, host tick, entity ID, command ID, and version.
 
+Verification is organized into three complementary levels:
+
+1. **Level 1 — standalone unit tests.** Test deterministic, game-independent production logic without loading ONI, Unity, Harmony, PLib, transport, or mod-packaging infrastructure. Tests may source-link narrowly selected production files into standalone test projects when this preserves the real production implementation while keeping the test assembly isolated.
+2. **Level 2 — standalone integration tests.** Exercise collaborations among game-independent multiplayer components, serialization, protocol, or other boundaries that can run outside ONI. This level is planned after the Level 1 foundation and must not be described as in-game verification.
+3. **Level 3 — in-game tests.** Retain ONI-dependent diagnostics and multiplayer runtime scenarios for Harmony/Unity/Klei integration, lifecycle ordering, transport behavior, and gameplay synchronization that cannot be established by standalone tests.
+
+The existing 92 in-game diagnostics are migrated incrementally, not replaced wholesale. Each diagnostic should move only when its subject can be tested faithfully at Level 1 or Level 2; ONI-dependent coverage stays at Level 3. Passing standalone tests do not establish mod startup, game integration, multiplayer runtime behavior, or release-artifact correctness.
+
+### N15-B standalone test-project structure and subsequent coverage
+
+The accepted Option 3 structure uses separate test projects under `tests/`, beginning with `tests/Shared.Tests`. A standalone project source-links eligible production files instead of referencing a game-dependent production project or copying production logic. This keeps production boundaries clean and allows later domain-focused test projects without forcing all tests into one assembly.
+
+The first implemented project is `Shared.Tests`, targeting `net10.0` with xUnit. It has no project references and explicitly removes inherited game/mod references and build behaviors. It source-links `Shared/Replication/SnapshotTimeline.cs`; production source is unchanged. Five `SnapshotTimeline` tests passed in both Debug and Release in the independently verified working tree. This proves the tested standalone timeline behavior and project isolation only. The GitHub Actions workflow was structurally inspected and locally validated for clean-runner use, but it has not yet run on GitHub.
+
+The current host checkpoint extends Shared.Tests with source-linked real Lifecycle, TransportServer and Session code using Unity/domain/protocol substitutes. Its 44 added cases comprise 30 transition-table cases and 14 scenarios; the saved full run passed 95 tests. This exercises dispatch, common completion/retry and continuation behavior, not native LAN/Steam, real Unity callbacks or gameplay. STATUS records the exact build/test evidence separately from the historical five-test foundation above.
+
 Minimum whole-mod scenarios cover:
 
 1. new-colony join, ready barrier, first command, disconnect;
@@ -385,7 +503,13 @@ Minimum whole-mod scenarios cover:
 
 | Module | Responsibility |
 | --- | --- |
-| `MultiplayerSession` / common networking | Shared multiplayer-session ownership, including common host/session/player state and shared registration/removal/connect/disconnect semantics |
+| `StateMachines.Lifecycle` | Event permission, transitions and internal essential EventAction dispatch; caller callback last; delegates domain work |
+| `Networking.Transport.TransportServer` | Common instance host operations, protocol completion/diagnostics and retained continuations; no global selection or phase authority |
+| `Networking.Runtime.NetworkingComponent` | Host ticking, cancellation polling and network servicing |
+| `Networking.Sessions.SessionHandshakeCoordinator` | Authorized handshake processing and host/capacity admission policy |
+| `Networking.NetworkConfig` | Current selected transport references, routing and queries; approved NetworkRuntime refinement is deferred |
+| `Networking.Sessions.Session` | Static logical identities, admitted membership, data invariants, metadata mutations and derived activity/role; no network policy or notifications |
+| `MultiplayerSession` / handshake processing | Existing network integration, authorization, registration/removal/connect/disconnect operations, pending targets and explicit game notifications; delegates logical data mutation to Session |
 | Transport implementations | Connections, delivery modes, lobby/file-transfer mechanics, transport handles/maps, and transport-specific identity mechanics; no duplicate ownership of common session state |
 | `GameClient` client lifecycle | Client-side load-generation transition, world reset/rebuild validation, `WorldLoadCompleted`, and final `Ready` production; reconnect only for actual transport loss/fallback |
 | `ReadyManager` / `GameServerHardSync` | Current readiness and synchronization lifecycle. `ReadyManager` remains speed-agnostic; synchronization pause is initiated only at the host/client one-shot synchronization entry points |
@@ -398,6 +522,7 @@ Minimum whole-mod scenarios cover:
 | `ReactableSyncer` | Local Reactable registry and host authorization rendezvous |
 | `GameSpeedSyncer` | Revisioned ordinary pause/speed command and replay, without load-time lifecycle resync ownership |
 | Harmony patches | Observe stable vanilla boundaries and delegate; avoid owning protocol logic |
+| `tests/Shared.Tests` | Standalone source-linked production coverage, including host Lifecycle/common TransportServer with substitutes; no native/game-runtime evidence |
 
 The target code layout separates protocol, session, commands, identity, state, events, save synchronization, diagnostics, and thin ONI patches. Wire schemas should not mirror private ONI constructors or reflection signatures; version-sensitive calls stay behind adapters.
 
@@ -457,11 +582,22 @@ The maintained Project references remain `ARCHITECTURE.md`, `DECISIONS.md`, `STA
 | Milestone 2 Navigator arrival-publication investigation and runtime verification | `game mod` Project conversation plus Local game mod report | Not applicable | 2026-09-28 | Root-cause, implementation, build, and runtime evidence; exact Stop counts and sequence continuity were not traced |
 | Reactable lifecycle discussions (`Reactable Step One`, `Patch Reactable Synchronization`) | ChatGPT Project conversations | Not applicable | 2026-09-27 | Previous observations plus architectural discussion |
 | Join-overlay/readiness implementation and LiteNetLib verification | `game mod` Project session; GitHub issues #78–#81 and PR #83 | PR head `cd14ac71bccb1a960f59ba92df0a4abf8cdb1c27`; merged to `develop` as `c1c93cb5ab2ae839d28d36d32eff9a565b4f111f` | 2026-10-07 | Source review plus single-joining-client LiteNetLib runtime evidence; Steam source-only; Riptide excluded |
+| N15-B independent verification report | `game mod` Project conversation | Working tree at verified HEAD `4ddb2ca893e29adab0db39b2a0747d45641c1b3f` on `refactor/mod-lifecycle`; implementation uncommitted | 2026-10-17 | `Shared.Tests` structure/isolation review; five `SnapshotTimeline` tests passed in Debug and Release; workflow locally validated only; no ONI runtime or GitHub Actions run |
 
 `animation_sync_spec.md` is obsolete and is not evidence for this architecture.
 
 ## Revision history
 
+- **2026-10-30 (common host checkpoint):** Reconciled implemented Lifecycle EventActions/common TransportServer ownership, Session-before-Hosting, confirmed cleanup, ticking and admission relocation; distinguished deferred NetworkRuntime/client/Session integration refinements and native runtime gates. See D-049.
+
+- **2026-10-30 (host target agreement):** Added D-048 target ownership and conceptual event actions, explicitly separating Hosting permission from subsequent Session activation and placing deactivation/shared cleanup in Stop. Retained the committed LAN ordering as implementation history; interfaces and client design remain pending.
+
+- **2026-10-30:** Recorded static Session ownership and derived roles, explicit network-owned notifications/target cleanup, remaining roster/Player/readiness work, and the distinction between current synchronization mechanics and approved D-047 direction.
+
+- **2026-10-29 (LAN lifecycle):** Recorded the persistent event/action host machine, current StateMachines/Runtime paths, repeated Stop and component-lifetime contracts, transport/domain cleanup ownership, load continuation limits, and current Session selection. Source inspection and user-reported compilation do not establish runtime behavior.
+
+- **2026-10-17:** Recorded the accepted three-level verification architecture, incremental migration policy for the existing 92 diagnostics, Option 3 standalone test-project structure, and the first isolated `Shared.Tests` implementation. Preserved the evidence boundary: five `SnapshotTimeline` tests passed Debug/Release, while GitHub Actions and ONI runtime remain unverified.
+- **2026-10-17:** Recorded the completed N14 startup/framework ownership and lifecycle: PLib/configuration and asset prerequisites, persistent identity/components, Harmony activation boundary, attribute-owned patches, and best-effort packet registration. Explicitly separated build evidence from deferred runtime verification and startup rollback.
 - **2026-10-15 (reconciliation):** Reclassified the PR #83 pending-join / intentional disconnect-reconnect flow as historical verified implementation evidence rather than current lifecycle architecture. Updated the current boundary to the later transport-preserving `develop` lifecycle, preserved exact-conformance uncertainty for the October 7 generation/reset proposal, and reconciled the formerly unknown pause mechanism with the accepted one-shot host/client pause entry points while keeping full-interval advancement coverage unverified.
 - **2026-10-15:** Removed lifecycle-specific speed coupling from the accepted architecture. Kept `ReadyManager` speed-agnostic, rejected `IsSimulationLocked` and load-time `GameSpeedSyncer.RequestReSync`/guards, assigned pause initiation to the accepted host/client synchronization entry points, and specified no automatic unpause. Clarified the intended session-centralization boundary while keeping PR #86 implementation and regression status separate from accepted architecture.
 - **2026-10-07:** Approved the transport-preserving normal world-load architecture. Separated transport/session lifetime from per-generation gameplay admission; added centralized world reset, recursive control-packet classification, discard-not-buffer loading behavior, verified reconstruction after `Game.OnSpawnComplete`, `WorldLoadCompleted(loadGeneration)` acknowledgement, and final-`Ready` admission. Recorded host-simulation advancement/catch-up as a blocking implementation prerequisite and retained reconnect for actual transport loss until LiteNetLib and Steam validation.

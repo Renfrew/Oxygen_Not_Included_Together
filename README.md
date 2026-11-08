@@ -1,8 +1,8 @@
 ![Logo](https://i.imgur.com/GCIbhpn.png)
 
-# Oxygen Not Included Together — Community Updated Fork
+# Multiplayer: ONI United
 
-A community-maintained fork of **Oxygen Not Included Together**, an experimental multiplayer mod for _Oxygen Not Included_.
+**Multiplayer: ONI United** is an independent, community-maintained multiplayer mod for _Oxygen Not Included_, built from the MIT-licensed history of **Oxygen Not Included Together**.
 
 This fork focuses on updating the original project, fixing multiplayer synchronization issues, improving stability, and maintaining compatibility with current versions of the game.
 
@@ -43,7 +43,7 @@ Created by **Luke Rapkin** and contributors.
 
 Original repository:
 
-https://github.com/Lyraedan/Oxygen_Not_Included_Together
+https://github.com/Renfrew/Oxygen_Not_Included_Together
 
 This community fork is maintained by **Liang Chen** and contains additional fixes, compatibility updates, and multiplayer development.
 
@@ -51,13 +51,16 @@ This project is an unofficial community project and is **not affiliated with, en
 
 ### Release Lineage and License Boundary
 
-The `0.8.0.5` release line represented by PR #63 is the final release intended to track and integrate changes from the original upstream repository.
+The published `0.8.0.5` release represented by PR #63 is the final release that tracks and integrates changes from the original upstream repository. The release-line merge is `2384d2bc8da37a69965b9409d047acc65af33f3e`; its `develop` parent containing the `0.8.0.5` version change is `c7e876174e0a28bd2d6bfd889a83405d07dc3220`. GitHub tag `v0.8.0.5` points to the release merge, establishing `2384d2bc8da37a69965b9409d047acc65af33f3e` as the published release boundary.
 
 The last upstream code imported into this release line is upstream commit `1c9d7226c7f9dbde7c303a11af4adf5fd5c2ffbb`, merged on October 5, 2026 while that code was published under the MIT License. The upstream license was changed later, on October 11, 2026. Those later source-available license commits are not part of this release's Git ancestry.
 
-Future releases from this repository are intended to be developed as an independent community-maintained project. Upstream changes made after the license transition will not be incorporated unless their licensing and any required permissions are reviewed separately.
+Development version `0.9.0` begins the independent project line. Upstream changes made after the verified MIT baseline will not be incorporated unless the specific material has separately verified compatible licensing or written permission. Inherited material remains under the retained MIT License and attribution.
+
+The independent project is publicly named **Multiplayer: ONI United**. Its package, assembly, static, configuration, development-folder, repository, and Workshop identities have moved to the independent project line. The inherited C# namespaces remain unchanged for now. The former external mod-integration API and dedicated-server application are not supported in `0.9.0`.
 
 See [`LICENSE.md`](LICENSE.md), [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), and [`ASSET_PROVENANCE.md`](ASSET_PROVENANCE.md) for the release's license, bundled-component notices, and asset review status.
+See [`docs/INDEPENDENT_DEVELOPMENT.md`](docs/INDEPENDENT_DEVELOPMENT.md) for the `0.9.0` identifier audit and migration boundary.
 
 ---
 
@@ -132,8 +135,10 @@ You will need:
 - Visual Studio with C#/.NET development support
 - .NET Framework 4.7.2
 - A local installation of Oxygen Not Included
-- .NET SDK required by the assembly publicizer tooling
+- .NET SDK 10.0.401 (configured via `global.json`)
 - Git
+
+Visual Studio installations used with this repository must support .NET SDK `10.0.401`. Verify SDK support in Visual Studio Installer for your installed edition/workloads.
 
 ---
 
@@ -148,7 +153,13 @@ cd Oxygen_Not_Included_Together
 
 ## 2. Open the Solution
 
-Open the `.sln` file in Visual Studio.
+Open `ONI_United.sln` in Visual Studio, or open the repository folder in VS Code.
+
+The repository uses `global.json` at the solution root to select .NET SDK `10.0.401` with patch roll-forward.
+
+The repository also includes a minimal root `.editorconfig` for shared baseline editor behavior (encoding, line endings, and newline handling). Keep personal editor preferences in local user/editor settings.
+
+If you use VS Code, `.vscode/extensions.json` includes an optional C# extension recommendation. It is not required to build the project.
 
 ---
 
@@ -167,6 +178,8 @@ Directory.Build.props.user
 ```
 
 `Directory.Build.props.user` contains machine-specific paths and should not be committed.
+
+`Directory.Build.props.user` is intentionally local and ignored by Git. The build imports it conditionally when present.
 
 Configure `GameLibsFolder` to point to your local Oxygen Not Included managed assemblies.
 
@@ -194,6 +207,10 @@ Run:
 dotnet tool restore
 ```
 
+> macOS SSH note  
+> In non-interactive SSH sessions, `dotnet` may not be on `PATH` even when installed at `/usr/local/share/dotnet/dotnet`.  
+> Prefer standard shell initialization so SSH sessions include .NET on `PATH`, or invoke that documented executable path explicitly in automation.
+
 The project uses an assembly publicizer so internal Oxygen Not Included game APIs can be referenced during development.
 
 ### Linux
@@ -202,7 +219,7 @@ Linux development may require .NET 6.0 for the publicizer.
 
 See the original setup documentation:
 
-https://github.com/Lyraedan/Oxygen_Not_Included_Together/wiki/Setting-up-publiciser-requirement-on-Linux
+https://github.com/Renfrew/Oxygen_Not_Included_Together/wiki/Setting-up-publiciser-requirement-on-Linux
 
 ---
 
@@ -212,11 +229,23 @@ Visual Studio will normally restore packages automatically.
 
 They can also be restored manually if necessary.
 
+For CLI/VS Code workflows, run:
+
+```bash
+dotnet restore ONI_United.sln
+```
+
 ---
 
 ## 6. Build
 
 Build the solution from Visual Studio.
+
+For CLI/VS Code workflows, run:
+
+```bash
+dotnet build ONI_United.sln
+```
 
 The first build creates the publicized Oxygen Not Included reference assemblies.
 
@@ -228,6 +257,24 @@ If this occurs:
 2. Restart Visual Studio.
 3. Reopen the solution.
 4. Build again.
+
+## Testing
+
+The project uses three testing levels:
+
+- **Unit tests** in `tests/Shared.Tests/` cover deterministic logic without requiring Oxygen Not Included or Unity.
+- **Standalone integration tests** will be added under `tests/ONI_United.IntegrationTests/` to exercise component interactions without launching the game.
+- **In-game integration tests** remain separate from unit tests and will use the developer diagnostics in `ONI_United/DebugTools/IntegrationTests/` for real multiplayer scenarios.
+
+Run the standalone unit tests locally with:
+
+```bash
+dotnet test tests/Shared.Tests/Shared.Tests.csproj --configuration Debug
+dotnet test tests/Shared.Tests/Shared.Tests.csproj --configuration Release
+```
+
+Existing in-game diagnostics remain supported; migration to standalone tests is incremental. GitHub Actions initially runs only the standalone unit-test project.
+Use the test-project path rather than solution-wide `dotnet test`, which can build production projects that require local game assemblies.
 
 ---
 

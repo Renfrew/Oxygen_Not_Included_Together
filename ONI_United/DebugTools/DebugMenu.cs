@@ -1,0 +1,182 @@
+using ONI_United.Core;
+using ONI_United.Networking;
+using ONI_United.Networking.Runtime;
+using ONI_United.Networking.Sessions.States;
+using ONI_United.Networking.Transports.Steamworks;
+using Steamworks;
+using ONI_United.Patches.ToolPatches;
+using System;
+using Shared.Profiling;
+using UnityEngine;
+using ONI_United;
+
+namespace ONI_United.DebugTools
+{
+	public class DebugMenu : MonoBehaviour
+	{
+		private static DebugMenu _instance;
+
+		private bool showMenu = false;
+		private Rect windowRect = new Rect(10, 10, 250, 300); // Position and size
+		private HierarchyViewer hierarchyViewer;
+		private DebugConsole debugConsole;
+
+		private Vector2 scrollPosition = Vector2.zero;
+
+		// LAN
+        private string lanHostPort = "7777";
+        private string[] hostTransportOptions = new string[]
+        {
+            "Steam",
+            "LAN"
+        };
+        private int selectedHostTransport = 0;
+
+        private string lanJoinAddress = "127.0.0.1:7777";
+
+		public static void Init()
+		{
+            using var _ = Profiler.Scope();
+
+			if (_instance != null) return;
+
+			GameObject go = new GameObject("ONI_Together_DebugMenu");
+			DontDestroyOnLoad(go);
+			_instance = go.AddComponent<DebugMenu>();
+
+            _instance.lanHostPort = Configuration.Instance.Host.LanPort.ToString();
+
+            _instance.lanJoinAddress = $"{Configuration.Instance.Client.LanSettings.Ip}:{Configuration.Instance.Client.LanSettings.Port}";
+
+        }
+
+		private void Awake()
+		{
+            using var _ = Profiler.Scope();
+
+			hierarchyViewer = gameObject.AddComponent<HierarchyViewer>();
+			//debugConsole = gameObject.AddComponent<DebugConsole>();
+		}
+
+		private void Update()
+		{
+            using var _ = Profiler.Scope();
+
+            return; // Disabled, no longer in use (for now)
+            if (Input.GetKeyDown(KeyCode.F2) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+			{
+				showMenu = !showMenu;
+			}
+		}
+
+		private void OnGUI()
+		{
+            using var _ = Profiler.Scope();
+
+			if (!showMenu) return;
+
+			GUIStyle windowStyle = new GUIStyle(GUI.skin.window) { padding = new RectOffset(10, 10, 20, 20) };
+			windowRect = GUI.ModalWindow(888, windowRect, DrawMenuContents, "DEBUG MENU", windowStyle);
+		}
+
+        private void DrawMenuContents(int windowID)
+        {
+            using var _ = Profiler.Scope();
+
+            scrollPosition = GUILayout.BeginScrollView(
+                scrollPosition,
+                false,
+                true,
+                GUILayout.Width(windowRect.width - 20),
+                GUILayout.Height(windowRect.height - 40)
+            );
+
+            GUILayout.Label("Hosting", GUI.skin.box);
+            GUILayout.Label("Transport:");
+            selectedHostTransport = GUILayout.Toolbar(selectedHostTransport, hostTransportOptions);
+
+            GUILayout.Space(5);
+
+            GUILayout.Label("Port:");
+            lanHostPort = GUILayout.TextField(lanHostPort);
+
+            if (GUILayout.Button("Start Hosting"))
+            {
+                if(selectedHostTransport == 0)
+                {
+                    NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.STEAMWORKS;
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
+                    NetworkRuntime.UpdateTransport(selected_transport);
+                    Configuration.Instance.Save();
+
+                    NetworkRuntime.StartServer();
+                    return;
+                }
+
+                if (int.TryParse(lanHostPort, out int port))
+                {
+                    DebugConsole.Log($"[LAN] Hosting on port {port}");
+
+                    Configuration.Instance.Host.LanPort = port;
+
+                    NetworkRuntime.NetworkTransport selected_transport = NetworkRuntime.NetworkTransport.LITENETLIB;
+                    Configuration.Instance.Network.Transport = (int)selected_transport;
+                    NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
+
+                    Configuration.Instance.Save();
+
+                    NetworkRuntime.StartServer();
+                }
+                else
+                {
+                    DebugConsole.LogError("Invalid port!");
+                }
+            }
+            if (GUILayout.Button("Stop Hosting"))
+            {
+                NetworkRuntime.Stop();
+            }
+
+
+            GUILayout.Space(10);
+
+            GUILayout.Label("LAN Join", GUI.skin.box);
+
+            GUILayout.Label("Server Address:");
+            lanJoinAddress = GUILayout.TextField(lanJoinAddress);
+
+            if (GUILayout.Button("Join Server"))
+            {
+                NetworkRuntime.UpdateTransport(NetworkRuntime.NetworkTransport.LITENETLIB);
+                DebugConsole.Log($"[LAN] Joining {lanJoinAddress}");
+
+                string[] address = lanJoinAddress.Split(':');
+                if(address.Length != 2)
+                {
+                    DebugConsole.LogError("Invalid address format! Use IP:Port", false);
+                    return;
+                }
+
+                if (int.TryParse(address[1], out int port))
+                {
+                    Configuration.Instance.Client.LanSettings.Ip = address[0];
+                    Configuration.Instance.Client.LanSettings.Port = port;
+                    Configuration.Instance.Save();
+
+                    Join(address[0], port);
+                }
+            }
+
+            GUILayout.EndScrollView();
+
+            GUI.DragWindow();
+        }
+
+        void Join(string ip, int port)
+        {
+            using var _ = Profiler.Scope();
+
+            GameClient.ConnectToHost(ip: ip, port: port);
+        }
+	}
+}

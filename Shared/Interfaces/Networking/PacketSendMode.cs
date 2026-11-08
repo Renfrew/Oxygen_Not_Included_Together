@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace ONI_Together.Networking
+namespace Shared.Interfaces.Networking
 {
     /// <summary>
     /// Describes how a packet should be delivered across the network.
-    /// Transport-agnostic abstraction that maps to the underlying networking backend (e.g. Steam, Riptide).
+    /// Transport-agnostic abstraction that maps to the underlying networking backend (e.g. Steam, LiteNetLib).
     /// <para />
     /// Based off Steam networking types: https://partner.steamgames.com/doc/api/steamnetworkingtypes
     /// </summary>
